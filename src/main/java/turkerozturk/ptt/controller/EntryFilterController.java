@@ -113,20 +113,31 @@ public class EntryFilterController {
     @PostMapping("/previous")
     public String previousRange(@ModelAttribute("filterDto") FilterDto filterDto,
                                 Model model) {
-        // Kaç günlük aralık?
+
+        // 1) Tarih aralığını kaydır
         int rangeLength = filterService.getRangeLength(filterDto);
-        // Tarihi geri kaydır
         filterDto.setStartDate(filterDto.getStartDate().minusDays(rangeLength));
         filterDto.setEndDate(filterDto.getEndDate().minusDays(rangeLength));
 
-        // Aynı filtre sorgusunu çalıştır
+        // 2) Filtreye uyan entries'leri çek
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
+        // 3) Date range listesi oluştur
+        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+
+        // 4) Pivot Data oluştur
+        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
+        // 5) Modele ekle
         model.addAttribute("entries", filteredEntries);
+        model.addAttribute("pivotData", pivotData);
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
+
+        // 6) Aynı form sayfasına dön
         return "entries/filter-form";
     }
+
 
     /**
      * Tarih aralığını 'sonraki periyot' kadar kaydırıp sonuçları tekrar gösterir.
@@ -143,7 +154,14 @@ public class EntryFilterController {
         // Aynı filtre sorgusunu çalıştır
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
+        // 3) Date range listesi oluştur
+        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+
+        // 4) Pivot Data oluştur
+        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
         model.addAttribute("entries", filteredEntries);
+        model.addAttribute("pivotData", pivotData);
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
