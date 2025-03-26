@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Entry Filtre</title>
+</head>
+<body>
+<a href="/">home</a>
+
+<h1>Entry Filtre Formu</h1>
+
+<!-- Validasyon hataları varsa gösterelim -->
+<!-- TODO
+<div th:if="${#fields.hasErrors('*')}">
+    <p style="color:red" th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
+</div>
+-->
+
+<form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
+
+    <!-- TOPIC SEÇİMİ (ÇOKLU) -->
+    <label>Topic Seçimi (çoklu):</label>
+    <select th:field="*{topicIds}" multiple size="5">
+        <option th:each="t : ${allTopics}"
+                th:value="${t.id}"
+                th:text="${t.name}">Topic Name
+        </option>
+    </select>
+    <br><br>
+
+    <!-- TARIH ARALIĞI -->
+    <label>Başlangıç Tarihi:</label>
+    <input type="date" th:field="*{startDate}" />
+    <br><br>
+
+    <label>Bitiş Tarihi:</label>
+    <input type="date" th:field="*{endDate}" />
+    <br><br>
+
+    <!-- STATUS SEÇİMİ (ÇOKLU) -->
+    <label>Status (çoklu):</label>
+    <select th:field="*{statuses}" multiple size="3">
+        <option value="0">Not Marked (0)</option>
+        <option value="1">Done (1)</option>
+        <option value="2">Warning (2)</option>
+    </select>
+    <br><br>
+
+    <!-- Filtrele Butonu -->
+    <button type="submit">Filtrele</button>
+</form>
+
+<!-- Önceki ve Sonraki Butonları -->
+<form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
+    <input type="hidden" th:field="*{topicIds}"/>
+    <input type="hidden" th:field="*{startDate}"/>
+    <input type="hidden" th:field="*{endDate}"/>
+    <input type="hidden" th:field="*{statuses}"/>
+    <button type="submit">Önceki</button>
+</form>
+
+<form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
+    <input type="hidden" th:field="*{topicIds}"/>
+    <input type="hidden" th:field="*{startDate}"/>
+    <input type="hidden" th:field="*{endDate}"/>
+    <input type="hidden" th:field="*{statuses}"/>
+    <button type="submit">Sonraki</button>
+</form>
+
+<!-- Temizle Butonu -->
+<form th:action="@{/entry-filter/clear}" method="post" style="display:inline;">
+    <button type="submit">Temizle</button>
+</form>
+
+<hr/>
+
+<!-- Filtre Sonuçları (entries) -->
+<div th:if="${entries != null}">
+    <h2>Sonuçlar</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Topic</th>
+            <th>DateMillisYmd</th>
+            <th>Status</th>
+            <th>Note</th>
+        </tr>
+        <tr th:each="entry : ${entries}">
+            <td th:text="${entry.id}">1</td>
+            <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+            <td th:text="${entry.dateMillisYmd}"></td>
+            <td th:text="${entry.status}"></td>
+            <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
