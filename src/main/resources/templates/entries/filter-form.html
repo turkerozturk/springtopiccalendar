@@ -4,39 +4,36 @@
     <title>Entry Filtre</title>
 </head>
 <body>
-<a href="/">home</a>
-
 <h1>Entry Filtre Formu</h1>
 
-<!-- Validasyon hataları varsa gösterelim -->
+<!-- Validasyon hataları -->
 <!-- TODO
 <div th:if="${#fields.hasErrors('*')}">
     <p style="color:red" th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
 </div>
 -->
-
 <form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
 
-    <!-- TOPIC SEÇİMİ (ÇOKLU) -->
+    <!-- Topic Çoklu -->
     <label>Topic Seçimi (çoklu):</label>
     <select th:field="*{topicIds}" multiple size="5">
         <option th:each="t : ${allTopics}"
                 th:value="${t.id}"
-                th:text="${t.name}">Topic Name
+                th:text="${t.name}">
         </option>
     </select>
     <br><br>
 
-    <!-- TARIH ARALIĞI -->
+    <!-- Tarih Aralığı -->
     <label>Başlangıç Tarihi:</label>
-    <input type="date" th:field="*{startDate}" />
+    <input type="date" th:field="*{startDate}"/>
     <br><br>
 
     <label>Bitiş Tarihi:</label>
-    <input type="date" th:field="*{endDate}" />
+    <input type="date" th:field="*{endDate}"/>
     <br><br>
 
-    <!-- STATUS SEÇİMİ (ÇOKLU) -->
+    <!-- Status Çoklu -->
     <label>Status (çoklu):</label>
     <select th:field="*{statuses}" multiple size="3">
         <option value="0">Not Marked (0)</option>
@@ -45,35 +42,35 @@
     </select>
     <br><br>
 
-    <!-- Filtrele Butonu -->
     <button type="submit">Filtrele</button>
 </form>
 
-<!-- Önceki ve Sonraki Butonları -->
+<!-- Önceki & Sonraki & Temizle -->
 <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
-    <input type="hidden" th:field="*{topicIds}"/>
-    <input type="hidden" th:field="*{startDate}"/>
-    <input type="hidden" th:field="*{endDate}"/>
-    <input type="hidden" th:field="*{statuses}"/>
+    <!-- Gizli alanlar -->
+    <input type="hidden" th:field="*{topicIds}" />
+    <input type="hidden" th:field="*{startDate}" />
+    <input type="hidden" th:field="*{endDate}" />
+    <input type="hidden" th:field="*{statuses}" />
     <button type="submit">Önceki</button>
 </form>
 
 <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
-    <input type="hidden" th:field="*{topicIds}"/>
-    <input type="hidden" th:field="*{startDate}"/>
-    <input type="hidden" th:field="*{endDate}"/>
-    <input type="hidden" th:field="*{statuses}"/>
+    <!-- Gizli alanlar -->
+    <input type="hidden" th:field="*{topicIds}" />
+    <input type="hidden" th:field="*{startDate}" />
+    <input type="hidden" th:field="*{endDate}" />
+    <input type="hidden" th:field="*{statuses}" />
     <button type="submit">Sonraki</button>
 </form>
 
-<!-- Temizle Butonu -->
 <form th:action="@{/entry-filter/clear}" method="post" style="display:inline;">
     <button type="submit">Temizle</button>
 </form>
 
 <hr/>
 
-<!-- Filtre Sonuçları (entries) -->
+<!-- Filtre Sonuçları -->
 <div th:if="${entries != null}">
     <h2>Sonuçlar</h2>
     <table border="1">

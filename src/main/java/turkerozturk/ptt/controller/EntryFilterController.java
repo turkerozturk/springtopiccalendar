@@ -14,7 +14,6 @@ import turkerozturk.ptt.service.FilterService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-
 @Controller
 @RequestMapping("/entry-filter")
 public class EntryFilterController {
@@ -32,37 +31,36 @@ public class EntryFilterController {
     }
 
     /**
-     * Filtre formunu ilk kez açarken varsayılan değerleri dolduralım:
-     * - Bu haftanın başlangıcı (parametrik, default Monday)
-     * - Bu haftanın bitişi
+     * Filtre formunu ilk kez açarken varsayılan değerleri doldurup
+     * otomatik olarak filtre sorgusunu çalıştırıp ekrana sonuçları gönderir.
      */
     @GetMapping("/form")
     public String filterForm(Model model) {
-
+        // 1) Varsayılan DTO Oluştur
         FilterDto filterDto = new FilterDto();
 
-        // Parametrik haftanın ilk günü => Pazartesi (veya sistem ayarınıza göre)
+        // 2) Bu haftanın başı ve sonu (örneğin pazartesi - pazar)
         LocalDate today = LocalDate.now();
-
-        // Örnek: pazartesiyi bulalım
         LocalDate startOfWeek = filterService.getStartOfWeek(today, DayOfWeek.MONDAY);
-        // Aynı şekilde haftanın son günü
         LocalDate endOfWeek = startOfWeek.plusDays(6);
 
         filterDto.setStartDate(startOfWeek);
         filterDto.setEndDate(endOfWeek);
+        // topicIds/statuses boş => “hepsi” gibi davranacak
 
-        // topic ve status çoklu seçim için şu an boş
-        // filterDto.getTopicIds() => boş
-        // filterDto.getStatuses() => boş
+        // 3) Filter sorgusunu çalıştır (ilk açılışta da verileri gösterelim)
+        List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
+        // 4) Model’e ekle
         model.addAttribute("filterDto", filterDto);
+        model.addAttribute("entries", filteredEntries);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
     }
 
     /**
-     * Filtre uygulanınca => validasyon + sonuç listesi
+     * Filtre formunda 'Filtrele' butonuna tıklayınca çalışır.
+     * Validasyon hatası yoksa sonuçları gösterir.
      */
     @PostMapping("/apply")
     public String applyFilter(@Valid @ModelAttribute("filterDto") FilterDto filterDto,
@@ -73,49 +71,63 @@ public class EntryFilterController {
             return "entries/filter-form";
         }
 
-        // Validasyon hatası yoksa DB'den filtreye uyan kayıtları çekelim:
+        // Filtre sorgusu
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
         model.addAttribute("entries", filteredEntries);
-        // Filtre formunu da tekrar gösterelim ama entries-list.html gibi de yapabilirsiniz
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
     }
 
     /**
-     * Tarih aralığını 'önceki periyot' kadar kaydırıp tekrar formu gösterir.
+     * Tarih aralığını 'önceki periyot' kadar kaydırıp sonuçları tekrar gösterir.
+     * Yani 'Filtrele' butonuna basmaya gerek kalmadan veriler listelenecek.
      */
     @PostMapping("/previous")
     public String previousRange(@ModelAttribute("filterDto") FilterDto filterDto,
                                 Model model) {
+        // Kaç günlük aralık?
         int rangeLength = filterService.getRangeLength(filterDto);
-        // startDate ve endDate'i rangeLength kadar geri kaydıralım
+        // Tarihi geri kaydır
         filterDto.setStartDate(filterDto.getStartDate().minusDays(rangeLength));
         filterDto.setEndDate(filterDto.getEndDate().minusDays(rangeLength));
 
+        // Aynı filtre sorgusunu çalıştır
+        List<Entry> filteredEntries = filterService.filterEntries(filterDto);
+
+        model.addAttribute("entries", filteredEntries);
+        model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
     }
 
     /**
-     * Tarih aralığını 'sonraki periyot' kadar kaydırıp tekrar formu gösterir.
+     * Tarih aralığını 'sonraki periyot' kadar kaydırıp sonuçları tekrar gösterir.
      */
     @PostMapping("/next")
     public String nextRange(@ModelAttribute("filterDto") FilterDto filterDto,
                             Model model) {
+        // Kaç günlük aralık?
         int rangeLength = filterService.getRangeLength(filterDto);
+        // Tarihi ileri kaydır
         filterDto.setStartDate(filterDto.getStartDate().plusDays(rangeLength));
         filterDto.setEndDate(filterDto.getEndDate().plusDays(rangeLength));
 
+        // Aynı filtre sorgusunu çalıştır
+        List<Entry> filteredEntries = filterService.filterEntries(filterDto);
+
+        model.addAttribute("entries", filteredEntries);
+        model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
     }
 
     /**
-     * Filtreyi temizle => varsayılan değerlere dön
+     * Filtreyi temizle => varsayılan değerlere dön (yani /form endpointine yönlendir).
+     * Orada sayfa açılırken otomatik filtre sorgusu yapıyor zaten.
      */
     @PostMapping("/clear")
-    public String clearFilter(Model model) {
-        return "redirect:/entry-filter/form"; // yeniden varsayılan doldurup form göster
+    public String clearFilter() {
+        return "redirect:/entry-filter/form";
     }
 }
