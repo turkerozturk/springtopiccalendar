@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Topic Form</title>
+</head>
+<body>
+<h1 th:if="${topicDTO.id != null}">Edit Topic</h1>
+<h1 th:if="${topicDTO.id == null}">Create Topic</h1>
+
+<form th:object="${topicDTO}"
+      th:action="${topicDTO.id != null} ? @{/topics/update/{id}(id=${topicDTO.id})} : @{/topics}"
+      method="post">
+
+    <div>
+        <label for="name">Topic Name:</label>
+        <input type="text" id="name" th:field="*{name}"/>
+    </div>
+
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" th:field="*{description}"></textarea>
+    </div>
+
+    <!-- Category Seçimi -->
+    <div>
+        <label for="category">Category:</label>
+        <select id="category" th:field="*{category.id}">
+            <!-- Yukarıda controller'da 'categories' isminde bir liste göndermiştik -->
+            <option th:each="cat : ${categories}"
+                    th:value="${cat.id}"
+                    th:text="${cat.name}">
+            </option>
+        </select>
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<br>
+<a th:href="@{/topics}">Back to Topic List</a>
+
+</body>
+</html>

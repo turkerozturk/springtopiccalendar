@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Entry Formu</title>
+</head>
+<body>
+<h1 th:text="${#strings.isEmpty(entry.id) ? 'Yeni Entry Ekle' : 'Entry Güncelle'}"></h1>
+
+<form th:action="@{/entries/save}" th:object="${entry}" method="post">
+
+    <!-- ID (gizli alan) -->
+    <input type="hidden" th:field="*{id}"/>
+
+    <!-- TOPIC SEÇİM ALANI -->
+    <label for="topic">Topic:</label>
+    <select th:field="*{topic.id}" id="topic">
+        <option th:each="t : ${topics}"
+                th:value="${t.id}"
+                th:text="${t.name}">Topic Adı
+        </option>
+    </select>
+    <br/><br/>
+
+    <!-- dateMillisYmd (Elle milis girişi) -->
+    <label for="dateMillisYmd">Milisaniye (13 hane):</label>
+    <input type="text"
+           id="dateMillisYmd"
+           th:field="*{dateMillisYmd}"
+            />
+    <br><br>
+
+    <!-- Alternatif: Date Picker (tıklayarak seçim) -->
+    <label for="datePicker">Tarih Seç:</label>
+    <input type="date" id="datePicker" onchange="convertDateToEpoch()" />
+    <br><br>
+
+    <!-- status -->
+    <label for="status">Status:</label>
+    <select th:field="*{status}" id="status">
+        <option value="0">Not Marked</option>
+        <option value="1">Done</option>
+        <option value="2">Warning</option>
+    </select>
+    <br/><br/>
+
+    <!-- NOTE CONTENT -->
+    <label for="note_content">Note:</label>
+    <textarea th:field="*{note.content}" id="note_content"></textarea>
+    <br/><br/>
+
+    <button type="submit">Kaydet</button>
+</form>
+
+<br/>
+<a th:href="@{/entries}">Listeye Dön</a>
+
+
+<script>
+    /**
+     * Date Picker’da tarih seçilince,
+     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
+     * dateMillisYmd input’una yazan basit fonksiyon.
+     */
+    function convertDateToEpoch() {
+        const selectedDate = document.getElementById('datePicker').value; // yyyy-MM-dd
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            // Aylar 0-index olduğu için (month - 1)
+            const dateObj = new Date(year, month - 1, day);
+            const epochMillis = dateObj.getTime(); // Tarihin milis cinsinden değeri
+            document.getElementById('dateMillisYmd').value = epochMillis;
+        }
+    }
+</script>
+</body>
+</html>

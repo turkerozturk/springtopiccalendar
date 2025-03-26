@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Topic List</title>
+</head>
+<body>
+<a href="/">home</a>
+
+<h1>Topic List</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Topic Name</th>
+        <th>Description</th>
+        <th>Category Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="topic : ${topics}">
+        <td th:text="${topic.id}">1</td>
+        <td th:text="${topic.name}">Sample Topic</td>
+        <td th:text="${topic.description}">Sample Description</td>
+        <td th:text="${topic.category.name}">Category Name</td>
+        <td>
+            <a th:href="@{/topics/edit/{id}(id=${topic.id})}">Edit</a> |
+            <a th:href="@{/topics/delete/{id}(id=${topic.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<a th:href="@{/topics/create}">Create New Topic</a>
+
+</body>
+</html>

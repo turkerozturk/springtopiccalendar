@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <head>
+
+        <title>CherryTree WebViewer</title>
+
+        <div th:replace="~{common/meta :: headerMeta}"></div>
+
+        <div th:replace="~{common/meta :: headerCssLibraries}"></div>
+
+        <section layout:fragment="pageSpecificCssStyles"></section>
+
+    </head>
+
+    <body>
+
+
+        <div th:replace="~{common/header :: header}"></div>
+
+        <section layout:fragment="content"></section>
+
+        <div th:replace="~{common/footer :: footer}"></div>
+
+        <div th:replace="~{common/footer :: footerJsLibraries}"></div>
+
+        <section layout:fragment="pageSpecificJsScripts"></section>
+
+    </body>
+
+</html>
+

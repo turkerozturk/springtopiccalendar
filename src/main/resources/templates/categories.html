@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Categories</title>
+</head>
+<body>
+<a href="/">home</a>
+
+<h1>Category List</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Topics Count</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
+    <tr th:each="cat : ${categories}">
+        <td th:text="${cat.id}">1</td>
+        <td th:text="${cat.name}">Example Category</td>
+        <td th:text="${cat.topics.size()}">0</td>
+        <td>
+            <a th:href="@{/categories/edit/{id}(id=${cat.id})}">Edit</a> |
+            <a th:href="@{/categories/delete/{id}(id=${cat.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<a th:href="@{/categories/create}">Create New Category</a>
+
+</body>
+</html>

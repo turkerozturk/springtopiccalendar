@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Entry Listesi</title>
+</head>
+<body>
+<a href="/">home</a>
+
+
+<h1>Entries</h1>
+
+<a th:href="@{/entries/new}">Yeni Entry Ekle</a><br/><br/>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Topic</th>
+        <th>DateMillisYmd</th>
+        <th>Status</th>
+        <th>Note</th>
+        <th>Aksiyon</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${entries}">
+        <td th:text="${entry.id}"></td>
+        <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+        <td th:text="${entry.dateMillisYmd}"></td>
+        <td th:text="${entry.status}"></td>
+        <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+        <td>
+            <a th:href="@{/entries/edit/{id}(id=${entry.id})}">Düzenle</a> |
+            <a th:href="@{/entries/delete/{id}(id=${entry.id})}">Sil</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Category Form</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1 th:if="${categoryDTO.id != null}">Edit Category</h1>
+<h1 th:if="${categoryDTO.id == null}">Create Category</h1>
+
+<form th:object="${categoryDTO}"
+      th:action="${categoryDTO.id != null} ? @{/categories/update/{id}(id=${categoryDTO.id})} : @{/categories}"
+      method="post">
+
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" th:field="*{name}" id="name"/>
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<br/>
+<a th:href="@{/categories}">Back to List</a>
+
+</body>
+</html>
