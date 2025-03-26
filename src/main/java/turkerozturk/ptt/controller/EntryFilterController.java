@@ -98,9 +98,21 @@ public class EntryFilterController {
             return "entries/filter-form";
         }
 
-        // Filtre sorgusu
+
+
+
+        // Aynı filtre sorgusunu çalıştır
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
+
+        // 3) Date range listesi oluştur
+        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+
+        // 4) Pivot Data oluştur
+        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
         model.addAttribute("entries", filteredEntries);
+        model.addAttribute("pivotData", pivotData);
+
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
         return "entries/filter-form";
