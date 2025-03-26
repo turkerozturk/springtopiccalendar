@@ -4,6 +4,8 @@
     <title>Entry Filtre</title>
 </head>
 <body>
+<a href="/">home</a>
+
 <h1>Entry Filtre Formu</h1>
 
 <!-- Validasyon hataları -->
@@ -71,6 +73,14 @@
 <hr/>
 
 <!-- Filtre Sonuçları -->
+
+
+
+
+
+
+<!-- Düz liste tablo -->
+
 <div th:if="${entries != null}">
     <h2>Sonuçlar</h2>
     <table border="1">
@@ -89,6 +99,59 @@
             <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
         </tr>
     </table>
+</div>
+
+
+<!-- Pivot tablo -->
+
+<div th:if="${entries != null}">
+    <h2>Pivot Tablo</h2>
+
+    <table border="1">
+        <!-- Tablonun başlığı (thead) -->
+        <thead>
+        <tr>
+            <th>Topic</th>
+            <!-- Tarih sütun başlıkları -->
+            <th th:each="day : ${pivotData.dateRange}"
+                th:text="${day}">Gün</th>
+            <th>Toplam</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <!-- Her topic için bir satır -->
+        <tr th:each="topic : ${pivotData.topicList}">
+            <!-- İlk sütun: topic adı -->
+            <td th:text="${topic.name}"></td>
+
+            <!-- Ardından pivotData.dateRange kadar hücre -->
+            <!-- pivotData.dateRange kadar hücre -->
+            <td th:each="day : ${pivotData.dateRange}">
+
+                <!-- 1) entriesForDay isminde bir değişken yaratıyoruz -->
+                <div th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
+
+                    <!-- 2) Hücredeki entry sayısını gösterelim -->
+                    <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span>
+
+                    <!-- 3) Eğer entriesForDay null değilse, linkleri basalım -->
+                    <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
+                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
+                           th:text="${'Entry ' + entryItem.id}"></a>
+                        <br/>
+                    </div>
+
+                </div>
+            </td>
+
+
+            <!-- Son sütun: o topic'in toplam entry sayısı -->
+            <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"></td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 
 </body>
