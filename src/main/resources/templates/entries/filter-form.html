@@ -127,23 +127,29 @@
 
             <!-- Ardından pivotData.dateRange kadar hücre -->
             <!-- pivotData.dateRange kadar hücre -->
-            <td th:each="day : ${pivotData.dateRange}">
 
-                <!-- 1) entriesForDay isminde bir değişken yaratıyoruz -->
-                <div th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
+            <td th:each="day : ${pivotData.dateRange}"
+                th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
 
-                    <!-- 2) Hücredeki entry sayısını gösterelim -->
-                    <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span>
+                <!-- Kac entry varsa göster -->
+                <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span>
 
-                    <!-- 3) Eğer entriesForDay null değilse, linkleri basalım -->
-                    <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
-                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
-                           th:text="${'Entry ' + entryItem.id}"></a>
-                        <br/>
-                    </div>
-
+                <!-- Var olan entry'leri link şeklinde göster -->
+                <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
+                    <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
+                       th:text="${'Entry ' + entryItem.id}"></a><br/>
                 </div>
+
+                <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
+                <div th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}">
+                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}">
+                        + New Entry
+                    </a>
+                </div>
+
             </td>
+
+
 
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->

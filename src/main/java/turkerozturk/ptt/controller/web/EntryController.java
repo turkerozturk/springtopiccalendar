@@ -6,9 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Note;
+import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.helper.DateUtils;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 @Controller
 @RequestMapping("/entries")
 public class EntryController {
@@ -28,21 +34,38 @@ public class EntryController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
-        // Yeni bir Entry nesnesi (içinde Note da null olabilir)
+    public String showCreateForm(
+            @RequestParam(name="topicId", required=false) Long topicId,
+            @RequestParam(name="dateYmd", required=false) String dateString,
+            Model model) {
+
+        // System.out.println("dateYmd: " + dateString );
         Entry entry = new Entry();
         entry.setNote(new Note());
-        // Yukarıda entry.setNote(...) diyerek formda not alanını rahatça doldurabilmeniz için null gelmesini engelliyoruz.
 
-        // Entry içindeki dateMillisYmd alanına bugünün değeri set ediliyor
-        entry.setDateMillisYmd(DateUtils.getEpochMillisToday());
+        // Topic set
+        if (topicId != null) {
+            Topic topic = topicRepository.findById(topicId).orElse(null);
+            entry.setTopic(topic);
+        }
+
+        if (dateString != null) {
+            // "2025-03-27" gibi bir tarih formatını LocalDate'e parse edip epoch milise çeviriyoruz
+            LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            long epochMillis = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            // System.out.println(dateString + " " + localDate + " " + epochMillis);
+            entry.setDateMillisYmd(epochMillis);
+        } else {
+            // Aksi halde bugünün tarih milisini varsayılan yap
+            entry.setDateMillisYmd(DateUtils.getEpochMillisToday());
+        }
 
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topicRepository.findAll());
-        System.out.println("zzz: " + DateUtils.getEpochMillisToday());
-
         return "entries/form";
     }
+
+
 
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry) {

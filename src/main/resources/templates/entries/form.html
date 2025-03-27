@@ -23,15 +23,21 @@
 
     <!-- dateMillisYmd (Elle milis girişi) -->
     <label for="dateMillisYmd">Milisaniye (13 hane):</label>
-    <input type="text"
-           id="dateMillisYmd"
-           th:field="*{dateMillisYmd}"
-            />
+    <input type="text" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
     <br><br>
 
     <!-- Alternatif: Date Picker (tıklayarak seçim) -->
     <label for="datePicker">Tarih Seç:</label>
-    <input type="date" id="datePicker" onchange="convertDateToEpoch()" />
+    <input type="date"
+           id="datePicker"
+           onchange="convertDateToEpoch()"
+           th:value="${
+             entry.dateMillisYmd != null
+               ? T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                  .atZone(T(java.time.ZoneId).systemDefault())
+                  .toLocalDate()
+               : ''
+           }" />
     <br><br>
 
     <!-- status -->
@@ -53,7 +59,6 @@
 
 <br/>
 <a th:href="@{/entries}">Listeye Dön</a>
-
 
 <script>
     /**
