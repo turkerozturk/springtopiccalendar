@@ -17,7 +17,7 @@
     <tr>
         <th>ID</th>
         <th>Topic</th>
-        <th>DateMillisYmd</th>
+        <th>Date</th>
         <th>Status</th>
         <th>Note</th>
         <th>Aksiyon</th>
@@ -27,7 +27,12 @@
     <tr th:each="entry : ${entries}">
         <td th:text="${entry.id}"></td>
         <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
-        <td th:text="${entry.dateMillisYmd}"></td>
+        <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                .atZone(T(java.time.ZoneId).systemDefault())
+                .toLocalDate())}"
+            th:title="${entry.dateMillisYmd}"
+        >        </td>
         <td th:text="${entry.status}"></td>
         <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
         <td>

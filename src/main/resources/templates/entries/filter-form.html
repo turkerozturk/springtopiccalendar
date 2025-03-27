@@ -2,6 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Entry Filtre</title>
+
+    <style>
+        .pivot-table-entry-cell {
+            text-align: center;      /* yatay ortalama */
+            vertical-align: middle;  /* dikey ortalama */
+        }
+
+        .pivot-table-entry-cell a {
+        text-decoration: none;   /* alt çizgiyi kaldır */
+        color: inherit;          /* bulunduğu hücrenin rengini kullan */
+        }
+
+        .pivot-table-entry-cell a:visited {
+            color: inherit;          /* tıklanmış linkin rengini değiştirme */
+        }
+
+        .pivot-table-entry-header {
+        writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+        transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+        text-align: center;
+        vertical-align: bottom;
+        padding: 5px;
+        white-space: nowrap;
+    }
+    </style>
 </head>
 <body>
 <a href="/">home</a>
@@ -79,27 +104,7 @@
 
 
 
-<!-- Düz liste tablo -->
 
-<div th:if="${entries != null}">
-    <h2>Sonuçlar</h2>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Topic</th>
-            <th>DateMillisYmd</th>
-            <th>Status</th>
-            <th>Note</th>
-        </tr>
-        <tr th:each="entry : ${entries}">
-            <td th:text="${entry.id}">1</td>
-            <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
-            <td th:text="${entry.dateMillisYmd}"></td>
-            <td th:text="${entry.status}"></td>
-            <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
-        </tr>
-    </table>
-</div>
 
 
 <!-- Pivot tablo -->
@@ -107,14 +112,15 @@
 <div th:if="${entries != null}">
     <h2>Pivot Tablo</h2>
 
-    <table border="1">
+    <table id="pivot-table" border="1">
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
             <th>Topic</th>
             <!-- Tarih sütun başlıkları -->
             <th th:each="day : ${pivotData.dateRange}"
-                th:text="${day}">Gün</th>
+                th:text="${day}"
+                class="pivot-table-entry-header">Gün</th>
             <th>Toplam</th>
         </tr>
         </thead>
@@ -129,7 +135,8 @@
             <!-- pivotData.dateRange kadar hücre -->
 
             <td th:each="day : ${pivotData.dateRange}"
-                th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
+                th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}"
+                class="pivot-table-entry-cell">
 
                 <!-- Kac entry varsa göster -->
                 <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span>
@@ -137,20 +144,20 @@
                 <!-- Var olan entry'leri link şeklinde göster -->
                 <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
                     <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
-                       th:text="${'Entry ' + entryItem.id}"></a><br/>
+                       th:title="${'Entry ' + entryItem.id}">
+                        *
+                    </a><br/>
                 </div>
 
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
                 <div th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}">
-                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}">
-                        + New Entry
+                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}"
+                    title="New Entry">
+                        +
                     </a>
                 </div>
 
             </td>
-
-
-
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->
             <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"></td>
@@ -158,6 +165,33 @@
         </tbody>
     </table>
 
+</div>
+
+<!-- Düz liste tablo -->
+
+<div th:if="${entries != null}">
+    <h2>Sonuçlar</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Topic</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Note</th>
+        </tr>
+        <tr th:each="entry : ${entries}">
+            <td th:text="${entry.id}">1</td>
+            <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+            <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                .atZone(T(java.time.ZoneId).systemDefault())
+                .toLocalDate())}"
+                th:title="${entry.dateMillisYmd}"
+            >
+            <td th:text="${entry.status}"></td>
+            <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+        </tr>
+    </table>
 </div>
 
 </body>
