@@ -66,7 +66,7 @@ public class EntryFilterController {
         PivotData pivotData = buildPivotData(filteredEntries, dateRange);
 
         for(Topic topic : pivotData.getTopicList()) {
-            System.out.println(topic.getName());
+            // System.out.println(topic.getName());
             for(LocalDate day: pivotData.getDateRange()) {
                 //size(pivotData.getPivotMap()[topic.getId()][day]) != null ? #lists.size(pivotData.pivotMap[topic.id][day]) : 0
             }
