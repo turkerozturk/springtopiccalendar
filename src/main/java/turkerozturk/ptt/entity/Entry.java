@@ -6,7 +6,12 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "entries")
+@Table(
+        name = "entries",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UniqueTopicAndDate", columnNames = { "topic_id", "date_millis_ymd" })
+        }
+)
 public class Entry {
 
     @Id
