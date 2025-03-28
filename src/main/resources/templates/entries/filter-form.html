@@ -7,11 +7,14 @@
         .pivot-table-entry-cell {
             text-align: center;      /* yatay ortalama */
             vertical-align: middle;  /* dikey ortalama */
+            min-width: 20px;
+            min-height: 14px;
         }
 
         .pivot-table-entry-cell a {
         text-decoration: none;   /* alt çizgiyi kaldır */
         color: inherit;          /* bulunduğu hücrenin rengini kullan */
+
         }
 
         .pivot-table-entry-cell a:visited {
@@ -23,7 +26,8 @@
         transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
         text-align: center;
         vertical-align: bottom;
-        padding: 5px;
+        padding: 0px;
+        margin: 0px;
         white-space: nowrap;
         }
 
@@ -42,6 +46,9 @@
 </head>
 <body>
 <a href="/">home</a>
+<br/><br/>
+<a th:href="@{/entries/new}">Yeni Entry Ekle</a><br/><br/>
+
 
 <h1>Entry Filtre Formu</h1>
 
@@ -152,6 +159,7 @@
 
                 <!-- Kac entry varsa göster -->
                 <!-- <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span> -->
+
 
                 <!-- Var olan entry'leri link şeklinde göster -->
                 <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
