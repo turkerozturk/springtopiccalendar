@@ -15,6 +15,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import java.util.Optional;
+
+
 @Controller
 @RequestMapping("/entries")
 public class EntryController {
@@ -68,40 +71,81 @@ public class EntryController {
 
 
     @PostMapping("/save")
-    public String saveEntry(@ModelAttribute("entry") Entry formEntry) {
-        // formEntry, thymeleaf’ten gelen Entry objesi. İçinde note de gelebilir.
+    public String saveEntry(@ModelAttribute("entry") Entry formEntry,
+                            Model model) {
+
+        // 1) Duplicate kayıt kontrolü için gerekli bilgileri alıyoruz
+        Long topicId = formEntry.getTopic() != null ? formEntry.getTopic().getId() : null;
+        Long dateMillisYmd = formEntry.getDateMillisYmd();
+
+        // (Opsiyonel) Null topic veya date durumuna karşı da tedbir alabilirsiniz.
+        if (topicId == null || dateMillisYmd == null) {
+            // İsterseniz hata veya uyarı verebilirsiniz.
+        }
+
+        // 2) Yeni kayıt mı yoksa güncelleme mi kontrol et
         if (formEntry.getId() == null) {
-            // 1) YENİ KAYIT
-            // Eğer note boş değilse two-way ilişkiyi kur
+            // *** YENİ KAYIT SENARYOSU ***
+
+            // a) Aynı topic+date'li kayıt var mı?
+            Optional<Entry> existing = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd);
+            if (existing.isPresent()) {
+                // Kayıt varsa formu tekrar göster ve hata mesajı ver
+                model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
+                model.addAttribute("entry", formEntry);
+                model.addAttribute("topics", topicRepository.findAll());
+                return "entries/form";
+            }
+
+            // b) Not'u da two-way ilişkiyle bağla
             if (formEntry.getNote() != null) {
                 formEntry.getNote().setEntry(formEntry);
             }
+
+            // c) Artık güvenle kaydedebiliriz
             entryRepository.save(formEntry);
+
         } else {
-            // 2) GÜNCELLEME
-            // DB’den ilgili kaydı çekiyoruz
+            // *** GÜNCELLEME SENARYOSU ***
+
             Entry dbEntry = entryRepository.findById(formEntry.getId())
                     .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + formEntry.getId()));
 
-            // GÜNCELLENECEK ALANLARI SETLE
+            // a) Aynı topic+date var mı diye kontrol et
+            // Ama bulduğumuz kayıt kendi id'si ise problem değil;
+            // farklı bir kaydın id'siyse problem.
+            Optional<Entry> existing = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd);
+            if (existing.isPresent() && !existing.get().getId().equals(formEntry.getId())) {
+                // Yine hata mesajını modele ekleyip formu gösteriyoruz
+                model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
+                model.addAttribute("entry", formEntry);
+                model.addAttribute("topics", topicRepository.findAll());
+                return "entries/form";
+            }
+
+            // b) Güncellenecek alanları setle
             dbEntry.setTopic(formEntry.getTopic());
             dbEntry.setDateMillisYmd(formEntry.getDateMillisYmd());
             dbEntry.setStatus(formEntry.getStatus());
 
-            // Note güncelle
+            // c) Note güncelle
             if (dbEntry.getNote() == null) {
-                // DB’de note yoksa yeni oluştur
                 Note newNote = new Note();
                 newNote.setEntry(dbEntry);
                 dbEntry.setNote(newNote);
             }
-            // content'i formdan gelenle güncelle
-            dbEntry.getNote().setContent(formEntry.getNote() != null ? formEntry.getNote().getContent() : "");
+            dbEntry.getNote().setContent(
+                    formEntry.getNote() != null ? formEntry.getNote().getContent() : ""
+            );
 
+            // d) DB'ye güncellenmiş halini kaydet
             entryRepository.save(dbEntry);
         }
+
+        // Kayıt başarılı, listeye dön.
         return "redirect:/entries";
     }
+
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {

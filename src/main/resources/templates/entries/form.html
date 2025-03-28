@@ -6,6 +6,11 @@
 <body>
 <h1 th:text="${#strings.isEmpty(entry.id) ? 'Yeni Entry Ekle' : 'Entry Güncelle'}"></h1>
 
+<!-- HATA MESAJI GÖSTERME ALANI -->
+<div th:if="${errorMessage != null}" style="color:red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
 <form th:action="@{/entries/save}" th:object="${entry}" method="post">
 
     <!-- ID (gizli alan) -->
