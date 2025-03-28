@@ -1,9 +1,11 @@
 package turkerozturk.ptt.controller.web;
 
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Note;
@@ -83,7 +85,9 @@ public class EntryController {
 
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry,
-                            Model model) {
+                            Model model,
+                            HttpSession session,
+                            @RequestParam(value="fromPivot", required=false) String fromPivot) {
 
         // 1) Duplicate kayıt kontrolü için gerekli bilgileri alıyoruz
         Long topicId = formEntry.getTopic() != null ? formEntry.getTopic().getId() : null;
@@ -105,7 +109,7 @@ public class EntryController {
                 model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                return "entries/form";
+                //return "entries/form";
             }
 
             // b) Not'u da two-way ilişkiyle bağla
@@ -131,7 +135,7 @@ public class EntryController {
                 model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                return "entries/form";
+                //return "entries/form";
             }
 
             // b) Güncellenecek alanları setle
@@ -153,6 +157,23 @@ public class EntryController {
             entryRepository.save(dbEntry);
         }
 
+
+        // (1) Session'da filtre bilgisi var mı?
+        FilterDto currentFilter = (FilterDto) session.getAttribute("currentFilterDto");
+        if (currentFilter != null) {
+            // Kullanıcı pivot'tan geldiyse oraya geri dönmek istiyoruz.
+            // Ama pivot'ta tabloyu yeniden oluşturmak için applyFilter benzeri bir işlem yapmamız lazım.
+
+            // Yöntem A: Sadece redirect "/entry-filter/return" gibi bir endpoint açar, orada
+            // filter'ı tekrar applyFilter benzeri kodla çalıştırır.
+            return "redirect:/entry-filter/return";
+            //return "entry-filter/return";
+
+            // Yöntem B: Direct "/entry-filter/form" a gider, ama orada filter'ı tekrar uygular.
+            // => Bunu bir endpoint'te handle etmek daha temiz olur.
+        }
+
+        // (2) Session'da filtre yoksa normal entries listesine
         // Kayıt başarılı, listeye dön.
         return "redirect:/entries";
     }

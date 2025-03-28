@@ -1,5 +1,6 @@
 package turkerozturk.ptt.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,12 +66,6 @@ public class EntryFilterController {
         // 3) Pivot Data hazırla
         PivotData pivotData = buildPivotData(filteredEntries, dateRange);
 
-        for(Topic topic : pivotData.getTopicList()) {
-            // System.out.println(topic.getName());
-            for(LocalDate day: pivotData.getDateRange()) {
-                //size(pivotData.getPivotMap()[topic.getId()][day]) != null ? #lists.size(pivotData.pivotMap[topic.id][day]) : 0
-            }
-        }
 
         // 4) Model’e ekle
 
@@ -92,7 +87,8 @@ public class EntryFilterController {
     @PostMapping("/apply")
     public String applyFilter(@Valid @ModelAttribute("filterDto") FilterDto filterDto,
                               BindingResult bindingResult,
-                              Model model) {
+                              Model model,
+                              HttpSession session) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("allTopics", topicRepository.findAll());
             return "entries/filter-form";
@@ -109,6 +105,9 @@ public class EntryFilterController {
 
         // 4) Pivot Data oluştur
         PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
+        // === (1) Session'a filtre bilgisini saklayalım ===
+        session.setAttribute("currentFilterDto", filterDto);
 
         model.addAttribute("entries", filteredEntries);
         model.addAttribute("pivotData", pivotData);
@@ -263,6 +262,26 @@ public class EntryFilterController {
     }
 
 
+    @GetMapping("/return")
+    public String returnToFilterForm(HttpSession session, Model model) {
+        FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
+        if (filterDto == null) {
+            // FilterDto yoksa mecburen sıfırdan sayfa açabilir veya entries'e gidebilirsiniz.
+            return "redirect:/entries";
+        }
+
+        // Tekrar filtre sonuçlarını oluşturup sayfaya bas
+        List<Entry> filteredEntries = filterService.filterEntries(filterDto);
+        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
+        model.addAttribute("entries", filteredEntries);
+        model.addAttribute("pivotData", pivotData);
+        model.addAttribute("filterDto", filterDto);
+        model.addAttribute("allTopics", topicRepository.findAll());
+
+        return "entries/filter-form";
+    }
 
 
 
