@@ -25,7 +25,19 @@
         vertical-align: bottom;
         padding: 5px;
         white-space: nowrap;
-    }
+        }
+
+        .status-0 {
+            background-color: gray;
+        }
+        .status-1 {
+            background-color: green;
+        }
+        .status-2 {
+            background-color: red;
+        }
+        /* gelecekte yeni status değerleri eklemek kolaylaşır */
+
     </style>
 </head>
 <body>
@@ -139,14 +151,21 @@
                 class="pivot-table-entry-cell">
 
                 <!-- Kac entry varsa göster -->
-                <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span>
+                <!-- <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span> -->
 
                 <!-- Var olan entry'leri link şeklinde göster -->
                 <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
                     <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
-                       th:title="${'Entry ' + entryItem.id}">
+                       th:title="${'Entry ' + entryItem.id}"
+                       th:classappend="
+                          ${entryItem.status == 0} ? 'status-0' :
+                          (${entryItem.status == 1} ? 'status-1' :
+                          (${entryItem.status == 2} ? 'status-2' : 'status-other'))
+                        "
+                    >
                         *
-                    </a><br/>
+                    </a>
+                    <br/>
                 </div>
 
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
