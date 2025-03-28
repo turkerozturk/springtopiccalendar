@@ -40,7 +40,7 @@ public class EntryFilterController {
      * otomatik olarak filtre sorgusunu çalıştırıp ekrana sonuçları gönderir.
      */
     @GetMapping("/form")
-    public String filterForm(Model model) {
+    public String filterForm(Model model, HttpSession session) {
         // 1) Varsayılan DTO Oluştur
         FilterDto filterDto = new FilterDto();
 
@@ -66,6 +66,8 @@ public class EntryFilterController {
         // 3) Pivot Data hazırla
         PivotData pivotData = buildPivotData(filteredEntries, dateRange);
 
+        // === ✅ Session'a kaydet (ilk açılışta da) ===
+        session.setAttribute("currentFilterDto", filterDto);
 
         // 4) Model’e ekle
 
