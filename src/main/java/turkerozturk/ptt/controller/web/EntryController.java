@@ -4,10 +4,12 @@ package turkerozturk.ptt.controller.web;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Note;
 import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.helper.DateUtils;
+import turkerozturk.ptt.repository.CategoryRepository;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
 
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,9 +28,13 @@ public class EntryController {
     private final EntryRepository entryRepository;
     private final TopicRepository topicRepository;
 
-    public EntryController(EntryRepository entryRepository, TopicRepository topicRepository) {
+    private final CategoryRepository categoryRepository;
+
+
+    public EntryController(EntryRepository entryRepository, TopicRepository topicRepository, CategoryRepository categoryRepository) {
         this.entryRepository = entryRepository;
         this.topicRepository = topicRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping
@@ -62,6 +69,10 @@ public class EntryController {
             // Aksi halde bugünün tarih milisini varsayılan yap
             entry.setDateMillisYmd(DateUtils.getEpochMillisToday());
         }
+
+        // to make topic selection easier from gui, we are sending categories to selection box:
+        List<Category> categories = categoryRepository.findAll();
+        model.addAttribute("categories", categories);
 
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topicRepository.findAll());
@@ -158,6 +169,10 @@ public class EntryController {
             note.setEntry(entry);
             entry.setNote(note);
         }
+
+        // to make topic selection easier from gui, we are sending categories to selection box:
+        List<Category> categories = categoryRepository.findAll();
+        model.addAttribute("categories", categories);
 
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topicRepository.findAll());

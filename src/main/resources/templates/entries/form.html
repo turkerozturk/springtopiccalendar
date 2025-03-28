@@ -16,12 +16,31 @@
     <!-- ID (gizli alan) -->
     <input type="hidden" th:field="*{id}"/>
 
-    <!-- TOPIC SEÇİM ALANI -->
+    <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
+    <label for="categoryFilter">Filter by Category:</label>
+    <select id="categoryFilter" onchange="filterTopics()">
+        <option value="">All Categories</option>
+        <!-- Elinizde kategori listesi varsa doldurabilirsiniz -->
+        <option th:each="cat : ${categories}"
+                th:value="${cat.name}"
+                th:text="${cat.name}">
+        </option>
+    </select>
+    <br/><br/>
+
+    <!-- (2) ARAMA METNİ İLE FİLTRE -->
+    <label for="topicSearch">Search Topic:</label>
+    <input type="text" id="topicSearch" oninput="filterTopics()"/>
+    <br/><br/>
+
+    <!-- (3) TOPIC SEÇİM ALANI -->
     <label for="topic">Topic:</label>
-    <select th:field="*{topic.id}" id="topic">
+    <select th:field="*{topic.id}" id="topicSelect">
         <option th:each="t : ${topics}"
                 th:value="${t.id}"
-                th:text="${t.name}">Topic Adı
+                th:text="${t.name}"
+                th:attr="data-category=${t.category != null ? t.category.name : ''}">
+            <!-- t.category.name varsa data-category'ye ekle -->
         </option>
     </select>
     <br/><br/>
@@ -75,11 +94,41 @@
         const selectedDate = document.getElementById('datePicker').value; // yyyy-MM-dd
         if (selectedDate) {
             const [year, month, day] = selectedDate.split('-');
-            // Aylar 0-index olduğu için (month - 1)
             const dateObj = new Date(year, month - 1, day);
-            const epochMillis = dateObj.getTime(); // Tarihin milis cinsinden değeri
+            const epochMillis = dateObj.getTime();
             document.getElementById('dateMillisYmd').value = epochMillis;
         }
+    }
+
+    /**
+     * Kategori seçimi veya arama metni değiştiğinde
+     * selectbox içindeki 'option'ları filtrele
+     */
+    function filterTopics() {
+        const searchText = document.getElementById('topicSearch').value.toLowerCase();
+        const selectedCategory = document.getElementById('categoryFilter').value;
+        const topicSelect = document.getElementById('topicSelect');
+
+        // Tüm <option> elemanlarını dolaş
+        const options = topicSelect.querySelectorAll('option');
+        options.forEach(option => {
+            // Option yazısı
+            const optionText = option.textContent.toLowerCase();
+            // Option'ın data-category değeri
+            const optionCategory = option.getAttribute('data-category');
+
+            // Arama metnine uyuyor mu?
+            const matchesText = !searchText || optionText.includes(searchText);
+            // Kategori seçimine uyuyor mu? (Boş ise tüm kategorileri göster)
+            const matchesCategory = !selectedCategory || optionCategory === selectedCategory;
+
+            // İkisi de uyuyorsa göster, yoksa gizle
+            if (matchesText && matchesCategory) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
     }
 </script>
 </body>
