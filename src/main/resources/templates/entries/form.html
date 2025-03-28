@@ -34,7 +34,7 @@
     <br/><br/>
 
     <!-- (3) TOPIC SEÇİM ALANI -->
-    <label for="topic">Topic:</label>
+    <label for="topicSelect">Topic:</label>
     <select th:field="*{topic.id}" id="topicSelect">
         <option th:each="t : ${topics}"
                 th:value="${t.id}"

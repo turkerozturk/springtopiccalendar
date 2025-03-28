@@ -86,8 +86,9 @@ public class EntryController {
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry,
                             Model model,
-                            HttpSession session,
-                            @RequestParam(value="fromPivot", required=false) String fromPivot) {
+                            HttpSession session) {
+
+
 
         // 1) Duplicate kayıt kontrolü için gerekli bilgileri alıyoruz
         Long topicId = formEntry.getTopic() != null ? formEntry.getTopic().getId() : null;
