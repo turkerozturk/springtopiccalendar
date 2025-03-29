@@ -8,6 +8,12 @@
 
 <h1>Topic List</h1>
 
+<!-- Hata mesajı varsa göster -->
+<div th:if="${errorMessage != null}" style="color:red; font-weight: bold;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+
 <table border="1">
     <thead>
     <tr>

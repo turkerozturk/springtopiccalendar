@@ -27,6 +27,14 @@ public class TopicService {
     }
 
     public void deleteTopic(Long id) {
-        topicRepository.deleteById(id);
+        Optional<Topic> optionalTopic = topicRepository.findById(id);
+        if (optionalTopic.isPresent()) {
+            Topic topic = optionalTopic.get();
+            if (topic.getActivities() != null && !topic.getActivities().isEmpty()) {
+                throw new IllegalStateException("Cannot delete topic with associated entries.");
+            }
+            topicRepository.delete(topic);
+        }
     }
+
 }
