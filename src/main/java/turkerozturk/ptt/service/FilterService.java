@@ -1,18 +1,24 @@
 package turkerozturk.ptt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.repository.EntryRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
 public class FilterService {
 
     private final EntryRepository entryRepository;
+
+    @Autowired
+    private AppTimeZoneProvider timeZoneProvider;
 
     public FilterService(EntryRepository entryRepository) {
         this.entryRepository = entryRepository;
@@ -45,8 +51,10 @@ public class FilterService {
         // 1) startDate ve endDate'i epoch'a dönüştürelim (eğer dateMillisYmd = günün epoch milisiyse)
         //    Sizin dateMillisYmd, 13 haneli milis (sadece tarih), bu kısım mantığa göre düzenlenmeli.
 
-        long startEpoch = filterDto.getStartDate().atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC) * 1000;
-        long endEpoch = filterDto.getEndDate().atStartOfDay().toEpochSecond(java.time.ZoneOffset.UTC) * 1000;
+        ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
+
+        long startEpoch = filterDto.getStartDate().atStartOfDay(zone).toInstant().toEpochMilli();
+        long endEpoch = filterDto.getEndDate().atStartOfDay(zone).toInstant().toEpochMilli();
 
         // 2) Topic seçilmemişse => tüm topic'ler
         //    Status seçilmemişse => tüm status'ler
