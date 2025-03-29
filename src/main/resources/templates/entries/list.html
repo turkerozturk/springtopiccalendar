@@ -37,10 +37,16 @@
         <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
         <td>
             <a th:href="@{/entries/edit/{id}(id=${entry.id})}">Düzenle</a> |
-            <a th:href="@{/entries/delete/{id}(id=${entry.id})}">Sil</a>
+            <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+               onclick="return confirmDelete()">Sil</a>
         </td>
     </tr>
     </tbody>
 </table>
+<script>
+    function confirmDelete() {
+        return confirm("Bu entry kaydını silmek istediğinize emin misiniz?");
+    }
+</script>
 </body>
 </html>
