@@ -18,24 +18,29 @@
 <table border="1">
     <thead>
     <tr>
+        <th>Actions</th>
         <th>ID</th>
+        <th>Category Name</th>
         <th>Topic Name</th>
         <th>Description</th>
-        <th>Category Name</th>
-        <th>Actions</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="topic : ${topics}">
-        <td th:text="${topic.id}">1</td>
-        <td th:text="${topic.name}">Sample Topic</td>
-        <td th:text="${topic.description}">Sample Description</td>
-        <td th:text="${topic.category.name}">Category Name</td>
         <td>
             <a th:href="@{/topics/edit/{id}(id=${topic.id})}">Edit</a> |
             <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-               onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a>
+               onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a> |
+            <a th:href="@{/entries/new(topicId=${topic.id})}"
+               title="New Entry">
+                +
+            </a>
         </td>
+        <td th:text="${topic.id}">1</td>
+        <td th:text="${topic.category.name}">Category Name</td>
+        <td th:text="${topic.name}">Sample Topic</td>
+        <td th:text="${topic.description}">Sample Description</td>
+
     </tr>
     </tbody>
 </table>
