@@ -81,6 +81,15 @@
     <button type="submit">Kaydet</button>
 </form>
 
+<!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
+<div th:if="${entry.id != null}">
+    <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+       onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');">
+        Delete Entry
+    </a>
+</div>
+
+
 <br/>
 <a th:href="@{/entries}">Listeye Dön</a>
 

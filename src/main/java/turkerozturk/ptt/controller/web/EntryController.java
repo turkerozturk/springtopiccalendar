@@ -202,8 +202,18 @@ public class EntryController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteEntry(@PathVariable Long id) {
+    public String deleteEntry(@PathVariable Long id, HttpSession session) {
         entryRepository.deleteById(id);
-        return "redirect:/entries";
+
+        // Session'da currentFilterDto var mı, kontrol et
+        FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
+        if (filterDto != null) {
+            // Pivot'tan gelindiğini varsay => tekrar pivot görünümüne dön
+            return "redirect:/entry-filter/return";
+        } else {
+            // Pivot bilgisi yok, normal entries listesine dön
+            return "redirect:/entries";
+        }
     }
+
 }
