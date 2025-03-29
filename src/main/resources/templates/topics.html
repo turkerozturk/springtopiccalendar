@@ -13,6 +13,7 @@
     <p th:text="${errorMessage}"></p>
 </div>
 
+<a th:href="@{/topics/create}">Create New Topic</a>
 
 <table border="1">
     <thead>
@@ -32,14 +33,18 @@
         <td th:text="${topic.category.name}">Category Name</td>
         <td>
             <a th:href="@{/topics/edit/{id}(id=${topic.id})}">Edit</a> |
-            <a th:href="@{/topics/delete/{id}(id=${topic.id})}">Delete</a>
+            <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
+               onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a>
         </td>
     </tr>
     </tbody>
 </table>
 
 <br>
-<a th:href="@{/topics/create}">Create New Topic</a>
-
+<script>
+    function confirmDelete() {
+        return confirm("Bu entry kaydını silmek istediğinize emin misiniz?");
+    }
+</script>
 </body>
 </html>
