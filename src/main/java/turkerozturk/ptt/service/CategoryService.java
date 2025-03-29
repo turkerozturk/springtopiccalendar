@@ -28,6 +28,15 @@ public class CategoryService {
     }
 
     public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+        Optional<Category> optionalCategory = categoryRepository.findById(id);
+        if (optionalCategory.isPresent()) {
+            Category category = optionalCategory.get();
+            if (category.getTopics() != null && !category.getTopics().isEmpty()) {
+                // Bağlı topic'ler varsa silme!
+                throw new IllegalStateException("Cannot delete category with associated topics.");
+            }
+            categoryRepository.delete(category);
+        }
     }
+
 }
