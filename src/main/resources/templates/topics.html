@@ -14,15 +14,45 @@
 </div>
 
 <a th:href="@{/topics/create}">Create New Topic</a>
+<br><br>
 
-<table border="1">
+<!-- Kategori Seçimi -->
+<label for="categorySelect">Kategori: </label>
+<select id="categorySelect" onchange="filterRows()">
+    <option value="">Hepsi</option>
+    <!-- Tüm kategoriler listeleniyor -->
+    <option th:each="cat : ${categories}"
+            th:value="${cat.name}"
+            th:text="${cat.name}">
+    </option>
+</select>
+
+<table id="topicsTable" border="1" style="margin-top: 10px; border-collapse: collapse;">
     <thead>
+    <!-- Tablo başlıkları -->
     <tr>
         <th>Actions</th>
-        <th>ID</th>
-        <th>Category Name</th>
-        <th>Topic Name</th>
-        <th>Description</th>
+        <!-- Sıralamayı kolona tıklayarak yaptırmak için onclick -->
+        <th onclick="sortTable(1)">ID</th>
+        <th onclick="sortTable(2)">Category Name</th>
+        <th onclick="sortTable(3)">Topic Name</th>
+        <th onclick="sortTable(4)">Description</th>
+    </tr>
+    <!-- Filtre kutuları (header'larla aynı hizada) -->
+    <tr>
+        <th></th>
+        <th>
+            <input type="text" id="filterId" onkeyup="filterRows()" placeholder="Filtre ID"/>
+        </th>
+        <th>
+            <input type="text" id="filterCategoryName" onkeyup="filterRows()" placeholder="Filtre Kategori"/>
+        </th>
+        <th>
+            <input type="text" id="filterTopicName" onkeyup="filterRows()" placeholder="Filtre Topic"/>
+        </th>
+        <th>
+            <input type="text" id="filterDescription" onkeyup="filterRows()" placeholder="Filtre Description"/>
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -31,25 +61,114 @@
             <a th:href="@{/topics/edit/{id}(id=${topic.id})}">Edit</a> |
             <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
                onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a> |
-            <a th:href="@{/entries/new(topicId=${topic.id})}"
-               title="New Entry">
-                +
-            </a>
+            <a th:href="@{/entries/new(topicId=${topic.id})}" title="New Entry">+</a>
         </td>
         <td th:text="${topic.id}">1</td>
+        <!-- Category Name -->
         <td th:text="${topic.category.name}">Category Name</td>
+        <!-- Topic Name -->
         <td th:text="${topic.name}">Sample Topic</td>
+        <!-- Description -->
         <td th:text="${topic.description}">Sample Description</td>
-
     </tr>
     </tbody>
 </table>
 
-<br>
 <script>
-    function confirmDelete() {
-        return confirm("Bu entry kaydını silmek istediğinize emin misiniz?");
+    // Filtreleme fonksiyonu
+    function filterRows() {
+        // Kategori select değeri
+        var categorySelect = document.getElementById("categorySelect").value.toLowerCase();
+
+        // Textbox filtre değerleri
+        var filterId = document.getElementById("filterId").value.toLowerCase();
+        var filterCategoryName = document.getElementById("filterCategoryName").value.toLowerCase();
+        var filterTopicName = document.getElementById("filterTopicName").value.toLowerCase();
+        var filterDescription = document.getElementById("filterDescription").value.toLowerCase();
+
+        var table = document.getElementById("topicsTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        var rows = tbody.getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var tds = rows[i].getElementsByTagName("td");
+
+            // td[1] -> ID
+            // td[2] -> Category Name
+            // td[3] -> Topic Name
+            // td[4] -> Description
+            var idText = tds[1].textContent.toLowerCase();
+            var categoryText = tds[2].textContent.toLowerCase();
+            var topicText = tds[3].textContent.toLowerCase();
+            var descText = tds[4].textContent.toLowerCase();
+
+            // Kategori select'i boş ya da satırın kategorisini içeriyorsa
+            var categoryMatch = (categorySelect === "" || categoryText.includes(categorySelect));
+
+            // Diğer textbox filtrelerini contains mantığıyla karşılaştır
+            var idMatch = idText.includes(filterId);
+            var categoryNameMatch = categoryText.includes(filterCategoryName);
+            var topicNameMatch = topicText.includes(filterTopicName);
+            var descMatch = descText.includes(filterDescription);
+
+            // Tüm koşulları AND ile birleştiriyoruz
+            if (categoryMatch && idMatch && categoryNameMatch && topicNameMatch && descMatch) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+
+    // Sıralama fonksiyonu (tıklanan sütuna göre A-Z / Z-A sırala)
+    // columnIndex: tablo header'ındaki kolona göre,
+    // örneğin ID sütunu = 1, CategoryName sütunu = 2 vb.
+    function sortTable(columnIndex) {
+        var table = document.getElementById("topicsTable");
+        var switching = true;
+        var direction = "asc"; // ilk tıklamada asc başlasın
+        var switchCount = 0;
+
+        while (switching) {
+            switching = false;
+            var rows = table.getElementsByTagName("tbody")[0].rows;
+
+            for (var i = 0; i < rows.length - 1; i++) {
+                var shouldSwitch = false;
+                var x = rows[i].getElementsByTagName("td")[columnIndex];
+                var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
+
+                var xText = x.textContent.toLowerCase();
+                var yText = y.textContent.toLowerCase();
+
+                if (direction === "asc") {
+                    // A-Z
+                    if (xText > yText) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else {
+                    // Z-A
+                    if (xText < yText) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchCount++;
+            } else {
+                // Hiç switch olmadıysa ve yön ASC ise, yönü DESC yapıp tekrar dene
+                if (switchCount === 0 && direction === "asc") {
+                    direction = "desc";
+                    switching = true;
+                }
+            }
+        }
     }
 </script>
+
 </body>
 </html>

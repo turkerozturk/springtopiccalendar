@@ -23,13 +23,18 @@ public class TopicWebController {
     private CategoryService categoryService;
 
     // Tüm topic'leri listeleyen sayfa
+    // Tüm topic'leri listeleyen sayfa
     @GetMapping
     public String listTopics(Model model) {
+        // Tüm topic'leri çek
         var topicDTOList = topicService.getAllTopics()
                 .stream()
                 .collect(Collectors.toList());
+        // Tüm kategorileri de filtrelemede kullanmak için modele ekle
+        var categoryList = categoryService.getAllCategories();
 
         model.addAttribute("topics", topicDTOList);
+        model.addAttribute("categories", categoryList);
         return "topics"; // templates/topics.html
     }
 
