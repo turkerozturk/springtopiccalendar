@@ -2,6 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Topic List</title>
+    <style>
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:visited {
+            color: inherit;
+        }
+
+        a:hover {
+            color: blue;
+        }
+
+        .add-entry-column {
+            text-align: center;
+        }
+        .edit-entry-column {
+            text-align: center;
+        }
+        .delete-entry-column {
+            text-align: center;
+        }
+    </style>
+
 </head>
 <body>
 <a href="/">home</a>
@@ -31,22 +56,24 @@
     <thead>
     <!-- Tablo başlıkları -->
     <tr>
-        <th>Actions</th>
+        <th>Delete</th>
         <!-- Sıralamayı kolona tıklayarak yaptırmak için onclick -->
         <th onclick="sortTable(1)">ID</th>
         <th onclick="sortTable(2)">Category Name</th>
-        <th onclick="sortTable(3)">Topic Name</th>
-        <th onclick="sortTable(4)">Description</th>
+        <th>Entry</th>
+        <th onclick="sortTable(4)">Topic Name</th>
+        <th onclick="sortTable(5)">Description</th>
     </tr>
     <!-- Filtre kutuları (header'larla aynı hizada) -->
     <tr>
-        <th></th>
+        <th><!-- no filter --></th>
         <th>
             <input type="text" id="filterId" onkeyup="filterRows()" placeholder="Filtre ID"/>
         </th>
         <th>
             <input type="text" id="filterCategoryName" onkeyup="filterRows()" placeholder="Filtre Kategori"/>
         </th>
+        <th><!-- no filter --></th>
         <th>
             <input type="text" id="filterTopicName" onkeyup="filterRows()" placeholder="Filtre Topic"/>
         </th>
@@ -56,16 +83,21 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="topic : ${topics}">
-        <td>
-            <a th:href="@{/topics/edit/{id}(id=${topic.id})}">Edit</a> |
+    <tr th:each="topic : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
+        <td class="delete-entry-column">
             <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-               onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a> |
-            <a th:href="@{/entries/new(topicId=${topic.id})}" title="New Entry">+</a>
+               onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a>
         </td>
-        <td th:text="${topic.id}">1</td>
+        <td class="edit-entry-column">
+            <a th:href="@{/topics/edit/{id}(id=${topic.id})}" th:text="${zeroPaddedTopicId}">Edit</a>
+        </td>
         <!-- Category Name -->
         <td th:text="${topic.category.name}">Category Name</td>
+        <!-- Quick Add Entry -->
+        <td class="add-entry-column">
+            <a th:href="@{/entries/new(topicId=${topic.id})}" title="+"
+               target="_blank" rel="noopener noreferrer">+</a>
+        </td>
         <!-- Topic Name -->
         <td th:text="${topic.name}">Sample Topic</td>
         <!-- Description -->
@@ -95,12 +127,12 @@
 
             // td[1] -> ID
             // td[2] -> Category Name
-            // td[3] -> Topic Name
-            // td[4] -> Description
+            // td[4] -> Topic Name
+            // td[5] -> Description
             var idText = tds[1].textContent.toLowerCase();
             var categoryText = tds[2].textContent.toLowerCase();
-            var topicText = tds[3].textContent.toLowerCase();
-            var descText = tds[4].textContent.toLowerCase();
+            var topicText = tds[4].textContent.toLowerCase();
+            var descText = tds[5].textContent.toLowerCase();
 
             // Kategori select'i boş ya da satırın kategorisini içeriyorsa
             var categoryMatch = (categorySelect === "" || categoryText.includes(categorySelect));
