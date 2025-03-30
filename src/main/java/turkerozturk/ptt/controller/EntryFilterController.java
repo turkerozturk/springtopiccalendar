@@ -2,13 +2,16 @@ package turkerozturk.ptt.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.dto.FilterDto;
+import turkerozturk.ptt.dto.TopicDto;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
+import turkerozturk.ptt.repository.CategoryRepository;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
 import turkerozturk.ptt.service.FilterService;
@@ -27,12 +30,15 @@ public class EntryFilterController {
     private final TopicRepository topicRepository;
     private final FilterService filterService;
 
+    private final CategoryRepository categoryRepository;
+
     public EntryFilterController(EntryRepository entryRepository,
                                  TopicRepository topicRepository,
-                                 FilterService filterService) {
+                                 FilterService filterService, CategoryRepository categoryRepository) {
         this.entryRepository = entryRepository;
         this.topicRepository = topicRepository;
         this.filterService = filterService;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
@@ -75,12 +81,31 @@ public class EntryFilterController {
         model.addAttribute("entries", filteredEntries);  // Normal tablo
         model.addAttribute("pivotData", pivotData);      // Pivot tablo
         model.addAttribute("allTopics", topicRepository.findAll());
+
+        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("topicsForSelectedCategory", List.of());
         return "entries/filter-form";
 
 
 
 
     }
+
+    @ResponseBody
+    @GetMapping("/topics-by-category")
+    public List<TopicDto> getTopicsByCategory(@RequestParam("categoryId") Long categoryId) {
+        if (categoryId == null) {
+            return List.of();
+        }
+        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+
+        // Entity -> DTO dönüştürme
+        return topics.stream()
+                .map(t -> new TopicDto(t.getId(), t.getName()))
+                .toList();
+    }
+
+
 
     /**
      * Filtre formunda 'Filtrele' butonuna tıklayınca çalışır.
@@ -92,7 +117,10 @@ public class EntryFilterController {
                               Model model,
                               HttpSession session) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allTopics", topicRepository.findAll());
+            model.addAttribute("allCategories", categoryRepository.findAll());
+            // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
+            model.addAttribute("topicsForSelectedCategory",
+                    topicRepository.findByCategoryId(filterDto.getCategoryId()));
             return "entries/filter-form";
         }
 
@@ -116,6 +144,15 @@ public class EntryFilterController {
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
+
+        // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
+        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("topicsForSelectedCategory",
+                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
+
+
+
         return "entries/filter-form";
     }
 
@@ -147,6 +184,12 @@ public class EntryFilterController {
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
 
+
+        // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
+        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("topicsForSelectedCategory",
+                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
         // 6) Aynı form sayfasına dön
         return "entries/filter-form";
     }
@@ -177,6 +220,12 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
+
+        // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
+        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("topicsForSelectedCategory",
+                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
         return "entries/filter-form";
     }
 
@@ -281,6 +330,12 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
+
+
+        // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
+        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("topicsForSelectedCategory",
+                topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
         return "entries/filter-form";
     }

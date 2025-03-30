@@ -60,10 +60,30 @@
 -->
 <form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
 
-    <!-- Topic Çoklu -->
+    <!-- Kategori seçimi -->
+    <label>Kategori:</label>
+    <select id="categorySelect"
+            th:field="*{categoryId}"
+            onchange="onCategoryChange(this.value)">
+        <option value="">--Seçiniz--</option>
+        <option th:each="cat : ${allCategories}"
+                th:value="${cat.id}"
+                th:text="${cat.name}">
+        </option>
+    </select>
+    <br><br>
+
+    <!-- Topic Çoklu (Dinamik değişecek) -->
     <label>Topic Seçimi (çoklu):</label>
-    <select th:field="*{topicIds}" multiple size="5">
-        <option th:each="t : ${allTopics}"
+    <select id="topicsSelect"
+            th:field="*{topicIds}"
+            multiple
+            size="5">
+        <!-- Sayfa ilk açıldığında boş.
+             AJAX ile dolduracağız veya
+             isterseniz sunucu tarafında ${topicsForSelectedCategory} doldurabilir,
+             then diyebilirsiniz. -->
+        <option th:each="t : ${topicsForSelectedCategory}"
                 th:value="${t.id}"
                 th:text="${t.name}">
         </option>
@@ -224,6 +244,68 @@
         </tr>
     </table>
 </div>
+
+<!-- AJAX / JavaScript Kısmı -->
+<script>
+    function onCategoryChange(categoryId) {
+        // Kategori seçilmediyse, topic alanını temizle
+        if(!categoryId) {
+            const topicsSelect = document.getElementById('topicsSelect');
+            topicsSelect.innerHTML = ''; // Tüm optionları temizle
+            return;
+        }
+
+        // Seçilen kategoriye göre sunucuya AJAX çağrısı
+        fetch('/entry-filter/topics-by-category?categoryId=' + categoryId)
+            .then(response => response.json())
+            .then(data => {
+                // data => Topic nesnelerinin listesi
+                const topicsSelect = document.getElementById('topicsSelect');
+                topicsSelect.innerHTML = ''; // Öncekileri temizle
+
+                data.forEach(topic => {
+                    const option = document.createElement('option');
+                    option.value = topic.id;
+                    option.text = topic.name;
+                    topicsSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error('Topic getirme hatası', err);
+            });
+    }
+</script>
+<script>
+    function onCategoryChange(categoryId) {
+        // Kategori seçilmediyse, topic alanını temizle
+        if(!categoryId) {
+            const topicsSelect = document.getElementById('topicsSelect');
+            topicsSelect.innerHTML = ''; // Tüm optionları temizle
+            return;
+        }
+
+        // Seçilen kategoriye göre sunucuya AJAX çağrısı
+        fetch('/entry-filter/topics-by-category?categoryId=' + categoryId)
+            .then(response => response.json())
+            .then(data => {
+                // data => Topic nesnelerinin listesi (JSON)
+                const topicsSelect = document.getElementById('topicsSelect');
+                topicsSelect.innerHTML = ''; // Öncekileri temizle
+
+                data.forEach(topic => {
+                    const option = document.createElement('option');
+                    option.value = topic.id;
+                    option.text = topic.name;
+                    // Varsayılan olarak seçili olsun:
+                    option.selected = true;
+                    topicsSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error('Topic getirme hatası', err);
+            });
+    }
+</script>
 
 </body>
 </html>
