@@ -4,43 +4,57 @@
     <title>Entry Filtre</title>
 
     <style>
-        .pivot-table-entry-cell {
-            text-align: center;      /* yatay ortalama */
-            vertical-align: middle;  /* dikey ortalama */
-            min-width: 20px;
-            min-height: 14px;
-        }
+        a {
+    text-decoration: none;
+    color: inherit;
+    }
 
-        .pivot-table-entry-cell a {
-        text-decoration: none;   /* alt çizgiyi kaldır */
-        color: inherit;          /* bulunduğu hücrenin rengini kullan */
+    a:visited {
+        color: inherit;
+    }
 
-        }
+    a:hover {
+        color: blue;
+    }
 
-        .pivot-table-entry-cell a:visited {
-            color: inherit;          /* tıklanmış linkin rengini değiştirme */
-        }
 
-        .pivot-table-entry-header {
-        writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
-        transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
-        text-align: center;
-        vertical-align: bottom;
-        padding: 0px;
-        margin: 0px;
-        white-space: nowrap;
-        }
+.pivot-table-entry-cell {
+    text-align: center;      /* yatay ortalama */
+    vertical-align: middle;  /* dikey ortalama */
+    min-width: 20px;
+    min-height: 14px;
+}
 
-        .status-0 {
-            background-color: gray;
-        }
-        .status-1 {
-            background-color: green;
-        }
-        .status-2 {
-            background-color: red;
-        }
-        /* gelecekte yeni status değerleri eklemek kolaylaşır */
+.pivot-table-entry-cell a {
+text-decoration: none;   /* alt çizgiyi kaldır */
+color: inherit;          /* bulunduğu hücrenin rengini kullan */
+
+}
+
+.pivot-table-entry-cell a:visited {
+    color: inherit;          /* tıklanmış linkin rengini değiştirme */
+}
+
+.pivot-table-entry-header {
+writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+text-align: center;
+vertical-align: bottom;
+padding: 0px;
+margin: 0px;
+white-space: nowrap;
+}
+
+.status-0 {
+    background-color: gray;
+}
+.status-1 {
+    background-color: green;
+}
+.status-2 {
+    background-color: red;
+}
+/* gelecekte yeni status değerleri eklemek kolaylaşır */
 
     </style>
 </head>
