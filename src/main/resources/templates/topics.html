@@ -19,10 +19,10 @@
         .add-entry-column {
             text-align: center;
         }
-        .edit-entry-column {
+        .edit-topic-column {
             text-align: center;
         }
-        .delete-entry-column {
+        .delete-topic-column {
             text-align: center;
         }
     </style>
@@ -84,12 +84,13 @@
     </thead>
     <tbody>
     <tr th:each="topic : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
-        <td class="delete-entry-column">
+        <td class="delete-topic-column">
             <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
                onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">Delete</a>
         </td>
-        <td class="edit-entry-column">
-            <a th:href="@{/topics/edit/{id}(id=${topic.id})}" th:text="${zeroPaddedTopicId}">Edit</a>
+        <td class="edit-topic-column">
+            <a th:href="@{/topics/edit/{id}(id=${topic.id})}" th:text="${zeroPaddedTopicId}"
+               target="_blank" rel="noopener noreferrer">Edit</a>
         </td>
         <!-- Category Name -->
         <td th:text="${topic.category.name}">Category Name</td>

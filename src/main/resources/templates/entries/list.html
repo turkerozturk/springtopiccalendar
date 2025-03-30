@@ -2,6 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Entry Listesi</title>
+    <style>
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a:visited {
+            color: inherit;
+        }
+
+        a:hover {
+            color: blue;
+        }
+
+        .edit-entry-column {
+            text-align: center;
+        }
+        .delete-entry-column {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <a href="/">home</a>
@@ -15,23 +36,24 @@
 <table border="1">
     <thead>
     <tr>
-        <th>Aksiyon</th>
+        <th>Delete</th>
         <th>ID</th>
-        <th>Topic</th>
         <th>Date</th>
         <th>Status</th>
+        <th>Topic</th>
         <th>Note</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="entry : ${entries}">
+    <tr th:each="entry : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
         <td>
-            <a th:href="@{/entries/edit/{id}(id=${entry.id})}">Düzenle</a> |
             <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
-               onclick="return confirmDelete()">Sil</a>
+               onclick="return confirmDelete()">Delete</a>
         </td>
-        <td th:text="${entry.id}"></td>
-        <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+        <td class="edit-entry-column">
+            <a th:href="@{/entries/edit/{id}(id=${entry.id})}" th:text="${zeroPaddedEntryId}"
+               target="_blank" rel="noopener noreferrer">Edit</a>
+        </td>
         <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
                 .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
                 .atZone(T(java.time.ZoneId).systemDefault())
@@ -39,6 +61,7 @@
             th:title="${entry.dateMillisYmd}"
         >        </td>
         <td th:text="${entry.status}"></td>
+        <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
         <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
     </tr>
     </tbody>
