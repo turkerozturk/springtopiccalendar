@@ -148,7 +148,11 @@
         <!-- Her topic için bir satır -->
         <tr th:each="topic : ${pivotData.topicList}">
             <!-- İlk sütun: topic adı -->
-            <td th:text="${topic.name}"></td>
+            <td>
+                <a th:href="@{/entries(topicId=${topic.id})}"
+                   th:text="${topic.name}">
+                </a>
+            </td>
 
             <!-- Ardından pivotData.dateRange kadar hücre -->
             <!-- pivotData.dateRange kadar hücre -->

@@ -15,16 +15,21 @@
 <table border="1">
     <thead>
     <tr>
+        <th>Aksiyon</th>
         <th>ID</th>
         <th>Topic</th>
         <th>Date</th>
         <th>Status</th>
         <th>Note</th>
-        <th>Aksiyon</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="entry : ${entries}">
+        <td>
+            <a th:href="@{/entries/edit/{id}(id=${entry.id})}">Düzenle</a> |
+            <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+               onclick="return confirmDelete()">Sil</a>
+        </td>
         <td th:text="${entry.id}"></td>
         <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
         <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
@@ -35,11 +40,6 @@
         >        </td>
         <td th:text="${entry.status}"></td>
         <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
-        <td>
-            <a th:href="@{/entries/edit/{id}(id=${entry.id})}">Düzenle</a> |
-            <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
-               onclick="return confirmDelete()">Sil</a>
-        </td>
     </tr>
     </tbody>
 </table>

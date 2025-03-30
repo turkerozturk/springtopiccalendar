@@ -40,9 +40,20 @@ public class EntryController {
     }
 
     @GetMapping
-    public String listEntries(Model model) {
-        model.addAttribute("entries", entryRepository.findAll());
-        return "entries/list";
+    public String listEntries(@RequestParam(name = "topicId", required = false) Long topicId,
+                              Model model) {
+
+        if (topicId != null) {
+            // Belirtilen topic'e ait entry'leri getir
+            var entries = entryRepository.findByTopicId(topicId);
+            model.addAttribute("entries", entries);
+        } else {
+            // topicId gönderilmemişse tüm entry'leri getir
+            var allEntries = entryRepository.findAll();
+            model.addAttribute("entries", allEntries);
+        }
+
+        return "entries/list";  // templates/entries/list.html
     }
 
     @GetMapping("/new")
