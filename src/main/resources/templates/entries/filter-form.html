@@ -155,7 +155,21 @@
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
-            <th>Topic</th>
+            <!-- Topic başlığı -->
+            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;">
+                <!-- Tıklayınca sıralama yapsın -->
+                Topic
+
+                <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
+                <div>
+                    <input type="text"
+                           id="topicSearchBox"
+                           placeholder="Topic ara..."
+                           onkeyup="filterPivotTableByTopic()"
+                           style="width: 100px;" />
+                </div>
+            </th>
+
             <!-- Tarih sütun başlıkları -->
             <th th:each="day : ${pivotData.dateRange}"
                 th:text="${day}"
@@ -306,6 +320,71 @@
             });
     }
 </script>
+
+<script>
+    // Bu değişken, tıklama sıralarını takip etmek için kullanılır
+    // 1 => A-Z (ascending), -1 => Z-A (descending)
+    let pivotTopicSortOrder = 1;
+
+    // 1) Tablonun "Topic" sütunu göre sıralama
+    function sortPivotTableByTopic() {
+        const table = document.getElementById("pivot-table");
+        if (!table) return;
+
+        const tbody = table.querySelector("tbody");
+        if (!tbody) return;
+
+        // <tr> satırlarını diziye al
+        const rowsArray = Array.from(tbody.querySelectorAll("tr"));
+
+        // rowsArray'i sort ederken, Topic hücresindeki metne göre karşılaştırma yapıyoruz
+        rowsArray.sort((rowA, rowB) => {
+            // Birinci sütun (Topic) -> index 0
+            const cellA = rowA.cells[0]?.innerText?.trim() || "";
+            const cellB = rowB.cells[0]?.innerText?.trim() || "";
+
+            if (cellA < cellB) return -1 * pivotTopicSortOrder;
+            if (cellA > cellB) return 1 * pivotTopicSortOrder;
+            return 0;
+        });
+
+        // Sıralama yapıldıktan sonra, tbody içine yeniden ekle
+        rowsArray.forEach(row => tbody.appendChild(row));
+
+        // Sıradaki tıklamada tam tersi sırada sıralamak için çevir
+        pivotTopicSortOrder *= -1;
+    }
+
+    // 2) "Topic" sütununda arama kutusuna göre filtreleme
+    function filterPivotTableByTopic() {
+        const input = document.getElementById("topicSearchBox");
+        if (!input) return;
+        const filterText = input.value.toLowerCase(); // arama metni (küçük harfe dönüştürdük)
+
+        const table = document.getElementById("pivot-table");
+        if (!table) return;
+
+        const tbody = table.querySelector("tbody");
+        if (!tbody) return;
+
+        // Tüm satırları gez
+        const rows = tbody.querySelectorAll("tr");
+        rows.forEach((row) => {
+            const topicCell = row.cells[0]; // ilk sütun (Topic)
+            if (!topicCell) return;
+
+            const topicText = topicCell.innerText.toLowerCase();
+
+            // Aranan metin, topic ismi içinde geçiyorsa göster, değilse gizle
+            if (topicText.includes(filterText)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+</script>
+
 
 </body>
 </html>
