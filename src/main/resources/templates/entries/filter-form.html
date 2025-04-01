@@ -43,14 +43,28 @@ color: inherit;          /* bulunduğu hücrenin rengini kullan */
     color: inherit;          /* tıklanmış linkin rengini değiştirme */
 }
 
+a.add-new-entry {
+  color: transparent;
+  transition: color 0.3s ease;
+}
+
+a.add-new-entry:hover {
+  color: black;
+}
+
 .pivot-table-entry-header {
-writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
-transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
-text-align: center;
-vertical-align: bottom;
-padding: 0px;
-margin: 0px;
-white-space: nowrap;
+
+    text-align: center;
+
+}
+
+.vertical-text {
+    writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+    transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+    vertical-align: middle;
+    padding: 0px;
+    margin: 0px;
+    white-space: nowrap;
 }
 
 .status-0 {
@@ -162,7 +176,7 @@ white-space: nowrap;
                             <div class="col-sm-8">
                                 <input type="date" id="startDate"
                                        class="form-control"
-                                       th:field="*{startDate}" />
+                                       th:field="*{startDate}"/>
                             </div>
                         </div>
 
@@ -174,7 +188,7 @@ white-space: nowrap;
                             <div class="col-sm-8">
                                 <input type="date" id="endDate"
                                        class="form-control"
-                                       th:field="*{endDate}" />
+                                       th:field="*{endDate}"/>
                             </div>
                         </div>
 
@@ -218,19 +232,19 @@ white-space: nowrap;
     <!-- Önceki & Sonraki & Temizle -->
     <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
         <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}" />
-        <input type="hidden" th:field="*{startDate}" />
-        <input type="hidden" th:field="*{endDate}" />
-        <input type="hidden" th:field="*{statuses}" />
+        <input type="hidden" th:field="*{topicIds}"/>
+        <input type="hidden" th:field="*{startDate}"/>
+        <input type="hidden" th:field="*{endDate}"/>
+        <input type="hidden" th:field="*{statuses}"/>
         <button type="submit">Previous</button>
     </form>
 
     <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
         <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}" />
-        <input type="hidden" th:field="*{startDate}" />
-        <input type="hidden" th:field="*{endDate}" />
-        <input type="hidden" th:field="*{statuses}" />
+        <input type="hidden" th:field="*{topicIds}"/>
+        <input type="hidden" th:field="*{startDate}"/>
+        <input type="hidden" th:field="*{endDate}"/>
+        <input type="hidden" th:field="*{statuses}"/>
         <button type="submit">Next</button>
     </form>
 
@@ -245,19 +259,12 @@ white-space: nowrap;
 <!-- Filtre Sonuçları -->
 
 
-
-
-
-
-
-
-
 <!-- Pivot tablo -->
 
 <div th:if="${entries != null}">
     <h2>Pivot Table</h2>
 
-    <table id="pivot-table" class="table">
+    <table id="pivot-table" class="table table-bordered">
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
@@ -272,15 +279,19 @@ white-space: nowrap;
                            id="topicSearchBox"
                            placeholder="Topic ara..."
                            onkeyup="filterPivotTableByTopic()"
-                           style="width: 100px;" />
+                           style="width: 100px;"/>
                 </div>
             </th>
 
             <!-- Tarih sütun başlıkları -->
-            <th th:each="day : ${pivotData.dateRange}"
-                th:text="${day}"
-                class="pivot-table-entry-header">Gün</th>
-            <th>Total</th>
+            <th th:each="day : ${pivotData.dateRange}" class="pivot-table-entry-header">
+                <span th:text="${day}"
+                class="vertical-text">
+                Gün
+
+                </span>
+            </th>
+            <th class="text-center">Total</th>
         </tr>
         </thead>
 
@@ -315,7 +326,7 @@ white-space: nowrap;
                           (${entryItem.status == 2} ? 'status-2' : 'status-other'))
                         "
                     >
-                        *
+                        @
                     </a>
                     <br/>
                 </div>
@@ -323,7 +334,7 @@ white-space: nowrap;
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
                 <div th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}">
                     <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}"
-                    title="New Entry">
+                       title="Add New Entry" class="add-new-entry">
                         +
                     </a>
                 </div>
@@ -331,7 +342,8 @@ white-space: nowrap;
             </td>
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->
-            <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"></td>
+            <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
+                class="text-center"></td>
         </tr>
         </tbody>
     </table>
