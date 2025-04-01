@@ -1,17 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>deneme</title>
+    <title>Topics Tracker</title>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
 </head>
 <body>
-<p>deneme</p>
-<a href="categories">categories</a>
-<br />
-<a href="topics">topics</a>
-<br />
-<a href="entries">entries</a>
-<br />
-<a href="entry-filter/form">entry-filter/form</a>
+
+<div class="container my-5 mx-auto" style="max-width: 600px;">
+    <h1 class="mb-4">Topics Tracker Personal</h1>
+
+    <!-- Lorem Ipsum Açıklama -->
+    <p>
+        This is the main page. For more info, visit the
+        <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank">website</a>.
+        You need to create one or more categories, one or more topics, and then you can add entries for the topics.
+    </p>
+
+    <!-- Bağlantılar (List Group) -->
+    <div class="list-group">
+        <a href="categories" class="list-group-item list-group-item-action">
+            Categories
+        </a>
+        <a href="topics" class="list-group-item list-group-item-action">
+            Topics
+        </a>
+        <a href="entries" class="list-group-item list-group-item-action">
+            Entries
+        </a>
+        <a href="entry-filter/form" class="list-group-item list-group-item-action">
+            Entry Filter Form
+        </a>
+    </div>
+</div>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </body>
 </html>
