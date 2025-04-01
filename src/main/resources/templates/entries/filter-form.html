@@ -25,12 +25,20 @@
         color: blue;
     }
 
+.centered {
+max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  }
 
 .pivot-table-entry-cell {
     text-align: center;      /* yatay ortalama */
     vertical-align: middle;  /* dikey ortalama */
     min-width: 20px;
     min-height: 14px;
+
+    max-width: 20px;         /* Maksimum genişlik 30px */
+    width: 20px;             /* Sabit genişlik 30px */
 }
 
 .pivot-table-entry-cell a {
@@ -65,6 +73,10 @@ a.add-new-entry:hover {
     padding: 0px;
     margin: 0px;
     white-space: nowrap;
+
+    max-width: 20px;
+    width: 20px;
+
 }
 
 .status-0 {
@@ -261,15 +273,15 @@ a.add-new-entry:hover {
 
 <!-- Pivot tablo -->
 
-<div th:if="${entries != null}">
+<div th:if="${entries != null}" class="centered">
     <h2>Pivot Table</h2>
 
-    <table id="pivot-table" class="table table-bordered table-sm">
+    <table id="pivot-table" class="table-bordered table-sm">
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
             <!-- Topic başlığı -->
-            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;" class="col-1">
+            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;">
                 <!-- Tıklayınca sıralama yapsın -->
                 Topic
 
@@ -342,7 +354,7 @@ a.add-new-entry:hover {
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->
             <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
-                class="text-center col-1"></td>
+                class="text-center"></td>
         </tr>
         </tbody>
     </table>
