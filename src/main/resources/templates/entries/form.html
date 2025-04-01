@@ -1,97 +1,129 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
     <title>Entry Formu</title>
 </head>
+
+
 <body>
-<h1 th:text="${#strings.isEmpty(entry.id) ? 'Yeni Entry Ekle' : 'Entry Güncelle'}"></h1>
 
-<!-- HATA MESAJI GÖSTERME ALANI -->
-<div th:if="${errorMessage != null}" style="color:red;">
-    <p th:text="${errorMessage}"></p>
+<div class="container mx-auto mt-4" style="max-width: 400px;">
+    <h1 th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry'}"></h1>
+
+    <!-- HATA MESAJI GÖSTERME ALANI -->
+    <div th:if="${errorMessage != null}" class="text-danger mb-3">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <form th:action="@{/entries/save}" th:object="${entry}" method="post">
+
+        <!-- ID (gizli alan) -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- dateMillisYmd (artık gizli) -->
+        <input type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
+
+        <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
+        <div class="mb-3 row">
+            <label for="categoryFilter" class="col-sm-4 col-form-label">Filter by Category:</label>
+            <div class="col-sm-8">
+                <select id="categoryFilter" class="form-select" onchange="filterTopics()">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.name}"
+                            th:text="${cat.name}"></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- (2) ARAMA METNİ İLE FİLTRE -->
+        <div class="mb-3 row">
+            <label for="topicSearch" class="col-sm-4 col-form-label">Search Topic:</label>
+            <div class="col-sm-8">
+                <input type="text" id="topicSearch" class="form-control" oninput="filterTopics()"/>
+            </div>
+        </div>
+
+        <!-- (3) TOPIC SEÇİM ALANI -->
+        <div class="mb-3 row">
+            <label for="topicSelect" class="col-sm-4 col-form-label">Topic:</label>
+            <div class="col-sm-8">
+                <select th:field="*{topic.id}" id="topicSelect" class="form-select">
+                    <option th:each="t : ${topics}"
+                            th:value="${t.id}"
+                            th:text="${t.name}"
+                            th:attr="data-category=${t.category != null ? t.category.name : ''}">
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Alternatif: Date Picker (tıklayarak seçim) -->
+        <div class="mb-3 row">
+            <label for="datePicker" class="col-sm-4 col-form-label">Select Date:</label>
+            <div class="col-sm-8">
+                <input type="date"
+                       id="datePicker"
+                       class="form-control"
+                       onchange="convertDateToEpoch()"
+                       th:value="${
+                           entry.dateMillisYmd != null
+                             ? T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                                .atZone(T(java.time.ZoneId).systemDefault())
+                                .toLocalDate()
+                             : ''
+                       }" />
+            </div>
+        </div>
+
+        <!-- status -->
+        <div class="mb-3 row">
+            <label for="status" class="col-sm-4 col-form-label">Status:</label>
+            <div class="col-sm-8">
+                <select th:field="*{status}" id="status" class="form-select">
+                    <option value="0">Not Marked</option>
+                    <option value="1">Done</option>
+                    <option value="2">Warning</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- NOTE CONTENT -->
+        <div class="mb-3 row">
+            <label for="note_content" class="col-sm-4 col-form-label">Note:</label>
+            <div class="col-sm-8">
+                <textarea th:field="*{note.content}" id="note_content" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+    </form>
+
+    <!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
+    <div th:if="${entry.id != null}" class="mt-3">
+        <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+           onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');"
+           class="btn btn-danger w-100">
+            Delete Entry
+        </a>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/entries}" class="btn btn-secondary w-100">Listeye Dön</a>
+    </div>
 </div>
 
-<form th:action="@{/entries/save}" th:object="${entry}" method="post">
-
-    <!-- ID (gizli alan) -->
-    <input type="hidden" th:field="*{id}"/>
-
-    <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
-    <label for="categoryFilter">Filter by Category:</label>
-    <select id="categoryFilter" onchange="filterTopics()">
-        <option value="">All Categories</option>
-        <!-- Elinizde kategori listesi varsa doldurabilirsiniz -->
-        <option th:each="cat : ${categories}"
-                th:value="${cat.name}"
-                th:text="${cat.name}">
-        </option>
-    </select>
-    <br/><br/>
-
-    <!-- (2) ARAMA METNİ İLE FİLTRE -->
-    <label for="topicSearch">Search Topic:</label>
-    <input type="text" id="topicSearch" oninput="filterTopics()"/>
-    <br/><br/>
-
-    <!-- (3) TOPIC SEÇİM ALANI -->
-    <label for="topicSelect">Topic:</label>
-    <select th:field="*{topic.id}" id="topicSelect">
-        <option th:each="t : ${topics}"
-                th:value="${t.id}"
-                th:text="${t.name}"
-                th:attr="data-category=${t.category != null ? t.category.name : ''}">
-            <!-- t.category.name varsa data-category'ye ekle -->
-        </option>
-    </select>
-    <br/><br/>
-
-    <!-- dateMillisYmd (Elle milis girişi) -->
-    <label for="dateMillisYmd">Milisaniye (13 hane):</label>
-    <input type="text" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
-    <br><br>
-
-    <!-- Alternatif: Date Picker (tıklayarak seçim) -->
-    <label for="datePicker">Tarih Seç:</label>
-    <input type="date"
-           id="datePicker"
-           onchange="convertDateToEpoch()"
-           th:value="${
-             entry.dateMillisYmd != null
-               ? T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
-                  .atZone(T(java.time.ZoneId).systemDefault())
-                  .toLocalDate()
-               : ''
-           }" />
-    <br><br>
-
-    <!-- status -->
-    <label for="status">Status:</label>
-    <select th:field="*{status}" id="status">
-        <option value="0">Not Marked</option>
-        <option value="1">Done</option>
-        <option value="2">Warning</option>
-    </select>
-    <br/><br/>
-
-    <!-- NOTE CONTENT -->
-    <label for="note_content">Note:</label>
-    <textarea th:field="*{note.content}" id="note_content"></textarea>
-    <br/><br/>
-
-    <button type="submit">Kaydet</button>
-</form>
-
-<!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
-<div th:if="${entry.id != null}">
-    <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
-       onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');">
-        Delete Entry
-    </a>
-</div>
 
 
-<br/>
-<a th:href="@{/entries}">Listeye Dön</a>
+
+
+
 
 <script>
     /**
@@ -140,5 +172,7 @@
         });
     }
 </script>
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </body>
 </html>
