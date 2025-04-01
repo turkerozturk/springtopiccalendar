@@ -12,93 +12,103 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
     <style>
-        a {
-    text-decoration: none;
-    color: inherit;
-    }
+        #topic-name {
+          white-space: nowrap;
+          overflow: hidden;
+          position: relative;
+          max-width: 200px;
+      }
 
-    a:visited {
-        color: inherit;
-    }
 
-    a:hover {
-        color: blue;
-    }
 
-.centered {
-max-width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
-  }
 
-.pivot-table-entry-cell {
-    text-align: center;      /* yatay ortalama */
-    vertical-align: middle;  /* dikey ortalama */
-    min-width: 20px;
-    min-height: 14px;
+              a {
+          text-decoration: none;
+          color: inherit;
+          }
 
-    max-width: 20px;         /* Maksimum genişlik 30px */
-    width: 20px;             /* Sabit genişlik 30px */
-}
+          a:visited {
+              color: inherit;
+          }
 
-.pivot-table-entry-cell a {
-text-decoration: none;   /* alt çizgiyi kaldır */
-color: inherit;          /* bulunduğu hücrenin rengini kullan */
+          a:hover {
+              color: blue;
+          }
 
-}
-
-.pivot-table-entry-cell a:visited {
-    color: inherit;          /* tıklanmış linkin rengini değiştirme */
-}
-
-a.add-new-entry {
-  color: transparent;
-  transition: color 0.3s ease;
-}
-
-a.add-new-entry:hover {
-  color: black;
-}
-
-.pivot-table-entry-header {
-
-    text-align: center;
-
-}
-
-.vertical-text {
-    writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
-    transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
-    vertical-align: middle;
-    padding: 0px;
-    margin: 0px;
-    white-space: nowrap;
-
-    max-width: 20px;
-    width: 20px;
-
-}
-
-.status-0 {
-    background-color: gainsboro !important;
-}
-.status-1 {
-    background-color: palegreen !important;
-}
-.status-2 {
-    background-color: tomato !important;
-}
-/* gelecekte yeni status değerleri eklemek kolaylaşır */
-
-        .accordion-container {
-          max-width: 400px;
-          margin: 0 auto; /* Ortalansın diye */
+      .centered {
+      max-width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
         }
 
-        .align-center-horizontal {
-          max-width: 400px;
-          margin: 0 auto; /* Ortalansın diye */
-        }
+      .pivot-table-entry-cell {
+          text-align: center;      /* yatay ortalama */
+          vertical-align: middle;  /* dikey ortalama */
+          min-width: 20px;
+          min-height: 14px;
+
+          max-width: 20px;         /* Maksimum genişlik 30px */
+          width: 20px;             /* Sabit genişlik 30px */
+      }
+
+      .pivot-table-entry-cell a {
+      text-decoration: none;   /* alt çizgiyi kaldır */
+      color: inherit;          /* bulunduğu hücrenin rengini kullan */
+
+      }
+
+      .pivot-table-entry-cell a:visited {
+          color: inherit;          /* tıklanmış linkin rengini değiştirme */
+      }
+
+      a.add-new-entry {
+        color: transparent;
+        transition: color 0.3s ease;
+      }
+
+      a.add-new-entry:hover {
+        color: black;
+      }
+
+      .pivot-table-entry-header {
+
+          text-align: center;
+
+      }
+
+      .vertical-text {
+          writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+          transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+          vertical-align: middle;
+          padding: 0px;
+          margin: 0px;
+          white-space: nowrap;
+
+          max-width: 20px;
+          width: 20px;
+
+      }
+
+      .status-0 {
+          background-color: gainsboro !important;
+      }
+      .status-1 {
+          background-color: palegreen !important;
+      }
+      .status-2 {
+          background-color: tomato !important;
+      }
+      /* gelecekte yeni status değerleri eklemek kolaylaşır */
+
+              .accordion-container {
+                max-width: 400px;
+                margin: 0 auto; /* Ortalansın diye */
+              }
+
+              .align-center-horizontal {
+                max-width: 400px;
+                margin: 0 auto; /* Ortalansın diye */
+              }
 
     </style>
 </head>
@@ -315,9 +325,9 @@ a.add-new-entry:hover {
         <!-- Her topic için bir satır -->
         <tr th:each="topic : ${pivotData.topicList}">
             <!-- İlk sütun: topic adı -->
-            <td>
+            <td id="topic-name">
                 <a th:href="@{/entries(topicId=${topic.id})}"
-                   th:text="${topic.name}">
+                   th:text="${topic.name}" th:title="${topic.name}">
                 </a>
             </td>
 
