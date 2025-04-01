@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
     <title>Entry Listesi</title>
+
+    <!-- Bootstrap CSS (Örnek 5.x sürümü) -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" /> -->
+
     <style>
+        /* Mevcut link stilleriniz */
         a {
             text-decoration: none;
             color: inherit;
         }
-
         a:visited {
             color: inherit;
         }
-
         a:hover {
             color: blue;
         }
 
+        /* Kolonları koruyoruz */
         .edit-entry-column {
             text-align: center;
         }
@@ -25,51 +35,76 @@
     </style>
 </head>
 <body>
-<a href="/">home</a>
 
+<div class="container my-4" style="max-width: 1000px;">
 
-<h1>Entries</h1>
+    <!-- Ana sayfaya dön linki -->
+    <div class="mb-3">
+        <a href="/" class="btn btn-secondary">Home</a>
+    </div>
 
-<a th:href="@{/entries/new}">Yeni Entry Ekle</a><br/><br/>
-<br />
-<a href="entry-filter/form">entry-filter/form</a>
-<table border="1">
-    <thead>
-    <tr>
-        <th>Delete</th>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Topic</th>
-        <th>Note</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="entry : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
-        <td>
-            <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
-               onclick="return confirmDelete()">Delete</a>
-        </td>
-        <td class="edit-entry-column">
-            <a th:href="@{/entries/edit/{id}(id=${entry.id})}" th:text="${zeroPaddedEntryId}"
-               target="_blank" rel="noopener noreferrer">Edit</a>
-        </td>
-        <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
-                .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
-                .atZone(T(java.time.ZoneId).systemDefault())
-                .toLocalDate())}"
-            th:title="${entry.dateMillisYmd}"
-        >        </td>
-        <td th:text="${entry.status}"></td>
-        <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
-        <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
-    </tr>
-    </tbody>
-</table>
+    <h1 class="mb-4">Entries</h1>
+
+    <!-- Yeni Entry Butonu -->
+    <div class="mb-3">
+        <a th:href="@{/entries/new}" class="btn btn-primary">Add New Entry</a>
+    </div>
+
+    <!-- Filtre Form (opsiyonel) -->
+    <div class="mb-3">
+        <a href="entry-filter/form" class="btn btn-info">entry-filter/form</a>
+    </div>
+
+    <!-- Entries Tablosu -->
+    <table class="table table-striped table-bordered align-middle">
+        <thead>
+        <tr>
+            <th>Delete</th>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Topic</th>
+            <th>Note</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
+            <td class="delete-entry-column">
+                <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+                   onclick="return confirmDelete()">
+                    Delete
+                </a>
+            </td>
+            <td class="edit-entry-column">
+                <a th:href="@{/entries/edit/{id}(id=${entry.id})}"
+                   th:text="${zeroPaddedEntryId}"
+                   target="_blank" rel="noopener noreferrer">
+                    Edit
+                </a>
+            </td>
+            <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                              .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                              .atZone(T(java.time.ZoneId).systemDefault())
+                              .toLocalDate())}"
+                th:title="${entry.dateMillisYmd}">
+            </td>
+            <td th:text="${entry.status}"></td>
+            <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+            <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS (opsiyonel) -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+
 <script>
     function confirmDelete() {
-        return confirm("Bu entry kaydını silmek istediğinize emin misiniz?");
+        return confirm("Are you sure to delete this entry?");
     }
 </script>
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </body>
 </html>
