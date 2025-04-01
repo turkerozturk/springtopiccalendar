@@ -275,6 +275,8 @@ a.add-new-entry:hover {
 
 <div th:if="${entries != null}" class="centered">
 
+    <!-- Tabloyu sarmalayan scrollable container -->
+    <div style="overflow-x: auto; max-width: 100%;">
 
     <table id="pivot-table" class="table-bordered table-sm">
         <caption>Pivot Table</caption>
@@ -360,7 +362,7 @@ a.add-new-entry:hover {
         </tr>
         </tbody>
     </table>
-
+    </div>
 </div>
 
 <!-- Düz liste tablo -->
