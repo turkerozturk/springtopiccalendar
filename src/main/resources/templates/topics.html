@@ -133,7 +133,7 @@
         <tr th:each="topic : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
             <td class="delete-topic-column">
                 <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-                   onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?')">
+                   onclick="return confirm('Are you sure to delete this topic?')">
                     Delete
                 </a>
             </td>
