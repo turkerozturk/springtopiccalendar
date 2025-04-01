@@ -68,13 +68,13 @@ a.add-new-entry:hover {
 }
 
 .status-0 {
-    background-color: gray;
+    background-color: gainsboro !important;
 }
 .status-1 {
-    background-color: green;
+    background-color: palegreen !important;
 }
 .status-2 {
-    background-color: red;
+    background-color: tomato !important;
 }
 /* gelecekte yeni status değerleri eklemek kolaylaşır */
 
@@ -264,12 +264,12 @@ a.add-new-entry:hover {
 <div th:if="${entries != null}">
     <h2>Pivot Table</h2>
 
-    <table id="pivot-table" class="table table-bordered">
+    <table id="pivot-table" class="table table-bordered table-sm">
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
             <!-- Topic başlığı -->
-            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;">
+            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;" class="col-1">
                 <!-- Tıklayınca sıralama yapsın -->
                 Topic
 
@@ -291,7 +291,7 @@ a.add-new-entry:hover {
 
                 </span>
             </th>
-            <th class="text-center">Total</th>
+            <th class="text-center" style="vertical-align: middle;">Total</th>
         </tr>
         </thead>
 
@@ -308,42 +308,41 @@ a.add-new-entry:hover {
             <!-- Ardından pivotData.dateRange kadar hücre -->
             <!-- pivotData.dateRange kadar hücre -->
 
-            <td th:each="day : ${pivotData.dateRange}"
+            <th:block th:each="day : ${pivotData.dateRange}"
                 th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}"
-                class="pivot-table-entry-cell">
+                >
 
                 <!-- Kac entry varsa göster -->
                 <!-- <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span> -->
 
 
                 <!-- Var olan entry'leri link şeklinde göster -->
-                <div th:if="${entriesForDay != null}" th:each="entryItem : ${entriesForDay}">
+                <th:block th:if="${entriesForDay != null}">
+                    <td th:each="entryItem : ${entriesForDay}"
+                        th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
+
                     <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
                        th:title="${'Entry ' + entryItem.id}"
-                       th:classappend="
-                          ${entryItem.status == 0} ? 'status-0' :
-                          (${entryItem.status == 1} ? 'status-1' :
-                          (${entryItem.status == 2} ? 'status-2' : 'status-other'))
-                        "
+
                     >
                         @
                     </a>
                     <br/>
-                </div>
-
+                </td>
+                </th:block>
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
-                <div th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}">
+                <td th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}" class="pivot-table-entry-cell">
                     <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}"
                        title="Add New Entry" class="add-new-entry">
                         +
                     </a>
-                </div>
+                </td>
 
-            </td>
+            </th:block>
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->
             <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
-                class="text-center"></td>
+                class="text-center col-1"></td>
         </tr>
         </tbody>
     </table>
@@ -354,7 +353,7 @@ a.add-new-entry:hover {
 
 <div th:if="${entries != null}" class="align-center-horizontal">
     <h2>Results</h2>
-    <table border="1">
+    <table class="table table-bordered table-sm">
         <tr>
             <th>ID</th>
             <th>Topic</th>
