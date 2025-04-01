@@ -80,7 +80,8 @@ public class EntryController {
             entry.setDateMillisYmd(epochMillis);
         } else {
             // Aksi halde bugünün tarih milisini varsayılan yap
-            entry.setDateMillisYmd(DateUtils.getEpochMillisToday());
+            DateUtils dateUtils = new DateUtils();
+            entry.setDateMillisYmd(dateUtils.getEpochMillisToday());
         }
 
         // to make topic selection easier from gui, we are sending categories to selection box:
