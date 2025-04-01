@@ -8,11 +8,16 @@ import java.time.ZoneId;
 
 public class DateUtils {
 
-    @Autowired
-    private AppTimeZoneProvider timeZoneProvider;
 
-   // private static String timeZone = "UTC";
-    ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
+    public void setZoneId(ZoneId zoneId) {
+        this.zone = zoneId;
+    }
+
+
+
+
+    // private static String timeZone = "UTC";
+    private ZoneId zone;
     public long getEpochMillis(int year, int month, int day) {
         // Create a LocalDate instance
         LocalDate date = LocalDate.of(year, month, day);

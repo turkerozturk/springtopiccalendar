@@ -29,15 +29,16 @@ import java.util.Optional;
 @RequestMapping("/entries")
 public class EntryController {
 
-    @Autowired
-    private AppTimeZoneProvider timeZoneProvider;
+
+    private final AppTimeZoneProvider timeZoneProvider;
     private final EntryRepository entryRepository;
     private final TopicRepository topicRepository;
 
     private final CategoryRepository categoryRepository;
 
 
-    public EntryController(EntryRepository entryRepository, TopicRepository topicRepository, CategoryRepository categoryRepository) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, TopicRepository topicRepository, CategoryRepository categoryRepository) {
+        this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.topicRepository = topicRepository;
         this.categoryRepository = categoryRepository;
@@ -75,11 +76,11 @@ public class EntryController {
             Topic topic = topicRepository.findById(topicId).orElse(null);
             entry.setTopic(topic);
         }
+        ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
 
         if (dateString != null) {
             // "2025-03-27" gibi bir tarih formatını LocalDate'e parse edip epoch milise çeviriyoruz
             LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
 
             long epochMillis = localDate.atStartOfDay(zone).toInstant().toEpochMilli();
             // System.out.println(dateString + " " + localDate + " " + epochMillis);
@@ -87,6 +88,7 @@ public class EntryController {
         } else {
             // Aksi halde bugünün tarih milisini varsayılan yap
             DateUtils dateUtils = new DateUtils();
+            dateUtils.setZoneId(zone);
             entry.setDateMillisYmd(dateUtils.getEpochMillisToday());
         }
 
