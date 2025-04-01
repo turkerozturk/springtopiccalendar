@@ -2,9 +2,11 @@ package turkerozturk.ptt.controller.web;
 
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
@@ -27,6 +29,8 @@ import java.util.Optional;
 @RequestMapping("/entries")
 public class EntryController {
 
+    @Autowired
+    private AppTimeZoneProvider timeZoneProvider;
     private final EntryRepository entryRepository;
     private final TopicRepository topicRepository;
 
@@ -75,7 +79,9 @@ public class EntryController {
         if (dateString != null) {
             // "2025-03-27" gibi bir tarih formatını LocalDate'e parse edip epoch milise çeviriyoruz
             LocalDate localDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            long epochMillis = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
+
+            long epochMillis = localDate.atStartOfDay(zone).toInstant().toEpochMilli();
             // System.out.println(dateString + " " + localDate + " " + epochMillis);
             entry.setDateMillisYmd(epochMillis);
         } else {
