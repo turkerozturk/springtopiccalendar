@@ -101,6 +101,9 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);      // Pivot tablo
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
+        // Bugünün tarihini modele ekleyelim
+        model.addAttribute("today", today);
+
         model.addAttribute("allTopics", topicRepository.findAll());
 
         model.addAttribute("allCategories", categoryRepository.findAll());
@@ -164,6 +167,10 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
+        // Bugünün tarihini modele ekleyelim
+        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
@@ -206,6 +213,10 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
+        // Bugünün tarihini modele ekleyelim
+        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
@@ -246,6 +257,10 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
+        // Bugünün tarihini modele ekleyelim
+        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
@@ -359,6 +374,10 @@ public class EntryFilterController {
         model.addAttribute("pivotData", pivotData);
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
+        // Bugünün tarihini modele ekleyelim
+        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
