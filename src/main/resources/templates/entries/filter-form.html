@@ -312,7 +312,7 @@
             <!-- Tarih sütun başlıkları -->
             <th th:each="day : ${pivotData.dateRange}" class="pivot-table-entry-header">
                 <span th:text="${day}"
-                class="vertical-text">
+                class="vertical-text" th:title="${day}">
                 Gün
 
                 </span>

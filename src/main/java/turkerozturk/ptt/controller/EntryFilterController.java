@@ -3,10 +3,12 @@ package turkerozturk.ptt.controller;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.dto.TopicDto;
 import turkerozturk.ptt.entity.Entry;
@@ -26,20 +28,27 @@ import java.util.*;
 @RequestMapping("/entry-filter")
 public class EntryFilterController {
 
+    private final AppTimeZoneProvider timeZoneProvider;
+
     private final EntryRepository entryRepository;
     private final TopicRepository topicRepository;
     private final FilterService filterService;
 
     private final CategoryRepository categoryRepository;
 
-    public EntryFilterController(EntryRepository entryRepository,
+    public EntryFilterController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository,
                                  TopicRepository topicRepository,
                                  FilterService filterService, CategoryRepository categoryRepository) {
+        this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.topicRepository = topicRepository;
         this.filterService = filterService;
         this.categoryRepository = categoryRepository;
     }
+
+    @Value("${week.start.day:MONDAY}")
+    private String startDayOfWeek;
+
 
     /**
      * Filtre formunu ilk kez açarken varsayılan değerleri doldurup
@@ -51,8 +60,11 @@ public class EntryFilterController {
         FilterDto filterDto = new FilterDto();
 
         // 2) Bu haftanın başı ve sonu (örneğin pazartesi - pazar)
-        LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = filterService.getStartOfWeek(today, DayOfWeek.MONDAY);
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
         LocalDate endOfWeek = startOfWeek.plusDays(6);
 
         filterDto.setStartDate(startOfWeek);
