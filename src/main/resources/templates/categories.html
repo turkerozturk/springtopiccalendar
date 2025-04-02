@@ -55,6 +55,7 @@
                 Topics Count
             </th>
             <th scope="col">Actions</th>
+            <th scope="col">Add Topic</th>
         </tr>
         </thead>
         <tbody>
@@ -71,6 +72,13 @@
                    class="btn btn-sm btn-danger"
                    onclick="return confirmDelete()">
                     Delete
+                </a>
+            </td>
+            <!-- Her kategori satırında, yeni topic oluşturma linki -->
+            <td>
+                <a th:href="@{/topics/create(categoryId=${cat.id})}" class="btn btn-sm btn-primary"
+                   target="_blank" title="Add Topic">
+                    +
                 </a>
             </td>
         </tr>

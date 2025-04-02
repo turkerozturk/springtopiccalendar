@@ -10,6 +10,7 @@ import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.service.CategoryService;
 import turkerozturk.ptt.service.TopicService;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -40,9 +41,25 @@ public class TopicWebController {
 
     // Yeni topic oluşturma formu
     @GetMapping("/create")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(
+            @RequestParam(name="categoryId", required=false) Long categoryId,
+            Model model) {
+
+        // Yeni boş Topic nesnesi (formda doldurulacak)
+        Topic topic = new Topic();
+
+        // Eğer bir categoryId gelmişse, bu ID'ye karşılık gelen Category'yi bulup topic’e set ediyoruz
+        if (categoryId != null) {
+            Category cat = categoryService.getCategoryById(categoryId).orElse(null);
+
+                topic.setCategory(cat);
+
+        }
+
+
+
         // Boş bir DTO
-        model.addAttribute("topicDTO", new Topic());
+        model.addAttribute("topicDTO", topic);
 
         // Kategori seçimi için tüm kategorileri DTO olarak modele ekleyelim
         var categoryDTOList = categoryService.getAllCategories()
