@@ -18,6 +18,11 @@ public class TopicService {
         return topicRepository.findAll();
     }
 
+    public List<Topic> getTopicsByCategoryId(Long categoryId) {
+        return topicRepository.findByCategoryId(categoryId);
+    }
+
+
     public Optional<Topic> getTopicById(Long id) {
         return topicRepository.findById(id);
     }

@@ -68,12 +68,14 @@
         <div class="col-auto">
             <select id="categorySelect"
                     class="form-select"
-                    onchange="filterRows()">
+                    onchange="onCategoryChange()">
                 <option value="">All</option>
                 <!-- Tüm kategoriler listeleniyor -->
                 <option th:each="cat : ${categories}"
-                        th:value="${cat.name}"
-                        th:text="${cat.name}">
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:selected="${cat.id} == ${selectedCategoryId}">
+                >
                 </option>
             </select>
         </div>
@@ -191,8 +193,8 @@
             var topicText = tds[4].textContent.toLowerCase();
             var descText = tds[5].textContent.toLowerCase();
 
-            // Kategori select'i boş ya da satırın kategorisini içeriyorsa
-            var categoryMatch = (categorySelect === "" || categoryText.includes(categorySelect));
+
+
 
             // Diğer textbox filtrelerini contains mantığıyla karşılaştır
             var idMatch = idText.includes(filterId);
@@ -201,7 +203,7 @@
             var descMatch = descText.includes(filterDescription);
 
             // Tüm koşulları AND ile birleştiriyoruz
-            if (categoryMatch && idMatch && categoryNameMatch && topicNameMatch && descMatch) {
+            if (idMatch && categoryNameMatch && topicNameMatch && descMatch) {
                 rows[i].style.display = "";
             } else {
                 rows[i].style.display = "none";
@@ -258,6 +260,19 @@
         }
     }
 </script>
+<script th:inline="javascript">
+    function onCategoryChange() {
+        var categoryId = document.getElementById("categorySelect").value;
+        var baseUrl = /*[[ @{/topics} ]]*/;  // Bu satır, server tarafında /topics olarak parse edilecek
+
+        if (categoryId === "") {
+            window.location.href = baseUrl;
+        } else {
+            window.location.href = baseUrl + "?categoryId=" + categoryId;
+        }
+    }
+</script>
+
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </body>

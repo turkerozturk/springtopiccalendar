@@ -62,7 +62,12 @@
         <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
         <tr th:each="cat : ${categories}">
             <td th:text="${cat.id}">1</td>
-            <td th:text="${cat.name}">Example Category</td>
+            <td>
+                <a th:href="@{/topics(categoryId=${cat.id})}"
+                   target="_blank" th:text="${cat.name}" th:title="${cat.name}">
+
+                </a>
+            </td>
             <td th:text="${cat.topics.size()}">0</td>
             <td>
                 <a th:href="@{/categories/edit/{id}(id=${cat.id})}" class="btn btn-sm btn-warning">

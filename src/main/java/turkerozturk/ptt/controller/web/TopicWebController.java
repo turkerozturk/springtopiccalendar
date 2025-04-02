@@ -10,6 +10,7 @@ import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.service.CategoryService;
 import turkerozturk.ptt.service.TopicService;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,21 +24,32 @@ public class TopicWebController {
     @Autowired
     private CategoryService categoryService;
 
-    // Tüm topic'leri listeleyen sayfa
-    // Tüm topic'leri listeleyen sayfa
+    // Tüm topic'leri veya belli kategoriye ait topic'leri listeleyen sayfa
     @GetMapping
-    public String listTopics(Model model) {
-        // Tüm topic'leri çek
-        var topicDTOList = topicService.getAllTopics()
-                .stream()
-                .collect(Collectors.toList());
-        // Tüm kategorileri de filtrelemede kullanmak için modele ekle
+    public String listTopics(@RequestParam(value = "categoryId", required = false) Long categoryId,
+                             Model model) {
+        // Tüm kategorileri drop-down'da göstermek için çekelim
         var categoryList = categoryService.getAllCategories();
 
+        // Eğer kategori ID geldiyse filtreli liste, yoksa tüm liste
+        List<Topic> topicDTOList;
+        if (categoryId != null) {
+            topicDTOList = topicService.getTopicsByCategoryId(categoryId);
+            model.addAttribute("selectedCategoryId", categoryId);
+        } else {
+            topicDTOList = topicService.getAllTopics();
+            // Seçili kategori yoksa null bırakabiliriz
+            model.addAttribute("selectedCategoryId", null);
+        }
+
+        // Modele eklemeler
         model.addAttribute("topics", topicDTOList);
         model.addAttribute("categories", categoryList);
+
         return "topics"; // templates/topics.html
     }
+
+
 
     // Yeni topic oluşturma formu
     @GetMapping("/create")
