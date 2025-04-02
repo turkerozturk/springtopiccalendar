@@ -58,9 +58,19 @@
     </div>
 
     <!-- "Create New Topic" butonu -->
-    <div class="mb-3">
-        <a th:href="@{/topics/create}" class="btn btn-primary">Create New Topic</a>
-    </div>
+    <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
+         seçiliyse ?catId=xxx şeklinde gönder -->
+    <a th:if="${selectedCategoryId != null}"
+       th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
+       class="btn btn-primary">
+        Create New Topic
+    </a>
+    <a th:if="${selectedCategoryId == null}"
+       th:href="@{/topics/create}"
+       class="btn btn-primary">
+        Create New Topic
+    </a>
+
 
     <!-- Kategori Seçimi -->
     <div class="row align-items-center mb-3">
