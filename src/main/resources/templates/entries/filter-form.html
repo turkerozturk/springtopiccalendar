@@ -309,14 +309,15 @@
                 </div>
             </th>
 
-            <!-- Tarih sütun başlıkları -->
+            <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
             <th th:each="day : ${pivotData.dateRange}" class="pivot-table-entry-header">
-                <span th:text="${day}"
-                class="vertical-text" th:title="${day}">
-                Gün
-
+                <span th:text="${#temporals.format(day, dateFormat)}"
+                      class="vertical-text"
+                      th:title="${#temporals.format(day, dateFormatTitle)}">
+                    Gün
                 </span>
             </th>
+
             <th class="text-center" style="vertical-align: middle;">Total</th>
         </tr>
         </thead>

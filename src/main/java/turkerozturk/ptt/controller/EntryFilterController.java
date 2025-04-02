@@ -28,6 +28,13 @@ import java.util.*;
 @RequestMapping("/entry-filter")
 public class EntryFilterController {
 
+    @Value("${pivot.table.date.format:yyyy-MM-dd}")
+    private String dateFormat;
+
+    @Value("${pivot.table.date.format.title:yyyy-MM-dd EEEE}")
+    private String dateFormatTitle;
+
+
     private final AppTimeZoneProvider timeZoneProvider;
 
     private final EntryRepository entryRepository;
@@ -92,6 +99,8 @@ public class EntryFilterController {
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("entries", filteredEntries);  // Normal tablo
         model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
         model.addAttribute("allTopics", topicRepository.findAll());
 
         model.addAttribute("allCategories", categoryRepository.findAll());
@@ -153,6 +162,8 @@ public class EntryFilterController {
 
         model.addAttribute("entries", filteredEntries);
         model.addAttribute("pivotData", pivotData);
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
 
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
@@ -193,6 +204,9 @@ public class EntryFilterController {
         // 5) Modele ekle
         model.addAttribute("entries", filteredEntries);
         model.addAttribute("pivotData", pivotData);
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
+
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
 
@@ -230,6 +244,9 @@ public class EntryFilterController {
 
         model.addAttribute("entries", filteredEntries);
         model.addAttribute("pivotData", pivotData);
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
+
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
 
@@ -340,6 +357,9 @@ public class EntryFilterController {
 
         model.addAttribute("entries", filteredEntries);
         model.addAttribute("pivotData", pivotData);
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
+
         model.addAttribute("filterDto", filterDto);
         model.addAttribute("allTopics", topicRepository.findAll());
 
