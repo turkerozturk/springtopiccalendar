@@ -293,7 +293,12 @@
     <div style="overflow-x: auto; max-width: 100%;">
 
     <table id="pivot-table" class="table-bordered table-sm">
-        <caption>Pivot Table</caption>
+        <caption>Pivot Tablo
+              <span th:each="cat : ${allCategories}"
+                    th:if="${cat.id} == ${filterDto.categoryId}"
+                    th:text="${'-&nbsp;' + cat.name}">
+              </span>
+        </caption>
 
         <!-- Tablonun başlığı (thead) -->
         <thead>
