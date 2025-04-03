@@ -17,102 +17,110 @@
           overflow: hidden;
           position: relative;
           max-width: 200px;
-      }
-
-.highlighted-day {
-    background-color: yellow; /* Örnek */
-    font-weight: bold;
-}
-
-
-
-              a {
-          text-decoration: none;
-          color: inherit;
-          }
-
-          a:visited {
-              color: inherit;
-          }
-
-          a:hover {
-              color: blue;
-          }
-
-      .centered {
-      max-width: fit-content;
-        margin-left: auto;
-        margin-right: auto;
         }
 
-      .pivot-table-entry-cell {
-          text-align: center;      /* yatay ortalama */
-          vertical-align: middle;  /* dikey ortalama */
-          min-width: 20px;
-          min-height: 14px;
-
-          max-width: 20px;         /* Maksimum genişlik 30px */
-          width: 20px;             /* Sabit genişlik 30px */
-      }
-
-      .pivot-table-entry-cell a {
-      text-decoration: none;   /* alt çizgiyi kaldır */
-      color: inherit;          /* bulunduğu hücrenin rengini kullan */
-
-      }
-
-      .pivot-table-entry-cell a:visited {
-          color: inherit;          /* tıklanmış linkin rengini değiştirme */
-      }
-
-      a.add-new-entry {
-        color: transparent;
-        transition: color 0.3s ease;
-      }
-
-      a.add-new-entry:hover {
-        color: black;
-      }
-
-      .pivot-table-entry-header {
-
-          text-align: center;
-
-      }
-
-      .vertical-text {
-          writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
-          transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
-          vertical-align: middle;
-          padding: 0px;
-          margin: 0px;
+        #category-name {
           white-space: nowrap;
+          overflow: hidden;
+          position: relative;
+          max-width: 100px;
+        }
 
-          max-width: 20px;
-          width: 20px;
 
-      }
+        .highlighted-day {
+            background-color: yellow; /* Örnek */
+            font-weight: bold;
+        }
 
-      .status-0 {
-          background-color: gainsboro !important;
-      }
-      .status-1 {
-          background-color: palegreen !important;
-      }
-      .status-2 {
-          background-color: tomato !important;
-      }
-      /* gelecekte yeni status değerleri eklemek kolaylaşır */
 
-              .accordion-container {
-                max-width: 400px;
-                margin: 0 auto; /* Ortalansın diye */
+
+                      a {
+                  text-decoration: none;
+                  color: inherit;
+                  }
+
+                  a:visited {
+                      color: inherit;
+                  }
+
+                  a:hover {
+                      color: blue;
+                  }
+
+              .centered {
+              max-width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+                }
+
+              .pivot-table-entry-cell {
+                  text-align: center;      /* yatay ortalama */
+                  vertical-align: middle;  /* dikey ortalama */
+                  min-width: 20px;
+                  min-height: 14px;
+
+                  max-width: 20px;         /* Maksimum genişlik 30px */
+                  width: 20px;             /* Sabit genişlik 30px */
               }
 
-              .align-center-horizontal {
-                max-width: 400px;
-                margin: 0 auto; /* Ortalansın diye */
+              .pivot-table-entry-cell a {
+              text-decoration: none;   /* alt çizgiyi kaldır */
+              color: inherit;          /* bulunduğu hücrenin rengini kullan */
+
               }
+
+              .pivot-table-entry-cell a:visited {
+                  color: inherit;          /* tıklanmış linkin rengini değiştirme */
+              }
+
+              a.add-new-entry {
+                color: transparent;
+                transition: color 0.3s ease;
+              }
+
+              a.add-new-entry:hover {
+                color: black;
+              }
+
+              .pivot-table-entry-header {
+
+                  text-align: center;
+
+              }
+
+              .vertical-text {
+                  writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+                  transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+                  vertical-align: middle;
+                  padding: 0px;
+                  margin: 0px;
+                  white-space: nowrap;
+
+                  max-width: 20px;
+                  width: 20px;
+
+              }
+
+              .status-0 {
+                  background-color: gainsboro !important;
+              }
+              .status-1 {
+                  background-color: palegreen !important;
+              }
+              .status-2 {
+                  background-color: tomato !important;
+              }
+              /* gelecekte yeni status değerleri eklemek kolaylaşır */
+
+                      .accordion-container {
+                        max-width: 400px;
+                        margin: 0 auto; /* Ortalansın diye */
+                      }
+
+                      .align-center-horizontal {
+                        max-width: 400px;
+                        margin: 0 auto; /* Ortalansın diye */
+                      }
 
     </style>
 </head>
@@ -303,7 +311,8 @@
         <!-- Tablonun başlığı (thead) -->
         <thead>
         <tr>
-            <!-- Topic başlığı -->
+
+            <!-- ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
             <th onclick="sortPivotTableByTopic()" style="cursor: pointer;">
                 <!-- Tıklayınca sıralama yapsın -->
                 Topic
@@ -317,6 +326,9 @@
                            style="width: 100px;"/>
                 </div>
             </th>
+
+            <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
+            <th th:if="${filterDto.categoryId == null}">Category</th>
 
             <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
             <th th:each="day : ${pivotData.dateRange}"
@@ -338,12 +350,16 @@
         <tbody>
         <!-- Her topic için bir satır -->
         <tr th:each="topic : ${pivotData.topicList}">
-            <!-- İlk sütun: topic adı -->
+
+            <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
             <td id="topic-name">
                 <a th:href="@{/entries(topicId=${topic.id})}"
                    th:text="${topic.name}" th:title="${topic.name}">
                 </a>
             </td>
+
+            <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
+            <td id="category-name" th:if="${filterDto.categoryId == null}" th:text="${topic.category.name}"></td>
 
             <!-- Ardından pivotData.dateRange kadar hücre -->
             <!-- pivotData.dateRange kadar hücre -->
@@ -395,6 +411,7 @@
     <h2>Results</h2>
     <table class="table table-bordered table-sm">
         <tr>
+            <th>Category</th>
             <th>ID</th>
             <th>Topic</th>
             <th>Date</th>
@@ -402,6 +419,7 @@
             <th>Note</th>
         </tr>
         <tr th:each="entry : ${entries}">
+            <td th:text="${entry.topic.category.name}"></td>
             <td th:text="${entry.id}">1</td>
             <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
             <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
