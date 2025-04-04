@@ -54,29 +54,32 @@
 
     <!-- Ana sayfaya dön linki -->
     <div class="mb-3">
-        <a href="/" class="btn btn-secondary">Home</a>
+        <a href="/" class="btn btn-secondary btn-sm">Home</a>
+        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
+
+        <!-- "Create New Topic" butonu -->
+        <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
+             seçiliyse ?catId=xxx şeklinde gönder -->
+        <a th:if="${selectedCategoryId != null}"
+           th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
+           class="btn btn-success">
+            Create New Topic
+        </a>
+        <a th:if="${selectedCategoryId == null}"
+           th:href="@{/topics/create}"
+           class="btn btn-success">
+            Create New Topic
+        </a>
     </div>
 
-    <h1 class="mb-4">Topic List</h1>
+    <h1 class="mb-4">Topics</h1>
 
     <!-- Hata mesajı varsa göster -->
     <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <!-- "Create New Topic" butonu -->
-    <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
-         seçiliyse ?catId=xxx şeklinde gönder -->
-    <a th:if="${selectedCategoryId != null}"
-       th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
-       class="btn btn-primary">
-        Create New Topic
-    </a>
-    <a th:if="${selectedCategoryId == null}"
-       th:href="@{/topics/create}"
-       class="btn btn-primary">
-        Create New Topic
-    </a>
+
 
 
     <!-- Kategori Seçimi -->

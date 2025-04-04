@@ -15,6 +15,13 @@
 
 <div class="container my-4" style="max-width: 600px;">
 
+    <div class="mb-3">
+        <a href="/" class="btn btn-sm">Home</a>
+
+
+        <a href="/categories" class="btn btn-sm">Categories</a>
+    </div>
+
     <!-- Başlık (Edit veya Create) -->
     <h1 th:if="${categoryDTO.id != null}" class="mb-4">Edit Category</h1>
     <h1 th:if="${categoryDTO.id == null}" class="mb-4">Create Category</h1>
