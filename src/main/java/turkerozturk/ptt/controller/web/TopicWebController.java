@@ -99,8 +99,7 @@ public class TopicWebController {
 
         // Kaydet
         topicService.saveTopic(topic);
-
-        return "redirect:/topics";
+        return "redirect:/topics?categoryId=" + categoryId;
     }
 
     // Mevcut topic'i düzenleme formu
@@ -145,7 +144,7 @@ public class TopicWebController {
         // Kayıt
         topicService.saveTopic(existingTopic);
 
-        return "redirect:/topics";
+        return "redirect:/topics?categoryId=" + categoryId;
     }
 
     // Topic silme
