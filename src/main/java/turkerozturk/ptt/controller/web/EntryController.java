@@ -123,7 +123,7 @@ public class EntryController {
         }
         List<Topic> topics = topicRepository.findByCategoryId(categoryId);
 
-        System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
+
 
         // Entity -> DTO dönüştürme
         return topics.stream()

@@ -129,8 +129,9 @@
 <div class="align-center-horizontal">
     <a href="/">Home</a>
     <span>&nbsp;|&nbsp;</span>
-    <a th:href="@{/entries/new(dateYmd=${day}, categoryId=${categoryId}, returnPage=pivottable)}"
-        >Add New Entry</a>
+<!--    <a th:href="@{/entries/new(dateYmd=${#temporals.format(today, dateFormat)}, returnPage=pivottable)}"
+        >Add New Entry</a> -->
+    (Note: Temporarily, Use topics page to add the first entry of a topic, or if any entry exists in the past, make date range wider, until finding a better solution )
     <br/>
 </div>
 
