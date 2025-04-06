@@ -57,15 +57,21 @@
                   text-align: center;      /* yatay ortalama */
                   vertical-align: middle;  /* dikey ortalama */
                   min-width: 20px;
-                  min-height: 14px;
+                  min-height: 20px;
 
-                  max-width: 20px;         /* Maksimum genişlik 30px */
-                  width: 20px;             /* Sabit genişlik 30px */
+                  max-width: 20px;         /* Maksimum genişlik  */
+                  max-height: 20px;         /* Maksimum genişlik  */
+
+                  width: 20px;             /* Sabit genişlik  */
+                  height: 20px;
+                  padding: 0px;
+
               }
 
               .pivot-table-entry-cell a {
               text-decoration: none;   /* alt çizgiyi kaldır */
               color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                  padding: 0px;
 
               }
 
@@ -76,10 +82,33 @@
               a.add-new-entry {
                 color: transparent;
                 transition: color 0.3s ease;
+
+                min-width: 20px;
+                min-height: 20px;
+
+                max-width: 20px;         /* Maksimum genişlik  */
+                max-height: 20px;         /* Maksimum genişlik  */
+
+                width: 20px;             /* Sabit genişlik  */
+                height: 20px;
+                padding: 0px;
               }
 
               a.add-new-entry:hover {
                 color: black;
+                background-color:honeydew;
+                font-size: 16px;
+                font-weight: bold;
+
+                min-width: 20px;
+                min-height: 20px;
+
+                max-width: 20px;         /* Maksimum genişlik  */
+                max-height: 20px;         /* Maksimum genişlik  */
+
+                width: 20px;             /* Sabit genişlik  */
+                height: 20px;
+                padding: 0px;
               }
 
               .pivot-table-entry-header {
@@ -127,12 +156,11 @@
 <body>
 
 <div class="align-center-horizontal">
-    <a href="/">Home</a>
-    <span>&nbsp;|&nbsp;</span>
-<!--    <a th:href="@{/entries/new(dateYmd=${#temporals.format(today, dateFormat)}, returnPage=pivottable)}"
-        >Add New Entry</a> -->
-    (Note: Temporarily, Use topics page to add the first entry of a topic, or if any entry exists in the past, make date range wider, until finding a better solution )
-    <br/>
+    <a href="/" class="btn btn-secondary btn-sm">Home</a>
+    <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
+    <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm">Topics</a>
+
+
 </div>
 
 <!-- <h1>Entry Filtre Formu</h1> -->
@@ -293,6 +321,11 @@
 
 <hr/>
 
+<!-- Seçili Kategori'ye ait tüm topicler için new entry ekleme linklerin basılacağı placeholder, js bağlantılı  -->
+<div id="newEntryLinksContainer" style="margin-top: 10px; max-width:800px; background-color:honeydew;"  class="centered">
+    When you select a category from the category filter, the entry adding links will appear here.
+</div>
+
 <!-- Filtre Sonuçları -->
 
 
@@ -304,7 +337,7 @@
     <div style="overflow-x: auto; max-width: 100%;">
 
     <table id="pivot-table" class="table-bordered table-sm">
-        <caption>Pivot Tablo
+        <caption>Pivot Table
               <span th:each="cat : ${allCategories}"
                     th:if="${cat.id} == ${filterDto.categoryId}"
                     th:text="${'-&nbsp;' + cat.name}">
@@ -405,8 +438,12 @@
         </tr>
         </tbody>
     </table>
+
+
     </div>
 </div>
+
+
 
 <!-- Düz liste tablo -->
 
@@ -464,11 +501,41 @@
                     option.selected = true;
                     topicsSelect.appendChild(option);
                 });
+
+                // Linkleri oluşturup ekrana basalım
+                createNewEntryLinks(categoryId, data);
             })
             .catch(err => {
                 console.error('Topic getirme hatası', err);
             });
     }
+
+
+    // Bu metod seçili kategoriye ait topiclerden linkler oluşturur
+function createNewEntryLinks(categoryId, topics) {
+    const container = document.getElementById('newEntryLinksContainer');
+
+    // Eğer topic yoksa (veya boşsa)
+    if (!topics || topics.length === 0) {
+        container.innerHTML = "kategori seçtiğinizde entry ekleme linkleri burada görünecektir";
+        return;
+    }
+
+    // Önce açıklama ekleyelim
+    container.innerHTML = "Entry eklemek için tıklayın: ";
+
+    // Topic listesi alfabetik sırala
+    topics.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Linkleri oluştur
+    const links = topics.map(topic => {
+        return `<a href="/entries/new?topicId=${topic.id}&returnPage=pivottable&categoryId=${categoryId}">${topic.name}</a>`;
+    }).join(', ');
+
+    // İçeriğe ekleyelim
+    container.innerHTML += " " + links;
+}
+
 </script>
 
 <script>
