@@ -21,8 +21,8 @@
 package turkerozturk.ptt.dummydata;
 
 
-import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
+import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

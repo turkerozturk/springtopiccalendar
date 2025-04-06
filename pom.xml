@@ -2,10 +2,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>spring-boot-crud-example</artifactId>
+  <artifactId>daily-topic-tracker</artifactId>
   <version>1.0.0</version>
-  <name>Spring Boot CRUD Example</name>
-  <description>Spring Boot CRUD example with SQLite</description>
+  <name>Daily Topic Tracker</name>
+  <description>Daily Topic Tracker, a Java Spring Boot application with SQLite database.</description>
+  <url>https://github.com/turkerozturk/springtopiccalendar</url>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -177,10 +178,12 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- https://www.datafaker.net This library is an improved fork of JavaFaker -->
+    <!-- https://mvnrepository.com/artifact/net.datafaker/datafaker -->
     <dependency>
-      <groupId>com.github.javafaker</groupId>
-      <artifactId>javafaker</artifactId>
-      <version>1.0.2</version>
+      <groupId>net.datafaker</groupId>
+      <artifactId>datafaker</artifactId>
+      <version>2.4.2</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
