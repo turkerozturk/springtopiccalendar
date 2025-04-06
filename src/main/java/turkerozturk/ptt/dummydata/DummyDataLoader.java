@@ -105,24 +105,34 @@ public class DummyDataLoader implements CommandLineRunner {
         }
 
 
-        // --- 2) Faker ayarla ve 50 Topic ekle ---
+        // Örnek: DataFaker importları
+// import net.datafaker.Faker;
+// import net.datafaker.providers.base.*;
+// vb. gerekli importlarınız
+
+// --- 1) Kategorileri ayarla ---
         Faker faker = new Faker();
 
-        // --- 1) Önce kategorileri ekleyelim ---
-        // --- Category Generation using Faker and randomCategoryCount ---
         int categoryCount = Integer.parseInt(randomCategoryCount);
-        List<String> availableCategoryNames = new ArrayList<>(Arrays.asList("Food", "Health", "Sport", "Work", "Payments", "Projects"));
+
+// Örnek olarak kullanmak istediğimiz kategoriler:
+        List<String> availableCategoryNames = new ArrayList<>(
+                Arrays.asList("App", "Book", "Hobby", "Medication", "Movie", "Food", "Olympic Sport", "Music")
+        );
         Collections.shuffle(availableCategoryNames);
+
+// Kategorilerin isim tekrarını engellemek için
         Set<String> usedCategoryNames = new HashSet<>();
         List<Category> categories = new ArrayList<>();
 
         for (int i = 0; i < categoryCount; i++) {
-            // Use a predefined name if available, otherwise generate one via Faker.
+            // Eğer listede yeterli kategori kalmadıysa, ek kategori isimlerini
+            // datafaker’dan üretmek istiyorsanız (örneğin commerce().department),
+            // aşağıdaki gibi bir fallback kullanabilirsiniz; burada opsiyonel bırakıyorum:
             String candidateName = i < availableCategoryNames.size()
                     ? availableCategoryNames.get(i)
                     : faker.commerce().department();
 
-            // Ensure the candidateName is unique; if not, append a random alphanumeric suffix.
             while (usedCategoryNames.contains(candidateName)) {
                 candidateName = candidateName + "_" + faker.bothify("??##");
             }
@@ -132,52 +142,81 @@ public class DummyDataLoader implements CommandLineRunner {
             categories.add(categoryRepository.save(c));
         }
 
-
-        // --- 2) Topic ekle ---
+// --- 2) Topic ekle ---
         List<Topic> topics = new ArrayList<>();
 
         for (int i = 0; i < Integer.parseInt(randomTopicCount); i++) {
+            // Rastgele bir kategori seç
             Category randomCategory = categories.get(faker.random().nextInt(categories.size()));
+
             Topic t = new Topic();
             t.setCategory(randomCategory);
-            t.setName(faker.book().title());         // Örnek olarak "Random Book Title"
-            t.setDescription(faker.lorem().sentence()); // Kısa açıklama
+
+            // Kategori adına göre, topic adını ilgili DataFaker metoduyla çekiyoruz:
+            switch (randomCategory.getName()) {
+                case "App":
+                    t.setName(faker.app().name());               // Örn: "CalendarPro"
+                    break;
+                case "Book":
+                    t.setName(faker.book().title());             // Örn: "Lord of The Fakes"
+                    break;
+                case "Hobby":
+                    t.setName(faker.hobby().activity());         // Örn: "Woodworking"
+                    break;
+                case "Medication":
+                    t.setName(faker.medication().drugName());    // Örn: "Aspirin"
+                    break;
+                case "Movie":
+                    t.setName(faker.movie().name());             // Örn: "Random Movie Title"
+                    break;
+                case "Food":
+                    // örnek: "Pizza", "Sushi", vb.
+                    t.setName(faker.food().dish());
+                    break;
+                case "Olympic Sport":
+                    t.setName(faker.olympicSport().summerOlympics());
+                    break;
+                case "Music":
+                    // örnek: "Piano", "Guitar", vb.
+                    t.setName(faker.music().instrument());
+                    break;
+                default:
+                    // Eğer fallback ya da fazladan bir kategoriye düşersek
+                    t.setName(faker.lorem().word());
+                    break;
+            }
+
+            // Kısa bir açıklama
+            t.setDescription(faker.lorem().sentence());
             topics.add(topicRepository.save(t));
         }
 
-        // --- 3) iki tarih arası tarih aralığında Entryleri ekle ---
-        // --- Parsing date properties into LocalDate ---
-        LocalDate startDate = LocalDate.parse(randomStartDate);  // e.g., "2025-03-01"
-        LocalDate endDate   = LocalDate.parse(randomEndDate);    // e.g., "2025-05-01"
+// --- 3) Entry'leri, tarih aralığı + status + note içerikleriyle ekle ---
+        LocalDate startDate = LocalDate.parse(randomStartDate);
+        LocalDate endDate   = LocalDate.parse(randomEndDate);
         long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
-        // (startDate ile endDate dahil fark + 1 gün)
 
-        // Uniq. constraint için kullanılan set: "topicId:dateMillis" şeklinde
+// Uniq. constraint set: "topicId:dateMillis"
         Set<String> usedTopicDatePairs = new HashSet<>();
 
         for (int i = 0; i < Integer.parseInt(randomEntryCount); i++) {
-            // Rastgele bir topic seç
             Topic randomTopic = topics.get(faker.random().nextInt(topics.size()));
 
-            // Rastgele bir gün seç (0 ile totalDays-1 arası)
             long randomOffset = faker.number().numberBetween(0L, totalDays);
             LocalDate randomDate = startDate.plusDays(randomOffset);
 
-            // Sadece tarih bazlı epoch (00:00:00)
             long dateMillis = randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-
-            // Tekrarlanma ihtimaline karşı 10 denemeye kadar yeni tarih arayabiliriz
             String pairKey = randomTopic.getId() + ":" + dateMillis;
+
             int attempt = 0;
             while (usedTopicDatePairs.contains(pairKey) && attempt < 10) {
                 randomOffset = faker.number().numberBetween(0L, totalDays);
-                randomDate   = startDate.plusDays(randomOffset);
-                dateMillis   = randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-                pairKey      = randomTopic.getId() + ":" + dateMillis;
+                randomDate = startDate.plusDays(randomOffset);
+                dateMillis = randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                pairKey = randomTopic.getId() + ":" + dateMillis;
                 attempt++;
             }
 
-            // Son denemede hala varsa, bu kaydı atla
             if (usedTopicDatePairs.contains(pairKey)) {
                 continue;
             }
@@ -187,19 +226,17 @@ public class DummyDataLoader implements CommandLineRunner {
             Entry entry = new Entry();
             entry.setTopic(randomTopic);
             entry.setDateMillisYmd(dateMillis);
-            // status = [0,1,2] => 0=not marked, 1=done, 2=warning
-            entry.setStatus(faker.number().numberBetween(0, 3));
+            entry.setStatus(faker.number().numberBetween(0, 3)); // 0=not marked,1=done,2=warning
 
-            // Note oluştur
+            // Note ilişkisi
             Note note = new Note();
-            note.setContent(faker.lorem().paragraph()); // Lorem ipsum benzeri içerik
-            // Note ile Entry arasındaki ilişkiyi kur
+            note.setContent(faker.lorem().paragraph());
             note.setEntry(entry);
             entry.setNote(note);
 
-            // Kaydet
             entryRepository.save(entry);
         }
+
 
         System.out.println("Dummy data yüklemesi tamamlandı!");
     }
