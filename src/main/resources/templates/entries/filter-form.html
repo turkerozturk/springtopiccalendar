@@ -388,7 +388,7 @@
                 </th:block>
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
                 <td th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}" class="pivot-table-entry-cell">
-                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day})}"
+                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day}, categoryId=${topic.category.id})}"
                        title="Add New Entry" class="add-new-entry">
                         +
                     </a>
@@ -435,35 +435,7 @@
 </div>
 
 <!-- AJAX / JavaScript Kısmı -->
-<script>
-    function onCategoryChange(categoryId) {
-        // Kategori seçilmediyse, topic alanını temizle
-        if(!categoryId) {
-            const topicsSelect = document.getElementById('topicsSelect');
-            topicsSelect.innerHTML = ''; // Tüm optionları temizle
-            return;
-        }
 
-        // Seçilen kategoriye göre sunucuya AJAX çağrısı
-        fetch('/entry-filter/topics-by-category?categoryId=' + categoryId)
-            .then(response => response.json())
-            .then(data => {
-                // data => Topic nesnelerinin listesi
-                const topicsSelect = document.getElementById('topicsSelect');
-                topicsSelect.innerHTML = ''; // Öncekileri temizle
-
-                data.forEach(topic => {
-                    const option = document.createElement('option');
-                    option.value = topic.id;
-                    option.text = topic.name;
-                    topicsSelect.appendChild(option);
-                });
-            })
-            .catch(err => {
-                console.error('Topic getirme hatası', err);
-            });
-    }
-</script>
 <script>
     function onCategoryChange(categoryId) {
         // Kategori seçilmediyse, topic alanını temizle

@@ -163,18 +163,17 @@
             </td>
             <td class="edit-topic-column">
                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                   th:text="${zeroPaddedTopicId}"
-                   target="_blank" rel="noopener noreferrer">
+                   th:text="${zeroPaddedTopicId}">
                     Edit
                 </a>
             </td>
             <!-- Category Name -->
             <td th:text="${topic.category.name}" class="crop-text">Category Name</td>
+
             <!-- Quick Add Entry -->
             <td class="add-entry-column">
-                <a th:href="@{/entries/new(topicId=${topic.id})}"
-                   title="+"
-                   target="_blank" rel="noopener noreferrer">
+                <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
+                   title="+">
                     +
                 </a>
             </td>
@@ -185,8 +184,7 @@
 
             <td>
                 <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
-                   th:text="list"
-                   target="_blank" rel="noopener noreferrer">
+                   th:text="list">
                     Entries List
                 </a>
             </td>

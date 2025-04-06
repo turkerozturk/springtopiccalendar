@@ -1,6 +1,7 @@
 package turkerozturk.ptt.controller.web;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -8,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
+import turkerozturk.ptt.dto.TopicDto;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Note;
@@ -65,6 +67,8 @@ public class EntryController {
     public String showCreateForm(
             @RequestParam(name="topicId", required=false) Long topicId,
             @RequestParam(name="dateYmd", required=false) String dateString,
+            @RequestParam(name="returnPage", required=false) String returnPage,
+            @RequestParam(name="categoryId", required=false) Long categoryId,
             Model model) {
 
         // System.out.println("dateYmd: " + dateString );
@@ -95,18 +99,44 @@ public class EntryController {
         // to make topic selection easier from gui, we are sending categories to selection box:
         List<Category> categories = categoryRepository.findAll();
         model.addAttribute("categories", categories);
-
+// categoryId doluysa sadece o kategoriye ait topicleri çekelim:
+        List<Topic> topics = (categoryId != null)
+                ? topicRepository.findByCategoryId(categoryId)
+                : topicRepository.findAll();
         model.addAttribute("entry", entry);
-        model.addAttribute("topics", topicRepository.findAll());
+        model.addAttribute("topics", topics);
+        //System.out.println("return page: " + returnPage);
+        model.addAttribute("returnPage", returnPage);
+        model.addAttribute("categoryId", categoryId);
+
         return "entries/form";
     }
 
+    @GetMapping("/api/topicsByCategory")
+    @ResponseBody
+    public List<TopicDto> getTopicsByCategory(@RequestParam("categoryId") Long categoryId) {
+        // İstediğiniz sorguya göre Topics döndürün
+        // Örneğin: List<Topic> list = topicRepository.findByCategoryId(categoryId);
+        // Veya custom sorgu...
+        if (categoryId == null) {
+            return List.of();
+        }
+        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+
+        System.out.println("aaaaaaaaaaaaaaaaaaaaaa");
+
+        // Entity -> DTO dönüştürme
+        return topics.stream()
+                .map(t -> new TopicDto(t.getId(), t.getName()))
+                .toList();
+    }
 
 
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry,
                             Model model,
-                            HttpSession session) {
+                            HttpSession session,
+                            HttpServletRequest request) {
 
 
 
@@ -178,6 +208,40 @@ public class EntryController {
             entryRepository.save(dbEntry);
         }
 
+        // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
+        String paramCategoryId = request.getParameter("categoryId");
+        Long categoryIdFromForm = null;
+        if (paramCategoryId != null && !paramCategoryId.isEmpty()) {
+            categoryIdFromForm = Long.valueOf(paramCategoryId);
+        }
+
+        // 2) Elinizde hem "topic üzerinden gelen" hem de "formdan gizli input ile gelen"
+        // categoryId bilgisi var. Hangisini kullanmak istediğinize karar verin:
+        Long categoryId = formEntry.getTopic() != null && formEntry.getTopic().getCategory() != null
+                ? formEntry.getTopic().getCategory().getId()
+                : null;
+
+        // Eğer "topic.category" null ise, en azından formdan gelen categoryId'yi kullanın
+        if (categoryId == null && categoryIdFromForm != null) {
+            categoryId = categoryIdFromForm;
+        }
+
+
+
+
+        // Hangi sayfadan gelindiğini kontrol ediyoruz.
+        String returnPage = request.getParameter("returnPage");
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "topics":
+                    return "redirect:/topics?categoryId=" + categoryId;
+                case "entry-filter/form":
+                    return "redirect:/entry-filter/return?categoryId=" + categoryId;
+                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+                    return "redirect:/" + returnPage + "?categoryId=" + categoryId;
+            }
+        }
 
         // (1) Session'da filtre bilgisi var mı?
         FilterDto currentFilter = (FilterDto) session.getAttribute("currentFilterDto");
@@ -187,7 +251,7 @@ public class EntryController {
 
             // Yöntem A: Sadece redirect "/entry-filter/return" gibi bir endpoint açar, orada
             // filter'ı tekrar applyFilter benzeri kodla çalıştırır.
-            return "redirect:/entry-filter/return";
+            return "redirect:/entry-filter/return?categoryId=" + categoryId;
             //return "entry-filter/return";
 
             // Yöntem B: Direct "/entry-filter/form" a gider, ama orada filter'ı tekrar uygular.
@@ -196,7 +260,7 @@ public class EntryController {
 
         // (2) Session'da filtre yoksa normal entries listesine
         // Kayıt başarılı, listeye dön.
-        return "redirect:/entries";
+        return "redirect:/entries?categoryId=" + categoryId;
     }
 
 

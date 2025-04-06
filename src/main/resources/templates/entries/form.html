@@ -23,7 +23,16 @@
 
     <form th:action="@{/entries/save}" th:object="${entry}" method="post">
 
-        <!-- ID (gizli alan) -->
+
+
+        <!-- Kaynak URL'deki parametreyle gelen categoryId'yi burada saklıyoruz -->
+        <!-- <input type="hidden" name="origCategoryId" th:value="${categoryId}"/> -->
+
+        <!-- kaydolunca geri donecegi sayfayi belirten bir placeholer string. bkz. save metodu.(gizli alan) -->
+        <input type="hidden" name="returnPage" th:value="${returnPage}">
+
+
+        <!-- topic ID (gizli alan) -->
         <input type="hidden" th:field="*{id}"/>
 
         <!-- dateMillisYmd (artık gizli) -->
@@ -31,13 +40,13 @@
 
         <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
         <div class="mb-3 row">
-            <label for="categoryFilter" class="col-sm-4 col-form-label">Filter by Category:</label>
+            <label for="categoryFilter" class="col-sm-4 col-form-label">Select a Category:</label>
             <div class="col-sm-8">
-                <select id="categoryFilter" class="form-select" onchange="filterTopics()">
-                    <option value="">All Categories</option>
+                <select id="categoryFilter" class="form-select" name="categoryId" onchange="loadTopicsByCategory(this.value)">
                     <option th:each="cat : ${categories}"
-                            th:value="${cat.name}"
-                            th:text="${cat.name}"></option>
+                            th:value="${cat.id}"
+                            th:text="${cat.name}"
+                            th:selected="${cat.id} == ${categoryId}"></option>
                 </select>
             </div>
         </div>
@@ -117,6 +126,10 @@
     <div class="mt-3">
         <a th:href="@{/entries}" class="btn btn-secondary w-100">Listeye Dön</a>
     </div>
+
+    <div class="mt-3">
+        <a th:href="@{/topics(categoryId=${entry.topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+    </div>
 </div>
 
 
@@ -141,13 +154,16 @@
         }
     }
 
+
+
+
     /**
      * Kategori seçimi veya arama metni değiştiğinde
      * selectbox içindeki 'option'ları filtrele
      */
     function filterTopics() {
         const searchText = document.getElementById('topicSearch').value.toLowerCase();
-        const selectedCategory = document.getElementById('categoryFilter').value;
+        //const selectedCategory = document.getElementById('categoryFilter').value;
         const topicSelect = document.getElementById('topicSelect');
 
         // Tüm <option> elemanlarını dolaş
@@ -156,15 +172,15 @@
             // Option yazısı
             const optionText = option.textContent.toLowerCase();
             // Option'ın data-category değeri
-            const optionCategory = option.getAttribute('data-category');
+            //const optionCategory = option.getAttribute('data-category');
 
             // Arama metnine uyuyor mu?
             const matchesText = !searchText || optionText.includes(searchText);
             // Kategori seçimine uyuyor mu? (Boş ise tüm kategorileri göster)
-            const matchesCategory = !selectedCategory || optionCategory === selectedCategory;
+            //const matchesCategory = !selectedCategory || optionCategory === selectedCategory;
 
             // İkisi de uyuyorsa göster, yoksa gizle
-            if (matchesText && matchesCategory) {
+            if (matchesText) {
                 option.style.display = '';
             } else {
                 option.style.display = 'none';
@@ -172,6 +188,48 @@
         });
     }
 </script>
+
+<script>
+    async function loadTopicsByCategory(categoryId) {
+        // Kategori seçimi boşaldıysa topic listesini temizleyebilir veya tüm topicleri tekrar çağırabilirsiniz.
+        if (!categoryId) {
+            clearTopicSelect();
+            return;
+        }
+
+        try {
+            const response = await fetch('/entries/api/topicsByCategory?categoryId=' + categoryId);
+            if (!response.ok) throw new Error('Topic listesi çekilemedi.');
+
+            const data = await response.json(); // JSON array of topics
+
+            populateTopicSelect(data);
+        } catch (err) {
+            console.error(err);
+        }
+        filterTopics(); // kategori degistigi icin arama kutusu filtresini yeni topiclere gore tekrar calistiriyoruz.
+    }
+
+    // topicSelect'i temizle
+    function clearTopicSelect() {
+        const topicSelect = document.getElementById('topicSelect');
+        topicSelect.innerHTML = ''; // tüm option'ları sil
+    }
+
+    // topicSelect'i gelen verilerle güncelle
+    function populateTopicSelect(topics) {
+        const topicSelect = document.getElementById('topicSelect');
+        topicSelect.innerHTML = '';
+
+        topics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic.id;
+            option.textContent = topic.name;
+            topicSelect.appendChild(option);
+        });
+    }
+</script>
+
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 </body>
