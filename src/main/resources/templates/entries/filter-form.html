@@ -129,7 +129,9 @@
 <div class="align-center-horizontal">
     <a href="/">Home</a>
     <span>&nbsp;|&nbsp;</span>
-    <a th:href="@{/entries/new}">Add New Entry</a><br/><br/>
+    <a th:href="@{/entries/new(dateYmd=${day}, categoryId=${categoryId}, returnPage=pivottable)}"
+        >Add New Entry</a>
+    <br/>
 </div>
 
 <!-- <h1>Entry Filtre Formu</h1> -->
@@ -377,7 +379,7 @@
                     <td th:each="entryItem : ${entriesForDay}"
                         th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
 
-                    <a th:href="@{/entries/edit/{id}(id=${entryItem.id})}"
+                    <a th:href="@{/entries/edit/{id}(id=${entryItem.id}, categoryId=${topic.category.id}, returnPage=pivottable)}"
                        th:title="${'Entry ' + entryItem.id}"
 
                     >
@@ -388,7 +390,7 @@
                 </th:block>
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
                 <td th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}" class="pivot-table-entry-cell">
-                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day}, categoryId=${topic.category.id})}"
+                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day}, categoryId=${topic.category.id}, returnPage=pivottable)}"
                        title="Add New Entry" class="add-new-entry">
                         +
                     </a>

@@ -235,7 +235,7 @@ public class EntryController {
             switch (returnPage) {
                 case "topics":
                     return "redirect:/topics?categoryId=" + categoryId;
-                case "entry-filter/form":
+                case "pivottable":
                     return "redirect:/entry-filter/return?categoryId=" + categoryId;
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
@@ -265,7 +265,10 @@ public class EntryController {
 
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id,
+                               @RequestParam(name="returnPage", required=false) String returnPage,
+                               @RequestParam(name="categoryId", required=false) Long categoryId,
+                               Model model) {
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
 
@@ -279,9 +282,14 @@ public class EntryController {
         // to make topic selection easier from gui, we are sending categories to selection box:
         List<Category> categories = categoryRepository.findAll();
         model.addAttribute("categories", categories);
-
+        List<Topic> topics = (categoryId != null)
+                ? topicRepository.findByCategoryId(categoryId)
+                : topicRepository.findAll();
         model.addAttribute("entry", entry);
-        model.addAttribute("topics", topicRepository.findAll());
+        model.addAttribute("entry", entry);
+        model.addAttribute("topics", topics);
+        model.addAttribute("returnPage", returnPage);
+        model.addAttribute("categoryId", categoryId);
         return "entries/form";
     }
 
