@@ -1,17 +1,39 @@
-#NoTrayIcon ; Başlangıçta kendi tray ikonu gizli. Ama isterseniz tray ikonu da ekleyebilir, menü yapabilirsiniz.
+#NoTrayIcon
 
 #include <GUIConstantsEx.au3>
-#include <MsgBoxConstants.au3>
 #include <WindowsConstants.au3>
+#include <MsgBoxConstants.au3>
+#include <EditConstants.au3> ; Edit kontrolü sabitleri (ES_...)
 
-Global $g_iPID = 0 ; Java prosesinin PID'si
-Global $g_sPort = 8080 ; server.port değeri
+; ===== Renk Kodları (BGR formatı) =====
+Global Const $COLOR_RED     = 0xFFCCCC ; Kırmızı (B=FF)
+Global Const $COLOR_GREEN   = 0xCCFFCC ; Yeşil
+Global Const $COLOR_ORANGE  = 0xFFA5CC ; Turuncu (RGB(255,165,0) -> BGR(0,165,255))
+Global Const $COLOR_MAGENTA = 0xFFCCFF ; Mor / Magenta
 
-; ---- Fonksiyon: application.properties içinden port oku ----
+; ===== Uygulama Durumları =====
+Global Const $STATUS_STOPPED  = 0
+Global Const $STATUS_STARTING = 1
+Global Const $STATUS_RUNNING  = 2
+Global Const $STATUS_STOPPING = 3
+
+; ===== Global Değişkenler =====
+Global $g_iPID = 0               ; Java proses PID
+Global $g_sConsoleOutput = ""    ; Log metninin birikeceği yer
+Global $g_sPort = 8080           ; Port, application.properties içinden okuyoruz
+Global $g_iAppStatus = $STATUS_STOPPED ; Başlangıçta durdurulmuş kabul ediyoruz
+Global $g_bLogWindowVisible = True ; Log penceresi başta açık
+
+; ===== GUI Pencereleri ve Kontroller =====
+Global $hMainGUI, $hLogGUI
+Global $idStartStop, $idShowLogs, $idExit
+Global $idConsoleEdit
+
+; --------------------------------------------------------------------------------
+; application.properties içinden port numarasını okur (yoksa 8080 varsayar)
 Func ReadPortNumber($sPropFilePath)
     Local $hFile = FileOpen($sPropFilePath, 0)
     If $hFile = -1 Then
-        ; Dosya yok veya açılamadı -> varsayılan 8080
         Return 8080
     EndIf
 
@@ -24,93 +46,241 @@ Func ReadPortNumber($sPropFilePath)
             ExitLoop
         EndIf
     WEnd
-
     FileClose($hFile)
     Return $sPort
 EndFunc
 
-; ---- Fonksiyon: Spring Boot başlat ----
+; --------------------------------------------------------------------------------
+; GUI buton arkaplan rengini ve metnini, $g_iAppStatus'e göre günceller
+Func UpdateStartStopButtonColor()
+    Switch $g_iAppStatus
+        Case $STATUS_STOPPED
+            GUICtrlSetBkColor($idStartStop, $COLOR_RED)
+            GUICtrlSetData($idStartStop, "Start")
+        Case $STATUS_STARTING
+            GUICtrlSetBkColor($idStartStop, $COLOR_ORANGE)
+            GUICtrlSetData($idStartStop, "Starting...")
+        Case $STATUS_RUNNING
+            GUICtrlSetBkColor($idStartStop, $COLOR_GREEN)
+            GUICtrlSetData($idStartStop, "Stop")
+        Case $STATUS_STOPPING
+            GUICtrlSetBkColor($idStartStop, $COLOR_MAGENTA)
+            GUICtrlSetData($idStartStop, "Stopping...")
+    EndSwitch
+EndFunc
+
+; --------------------------------------------------------------------------------
+; Sunucu UP mı kontrolü için /actuator/health isteği atıyoruz.
+; Dönen metin içinde  "status":"UP"  varsa, True döner.
+Func IsServerUpViaActuator($iPort)
+    Local $sUrl = "http://localhost:" & $iPort & "/actuator/health"
+
+    ; 1) Binary okuma
+    Local $bBinary = InetRead($sUrl, 0) ; 0 => Binary mode
+    If @error Then
+        $g_sConsoleOutput &= "[DEBUG] InetRead failed. @error=" & @error & @CRLF
+        GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+        Return False
+    EndIf
+
+    ; 2) Binary'den string'e dönüştür (UTF-8 varsayımı)
+    Local $sRet = BinaryToString($bBinary, 4) ; 4 => $SB_UTF8
+    ; Alternatif: 1 => $SB_ANSI, 2 => $SB_UNICODE, 3 => $SB_UTF16LE
+    ; Spring Boot, genelde JSON'u UTF-8 olarak döndürür.
+
+    $g_sConsoleOutput &= "[DEBUG] Actuator response (decoded): " & $sRet & @CRLF
+    GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+
+    ; 3) "status":"UP" arıyor muyuz?
+    If StringInStr($sRet, '"status":"UP"') > 0 Then
+        Return True
+    EndIf
+
+    Return False
+EndFunc
+
+
+
+; --------------------------------------------------------------------------------
+; Spring Boot'u başlat (stdout/stderr yakalayacak şekilde).
+; Durumu STARTING yapar, eğer zamanında UP alırsa RUNNING'e geçer ve tarayıcı açar.
 Func StartSpringBoot()
     If $g_iPID <> 0 Then
         MsgBox($MB_ICONINFORMATION, "Uyarı", "Uygulama zaten çalışıyor!")
         Return
     EndIf
 
-    $g_iPID = Run("java -jar daily-topic-tracker-1.0.0.jar", "", @SW_HIDE)
+    ; Durum: STARTING => turuncu
+    $g_iAppStatus = $STATUS_STARTING
+    UpdateStartStopButtonColor()
+
+    ; Komutu başlat: 2=STDOUT,4=STDERR,32=NoConsole => 2+4+32=38
+    $g_iPID = Run("java -jar daily-topic-tracker-1.0.0.jar", "", @SW_HIDE, 38)
     If $g_iPID = 0 Then
-        MsgBox($MB_ICONERROR, "Hata", "Uygulama başlatılamadı!")
+        $g_sConsoleOutput &= "[Hata: Uygulama başlatılamadı!]" & @CRLF
+        GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+        $g_iAppStatus = $STATUS_STOPPED
+        UpdateStartStopButtonColor()
         Return
     EndIf
 
-    ; Portu kullanarak tarayıcı aç
-    ShellExecute("http://localhost:" & $g_sPort)
+    $g_sConsoleOutput &= "[Uygulama başlatılıyor - PID: " & $g_iPID & " ]" & @CRLF
+    GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
 EndFunc
 
-; ---- Fonksiyon: Spring Boot durdur ----
+; --------------------------------------------------------------------------------
+; Spring Boot'u durdur. Durumu STOPPING -> STOPPED.
 Func StopSpringBoot()
     If $g_iPID <> 0 Then
+        $g_iAppStatus = $STATUS_STOPPING
+        UpdateStartStopButtonColor()
+
         ProcessClose($g_iPID)
         $g_iPID = 0
+        $g_sConsoleOutput &= "[Uygulama durduruldu]" & @CRLF
+        GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+
+        $g_iAppStatus = $STATUS_STOPPED
+        UpdateStartStopButtonColor()
     EndIf
 EndFunc
 
-; ---- Program tamamen kapanırken yapılacaklar ----
+; --------------------------------------------------------------------------------
+; Ana Pencere X veya Exit ile kapatılırken
 Func OnClose()
-    ; Spring Boot'u kapat
     StopSpringBoot()
     Exit
 EndFunc
 
-; ---- Giriş Noktası ----
-
-; 1) Portu oku (application.properties hangi dizindeyse orayı belirtmelisiniz)
-$g_sPort = ReadPortNumber("C:\path\to\application.properties")
-
-; 2) GUI oluştur
-Opt("GUIOnEventMode", 1) ; Butonlar için event-based mod
-Local $hGUI = GUICreate("Daily Topic Tracker Control", 300, 120)
-GUISetOnEvent($GUI_EVENT_CLOSE, "OnClose")
-
-; Start/Stop Buton
-Local $idStartStop = GUICtrlCreateButton("Start/Stop", 30, 30, 100, 30)
-GUICtrlSetOnEvent($idStartStop, "ToggleApp")
-
-; Exit Buton
-Local $idExit = GUICtrlCreateButton("Exit", 160, 30, 100, 30)
-GUICtrlSetOnEvent($idExit, "OnClose")
-
-GUISetState(@SW_SHOW, $hGUI)
-
-; Tray simgesi isterseniz:
-; Tray menü (ana menü) oluşturuyoruz:
-Global $hMainMenu = TrayCreateMenu("Daily Tracker Menu")  ; Parametre ekledik
-TraySetToolTip("Daily Topic Tracker")
-TraySetState()  ; tepsi (tray) simgesini görünür hale getirir
-
-; Menü item'ı oluşturalım:
-Global $idShowHide = TrayCreateItem("Show/Hide", $hMainMenu)
-TrayItemSetOnEvent($idShowHide, "ShowHideFunction")
-
-; Boş satır ekleyelim (ayraç gibi)
-TrayCreateItem("", $hMainMenu)
-
-Global $idExitTray = TrayCreateItem("Exit", $hMainMenu)
-TrayItemSetOnEvent($idExitTray, "OnClose")
-
-
-; Tray simgesine tıklandığında pencereyi göstermek veya gizlemek isterseniz ek event'lar ekleyebilirsiniz.
-; Örneğin:
-; TrayItemSetOnEvent(TrayCreateItem("Show/Hide"), "ShowHideFunction")
-
-; Sonsuz döngü
-While 1
-    Sleep(100)
-WEnd
-
+; --------------------------------------------------------------------------------
+; Start/Stop butonuna tıklanınca
 Func ToggleApp()
-    If $g_iPID = 0 Then
+    If $g_iAppStatus = $STATUS_STOPPED Then
         StartSpringBoot()
-    Else
+    ElseIf $g_iAppStatus = $STATUS_RUNNING Then
         StopSpringBoot()
+    Else
+        ; STARTING veya STOPPING durumundaysa tıklandıysa ne yapsın?
+        ; İsterseniz iptal edin ya da bir uyarı verin.
+        MsgBox($MB_ICONINFORMATION, "Bilgi", "İşlem sürüyor, lütfen bekleyin.")
     EndIf
 EndFunc
+
+; --------------------------------------------------------------------------------
+; Log Penceresi aç/kapa
+Func ShowHideLogs()
+    If Not $g_bLogWindowVisible Then
+        GUISetState(@SW_SHOW, $hLogGUI)
+        $g_bLogWindowVisible = True
+    Else
+        GUISetState(@SW_HIDE, $hLogGUI)
+        $g_bLogWindowVisible = False
+    EndIf
+EndFunc
+
+Func OnCloseLogGUI()
+    GUISetState(@SW_HIDE, $hLogGUI)
+    $g_bLogWindowVisible = False
+EndFunc
+
+; --------------------------------------------------------------------------------
+; Tray menüsünde ana GUI'yi göster/gizle
+Func TrayShowHideMain()
+    If BitAND(GUIGetState($hMainGUI), $GUI_SHOW) Then
+        GUISetState(@SW_HIDE, $hMainGUI)
+    Else
+        GUISetState(@SW_SHOW, $hMainGUI)
+    EndIf
+EndFunc
+
+; --------------------------------------------------------------------------------
+; Giriş Noktası
+Opt("GUIOnEventMode", 1)
+
+; 1) Port numarasını oku
+$g_sPort = ReadPortNumber("C:\path\to\application.properties")
+
+; 2) Ana Pencere
+$hMainGUI = GUICreate("Daily Topic Tracker Control", 360, 130)
+GUISetOnEvent($GUI_EVENT_CLOSE, "OnClose")
+
+$idStartStop = GUICtrlCreateButton("Start", 30, 30, 100, 30)
+GUICtrlSetOnEvent($idStartStop, "ToggleApp")
+
+$idShowLogs = GUICtrlCreateButton("Hide Logs", 140, 30, 100, 30) ; ilk açılışta logs açık => buton "Hide Logs" yazabilir
+GUICtrlSetOnEvent($idShowLogs, "ShowHideLogs")
+
+$idExit = GUICtrlCreateButton("Exit", 250, 30, 70, 30)
+GUICtrlSetOnEvent($idExit, "OnClose")
+
+; Başlangıçta Durum STOPPED => Kırmızı
+UpdateStartStopButtonColor()
+GUISetState(@SW_SHOW, $hMainGUI)
+
+; 3) Log Penceresi (ilk başta visible, çünkü $g_bLogWindowVisible=True)
+$hLogGUI = GUICreate("Console Output", 1000, 400, -1, 600, BitOR($WS_CAPTION, $WS_SYSMENU))
+GUISetOnEvent($GUI_EVENT_CLOSE, "OnCloseLogGUI", $hLogGUI)
+
+$idConsoleEdit = GUICtrlCreateEdit("", 10, 10, 980, 350, _
+   BitOR($ES_WANTRETURN, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_READONLY))
+GUICtrlSetFont($idConsoleEdit, 9, 400, 0, "Courier New")
+GUICtrlSetData($idConsoleEdit, "[Uygulama log'ları burada görünecek]" & @CRLF)
+
+If $g_bLogWindowVisible Then
+    GUISetState(@SW_SHOW, $hLogGUI)
+Else
+    GUISetState(@SW_HIDE, $hLogGUI)
+EndIf
+
+; 4) Tray Menüsü (isteğe bağlı)
+TrayCreateMenu("Daily Tracker Menu")
+TraySetToolTip("Daily Topic Tracker")
+TraySetState()
+
+Global $idTrayShowHide = TrayCreateItem("Show/Hide Main GUI")
+TrayItemSetOnEvent($idTrayShowHide, "TrayShowHideMain")
+
+TrayCreateItem("") ; ayraç
+Global $idTrayExit = TrayCreateItem("Exit")
+TrayItemSetOnEvent($idTrayExit, "OnClose")
+
+; --------------------------------------------------------------------------------
+; Ana Döngü: Hem logları okuyoruz hem de actuator/health'i kontrol edip durum değiştirebiliriz.
+While True
+    ; (A) Log çekme
+    If $g_iPID <> 0 Then
+        ; Proses var mı hâlâ?
+        If ProcessExists($g_iPID) = 0 Then
+            ; Proses kendiliğinden kapandı
+            $g_sConsoleOutput &= "[Uygulama kendiliğinden kapandı]" & @CRLF
+            GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+
+            $g_iPID = 0
+            $g_iAppStatus = $STATUS_STOPPED
+            UpdateStartStopButtonColor()
+        Else
+            ; Yeni veri (stdout+stderr) var mı?
+            Local $sOut = StdoutRead($g_iPID)
+            If @error = 0 And $sOut <> "" Then
+                $g_sConsoleOutput &= $sOut
+                GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+            EndIf
+        EndIf
+    EndIf
+
+    ; (B) eğer STARTING durumundaysak actuator/health'e bakıp RUNNING'e geçebiliriz
+    If $g_iAppStatus = $STATUS_STARTING And $g_iPID <> 0 Then
+        ; check /actuator/health
+        If IsServerUpViaActuator($g_sPort) Then
+            ; uygulama artık UP
+            $g_iAppStatus = $STATUS_RUNNING
+            UpdateStartStopButtonColor()
+            ; Tarayıcı açalım
+            $g_sConsoleOutput &= "[Sunucu UP. Tarayıcı açılıyor...]" & @CRLF
+            GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)
+            ShellExecute("http://localhost:" & $g_sPort)
+        EndIf
+    EndIf
+
+    Sleep(200)
+WEnd
