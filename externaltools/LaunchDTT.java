@@ -44,7 +44,7 @@ public class LaunchDTT extends JFrame {
     }
 
     // Renkler (Swing'de RGB kullanıyoruz; AutoIt BGR idi)
-    private static final Color COLOR_STOPPED  = Color.RED;      // Kırmızı
+    private static final Color COLOR_STOPPED  = Color.PINK;      // Kırmızı
     private static final Color COLOR_STARTING = Color.ORANGE;   // Turuncu
     private static final Color COLOR_RUNNING  = Color.GREEN;    // Yeşil
     private static final Color COLOR_STOPPING = Color.MAGENTA;  // Mor/Magenta
@@ -67,7 +67,7 @@ public class LaunchDTT extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            DailyTrackerLauncher frame = new LaunchDTT();
+            LaunchDTT frame = new LaunchDTT();
             frame.setVisible(true);
         });
     }
