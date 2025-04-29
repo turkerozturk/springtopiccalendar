@@ -362,14 +362,26 @@
                 <div>
                     <input type="text"
                            id="topicSearchBox"
-                           placeholder="Topic ara..."
-                           onkeyup="filterPivotTableByTopic()"
+                           placeholder="Search Topic..."
+                           onkeyup="filterPivotTable()"
                            style="width: 100px;"/>
                 </div>
             </th>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
-            <th th:if="${filterDto.categoryId == null}">Category</th>
+            <th th:if="${filterDto.categoryId == null}">Category
+
+
+
+                <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
+                <div>
+                    <input type="text"
+                           id="categorySearchBox"
+                           placeholder="Search Category..."
+                           onkeyup="filterPivotTable()"
+                           style="width: 100px;"/>
+                </div>
+            </th>
 
             <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
             <th th:each="day : ${pivotData.dateRange}"
@@ -577,34 +589,36 @@ function createNewEntryLinks(categoryId, topics) {
         pivotTopicSortOrder *= -1;
     }
 
-    // 2) "Topic" sütununda arama kutusuna göre filtreleme
-    function filterPivotTableByTopic() {
-        const input = document.getElementById("topicSearchBox");
-        if (!input) return;
-        const filterText = input.value.toLowerCase(); // arama metni (küçük harfe dönüştürdük)
+    // 1) Tek filtre fonksiyonu: hem topic hem category'yi birlikte kullanır
+    function filterPivotTable() {
+        const topicInput = document.getElementById("topicSearchBox");
+        const categoryInput = document.getElementById("categorySearchBox");
+        const topicFilter = topicInput ? topicInput.value.toLowerCase() : "";
+        // categoryInput sayfada olmayabilir (conditional), o durumda boş string alır
+        const categoryFilter = categoryInput ? categoryInput.value.toLowerCase() : "";
 
         const table = document.getElementById("pivot-table");
         if (!table) return;
-
         const tbody = table.querySelector("tbody");
         if (!tbody) return;
 
-        // Tüm satırları gez
         const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-            const topicCell = row.cells[0]; // ilk sütun (Topic)
-            if (!topicCell) return;
+        rows.forEach(row => {
+            const topicCell = row.cells[0];
+            const categoryCell = row.cells[1];
 
-            const topicText = topicCell.innerText.toLowerCase();
+            const topicText = topicCell ? topicCell.innerText.toLowerCase() : "";
+            const categoryText = categoryCell ? categoryCell.innerText.toLowerCase() : "";
 
-            // Aranan metin, topic ismi içinde geçiyorsa göster, değilse gizle
-            if (topicText.includes(filterText)) {
+            // Her iki filtre de eşleşiyorsa göster, değilse gizle
+            if (topicText.includes(topicFilter) && categoryText.includes(categoryFilter)) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";
             }
         });
     }
+
 </script>
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
