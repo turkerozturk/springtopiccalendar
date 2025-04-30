@@ -21,12 +21,10 @@
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.*;
@@ -51,6 +49,7 @@ public class LaunchDTT extends JFrame {
 
     // Parçalar
     private final JButton btnStartStop = new JButton("Start");
+    JButton openBtn = new JButton("Open App Folder");
     private final JTextArea textAreaLogs = new JTextArea();
 
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
@@ -115,6 +114,11 @@ public class LaunchDTT extends JFrame {
         // Basit layout
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(btnStartStop);
+
+        openBtn.addActionListener( e -> {
+                onOpenDirectory(e);
+        });
+        topPanel.add(openBtn);
 
         // Ana panel
         setLayout(new BorderLayout());
@@ -266,4 +270,45 @@ public class LaunchDTT extends JFrame {
             appendLog("[ERROR] Cannot open browser: " + e + "\n");
         }
     }
+
+
+    private void onOpenDirectory(ActionEvent e) {
+        // Çalışma dizinini alıyoruz:
+        File dir = new File(".").getAbsoluteFile();
+
+        // 1) Desktop API ile dene
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+            if (desktop.isSupported(Desktop.Action.OPEN)) {
+                try {
+                    desktop.open(dir);
+                    return;
+                } catch (IOException ex) {
+                    // bir sorun oluştu, fallback yapacağız
+                }
+            }
+        }
+
+        // 2) Fallback: OS'e göre komut çalıştır
+        String os = System.getProperty("os.name").toLowerCase();
+        Runtime rt = Runtime.getRuntime();
+        try {
+            if (os.contains("win")) {
+                // Windows Explorer
+                rt.exec(new String[]{"explorer.exe", dir.getAbsolutePath()});
+            } else if (os.contains("mac")) {
+                // macOS Finder
+                rt.exec(new String[]{"open", dir.getAbsolutePath()});
+            } else {
+                // Muhtemelen Linux; xdg-open genelde yüklüdür
+                rt.exec(new String[]{"xdg-open", dir.getAbsolutePath()});
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Dosya yöneticisi açılamadı:\n" + ex.getMessage(),
+                    "Hata", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
 }
