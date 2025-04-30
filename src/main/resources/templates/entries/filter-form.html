@@ -17,6 +17,12 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
     <style>
+        .entry-with-content {
+            color: blue !important;
+            font-weight:bold;
+        }
+
+
         #topic-name {
           white-space: nowrap;
           overflow: hidden;
@@ -430,15 +436,28 @@
                     <td th:each="entryItem : ${entriesForDay}"
                         th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
 
-                    <a th:href="@{/entries/edit/{id}(id=${entryItem.id}, categoryId=${topic.category.id}, returnPage=pivottable)}"
-                       th:title="${'Entry ' + entryItem.id}"
+                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id}, categoryId=${topic.category.id}, returnPage=pivottable)}"
+                           >
 
-                    >
-                        @
-                    </a>
-                    <br/>
-                </td>
+                            <!-- Not içeriği varsa '@' kalın -->
+                            <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
+                                <span th:title="${entryItem.note.content}"  class="entry-with-content" >
+                                    @
+                                </span>
+                            </th:block>
+                            <!-- Yoksa normal '@' -->
+                            <th:block th:if="${#strings.isEmpty(entryItem.note.content)}">
+                                <span th:title="${'Entry ' + entryItem.id}">
+                                @
+                                </span>
+                            </th:block>
+
+                        </a>
+                        <br/>
+                    </td>
                 </th:block>
+
+
                 <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
                 <td th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}" class="pivot-table-entry-cell">
                     <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day}, categoryId=${topic.category.id}, returnPage=pivottable)}"
