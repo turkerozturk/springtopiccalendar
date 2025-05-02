@@ -30,7 +30,9 @@ import org.springframework.stereotype.Repository;
 import turkerozturk.ptt.entity.Entry;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
@@ -63,6 +65,9 @@ public class EntryRepositoryCustomImpl implements EntryRepositoryCustom {
         }
 
         cq.where(predicates.toArray(new Predicate[0]));
-        return em.createQuery(cq).getResultList();
+        List<Entry> sorted = em.createQuery(cq).getResultList().stream()
+                .sorted(Comparator.comparingLong(Entry::getDateMillisYmd).reversed())
+                .collect(Collectors.toList());
+        return sorted;
     }
 }
