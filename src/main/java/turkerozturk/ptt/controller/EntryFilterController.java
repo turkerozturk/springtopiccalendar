@@ -82,7 +82,9 @@ public class EntryFilterController {
      * otomatik olarak filtre sorgusunu çalıştırıp ekrana sonuçları gönderir.
      */
     @GetMapping("/form")
-    public String filterForm(Model model, HttpSession session) {
+    public String filterForm(Model model,
+                             HttpSession session,
+                             @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         // 1) Varsayılan DTO Oluştur
         FilterDto filterDto = new FilterDto();
 
@@ -108,8 +110,7 @@ public class EntryFilterController {
         // 2) dateRange listesi (örneğin startDate -> endDate arası)
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
-        // 3) Pivot Data hazırla
-        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
 
         // === ✅ Session'a kaydet (ilk açılışta da) ===
         session.setAttribute("currentFilterDto", filterDto);
@@ -117,8 +118,13 @@ public class EntryFilterController {
         // 4) Model’e ekle
 
         model.addAttribute("filterDto", filterDto);
-        model.addAttribute("entries", filteredEntries);  // Normal tablo
-        model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        if(reportType.equals("normal")) {
+            model.addAttribute("entries", filteredEntries);  // Normal tablo
+        } else if(reportType.equals("pivot")){
+            // 3) Pivot Data hazırla
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        }
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
@@ -159,7 +165,8 @@ public class EntryFilterController {
     public String applyFilter(@Valid @ModelAttribute("filterDto") FilterDto filterDto,
                               BindingResult bindingResult,
                               Model model,
-                              HttpSession session) {
+                              HttpSession session,
+                              @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("allCategories", categoryRepository.findAll());
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
@@ -177,14 +184,21 @@ public class EntryFilterController {
         // 3) Date range listesi oluştur
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
-        // 4) Pivot Data oluştur
-        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
+
 
         // === (1) Session'a filtre bilgisini saklayalım ===
         session.setAttribute("currentFilterDto", filterDto);
 
-        model.addAttribute("entries", filteredEntries);
-        model.addAttribute("pivotData", pivotData);
+
+
+        if(reportType.equals("normal")) {
+            model.addAttribute("entries", filteredEntries);  // Normal tablo
+        } else if(reportType.equals("pivot")){
+            // 3) Pivot Data hazırla
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        }
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
@@ -212,7 +226,8 @@ public class EntryFilterController {
      */
     @PostMapping("/previous")
     public String previousRange(@ModelAttribute("filterDto") FilterDto filterDto,
-                                Model model) {
+                                Model model,
+                                @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
 
         // 1) Tarih aralığını kaydır
         int rangeLength = filterService.getRangeLength(filterDto);
@@ -225,12 +240,17 @@ public class EntryFilterController {
         // 3) Date range listesi oluştur
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
-        // 4) Pivot Data oluştur
-        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+
+
 
         // 5) Modele ekle
-        model.addAttribute("entries", filteredEntries);
-        model.addAttribute("pivotData", pivotData);
+        if(reportType.equals("normal")) {
+            model.addAttribute("entries", filteredEntries);  // Normal tablo
+        } else if(reportType.equals("pivot")){
+            // 3) Pivot Data hazırla
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        }
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
@@ -257,7 +277,8 @@ public class EntryFilterController {
      */
     @PostMapping("/next")
     public String nextRange(@ModelAttribute("filterDto") FilterDto filterDto,
-                            Model model) {
+                            Model model,
+                            @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         // Kaç günlük aralık?
         int rangeLength = filterService.getRangeLength(filterDto);
         // Tarihi ileri kaydır
@@ -270,11 +291,15 @@ public class EntryFilterController {
         // 3) Date range listesi oluştur
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
-        // 4) Pivot Data oluştur
-        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
 
-        model.addAttribute("entries", filteredEntries);
-        model.addAttribute("pivotData", pivotData);
+
+        if(reportType.equals("normal")) {
+            model.addAttribute("entries", filteredEntries);  // Normal tablo
+        } else if(reportType.equals("pivot")){
+            // 3) Pivot Data hazırla
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        }
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
@@ -378,7 +403,9 @@ public class EntryFilterController {
 
 
     @GetMapping("/return")
-    public String returnToFilterForm(HttpSession session, Model model) {
+    public String returnToFilterForm(HttpSession session,
+                                     Model model,
+                                     @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
         if (filterDto == null) {
             // FilterDto yoksa mecburen sıfırdan sayfa açabilir veya entries'e gidebilirsiniz.
@@ -388,10 +415,13 @@ public class EntryFilterController {
         // Tekrar filtre sonuçlarını oluşturup sayfaya bas
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
-        PivotData pivotData = buildPivotData(filteredEntries, dateRange);
-
-        model.addAttribute("entries", filteredEntries);
-        model.addAttribute("pivotData", pivotData);
+        if(reportType.equals("normal")) {
+            model.addAttribute("entries", filteredEntries);  // Normal tablo
+        } else if(reportType.equals("pivot")){
+            // 3) Pivot Data hazırla
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            model.addAttribute("pivotData", pivotData);      // Pivot tablo
+        }
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
