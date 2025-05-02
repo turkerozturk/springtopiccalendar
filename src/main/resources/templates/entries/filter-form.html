@@ -415,7 +415,7 @@
             <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
             <td id="topic-name">
                 <a th:href="@{/entries(topicId=${topic.id})}"
-                   th:text="${topic.name}" th:title="${topic.name}">
+                   th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
                 </a>
             </td>
 
