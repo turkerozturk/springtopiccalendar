@@ -171,9 +171,16 @@
     <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
     <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm">Topics</a>
 
-
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+            aria-controls="offcanvasTop">Toggle Filter</button>
 </div>
 
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasTopLabel">Filter</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
 <!-- <h1>Entry Filtre Formu</h1> -->
 
 <!-- Validasyon hataları -->
@@ -186,24 +193,17 @@
 <div class="accordion-container">
 
     <!-- Accordion wrapper (Bootstrap 5 yapısı) -->
-    <div class="accordion" id="filterAccordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button collapsed"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseFilter"
-                        aria-expanded="false"
-                        aria-controls="collapseFilter">
+    <div>
+        <div>
+            <h2 >
+
+
                     Filter Criteria
-                </button>
             </h2>
 
-            <div id="collapseFilter"
-                 class="accordion-collapse collapse"
-                 aria-labelledby="headingOne"
-                 data-bs-parent="#filterAccordion">
-                <div class="accordion-body">
+            <div
+                 >
+                <div >
 
                     <!-- Form Başlangıcı -->
                     <form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
@@ -336,6 +336,8 @@
 <div id="newEntryLinksContainer" style="margin-top: 10px; max-width:800px; background-color:honeydew;"  class="centered">
     When you select a category from the category filter, the entry adding links will appear here.
 </div>
+
+    </div></div>
 
 <!-- Filtre Sonuçları -->
 
