@@ -170,9 +170,35 @@
     <a href="/" class="btn btn-secondary btn-sm">Home</a>
     <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
     <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm">Topics</a>
+</div>
+<div class="align-center-horizontal">
+
+
+
+
+
+    <!-- Önceki & Sonraki & Temizle -->
+    <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
+        <!-- Gizli alanlar -->
+        <input type="hidden" th:field="*{topicIds}"/>
+        <input type="hidden" th:field="*{startDate}"/>
+        <input type="hidden" th:field="*{endDate}"/>
+        <input type="hidden" th:field="*{statuses}"/>
+        <button type="submit">Previous</button>
+    </form>
 
     <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
             aria-controls="offcanvasTop">Toggle Filter</button>
+
+    <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
+        <!-- Gizli alanlar -->
+        <input type="hidden" th:field="*{topicIds}"/>
+        <input type="hidden" th:field="*{startDate}"/>
+        <input type="hidden" th:field="*{endDate}"/>
+        <input type="hidden" th:field="*{statuses}"/>
+        <button type="submit">Next</button>
+    </form>
+
 </div>
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
@@ -305,24 +331,7 @@
 
 <div class="align-center-horizontal">
 
-    <!-- Önceki & Sonraki & Temizle -->
-    <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
-        <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}"/>
-        <input type="hidden" th:field="*{startDate}"/>
-        <input type="hidden" th:field="*{endDate}"/>
-        <input type="hidden" th:field="*{statuses}"/>
-        <button type="submit">Previous</button>
-    </form>
 
-    <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
-        <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}"/>
-        <input type="hidden" th:field="*{startDate}"/>
-        <input type="hidden" th:field="*{endDate}"/>
-        <input type="hidden" th:field="*{statuses}"/>
-        <button type="submit">Next</button>
-    </form>
 
     <form th:action="@{/entry-filter/clear}" method="post" style="display:inline;">
         <button type="submit">Reset Filter</button>
