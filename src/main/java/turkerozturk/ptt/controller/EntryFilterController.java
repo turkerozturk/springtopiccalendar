@@ -172,7 +172,7 @@ public class EntryFilterController {
         List<Topic> topics = topicRepository.findByCategoryId(categoryId);
         model.addAttribute("topics", topics);
         model.addAttribute("categoryId", categoryId);
-        return "entries/filter-form :: topicList";
+        return "entries/fragments/_topics-by-category :: topicList";
     }
 
 

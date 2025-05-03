@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:hx="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!-- 3) backend’inize döndürttüğünüz Thymeleaf fragment’i (örneğin entry-filter/topics-by-category.html içinde) -->
+<!--   Bu fragment offcanvas-body içine yüklenecek. -->
+<!--   topics model attribute’u bir List<Topic> nesnesi olsun, categoryId de fragment’e atanmış olsun. -->
+<div th:fragment="topicList">
+    <table class="table table-borderless table-sm">
+        <tbody>
+        <tr th:each="topic : ${topics}">
+            <td>
+               (+) <a th:href="@{/entries/new(
+      topicId=${topic.id},
+      returnPage='pivottable',
+      categoryId=${categoryId}
+    )}"
+                   th:text="${topic.name}">
+                    Topic Name
+                </a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <h5 class="offcanvas-title">OR</h5>
+    <br/>
+
+    <a th:href="@{/topics/create(categoryId=${categoryId})}">Create A New Topic</a>
+</div>
+
+</body>
+</html>

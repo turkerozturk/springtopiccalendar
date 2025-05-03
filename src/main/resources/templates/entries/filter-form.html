@@ -549,7 +549,7 @@
         id="topicsOffcanvas"
         aria-labelledby="topicsOffcanvasLabel">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="topicsOffcanvasLabel">Topics in this Category</h5>
+        <h5 class="offcanvas-title" id="topicsOffcanvasLabel">Add Topics From This Category</h5>
         <button
                 type="button"
                 class="btn-close"
@@ -566,28 +566,7 @@
     </div>
 </div>
 
-<!-- 3) backend’inize döndürttüğünüz Thymeleaf fragment’i (örneğin entry-filter/topics-by-category.html içinde) -->
-<!--   Bu fragment offcanvas-body içine yüklenecek. -->
-<!--   topics model attribute’u bir List<Topic> nesnesi olsun, categoryId de fragment’e atanmış olsun. -->
-<div th:fragment="topicList">
-    <table class="table table-borderless table-sm">
-        <tbody>
-        <tr th:each="topic : ${topics}">
-            <td>
-                <a th:href="@{/entries/new(
-      topicId=${topic.id},
-      returnPage='pivottable',
-      categoryId=${categoryId}
-    )}"
-                   th:text="${topic.name}">
-                    Topic Adı
-                </a>
 
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
 
 
 <!-- AJAX / JavaScript Kısmı -->
