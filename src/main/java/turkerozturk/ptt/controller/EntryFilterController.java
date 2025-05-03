@@ -141,13 +141,22 @@ public class EntryFilterController {
 
     }
 
+    /**
+     * JSON olarak bir kategorideki topiclerin id ve name degerlerini dondurur.
+     * Bu metodu filtre seceneklerinde bir kategori secince seceneklerin altinda
+     * topic listesi gorunmesi icin kullaniyorum. Fakat artik fragment donduren diger
+     * metod sayfanin sol tarafinda daha kullanisli bir gorunum icinde ortaya cikiyor, onu
+     * kullaniyorum.
+     * @param categoryId
+     * @return
+     */
     @ResponseBody
     @GetMapping("/topics-by-category")
     public List<TopicDto> getTopicsByCategory(@RequestParam("categoryId") Long categoryId) {
         if (categoryId == null) {
             return List.of();
         }
-        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByNameAsc(categoryId);
 
         // Entity -> DTO dönüştürme
         return topics.stream()
@@ -169,7 +178,7 @@ public class EntryFilterController {
     public String topicsByCategory(
             @RequestParam Long categoryId,
             Model model) {
-        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByNameAsc(categoryId);
         model.addAttribute("topics", topics);
         model.addAttribute("categoryId", categoryId);
         return "entries/fragments/_topics-by-category :: topicList";
