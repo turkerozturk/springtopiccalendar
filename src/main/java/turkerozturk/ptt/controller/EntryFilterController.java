@@ -156,6 +156,27 @@ public class EntryFilterController {
     }
 
 
+    /**
+     * There is a thymeleaf fragment named "topicList" inside the filter-form.html template.
+     * This method returns data to fill it.
+     * a button with htmx code is calling this method. To show the topics list inside a offcanvas
+     * on the left side of webpage.
+     * @param categoryId
+     * @param model
+     * @return
+     */
+    @GetMapping("/fragment-topics-by-category")
+    public String topicsByCategory(
+            @RequestParam Long categoryId,
+            Model model) {
+        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+        model.addAttribute("topics", topics);
+        model.addAttribute("categoryId", categoryId);
+        return "entries/filter-form :: topicList";
+    }
+
+
+
 
     /**
      * Filtre formunda 'Filtrele' butonuna tıklayınca çalışır.

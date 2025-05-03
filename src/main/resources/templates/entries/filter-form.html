@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:hx="http://www.w3.org/1999/xhtml">
 <head>
     <!--
     This file is part of the DailyTopicTracker project.
@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <style>
         .entry-with-content {
@@ -371,9 +372,27 @@
         <tr>
 
             <!-- ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
-            <th onclick="sortPivotTableByTopic()" style="cursor: pointer;">
+            <th style="cursor: pointer;">
                 <!-- Tıklayınca sıralama yapsın -->
-                Topic
+                <span onclick="sortPivotTableByTopic()">Topic</span>
+
+                <!-- HTMX ayarları -->
+
+                <!-- 1) Offcanvas’ı tetikleyecek düğme -->
+                <button
+                        th:if="${filterDto.categoryId != null}"
+                class="btn btn-primary"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#topicsOffcanvas"
+                aria-controls="topicsOffcanvas"
+                th:attr="hx-get=@{/entry-filter/fragment-topics-by-category(categoryId=${filterDto.categoryId})}"
+                hx-target="#topicsOffcanvasBody"
+                hx-trigger="click"
+                title="Add Topic For This Category">
+                +
+                </button>
+
 
                 <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
                 <div>
@@ -520,6 +539,56 @@
         </tr>
     </table>
 </div>
+
+
+
+<!-- 2) Offcanvas yapısı -->
+<div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="topicsOffcanvas"
+        aria-labelledby="topicsOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="topicsOffcanvasLabel">Topics in this Category</h5>
+        <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body" id="topicsOffcanvasBody">
+        <!-- İlk açılışta isteği işlenene kadar gösterebileceğiniz bir yükleniyor animasyonu -->
+        <div class="text-center py-3">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Yükleniyor…</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3) backend’inize döndürttüğünüz Thymeleaf fragment’i (örneğin entry-filter/topics-by-category.html içinde) -->
+<!--   Bu fragment offcanvas-body içine yüklenecek. -->
+<!--   topics model attribute’u bir List<Topic> nesnesi olsun, categoryId de fragment’e atanmış olsun. -->
+<div th:fragment="topicList">
+    <table class="table table-borderless table-sm">
+        <tbody>
+        <tr th:each="topic : ${topics}">
+            <td>
+                <a th:href="@{/entries/new(
+      topicId=${topic.id},
+      returnPage='pivottable',
+      categoryId=${categoryId}
+    )}"
+                   th:text="${topic.name}">
+                    Topic Adı
+                </a>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 
 <!-- AJAX / JavaScript Kısmı -->
 
