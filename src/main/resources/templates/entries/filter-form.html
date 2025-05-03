@@ -163,6 +163,14 @@
                         margin: 0 auto; /* Ortalansın diye */
                       }
 
+
+   /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
+  .scrollable-topics-table {
+    max-height: 600px;      /* ~20 satırlık yükseklik, ihtiyaca göre ayarlayın */
+    overflow-y: auto;       /* dikey kaydırma */
+    /* isterseniz yatay kaydırma da istemiyorsanız overflow-x: hidden; ekleyin */
+  }
+
     </style>
 </head>
 <body>
