@@ -27,6 +27,10 @@ import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -49,7 +53,9 @@ public class LaunchDTT extends JFrame {
 
     // Parçalar
     private final JButton btnStartStop = new JButton("Start");
-    JButton openBtn = new JButton("Open App Folder");
+    private final JButton openBtn = new JButton("Open App Folder");
+
+    private final JComboBox<String> dbList = new JComboBox<>();
     private final JTextArea textAreaLogs = new JTextArea();
 
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
@@ -76,6 +82,9 @@ public class LaunchDTT extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
+
+        // loads *.db filenames into a list box if they exist. If not, you cannot see the list box.
+        loadDbFileNames();
 
         // Pencere kapanırken Process'i durdur, Executor'u kapat
         addWindowListener(new WindowAdapter() {
@@ -120,6 +129,8 @@ public class LaunchDTT extends JFrame {
         });
         topPanel.add(openBtn);
 
+        topPanel.add(dbList);
+
         // Ana panel
         setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
@@ -136,10 +147,25 @@ public class LaunchDTT extends JFrame {
         }
         setStatus(AppStatus.STARTING);
 
+        // Komut listesini hazırla
+        List<String> cmd = new ArrayList<>();
+        cmd.add("java");
+        cmd.add("-jar");
+        cmd.add("daily-topic-tracker-1.0.0.jar");
+
+        // Eğer dbList görünür ve bir öğe seçiliyse, ek parametre olarak ekle
+        if (dbList.isVisible()) {
+            String selectedDb = dbList.getSelectedItem().toString();
+            if (selectedDb != null && !selectedDb.isEmpty()) {
+                cmd.add(selectedDb);
+            }
+        }
+
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true); // stdout + stderr
+
         // Process'i başlat
         try {
-            ProcessBuilder pb = new ProcessBuilder("java", "-jar", "daily-topic-tracker-1.0.0.jar");
-            pb.redirectErrorStream(true); // stdout + stderr
             process = pb.start();
         } catch (IOException ex) {
             appendLog("[ERROR] Failed to start process: " + ex + "\n");
@@ -308,6 +334,26 @@ public class LaunchDTT extends JFrame {
                     "Dosya yöneticisi açılamadı:\n" + ex.getMessage(),
                     "Hata", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void loadDbFileNames() {
+        File dir = new File(System.getProperty("user.dir")); // Uygulamanın çalıştığı klasör
+        File[] dbFiles = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".db"));
+
+        if (dbFiles != null && dbFiles.length > 0) {
+            Arrays.sort(dbFiles, Comparator.comparing(File::getName));
+            DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+            for (File f : dbFiles) {
+                model.addElement(f.getName());
+            }
+            dbList.setModel(model);
+            dbList.setVisible(true);
+        } else {
+            // Hiç .db yoksa tamamen gizle
+            dbList.setVisible(false);
+        }
+
+
     }
 
 
