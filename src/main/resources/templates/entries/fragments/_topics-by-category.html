@@ -9,24 +9,32 @@
 <!-- 3) backend’inize döndürttüğünüz Thymeleaf fragment’i (örneğin entry-filter/topics-by-category.html içinde) -->
 <!--   Bu fragment offcanvas-body içine yüklenecek. -->
 <!--   topics model attribute’u bir List<Topic> nesnesi olsun, categoryId de fragment’e atanmış olsun. -->
+<!-- filter-form.html sayfasinda sol tarafta offcanvas icinde gorunur bu fragment. once bir kategori secip
+filtre yapmak gerekir, sonra da pivot tablodaki topic sutun basligindaki arti isaretike tiklamak gerekir o zaman
+ gorunur. topics eleman sayisi 20 den fazla ise scrollable-topics-table diye isimlendirdigimiz css sinifi devreye girer
+ css kodu filter-form.html sayfasindadir. -->
 <div th:fragment="topicList">
-    <table class="table table-borderless table-sm">
-        <tbody>
-        <tr th:each="topic : ${topics}">
-            <td>
-               (+) <a th:href="@{/entries/new(
-      topicId=${topic.id},
-      returnPage='pivottable',
-      categoryId=${categoryId}
-    )}"
-                   th:text="${topic.name}">
-                    Topic Name
-                </a>
-
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div
+            th:classappend="${#lists.size(topics) > 20} ? ' scrollable-topics-table' : ''"
+            class="mb-3">
+        <table class="table table-borderless table-sm mb-0">
+            <tbody>
+            <tr th:each="topic : ${topics}">
+                <td>
+                    (+)
+                    <a th:href="@{/entries/new(
+                  topicId=${topic.id},
+                  returnPage='pivottable',
+                  categoryId=${categoryId}
+                )}"
+                       th:text="${topic.name}">
+                        Topic Name
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <br/>
     <h5 class="offcanvas-title">OR</h5>
     <br/>
