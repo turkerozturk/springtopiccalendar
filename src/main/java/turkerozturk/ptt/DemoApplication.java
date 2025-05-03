@@ -30,6 +30,10 @@ public class DemoApplication {
 
 
     public static void main(String[] args) {
+        // Eğer args[0] varsa, sqlite dosya adı olarak kullan
+        if (args.length > 0 && !args[0].isBlank()) {
+            System.setProperty("spring.datasource.url", "jdbc:sqlite:" + args[0]);
+        }
         SpringApplication.run(DemoApplication.class, args);
     }
 }
