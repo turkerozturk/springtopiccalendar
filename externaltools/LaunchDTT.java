@@ -238,10 +238,12 @@ public class LaunchDTT extends JFrame {
                 case STOPPED:
                     btnStartStop.setText("Start");
                     btnStartStop.setBackground(COLOR_STOPPED);
+                    dbList.setEnabled(true);
                     break;
                 case STARTING:
                     btnStartStop.setText("Starting...");
                     btnStartStop.setBackground(COLOR_STARTING);
+                    dbList.setEnabled(false);
                     break;
                 case RUNNING:
                     btnStartStop.setText("Stop");
