@@ -40,6 +40,10 @@ orphan/WindowsLauncher.au3 file is deprecated.
 * Can start and stop the main application.
 * Can open the path of the main application by launching the file explorer of the operating system.
 * Can show the console output on its GUI.
+* Can start the main application with different databases, if they exist in the same folder.
+** All filenames with *.db extension in the same folder will be listed on the GUI.
+** If a blank file is created with *.db extension, the main application will create the database structure inside it automatically, with no data. This can be used to create a new blank database.
+** If no any *.db files are exist, the datasource inside the properties file is the default db. Just click the start button on the launcher GUI. Next time it will be shown on the database selection box.
 
 ==== What Intellij IDEA says about the LaunchDTT file
 
@@ -104,4 +108,8 @@ image::screenshot-launcher-2.jpg[]
 
 image::screenshot-launcher-3.jpg[]
 
+If more than one *.db files are exist in the same folder, it will show a selection box to select a database at startup.
 
+Once the start button is clicked, the selection box will be disabled until the stop button is clicked.
+
+image::screenshot-launcher-4.jpg[]
