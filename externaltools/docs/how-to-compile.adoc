@@ -67,6 +67,8 @@ javac LaunchDTT.java
 jar cfe LaunchDTT.jar LaunchDTT *.class
 -----
 
+Delete *.class files that start with the string "LaunchDTT", as they are no longer needed.
+
 ==== How to run the JAR file from command line
 
 -----
