@@ -78,11 +78,12 @@
             </th>
             <th scope="col">Actions</th>
             <th scope="col">Add Topic</th>
+            <th scope="col">#</th>
         </tr>
         </thead>
         <tbody>
         <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
-        <tr th:each="cat : ${categories}" th:with="zeroPaddedCategoryId=${#numbers.formatInteger(cat.id, 4)}">
+        <tr th:each="cat, iStat : ${categories}" th:with="zeroPaddedCategoryId=${#numbers.formatInteger(cat.id, 4)}">
             <td th:text="${zeroPaddedCategoryId}" class="text-center">1</td>
             <td>
                 <a th:href="@{/topics(categoryId=${cat.id})}"
@@ -107,6 +108,9 @@
                    target="_blank" title="Add Topic">
                     +
                 </a>
+            </td>
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:text="${iStat.index + 1}">
             </td>
         </tr>
         </tbody>

@@ -123,6 +123,8 @@
             <th style="cursor: pointer;" onclick="sortTable(4)">Topic Name</th>
             <th style="cursor: pointer;" onclick="sortTable(5)">Description</th>
             <th>Entries</th>
+            <th>#</th>
+
         </tr>
 
         <!-- Filtre kutuları (header'larla aynı hizada) -->
@@ -158,11 +160,13 @@
                        placeholder="Filter Description"/>
             </th>
             <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
         </tr>
         </thead>
 
         <tbody>
-        <tr th:each="topic : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
+        <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
+        <tr th:each="topic, iStat : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
             <td class="delete-topic-column">
                 <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
                    onclick="return confirm('Are you sure to delete this topic?')">
@@ -196,6 +200,11 @@
                     Entries List
                 </a>
             </td>
+
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:text="${iStat.index + 1}">
+            </td>
+
         </tr>
         </tbody>
     </table>

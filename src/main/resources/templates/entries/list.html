@@ -70,10 +70,11 @@
             <th>Status</th>
             <th>Topic</th>
             <th>Note</th>
+            <th>#</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="entry : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
+        <tr th:each="entry, iStat : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
             <td class="delete-entry-column">
                 <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
                    onclick="return confirmDelete()">
@@ -96,6 +97,11 @@
             <td th:text="${entry.status}"></td>
             <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
             <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:text="${iStat.index + 1}">
+            </td>
+
         </tr>
         </tbody>
     </table>
