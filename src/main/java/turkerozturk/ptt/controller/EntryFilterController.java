@@ -132,7 +132,7 @@ public class EntryFilterController {
 
         model.addAttribute("allTopics", topicRepository.findAll());
 
-        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory", List.of());
         return "entries/filter-form";
 
@@ -198,7 +198,7 @@ public class EntryFilterController {
                               HttpSession session,
                               @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allCategories", categoryRepository.findAll());
+            model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
                     topicRepository.findByCategoryId(filterDto.getCategoryId()));
@@ -241,7 +241,7 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -297,7 +297,7 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -350,7 +350,7 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -473,7 +473,7 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAll());
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
