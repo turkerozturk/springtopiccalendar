@@ -245,7 +245,18 @@
                     <!-- Form Başlangıcı -->
                     <form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
 
-                        <!-- Kategori Seçimi -->
+                        <!-- 1️⃣ Filtre Kutusu -->
+                        <div class="row mb-3">
+                            <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
+                            <div class="col-sm-8">
+                                <input type="text"
+                                       id="categoryTextFilter"
+                                       class="form-control"
+                                       placeholder="Category Containing..">
+                            </div>
+                        </div>
+
+                        <!-- 2️⃣ Kategori Seçimi -->
                         <div class="row mb-3">
                             <label for="categorySelect" class="col-sm-4 col-form-label">Category:</label>
                             <div class="col-sm-8">
@@ -707,6 +718,32 @@ function createNewEntryLinks(categoryId, topics) {
         });
     }
 
+</script>
+
+<!-- 3️⃣ Filtreleme için JS -->
+<script>
+    (function(){
+      const filterInput = document.getElementById('categoryTextFilter');
+      const selectEl    = document.getElementById('categorySelect');
+
+      // Orijinal seçenekleri saklıyoruz (value/text ikilisi)
+      const originalOptions = Array.from(selectEl.options)
+        .map(opt => ({ value: opt.value, text: opt.text }));
+
+      filterInput.addEventListener('input', function(){
+        const term = this.value.trim().toLowerCase();
+        // Select içini temizle
+        selectEl.innerHTML = '';
+
+        // Şartı sağlayanları yeniden ekle
+        originalOptions.forEach(({value, text}) => {
+          if (!term || text.toLowerCase().includes(term)) {
+            const opt = new Option(text, value);
+            selectEl.add(opt);
+          }
+        });
+      });
+    })();
 </script>
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
