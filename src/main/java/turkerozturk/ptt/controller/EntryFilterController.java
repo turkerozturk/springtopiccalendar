@@ -206,6 +206,7 @@ public class EntryFilterController {
         }
 
 
+        System.out.println("FILTEERRR apply: " + filterDto.getCategoryId());
 
 
         // Aynı filtre sorgusunu çalıştır
@@ -257,6 +258,7 @@ public class EntryFilterController {
     @PostMapping("/previous")
     public String previousRange(@ModelAttribute("filterDto") FilterDto filterDto,
                                 Model model,
+                                HttpSession session,
                                 @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
 
         // 1) Tarih aralığını kaydır
@@ -272,6 +274,8 @@ public class EntryFilterController {
 
 
 
+        // === (1) Session'a filtre bilgisini saklayalım ===
+        session.setAttribute("currentFilterDto", filterDto);
 
         // 5) Modele ekle
         if(reportType.equals("normal")) {
@@ -308,13 +312,16 @@ public class EntryFilterController {
     @PostMapping("/next")
     public String nextRange(@ModelAttribute("filterDto") FilterDto filterDto,
                             Model model,
+                            HttpSession session,
                             @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
+
+
         // Kaç günlük aralık?
         int rangeLength = filterService.getRangeLength(filterDto);
         // Tarihi ileri kaydır
         filterDto.setStartDate(filterDto.getStartDate().plusDays(rangeLength));
         filterDto.setEndDate(filterDto.getEndDate().plusDays(rangeLength));
-
+        System.out.println("FILTEERRR next: " + filterDto.getCategoryId());
         // Aynı filtre sorgusunu çalıştır
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
@@ -322,6 +329,8 @@ public class EntryFilterController {
         List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
 
+        // === (1) Session'a filtre bilgisini saklayalım ===
+        session.setAttribute("currentFilterDto", filterDto);
 
         if(reportType.equals("normal")) {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
