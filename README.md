@@ -42,6 +42,10 @@ Developer: Turker Ozturk
 
 ## Screenshots
 
+2025-05-07:
+
+![Screenshot](screenshots/dttweb20250507.jpg)
+
 2025-04-03:
 
 ![Screenshot](screenshots/pttweb20250403.jpg)
@@ -50,3 +54,4 @@ Developer: Turker Ozturk
 2025-04-07:
 
 ![Screenshot](screenshots/dttweb20250407.jpg)
+
