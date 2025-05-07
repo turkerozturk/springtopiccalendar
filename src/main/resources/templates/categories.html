@@ -30,6 +30,11 @@
         th {
             text-align: center;
         }
+
+        /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
+        #topicsTable input.form-control {
+            width: 100%; /* Hücrenin tamamını kaplasın */
+        }
     </style>
 </head>
 <body>
@@ -69,6 +74,28 @@
             <th scope="col">Add Topic</th>
             <th scope="col">#</th>
         </tr>
+
+        <!-- Filtre kutuları (header'larla aynı hizada) -->
+        <tr>
+            <th>
+                <input type="text"
+                       id="filterId"
+                       class="form-control"
+                       onkeyup="filterRows()"
+                       placeholder="Filter ID"/>
+            </th>
+            <th>
+                <input type="text"
+                       id="filterCategoryName"
+                       class="form-control"
+                       onkeyup="filterRows()"
+                       placeholder="Filter Category"/>
+            </th>
+            <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
+        </tr>
+
         </thead>
         <tbody>
         <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
@@ -88,7 +115,7 @@
                 <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
                    class="btn btn-sm btn-danger"
                    onclick="return confirmDelete()">
-                    Delete
+                    Del
                 </a>
             </td>
             <!-- Her kategori satırında, yeni topic oluşturma linki -->
@@ -113,9 +140,51 @@
     function confirmDelete() {
         return confirm("Are you sure to delete this category?");
     }
-
-
 </script>
+
+
+<script>
+    // Filtreleme fonksiyonu
+    function filterRows() {
+
+
+
+        // Textbox filtre değerleri
+        var filterId = document.getElementById("filterId").value.toLowerCase();
+        var filterCategoryName = document.getElementById("filterCategoryName").value.toLowerCase();
+
+
+
+        var table = document.getElementById("categoriesTable");
+        var tbody = table.getElementsByTagName("tbody")[0];
+        var rows = tbody.getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var tds = rows[i].getElementsByTagName("td");
+
+            // td[1] -> ID
+            // td[2] -> Category Name
+
+
+            var idText = tds[0].textContent.toLowerCase();
+            var categoryText = tds[1].textContent.toLowerCase();
+
+
+            // Diğer textbox filtrelerini contains mantığıyla karşılaştır
+            var idMatch = idText.includes(filterId);
+            var categoryNameMatch = categoryText.includes(filterCategoryName);
+
+
+            // Tüm koşulları AND ile birleştiriyoruz
+            if (idMatch && categoryNameMatch) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
 
 <script>
 
