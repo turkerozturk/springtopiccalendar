@@ -151,7 +151,7 @@ public class LaunchDTT extends JFrame {
         List<String> cmd = new ArrayList<>();
         cmd.add("java");
         cmd.add("-jar");
-        cmd.add("daily-topic-tracker-1.0.0.jar");
+        cmd.add("daily-topic-tracker.jar");
 
         // Eğer dbList görünür ve bir öğe seçiliyse, ek parametre olarak ekle
         if (dbList.isVisible()) {

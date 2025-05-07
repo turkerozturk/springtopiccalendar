@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>daily-topic-tracker</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>Daily Topic Tracker</name>
   <description>Daily Topic Tracker, a Java Spring Boot application with SQLite database.</description>
   <url>https://github.com/turkerozturk/springtopiccalendar</url>
@@ -197,6 +197,10 @@
   </dependencies>
 
   <build>
+
+    <!-- this setting makes the compiled filename independent of version information. -->
+    <finalName>${project.artifactId}</finalName>
+
     <plugins>
       <!-- Spring Boot Maven Plugin -->
       <plugin>

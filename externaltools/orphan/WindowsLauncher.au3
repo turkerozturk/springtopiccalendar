@@ -133,7 +133,7 @@ Func StartSpringBoot()
     UpdateStartStopButtonColor()
 
     ; Komutu başlat: 2=STDOUT,4=STDERR,32=NoConsole => 2+4+32=38
-    $g_iPID = Run("java -jar daily-topic-tracker-1.0.0.jar", "", @SW_HIDE, 38)
+    $g_iPID = Run("java -jar daily-topic-tracker.jar", "", @SW_HIDE, 38)
     If $g_iPID = 0 Then
         $g_sConsoleOutput &= "[Hata: Uygulama başlatılamadı!]" & @CRLF
         GUICtrlSetData($idConsoleEdit, $g_sConsoleOutput)

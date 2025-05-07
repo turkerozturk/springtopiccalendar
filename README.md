@@ -3,12 +3,12 @@ Daily Topic Tracker, a Java Spring Boot application with SQLite database.
 
 ## HOW TO DOWNLOAD
 
-Download the daily-topic-tracker-1.0.0.zip archive file to your computer.
+Download the daily-topic-tracker.zip archive file to your computer.
 Extract its contents to an empty folder.
 
 No installation required. It will work if Java is installed on your computer.
 
-https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.0/daily-topic-tracker-1.0.0.zip
+https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.1/daily-topic-tracker.zip
 
 ## HOW TO RUN:
 
@@ -18,7 +18,7 @@ And then click to the start button and wait a few seconds until it opens the app
 Or if you want to run it manually;
 
 Run with this console command;
-java -jar daily-topic-tracker-1.0.0.jar
+java -jar daily-topic-tracker.jar
 
 Copy and paste the link below into your web browser:
 http://localhost:8080/
