@@ -393,9 +393,9 @@
         <tr>
 
             <!-- ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
-            <th style="cursor: pointer;">
+            <th>
                 <!-- Tıklayınca sıralama yapsın -->
-                <span onclick="sortPivotTableByTopic()">Topic</span>
+                <span onclick="sortPivotTableByColumn(0)" style="cursor: pointer;">Topic</span>
 
                 <!-- HTMX ayarları -->
 
@@ -426,8 +426,9 @@
             </th>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
-            <th th:if="${filterDto.categoryId == null}">Category
+            <th th:if="${filterDto.categoryId == null}">
 
+                <span onclick="sortPivotTableByColumn(1)" style="cursor: pointer;">Category</span>
 
 
                 <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
@@ -655,38 +656,42 @@ function createNewEntryLinks(categoryId, topics) {
 </script>
 
 <script>
-    // Bu değişken, tıklama sıralarını takip etmek için kullanılır
-    // 1 => A-Z (ascending), -1 => Z-A (descending)
-    let pivotTopicSortOrder = 1;
 
-    // 1) Tablonun "Topic" sütunu göre sıralama
-    function sortPivotTableByTopic() {
-        const table = document.getElementById("pivot-table");
-        if (!table) return;
 
-        const tbody = table.querySelector("tbody");
-        if (!tbody) return;
 
-        // <tr> satırlarını diziye al
-        const rowsArray = Array.from(tbody.querySelectorAll("tr"));
+   // Her sütun için güncel sıralama yönünü tutar (1 = artan, -1 = azalan)
+const pivotSortOrders = {};
 
-        // rowsArray'i sort ederken, Topic hücresindeki metne göre karşılaştırma yapıyoruz
-        rowsArray.sort((rowA, rowB) => {
-            // Birinci sütun (Topic) -> index 0
-            const cellA = rowA.cells[0]?.innerText?.trim() || "";
-            const cellB = rowB.cells[0]?.innerText?.trim() || "";
+function sortPivotTableByColumn(colIndex) {
+    const table = document.getElementById("pivot-table");
+    if (!table) return;
 
-            if (cellA < cellB) return -1 * pivotTopicSortOrder;
-            if (cellA > cellB) return 1 * pivotTopicSortOrder;
-            return 0;
-        });
+    const tbody = table.querySelector("tbody");
+    if (!tbody) return;
 
-        // Sıralama yapıldıktan sonra, tbody içine yeniden ekle
-        rowsArray.forEach(row => tbody.appendChild(row));
+    // Tüm <tr> satırlarını al
+    const rowsArray = Array.from(tbody.querySelectorAll("tr"));
 
-        // Sıradaki tıklamada tam tersi sırada sıralamak için çevir
-        pivotTopicSortOrder *= -1;
-    }
+    // Bu sütun için önceki sıralama yönünü bul, yoksa varsayılan 1 (artan)
+    const sortOrder = pivotSortOrders[colIndex] || 1;
+
+    // Sıralama
+    rowsArray.sort((rowA, rowB) => {
+        const cellA = rowA.cells[colIndex]?.innerText.trim() || "";
+        const cellB = rowB.cells[colIndex]?.innerText.trim() || "";
+
+        if (cellA < cellB) return -1 * sortOrder;
+        if (cellA > cellB) return 1 * sortOrder;
+        return 0;
+    });
+
+    // Yeniden ekle
+    rowsArray.forEach(row => tbody.appendChild(row));
+
+    // Bu sütun için yönü tersine çevir
+    pivotSortOrders[colIndex] = -sortOrder;
+}
+
 
     // 1) Tek filtre fonksiyonu: hem topic hem category'yi birlikte kullanır
     function filterPivotTable() {
