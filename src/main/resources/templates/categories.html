@@ -57,25 +57,14 @@
     <table id="categoriesTable" class="table table-striped table-bordered table-sm">
         <thead>
         <tr>
-            <!-- Sıralamak istediğin sütunlara onclick ile sortTable çağrısı -->
-            <!-- 0. sütun (ID), numerik sort -->
-            <th scope="col"
-                style="cursor: pointer;"
-                onclick="sortTable('categoriesTable', 0, true)">
-                ID
-            </th>
-            <!-- 1. sütun (Name), alfabetik sort -->
-            <th scope="col"
-                style="cursor: pointer;"
-                onclick="sortTable('categoriesTable', 1, false)">
-                Name
-            </th>
-            <!-- 2. sütun (Topics Count), numerik sort -->
-            <th scope="col"
-                style="cursor: pointer;"
-                onclick="sortTable('categoriesTable', 2, true)">
-                Topics Count
-            </th>
+
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 0, false)">ID</th>
+
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Name</th>
+
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)">Topics Count</th>
+
+
             <th scope="col">Actions</th>
             <th scope="col">Add Topic</th>
             <th scope="col">#</th>
@@ -125,36 +114,66 @@
         return confirm("Are you sure to delete this category?");
     }
 
-    /**
-     * tableId: Tablo ID'si
-     * colIndex: Sıralanacak sütunun indexi (0,1,2, vs.)
-     * isNumeric: true ise numerik sırala, false ise alfabetik
-     */
-    function sortTable(tableId, colIndex, isNumeric) {
-        const table = document.getElementById(tableId);
-        const tbody = table.querySelector("tbody");
-        // HTMLCollection -> Array
-        const rowsArray = Array.from(tbody.querySelectorAll("tr"));
 
-        // Toggle'lı sıralama (her tıklamada yönü değiştirmek istersen)
-        // Basit yaklaşımda tek yönlü sıralama yapıyoruz. Dilersen "data-sort-dir" gibi bir değişken de tutabilirsin.
+</script>
 
-        rowsArray.sort((a, b) => {
-            const cellA = a.cells[colIndex].innerText.trim();
-            const cellB = b.cells[colIndex].innerText.trim();
+<script>
 
-            if (isNumeric) {
-                // Numerik dönüşüm
-                return parseFloat(cellA) - parseFloat(cellB);
-            } else {
-                // Alfabetik
-                return cellA.localeCompare(cellB);
+    // Sıralama fonksiyonu (tıklanan sütuna göre A-Z / Z-A sırala)
+    // columnIndex: tablo header'ındaki kolona göre,
+    // örneğin ID sütunu = 1, CategoryName sütunu = 2 vb.
+   function sortTable(tableId, columnIndex, isNumeric) {
+    var table = document.getElementById(tableId);
+    if (!table) return; // tablo yoksa çık
+    var tbody = table.querySelector("tbody");
+    if (!tbody) return;
+
+    var switching = true;
+    var direction = "asc"; // ilk seferde artan
+    var switchCount = 0;
+
+    while (switching) {
+        switching = false;
+        var rows = tbody.rows;
+        var shouldSwitch;
+
+        for (var i = 0; i < rows.length - 1; i++) {
+            shouldSwitch = false;
+            var x = rows[i].cells[columnIndex];
+            var y = rows[i + 1].cells[columnIndex];
+
+            var xText = x.textContent.trim();
+            var yText = y.textContent.trim();
+
+            // sayısal mı, metin mi?
+            var xValue = isNumeric ? parseFloat(xText) : xText.toLowerCase();
+            var yValue = isNumeric ? parseFloat(yText) : yText.toLowerCase();
+
+            if (direction === "asc") {
+                if (xValue > yValue) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else { // desc
+                if (xValue < yValue) {
+                    shouldSwitch = true;
+                    break;
+                }
             }
-        });
+        }
 
-        // Sıralanmış satırları tbody'ye yeniden ekleyelim
-        rowsArray.forEach(row => tbody.appendChild(row));
+        if (shouldSwitch) {
+            tbody.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchCount++;
+        } else if (switchCount === 0 && direction === "asc") {
+            // hiç swap olmadıysa, yönü tersine çevir ve tekrar döngü
+            direction = "desc";
+            switching = true;
+        }
     }
+}
+
 </script>
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
