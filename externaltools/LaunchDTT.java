@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.Properties;
 
 /**
  * Commands to compile to jar and run:
@@ -56,10 +57,11 @@ public class LaunchDTT extends JFrame {
     private final JButton openBtn = new JButton("Open App Folder");
 
     private final JComboBox<String> dbList = new JComboBox<>();
+    private final JLabel lblAppVersion = new JLabel("DailyTopicTracker V1.0.1 - Turker Ozturk");
     private final JTextArea textAreaLogs = new JTextArea();
 
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
-    private int serverPort = 8080;
+    private int serverPort;
 
     // Process
     private Process process;
@@ -82,6 +84,8 @@ public class LaunchDTT extends JFrame {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
+
+        serverPort = readServerPort();
 
         // loads *.db filenames into a list box if they exist. If not, you cannot see the list box.
         loadDbFileNames();
@@ -130,6 +134,7 @@ public class LaunchDTT extends JFrame {
         topPanel.add(openBtn);
 
         topPanel.add(dbList);
+        topPanel.add(lblAppVersion);
 
         // Ana panel
         setLayout(new BorderLayout());
@@ -356,6 +361,28 @@ public class LaunchDTT extends JFrame {
         }
 
 
+    }
+
+    private static final int DEFAULT_SERVER_PORT = 8080;
+    private int readServerPort() {
+        String userDir = System.getProperty("user.dir");
+        File propFile = new File(userDir, "application.properties");
+        if (!propFile.exists()) {
+            return DEFAULT_SERVER_PORT;
+        }
+
+        Properties props = new Properties();
+        try (FileInputStream in = new FileInputStream(propFile)) {
+            props.load(in);
+            String port = props.getProperty("server.port");
+            if (port != null) {
+                return Integer.parseInt(port.trim());
+            }
+        } catch (IOException | NumberFormatException e) {
+            // İsterseniz loglayabilirsiniz
+        }
+
+        return DEFAULT_SERVER_PORT;
     }
 
 
