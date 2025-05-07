@@ -84,7 +84,10 @@ You need to fill the "Jar" text box with the full path of the jar file, and the 
 
 Then click on to "gear icon"(Build wrapper).
 
-Then give any filename to the XML file of LAunch4j config. You can delete the config file after the operation, or store it for the next time to load.
+image::screenshot-launcher-6.jpg[]
+
+
+Then give any filename to the XML file of Launch4j config. You can delete the config file after the operation, or store it for the next time to load.
 
 [WARNING]
 .after operation
@@ -115,3 +118,8 @@ If more than one *.db files are exist in the same folder, it will show a selecti
 Once the start button is clicked, the selection box will be disabled until the stop button is clicked.
 
 image::screenshot-launcher-4.jpg[]
+
+Example: Uncomment and change the default server port in the application.properties file.
+
+image::screenshot-launcher-5.jpg[]
+
