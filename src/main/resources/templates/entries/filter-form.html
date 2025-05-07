@@ -455,12 +455,16 @@
 
 
             <th class="text-center" style="vertical-align: middle;">Total</th>
+
+            <th class="text-center" style="vertical-align: middle;">#</th>
+
+
         </tr>
         </thead>
 
         <tbody>
         <!-- Her topic için bir satır -->
-        <tr th:each="topic : ${pivotData.topicList}">
+        <tr th:each="topic, iStat : ${pivotData.topicList}">
 
             <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
             <td id="topic-name">
@@ -523,6 +527,10 @@
             <!-- Son sütun: o topic'in toplam entry sayısı -->
             <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
                 class="text-center"></td>
+
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:text="${iStat.index + 1}">
+
         </tr>
         </tbody>
     </table>
