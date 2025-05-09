@@ -134,7 +134,7 @@ public class TopicWebController {
                     //   return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":
                  //   return "redirect:/entry-filter/return?categoryId=" + categoryId;
-                    return "redirect:/entry-filter/form";
+                    return "redirect:/entry-filter/return";
                 case "entries":
                     //   return "redirect:/entries?topicId=" + topicId;
                     // Eğer ileride farklı sayfalardan gelme ihtimali varsa
