@@ -45,20 +45,35 @@
 
     <!-- Ana sayfaya dön linki -->
     <div class="mb-3">
-        <a href="/" class="btn btn-secondary">Home</a>
+
+        <a href="/" class="btn btn-secondary btn-sm">Home</a>
+        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
+        <a href="entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">
+            Tracker
+        </a>
     </div>
 
     <h1 class="mb-4">Entries</h1>
 
     <!-- Yeni Entry Butonu -->
-    <div class="mb-3">
+    <div th:if="${topic == null}" class="mb-3">
         <a th:href="@{/entries/new}" class="btn btn-primary">Add New Entry</a>
     </div>
 
-    <!-- Filtre Form (opsiyonel) -->
-    <div class="mb-3">
-        <a href="entry-filter/form" class="btn btn-info">entry-filter/form</a>
+    <div th:if="${topic != null}" class="mb-3">
+        <h3>
+            <a th:text="${topic.category.name}" th:href="@{/topics(categoryId=${topic.category.id}) }"></a> - <span th:text="${topic.name}"></span>
+
+            <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='entries', categoryId=${topic.category.id})}"
+               title="Add New Entry" class="btn btn-primary">
+                +
+            </a>
+        </h3>
+
     </div>
+
+
+
 
     <!-- Entries Tablosu -->
     <table class="table table-striped table-bordered align-middle">

@@ -74,6 +74,11 @@ public class EntryController {
             // Belirtilen topic'e ait entry'leri getir
             var entries = entryRepository.findByTopicId(topicId);
             model.addAttribute("entries", entries);
+            if(!entries.isEmpty()) {
+                model.addAttribute("topic", entries.get(0).getTopic());
+
+            }
+             // chatgpt bu bilgiyi burada veya thymeleafte topicID ve categoryId elde etmede kullan: entries.getFirst().getTopic().getCategory()
         } else {
             // topicId gönderilmemişse tüm entry'leri getir
             var allEntries = entryRepository.findAll();
@@ -257,6 +262,8 @@ public class EntryController {
                     return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":
                     return "redirect:/entry-filter/return?categoryId=" + categoryId;
+                case "entries":
+                    return "redirect:/entries?topicId=" + topicId;
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     return "redirect:/" + returnPage + "?categoryId=" + categoryId;
