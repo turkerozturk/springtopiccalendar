@@ -28,6 +28,9 @@
           th:action="${topicDTO.id != null} ? @{/topics/update/{id}(id=${topicDTO.id})} : @{/topics}"
           method="post">
 
+        <!-- preserve returnPage -->
+        <input type="hidden" name="returnPage" th:value="${returnPage}"/>
+
         <div class="mb-3">
             <label for="category" class="form-label">Category:</label>
             <select id="category" th:field="*{category.id}" class="form-select">
@@ -51,6 +54,12 @@
 
 
         <button type="submit" class="btn btn-primary w-100">Save</button>
+
+        <!-- if user hits “cancel,” send them back -->
+        <a th:if="${returnPage=='pivottable'}"
+           th:href="@{/entry-filter/form}">
+            Cancel
+        </a>
     </form>
 
     <div class="mt-3">

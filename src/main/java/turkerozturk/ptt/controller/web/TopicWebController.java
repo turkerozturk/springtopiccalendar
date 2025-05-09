@@ -20,6 +20,7 @@
  */
 package turkerozturk.ptt.controller.web;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +32,6 @@ import turkerozturk.ptt.service.CategoryService;
 import turkerozturk.ptt.service.TopicService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -73,9 +73,11 @@ public class TopicWebController {
 
     // Yeni topic oluşturma formu
     @GetMapping("/create")
-    public String showCreateForm(
-            @RequestParam(name="categoryId", required=false) Long categoryId,
-            Model model) {
+    public String showCreateForm(HttpSession session,
+                                 @RequestParam(name="categoryId", required=false) Long categoryId,
+                                 @RequestParam(name="returnPage", required=false) String returnPage,
+                                 Model model) {
+
 
         // Yeni boş Topic nesnesi (formda doldurulacak)
         Topic topic = new Topic();
@@ -99,12 +101,17 @@ public class TopicWebController {
                 .collect(Collectors.toList());
         model.addAttribute("categories", categoryDTOList);
 
+        // pass returnPage back into the template
+        model.addAttribute("returnPage", returnPage);
+
         return "topic-form"; // templates/topic-form.html
     }
 
     // Yeni topic kaydetme
     @PostMapping
-    public String saveTopic(@ModelAttribute("topicDTO") Topic topic) {
+    public String saveTopic(@ModelAttribute("topicDTO") Topic topic,
+                            @RequestParam(name="returnPage", required=false) String returnPage
+                            ) {
         // Seçilen category'yi veritabanından bul
         var categoryId = topic.getCategory().getId();
         Category category = categoryService
@@ -119,6 +126,25 @@ public class TopicWebController {
 
         // Kaydet
         topicService.saveTopic(topic);
+
+        // Hangi sayfadan gelindiğini kontrol ediyoruz.
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "topics":
+                    //   return "redirect:/topics?categoryId=" + categoryId;
+                case "pivottable":
+                 //   return "redirect:/entry-filter/return?categoryId=" + categoryId;
+                    return "redirect:/entry-filter/form";
+                case "entries":
+                    //   return "redirect:/entries?topicId=" + topicId;
+                    // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+                    //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;
+            }
+        }
+
+
+
         return "redirect:/topics?categoryId=" + categoryId;
     }
 
