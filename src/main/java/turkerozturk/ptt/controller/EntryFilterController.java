@@ -206,7 +206,6 @@ public class EntryFilterController {
         }
 
 
-        System.out.println("FILTEERRR apply: " + filterDto.getCategoryId());
 
 
         // Aynı filtre sorgusunu çalıştır
@@ -321,7 +320,7 @@ public class EntryFilterController {
         // Tarihi ileri kaydır
         filterDto.setStartDate(filterDto.getStartDate().plusDays(rangeLength));
         filterDto.setEndDate(filterDto.getEndDate().plusDays(rangeLength));
-        System.out.println("FILTEERRR next: " + filterDto.getCategoryId());
+
         // Aynı filtre sorgusunu çalıştır
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
