@@ -739,25 +739,33 @@ function sortPivotTableByColumn(colIndex) {
       const filterInput = document.getElementById('categoryTextFilter');
       const selectEl    = document.getElementById('categorySelect');
 
-      // Orijinal seçenekleri saklıyoruz (value/text ikilisi)
-      const originalOptions = Array.from(selectEl.options)
+      // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
+      const dummyOption = { value: '', text: '--Select--' };
+      const categoryOptions = Array.from(selectEl.options)
+        .filter(opt => opt.value !== '')    // value="" olan dummy'yi at
         .map(opt => ({ value: opt.value, text: opt.text }));
 
       filterInput.addEventListener('input', function(){
         const term = this.value.trim().toLowerCase();
-        // Select içini temizle
+
+        // 2️⃣ Select'i temizle
         selectEl.innerHTML = '';
 
-        // Şartı sağlayanları yeniden ekle
-        originalOptions.forEach(({value, text}) => {
-          if (!term || text.toLowerCase().includes(term)) {
-            const opt = new Option(text, value);
-            selectEl.add(opt);
-          }
-        });
+        // 3️⃣ En başa hep dummy seçeneğini ekle
+        selectEl.add(new Option(dummyOption.text, dummyOption.value));
+
+        // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
+        categoryOptions
+          .filter(({ text }) =>
+            term === '' || text.toLowerCase().includes(term)
+          )
+          .forEach(({ text, value }) => {
+            selectEl.add(new Option(text, value));
+          });
       });
     })();
 </script>
+
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.min.js}"></script>
 
