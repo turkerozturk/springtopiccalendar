@@ -122,7 +122,11 @@ public class EntryFilterController {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
-            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            // seçili tüm topicId’leri DB’den entity olarak yükleyelim
+            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+
+            // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics);
             model.addAttribute("pivotData", pivotData);      // Pivot tablo
         }
         model.addAttribute("dateFormat", dateFormat);
@@ -226,7 +230,12 @@ public class EntryFilterController {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
-            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            // seçili tüm topicId’leri DB’den entity olarak yükleyelim
+            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+
+            // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics);
+
             model.addAttribute("pivotData", pivotData);      // Pivot tablo
         }
         model.addAttribute("dateFormat", dateFormat);
@@ -281,7 +290,11 @@ public class EntryFilterController {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
-            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            // seçili tüm topicId’leri DB’den entity olarak yükleyelim
+            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+
+            // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics);
             model.addAttribute("pivotData", pivotData);      // Pivot tablo
         }
         model.addAttribute("dateFormat", dateFormat);
@@ -335,7 +348,11 @@ public class EntryFilterController {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
-            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            // seçili tüm topicId’leri DB’den entity olarak yükleyelim
+            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+
+            // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics);
             model.addAttribute("pivotData", pivotData);      // Pivot tablo
         }
         model.addAttribute("dateFormat", dateFormat);
@@ -389,44 +406,49 @@ public class EntryFilterController {
     /**
      * filteredEntries içinden pivotMap oluşturur.
      */
-    private PivotData buildPivotData(List<Entry> filteredEntries, List<LocalDate> dateRange) {
-        // 1) Tüm topicId'leri bulalım ve bunları entity olarak toplayalım.
-        //    (Aslında, map içerisinde dağınık. Aşağıda grouping yaparken elde edeceğiz.)
+    private PivotData buildPivotData(
+            List<Entry> filteredEntries,
+            List<LocalDate> dateRange,
+            List<Topic> selectedTopics     // yenilik: tüm seçili topic’ler
+    ) {
+        // 1) Topic’leri ID → Topic map’ine al, ve eşleştirme için boş yapılar oluştur
         Map<Long, Topic> topicMap = new HashMap<>();
-
-        // pivotMap: topicId -> (LocalDate -> List<Entry>)
         Map<Long, Map<LocalDate, List<Entry>>> pivotMap = new HashMap<>();
-
-        // topicEntryCount: topicId -> integer (toplam entry sayısı)
         Map<Long, Integer> topicEntryCount = new HashMap<>();
 
+        for (Topic t : selectedTopics) {
+            Long tid = t.getId();
+            topicMap.put(tid, t);
+            // her gün için liste oluşturmak yerine, user interface'ta yoksa null kabul edeceğiz
+            pivotMap.put(tid, new HashMap<>());
+            topicEntryCount.put(tid, 0);
+        }
+
+        // 2) Gerçek entry’leri grupla
         for (Entry e : filteredEntries) {
-            if (e.getTopic() == null) continue;  // topic yoksa atla
+            if (e.getTopic() == null) continue;
             Long tid = e.getTopic().getId();
-            topicMap.put(tid, e.getTopic());
+            // sadece seçili topic’ler üzerinde çalışacağımız için emin ol
+            if (!pivotMap.containsKey(tid)) continue;
 
             // Tarihi LocalDate'e çeviriyoruz (çünkü dateMillisYmd = sadece gün)
             // (Mantık: 13 haneli milisi LocalDate'e dönüştürmek)
             LocalDate entryDate = convertMillisToLocalDate(e.getDateMillisYmd());
-
-            // pivotMap içinde topicId var mı?
-            pivotMap.putIfAbsent(tid, new HashMap<>());
             Map<LocalDate, List<Entry>> dayMap = pivotMap.get(tid);
 
-            // dayMap içinde entryDate var mı?
-            dayMap.putIfAbsent(entryDate, new ArrayList<>());
-            dayMap.get(entryDate).add(e);
+            dayMap.computeIfAbsent(entryDate, d -> new ArrayList<>()).add(e);
 
             // topicEntryCount için +1
-            topicEntryCount.put(tid, topicEntryCount.getOrDefault(tid, 0) + 1);
+            topicEntryCount.put(tid, topicEntryCount.get(tid) + 1);
         }
 
-        // Tüm Topic’leri ID sırasına göre bir listeye alalım.
+        // 3) Topic listesi: seçili tüm topic’ler, alfabetik ya da ID’ye göre sıralı
         List<Topic> topicList = new ArrayList<>(topicMap.values());
-        topicList.sort(Comparator.comparing(Topic::getName)); // isterseniz ID'ye göre
+        topicList.sort(Comparator.comparing(Topic::getName));
 
         return new PivotData(dateRange, topicList, pivotMap, topicEntryCount);
     }
+
 
     /**
      * dateMillisYmd (13 haneli epoch -> sadece gün) => LocalDate
@@ -457,7 +479,11 @@ public class EntryFilterController {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
-            PivotData pivotData = buildPivotData(filteredEntries, dateRange);
+            // seçili tüm topicId’leri DB’den entity olarak yükleyelim
+            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+
+            // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
+            PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics);
             model.addAttribute("pivotData", pivotData);      // Pivot tablo
         }
         model.addAttribute("dateFormat", dateFormat);
