@@ -87,11 +87,20 @@
         <p th:text="${errorMessage}"></p>
     </div>
 
-
+    <!-- 1️⃣ Filtre Kutusu -->
+    <div class="row align-items-center mb-3">
+        <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
+        <div class="col-auto">
+            <input type="text"
+                   id="categoryTextFilter"
+                   class="form-control"
+                   placeholder="Category Containing..">
+        </div>
 
 
     <!-- Kategori Seçimi -->
-    <div class="row align-items-center mb-3">
+
+
         <label for="categorySelect" class="col-auto col-form-label">Category: </label>
         <div class="col-auto">
             <select id="categorySelect"
@@ -316,6 +325,39 @@
             window.location.href = baseUrl + "?categoryId=" + categoryId;
         }
     }
+</script>
+
+<!-- 3️⃣ Filtreleme için JS -->
+<script>
+    (function(){
+      const filterInput = document.getElementById('categoryTextFilter');
+      const selectEl    = document.getElementById('categorySelect');
+
+      // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
+      const dummyOption = { value: '', text: '--Select--' };
+      const categoryOptions = Array.from(selectEl.options)
+        .filter(opt => opt.value !== '')    // value="" olan dummy'yi at
+        .map(opt => ({ value: opt.value, text: opt.text }));
+
+      filterInput.addEventListener('input', function(){
+        const term = this.value.trim().toLowerCase();
+
+        // 2️⃣ Select'i temizle
+        selectEl.innerHTML = '';
+
+        // 3️⃣ En başa hep dummy seçeneğini ekle
+        selectEl.add(new Option(dummyOption.text, dummyOption.value));
+
+        // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
+        categoryOptions
+          .filter(({ text }) =>
+            term === '' || text.toLowerCase().includes(term)
+          )
+          .forEach(({ text, value }) => {
+            selectEl.add(new Option(text, value));
+          });
+      });
+    })();
 </script>
 
 <script type="text/javascript"
