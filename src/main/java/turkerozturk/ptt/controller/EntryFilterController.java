@@ -22,7 +22,6 @@ package turkerozturk.ptt.controller;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.dto.TopicDto;
+import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.repository.CategoryRepository;
@@ -43,6 +43,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/entry-filter")
@@ -196,11 +197,11 @@ public class EntryFilterController {
      * Validasyon hatası yoksa sonuçları gösterir.
      */
     @PostMapping("/apply")
-    public String applyFilter(@Valid @ModelAttribute("filterDto") FilterDto filterDto,
-                              BindingResult bindingResult,
-                              Model model,
-                              HttpSession session,
-                              @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
+    public String applyCategoryShiftingFilter(@Valid @ModelAttribute("filterDto") FilterDto filterDto,
+                                              BindingResult bindingResult,
+                                              Model model,
+                                              HttpSession session,
+                                              @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
@@ -507,6 +508,124 @@ public class EntryFilterController {
 
 
 
+    /**
+     * ortak filtre uygulama logic’i
+     * Please look at the previousCategory and nextCategory methods first. This method is part of them.
+     * If the user clicks on to ◀️cat or cat▶️ form buttons from pivot table tracker page,
+     * previousCategory, nextCategory and this method is responsible.
+     * @param filterDto
+     * @param model
+     * @param session
+     * @param reportType
+     * @return
+     */
+    private String applyCategoryShiftingFilter(FilterDto filterDto,
+                                               Model model,
+                                               HttpSession session,
+                                               String reportType) {
+
+        // start. We need to get topic ID's and set to filterDto. Because this method is for category shift.
+        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByNameAsc(filterDto.getCategoryId());
+        List<Long> topicIds = new ArrayList<>();
+        for(Topic topic : topicsOfTheCategory) {
+            topicIds.add(topic.getId());
+        }
+        filterDto.setTopicIds(topicIds);
+        // 1) session’a kaydet
+        session.setAttribute("currentFilterDto", filterDto);
+        // end.
 
 
+
+        // 2) filteredEntries
+        List<Entry> filtered = filterService.filterEntries(filterDto);
+
+        // 3) dateRange
+        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+
+        // 4) model’e pivot ya da normal tablo
+        if ("normal".equals(reportType)) {
+            model.addAttribute("entries", filtered);
+        } else {
+
+            PivotData pivot = buildPivotData(filtered, dateRange, topicsOfTheCategory);
+            model.addAttribute("pivotData", pivot);
+        }
+
+        // 5) ortak model attrs
+        model.addAttribute("dateFormat", dateFormat);
+        model.addAttribute("dateFormatTitle", dateFormatTitle);
+        model.addAttribute("today", LocalDate.now(timeZoneProvider.getZoneId()));
+        model.addAttribute("filterDto", filterDto);
+
+        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("topicsForSelectedCategory",
+                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+        // … gerekirse allTopics vs.
+
+        return "entries/filter-form";
+    }
+
+    /**
+     * Shifts categoryID to previous one. If the beginning has come, it starts from the end.
+     * @param filterDto
+     * @param model
+     * @param session
+     * @param reportType
+     * @return
+     */
+    @PostMapping("/previousCategory")
+    public String previousCategory(@ModelAttribute("filterDto") FilterDto filterDto,
+                                   Model model,
+                                   HttpSession session,
+                                   @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
+        List<Category> cats = categoryRepository.findAllByOrderByNameAsc();
+        int size = cats.size();
+
+        // mevcut indexi bul
+        Long current = filterDto.getCategoryId();
+        int idx = IntStream.range(0, size)
+                .filter(i -> cats.get(i).getId().equals(current))
+                .findFirst()
+                .orElse(-1);
+
+        // yeni index: eğer null ya da ilkse sona git, değilse idx-1
+        int newIdx = (idx <= 0) ? size - 1 : idx - 1;
+        filterDto.setCategoryId(cats.get(newIdx).getId());
+
+        return applyCategoryShiftingFilter(filterDto, model, session, reportType);
+    }
+
+    /**
+     * Shifts categoryID to next one. If the end is reached, it starts from the beginning.
+     * @param filterDto
+     * @param model
+     * @param session
+     * @param reportType
+     * @return
+     */
+    @PostMapping("/nextCategory")
+    public String nextCategory(@ModelAttribute("filterDto") FilterDto filterDto,
+                               Model model,
+                               HttpSession session,
+                               @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
+
+
+        List<Category> cats = categoryRepository.findAllByOrderByNameAsc();
+        int size = cats.size();
+
+        Long current = filterDto.getCategoryId();
+        int idx = IntStream.range(0, size)
+                .filter(i -> cats.get(i).getId().equals(current))
+                .findFirst()
+                .orElse(-1);
+
+        // yeni index: eğer null ya da son ise başa git, değilse idx+1
+        int newIdx = (idx < 0 || idx == size - 1) ? 0 : idx + 1;
+        filterDto.setCategoryId(cats.get(newIdx).getId());
+
+        return applyCategoryShiftingFilter(filterDto, model, session, reportType);
+    }
 }
+
+

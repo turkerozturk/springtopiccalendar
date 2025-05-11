@@ -194,11 +194,10 @@
         <input type="hidden" th:field="*{endDate}"/>
         <input type="hidden" th:field="*{statuses}"/>
         <input type="hidden" th:field="*{categoryId}"/>
-        <button type="submit">Previous</button>
+        <button type="submit" title="Previous Date Range">◀️date</button>
     </form>
 
-    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-            aria-controls="offcanvasTop">Toggle Filter</button>
+
 
     <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
         <!-- Gizli alanlar -->
@@ -207,10 +206,48 @@
         <input type="hidden" th:field="*{endDate}"/>
         <input type="hidden" th:field="*{statuses}"/>
         <input type="hidden" th:field="*{categoryId}"/>
-        <button type="submit">Next</button>
+        <button type="submit" title="Next Date Range">date▶️</button>
     </form>
 
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+            aria-controls="offcanvasTop">Toggle Filter</button>
+
+    <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
+    <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
+          method="post" style="display:inline;">
+        <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
+        <input type="hidden" th:field="*{topicIds}" />
+        <input type="hidden" th:field="*{startDate}" />
+        <input type="hidden" th:field="*{endDate}" />
+        <input type="hidden" th:field="*{statuses}" />
+        <input type="hidden" th:field="*{categoryId}" />
+
+        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Previous Category">
+            ◀️cat
+        </button>
+    </form>
+
+    <form th:action="@{/entry-filter/nextCategory}" th:object="${filterDto}"
+          method="post" style="display:inline; margin-left:4px;">
+        <input type="hidden" th:field="*{topicIds}" />
+        <input type="hidden" th:field="*{startDate}" />
+        <input type="hidden" th:field="*{endDate}" />
+        <input type="hidden" th:field="*{statuses}" />
+        <input type="hidden" th:field="*{categoryId}" />
+
+        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Next Category">
+            cat▶️
+        </button>
+    </form>
+
+
 </div>
+
+
+
+
+
+
 
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
     <div class="offcanvas-header">
@@ -380,7 +417,7 @@
     <!-- Tabloyu sarmalayan scrollable container -->
     <div style="overflow-x: auto; max-width: 100%;">
 
-    <table id="pivot-table" class="table-bordered table-sm">
+    <table id="pivot-table" class="table-bordered table-sm caption-top">
         <caption>Pivot Table
               <span th:each="cat : ${allCategories}"
                     th:if="${cat.id} == ${filterDto.categoryId}"
