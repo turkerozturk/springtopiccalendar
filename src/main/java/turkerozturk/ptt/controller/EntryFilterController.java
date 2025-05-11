@@ -86,8 +86,12 @@ public class EntryFilterController {
     public String filterForm(Model model,
                              HttpSession session,
                              @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
-        // 1) Varsayılan DTO Oluştur
-        FilterDto filterDto = new FilterDto();
+
+        FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
+        if (filterDto == null) {
+            filterDto = new FilterDto();
+        }
+
 
         // 2) Bu haftanın başı ve sonu (örneğin pazartesi - pazar)
         // Özellikten gelen değeri DayOfWeek'e dönüştür
