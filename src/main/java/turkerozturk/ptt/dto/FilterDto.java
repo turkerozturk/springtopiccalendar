@@ -46,4 +46,6 @@ public class FilterDto {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;   // varsayılan bu haftanın sonu
+
+    private Integer entriesThreshold;
 }

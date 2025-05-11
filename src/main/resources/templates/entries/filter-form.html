@@ -371,6 +371,45 @@
                             </div>
                         </div>
 
+
+                        <!-- 6️⃣ Entries Threshold -->
+                        <div class="row mb-3">
+                            <label for="entriesThreshold" class="col-sm-4 col-form-label">
+                                Entries Threshold:
+                            </label>
+                            <div class="col-sm-8">
+                                <div class="input-group">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="decrementThreshold()">
+                                        &minus;
+                                    </button>
+                                    <!-- binds to FilterDto.entriesThreshold -->
+                                    <input type="number"
+                                           id="entriesThreshold"
+                                           class="form-control text-center"
+                                           th:field="*{entriesThreshold}"
+                                           min="0"
+                                           placeholder="0"/>
+                                    <button class="btn btn-outline-secondary" type="button"
+                                            onclick="incrementThreshold()">
+                                        &#43;
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Current threshold:
+                                    <span id="thresholdValue"
+                                          th:text="${filterDto.entriesThreshold} ?: 0">
+                                        0
+                                    </span>
+                                </small>
+                            </div>
+                        </div>
+
+
+
+
+
+
                         <!-- Filtrele Butonu -->
                         <div class="row mb-3">
                             <div class="col-sm-12 text-center">
@@ -801,6 +840,29 @@ function sortPivotTableByColumn(colIndex) {
           });
       });
     })();
+</script>
+
+
+<!-- javascript to keep the label in sync -->
+<script>
+    function updateThresholdValue() {
+      const v = document.getElementById('entriesThreshold').value || 0;
+      document.getElementById('thresholdValue').innerText = v;
+    }
+    function incrementThreshold() {
+      const inpt = document.getElementById('entriesThreshold');
+      inpt.stepUp();
+      updateThresholdValue();
+    }
+    function decrementThreshold() {
+      const inpt = document.getElementById('entriesThreshold');
+      inpt.stepDown();
+      updateThresholdValue();
+    }
+    // keep label & input synced if user types manually
+    document
+      .getElementById('entriesThreshold')
+      .addEventListener('input', updateThresholdValue);
 </script>
 
 <script type="text/javascript"
