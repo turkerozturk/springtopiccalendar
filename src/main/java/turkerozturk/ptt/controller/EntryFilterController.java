@@ -95,10 +95,15 @@ public class EntryFilterController {
         ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
         LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
-        LocalDate endOfWeek = startOfWeek.plusDays(6);
 
-        filterDto.setStartDate(startOfWeek);
-        filterDto.setEndDate(endOfWeek);
+        // By default, the initial date range is 3 weeks(21 days);
+        // This week (7 days of date range)
+        LocalDate endOfWeek = startOfWeek.plusDays(6);
+        // I decided to add previous week to the date range too:
+        filterDto.setStartDate(startOfWeek.minusDays(7));
+        // I decided to add next week to the date range too:
+        filterDto.setEndDate(endOfWeek.plusDays(7));
+
         // topicIds/statuses boş => “hepsi” gibi davranacak
 
         // 3) Filter sorgusunu çalıştır (ilk açılışta da verileri gösterelim)
