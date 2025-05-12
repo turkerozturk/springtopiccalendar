@@ -39,4 +39,9 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     // Entry entity'sinde "topic" adında bir alan var,
     // bu alanın "id"si üzerinden filtre yapmak için:
     List<Entry> findByTopicId(Long topicId);
+
+    List<Entry> findAllByOrderByDateMillisYmdDesc();
+    List<Entry> findByTopicIdOrderByDateMillisYmdDesc(Long topicId);
+
+
 }
