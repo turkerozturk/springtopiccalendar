@@ -37,6 +37,16 @@
         .delete-entry-column {
             text-align: center;
         }
+
+        .status-0 {
+          background-color: gainsboro !important;
+        }
+        .status-1 {
+          background-color: palegreen !important;
+        }
+        .status-2 {
+          background-color: tomato !important;
+        }
     </style>
 </head>
 <body>
@@ -155,7 +165,10 @@
                               .toLocalDate())}"
                 th:title="${entry.dateMillisYmd}">
             </td>
-            <td th:text="${entry.status}"></td>
+            <td th:text="${entry.status}" th:class="'pivot-table-entry-cell status-' + ${entry.status}">Status</td>
+
+
+
             <td>
 
                 <a th:href="@{/topics/edit/{id}(id=${entry.topic.id})}" th:text="${entry.topic.name}" style="margin-top: 1.33em;
