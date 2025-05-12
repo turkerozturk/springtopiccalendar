@@ -74,10 +74,14 @@ public class EntryController {
             // Belirtilen topic'e ait entry'leri getir
             var entries = entryRepository.findByTopicId(topicId);
             model.addAttribute("entries", entries);
-            if(!entries.isEmpty()) {
-                model.addAttribute("topic", entries.get(0).getTopic());
+          //  if(!entries.isEmpty()) {
+                //model.addAttribute("topic", entries.get(0).getTopic());
+                Optional<Topic> optTopic = topicRepository.findById(topicId);
+                Topic topic = optTopic.get();
 
-            }
+                model.addAttribute("topic", topic);
+
+          //  }
              // chatgpt bu bilgiyi burada veya thymeleafte topicID ve categoryId elde etmede kullan: entries.getFirst().getTopic().getCategory()
         } else {
             // topicId gönderilmemişse tüm entry'leri getir
