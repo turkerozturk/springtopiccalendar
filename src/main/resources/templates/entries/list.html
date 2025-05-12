@@ -51,6 +51,8 @@
         <a href="entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">
             Tracker
         </a>
+        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
+
     </div>
 
     <h1 class="mb-4">Entries</h1>
@@ -95,7 +97,7 @@
     margin-right: 0;
     font-weight: normal;">
                 <a th:href="@{/topics(categoryId=${topic.category.id}) }" th:text="${topic.category.name}">Category Name</a>
-            </span>
+                </span>
                 &nbsp;/&nbsp;
                 (<a th:href="@{/entries/new(topicId=${topic.id}, returnPage='entries', categoryId=${topic.category.id})}"
                    title="Add New Entry" class=""
@@ -111,23 +113,13 @@
         font-size: 18px;
 
 
-"
-  > + </a>)
+"> + </a>)
                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                         th:text="${topic.name}" style="margin-top: 1.33em;
     margin-bottom: 1.33em;
     margin-left: 0;
     margin-right: 0;
     font-weight: normal;">Topic Name</a>
-
-
-
-
-
-
-
-
-
 
             </th:block>
         </caption>
@@ -137,7 +129,7 @@
             <th>ID</th>
             <th>Date</th>
             <th>Status</th>
-            <th>Topic</th>
+            <th>Topic/Category</th>
             <th>Note</th>
             <th>#</th>
         </tr>
@@ -164,7 +156,17 @@
                 th:title="${entry.dateMillisYmd}">
             </td>
             <td th:text="${entry.status}"></td>
-            <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
+            <td>
+
+                <a th:href="@{/topics/edit/{id}(id=${entry.topic.id})}" th:text="${entry.topic.name}" style="margin-top: 1.33em;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: normal;">Topic Name</a>
+                /
+                <a th:href="@{/topics(categoryId=${entry.topic.category.id}) }" th:text="${entry.topic.category.name}">Category Name</a>
+
+            </td>
             <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
 
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
