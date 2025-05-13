@@ -43,6 +43,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
@@ -428,8 +429,8 @@ public class EntryFilterController {
     private PivotData buildPivotData(
             List<Entry> filteredEntries,
             List<LocalDate> dateRange,
-            List<Topic> selectedTopics, // yenilik: tüm seçili topic’ler
-            Integer entriesThreshold    // yenilik: belli sayida entrysi olmayan topic elenir.
+            List<Topic> selectedTopics,
+            Integer entriesThreshold
     ) {
         // --- 1) pre-count entries per topic ---
         Map<Long, Integer> preCount = new HashMap<>();
@@ -443,7 +444,6 @@ public class EntryFilterController {
         }
 
         // --- 2) only include topics meeting threshold ---
-        // Topic’leri ID → Topic map’ine al, ve eşleştirme için boş yapılar oluştur
         Map<Long, Topic> topicMap = new HashMap<>();
         Map<Long, Map<LocalDate, List<Entry>>> pivotMap = new HashMap<>();
         Map<Long, Integer> topicEntryCount = new HashMap<>();
@@ -451,39 +451,81 @@ public class EntryFilterController {
         for (Topic t : selectedTopics) {
             Long tid = t.getId();
             int count = preCount.getOrDefault(tid, 0);
-            // if threshold >0 and count is too small, skip entirely
             if (entriesThreshold != null
                     && entriesThreshold > 0
                     && count < entriesThreshold) {
                 continue;
             }
             topicMap.put(tid, t);
-            pivotMap.put(tid, new HashMap<>());      // will fill in next step
-            topicEntryCount.put(tid, count);        // final count for UI
+            pivotMap.put(tid, new HashMap<>());
+            topicEntryCount.put(tid, count);
         }
 
         // --- 3) distribute entries into the pivotMap only for kept topics ---
-        // Gerçek entry’leri grupla
         for (Entry e : filteredEntries) {
             if (e.getTopic() == null) continue;
             Long tid = e.getTopic().getId();
             Map<LocalDate, List<Entry>> dayMap = pivotMap.get(tid);
-            if (dayMap == null) continue;  // either not selected or below threshold
+            if (dayMap == null) continue;
 
-            // Tarihi LocalDate'e çeviriyoruz (çünkü dateMillisYmd = sadece gün)
-            // (Mantık: 13 haneli milisi LocalDate'e dönüştürmek)
             LocalDate entryDate = convertMillisToLocalDate(e.getDateMillisYmd());
             dayMap.computeIfAbsent(entryDate, d -> new ArrayList<>())
                     .add(e);
         }
 
-        // --- 4) sorted topic list for the UI ---
-        // Topic listesi: seçili tüm topic’ler, alfabetik ya da ID’ye göre sıralı
+        // --- 4) inject synthetic "someTimeLater" entries without conflicts ---
+        for (Map.Entry<Long, Topic> me : topicMap.entrySet()) {
+            Long tid = me.getKey();
+            Topic topic = me.getValue();
+            Long offsetDays = topic.getSomeTimeLater();
+            if (offsetDays == null || offsetDays <= 0) continue;
+
+            // gerçek status=1 entry’leri al
+            List<Entry> doneEntries = filteredEntries.stream()
+                    .filter(e -> e.getTopic() != null
+                            && e.getTopic().getId().equals(tid)
+                            && e.getStatus() == 1)
+                    .collect(Collectors.toList());
+            if (doneEntries.isEmpty()) continue;
+
+            // en son yapılan entry’nin tarihi
+            Entry lastDone = doneEntries.stream()
+                    .max(Comparator.comparing(Entry::getDateMillisYmd))
+                    .get();
+            LocalDate lastDate = convertMillisToLocalDate(lastDone.getDateMillisYmd());
+            LocalDate newDate = lastDate.plusDays(offsetDays);
+
+            // aynı tarihte, status != 1 olan gerçek entry var mı diye bak
+            Map<LocalDate, List<Entry>> dayMap = pivotMap.get(tid);
+            List<Entry> entriesAtNewDate = dayMap.get(newDate);
+            boolean conflict = entriesAtNewDate != null && entriesAtNewDate.stream()
+                    .anyMatch(e -> e.getStatus() != 1);
+            if (conflict) continue;
+
+            // conflict yoksa, yeni geçici entry’yi ekle
+            Entry synthetic = new Entry();
+            synthetic.setTopic(topic);
+            synthetic.setStatus(3);
+            synthetic.setDateMillisYmd(
+                    newDate.atStartOfDay(ZoneId.systemDefault())
+                            .toInstant().toEpochMilli()
+            );
+
+            dayMap.computeIfAbsent(newDate, d -> new ArrayList<>())
+                    .add(synthetic);
+        }
+
+
+        // --- 5) sorted topic list for the UI ---
         List<Topic> topicList = new ArrayList<>(topicMap.values());
         topicList.sort(Comparator.comparing(Topic::getName));
 
         return new PivotData(dateRange, topicList, pivotMap, topicEntryCount);
     }
+
+
+
+
 
 
 

@@ -151,6 +151,10 @@
               .status-2 {
                   background-color: tomato !important;
               }
+              .status-3 {
+                  background-color: LightBlue !important;
+              }
+
               /* gelecekte yeni status değerleri eklemek kolaylaşır */
 
                       .accordion-container {
@@ -558,49 +562,61 @@
             <!-- pivotData.dateRange kadar hücre -->
 
             <th:block th:each="day : ${pivotData.dateRange}"
-                th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}"
-                >
+                      th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
 
-                <!-- Kac entry varsa göster -->
-                <!-- <span th:text="${entriesForDay != null ? entriesForDay.size() : 0}">0</span> -->
-
-
-                <!-- Var olan entry'leri link şeklinde göster -->
+                <!-- 1) Var olan (status!=3) entry’leri link şeklinde göster -->
                 <th:block th:if="${entriesForDay != null}">
                     <td th:each="entryItem : ${entriesForDay}"
+                        th:if="${entryItem.status != 3}"
                         th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
 
-                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id}, categoryId=${topic.category.id}, returnPage=pivottable)}"
-                           >
+                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
+                                           categoryId=${topic.category.id},
+                                           returnPage=pivottable)}">
 
-                            <!-- Not içeriği varsa '@' kalın -->
                             <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
-                                <span th:title="${entryItem.note.content}"  class="entry-with-content" >
-                                    @
-                                </span>
+                    <span th:title="${entryItem.note.content}"
+                          class="entry-with-content">
+                        @
+                    </span>
                             </th:block>
-                            <!-- Yoksa normal '@' -->
                             <th:block th:if="${#strings.isEmpty(entryItem.note.content)}">
-                                <span th:title="${'Entry ' + entryItem.id}">
-                                @
-                                </span>
+                    <span th:title="${'Entry ' + entryItem.id}">
+                        @
+                    </span>
                             </th:block>
-
                         </a>
                         <br/>
                     </td>
                 </th:block>
 
+                <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
+                <th:block th:if="${entriesForDay == null or #lists.isEmpty(entriesForDay)}">
+                    <td class="pivot-table-entry-cell">
+                        <a th:href="@{/entries/new(topicId=${topic.id},
+                                       dateYmd=${day},
+                                       categoryId=${topic.category.id},
+                                       returnPage=pivottable)}"
+                           title="Add New Entry"
+                           class="add-new-entry">+</a>
+                    </td>
+                </th:block>
 
-                <!-- Eğer hic entry yoksa 'New Entry' linki göster -->
-                <td th:if="${entriesForDay == null || #lists.isEmpty(entriesForDay)}" class="pivot-table-entry-cell">
-                    <a th:href="@{/entries/new(topicId=${topic.id}, dateYmd=${day}, categoryId=${topic.category.id}, returnPage=pivottable)}"
-                       title="Add New Entry" class="add-new-entry">
-                        +
-                    </a>
-                </td>
+                <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                <th:block th:if="${entriesForDay != null
+                     and !#lists.isEmpty(entriesForDay.?[status == 3])}">
+                    <td th:class="'pivot-table-entry-cell status-3'">
+                        <a th:href="@{/entries/new(topicId=${topic.id},
+                                       dateYmd=${day},
+                                       categoryId=${topic.category.id},
+                                       returnPage=pivottable)}"
+                           title="Add New Entry"
+                           class="add-new-entry">+</a>
+                    </td>
+                </th:block>
 
             </th:block>
+
 
             <!-- Son sütun: o topic'in toplam entry sayısı -->
             <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
