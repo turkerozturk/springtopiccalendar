@@ -46,9 +46,10 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Entry> activities = new ArrayList<>();
 
+    @Column(name = "some_time_later")
+    private Long someTimeLater;
+
     public Topic() {
     }
-
-
 
 }
