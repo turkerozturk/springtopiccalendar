@@ -23,7 +23,10 @@ package turkerozturk.ptt.controller.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +45,6 @@ import turkerozturk.ptt.repository.TopicRepository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -67,26 +69,38 @@ public class EntryController {
     }
 
     @GetMapping
-    public String listEntries(@RequestParam(name = "topicId", required = false) Long topicId,
-                              Model model) {
+    public String listEntries(
+            @RequestParam(name = "topicId", required = false) Long topicId,
+            @RequestParam(name = "page",    defaultValue = "0")  int page,
+            @RequestParam(name = "size",    defaultValue = "20") int size,
+            Model model) {
+
+        // sayfa isteğini oluşturuyoruz (tarih alanına göre azalan)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> entriesPage;
 
         if (topicId != null) {
-            // Belirtilen topic'e ait entry'leri getir
-            var entries = entryRepository.findByTopicIdOrderByDateMillisYmdDesc(topicId);
-            model.addAttribute("entries", entries);
-
-            Optional<Topic> optTopic = topicRepository.findById(topicId);
-            Topic topic = optTopic.get();
-
-            model.addAttribute("topic", topic);
-
+            entriesPage = entryRepository.findByTopicId(topicId, pageable);
+            model.addAttribute("topic", topicRepository.findById(topicId).orElseThrow());
         } else {
-            // topicId gönderilmemişse tüm entry'leri getir
-            List<Entry> allEntries = entryRepository.findAllByOrderByDateMillisYmdDesc();
-            model.addAttribute("entries", allEntries);
+            entriesPage = entryRepository.findAll(pageable);
         }
 
-        return "entries/list";  // templates/entries/list.html
+        model.addAttribute("entriesPage", entriesPage);
+        model.addAttribute("topicId",     topicId);
+
+        int current = entriesPage.getNumber();
+        int total   = entriesPage.getTotalPages();
+        int start   = Math.max(0, current - 5);
+        int end     = Math.min(total - 1, current + 5);
+
+        model.addAttribute("startPage", start);
+        model.addAttribute("endPage",   end);
+
+
+
+
+        return "entries/list";
     }
 
     @GetMapping("/new")

@@ -93,9 +93,102 @@
 
     </div>
 
+    <!-- pagination start -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <!--  pagination nav code -->
+        <!-- 1️⃣ << < önceki 5 … sonraki 5 … > >> -->
+        <nav th:with="startPage=${startPage}, endPage=${endPage}">
+            <ul class="pagination mb-0">
+                <!-- << -->
+                <li class="page-item" th:classappend="${entriesPage.first} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries(topicId=${topicId},page=0,size=${entriesPage.size})}">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+
+                <!-- < -->
+                <li class="page-item" th:classappend="${!entriesPage.hasPrevious()} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries(topicId=${topicId},page=${entriesPage.number-1},size=${entriesPage.size})}">
+                        &laquo;
+                    </a>
+                </li>
+
+                <!-- startPage…endPage -->
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${i == entriesPage.number} ? 'active'">
+
+                <span class="page-link"
+                      th:if="${i == entriesPage.number}"
+                      th:text="${i + 1}">1</span>
+
+                    <a class="page-link"
+                       th:if="${i != entriesPage.number}"
+                       th:href="@{/entries(topicId=${topicId},page=${i},size=${entriesPage.size})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+
+                <!-- > -->
+                <li class="page-item" th:classappend="${!entriesPage.hasNext()} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries(topicId=${topicId},page=${entriesPage.number+1},size=${entriesPage.size})}">
+                        &raquo;
+                    </a>
+                </li>
+
+                <!-- >> -->
+                <li class="page-item" th:classappend="${entriesPage.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries(topicId=${topicId},page=${entriesPage.totalPages-1},size=${entriesPage.size})}">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 2️⃣ Sayfa başına satır sayısı -->
+        <form th:action="@{/entries}" method="get" class="d-inline">
+            <input type="hidden" name="topicId" th:value="${topicId}" />
+            <input type="hidden" name="page"    th:value="${entriesPage.number}" />
+            <select name="size"
+                    class="form-select form-select-sm"
+                    th:onchange="this.form.submit()">
+                <option th:value="10"  th:selected="${entriesPage.size == 10}">10</option>
+                <option th:value="20"  th:selected="${entriesPage.size == 20}">20</option>
+                <option th:value="50"  th:selected="${entriesPage.size == 50}">50</option>
+                <option th:value="100" th:selected="${entriesPage.size == 100}">100</option>
+                <option th:value="200" th:selected="${entriesPage.size == 200}">200</option>
+            </select>
+        </form>
+
+        <!-- 3️⃣ “Go to” sayfa numarası (select) -->
+        <form th:action="@{/entries}" method="get" class="d-inline">
+            <input type="hidden" name="topicId" th:value="${topicId}" />
+            <input type="hidden" name="size"    th:value="${entriesPage.size}" />
+            <select name="page"
+                    class="form-select form-select-sm"
+                    th:onchange="this.form.submit()">
+                <option th:each="i : ${#numbers.sequence(0, entriesPage.totalPages-1)}"
+                        th:value="${i}"
+                        th:text="${i + 1}"
+                        th:selected="${i == entriesPage.number}">
+                </option>
+            </select>
+        </form>
+
+        <!-- 4️⃣ Sayfa etiketi: bulunduğumuz / toplam -->
+        <span class="align-self-center">
+        <span th:text="${entriesPage.number + 1}">1</span> /
+        <span th:text="${entriesPage.totalPages}">7</span>
+    </span>
+    </div>
+
 
     <!-- Entries Tablosu -->
-    <table class="table table-striped table-bordered align-middle caption-top">
+    <table class="table table-sm table-striped table-bordered align-middle caption-top">
         <caption>
 
             <th:block th:if="${topic != null}">
@@ -145,7 +238,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="entry, iStat : ${entries}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
+        <tr th:each="entry, iStat : ${entriesPage.content}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
             <td class="delete-entry-column">
                 <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
                    onclick="return confirmDelete()">
@@ -189,7 +282,19 @@
         </tr>
         </tbody>
     </table>
+
+
+
+
+
+
+
+
+
 </div>
+
+
+
 
 <!-- Bootstrap JS (opsiyonel) -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->

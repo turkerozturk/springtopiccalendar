@@ -21,6 +21,8 @@
 package turkerozturk.ptt.repository;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import turkerozturk.ptt.entity.Entry;
@@ -31,6 +33,9 @@ import java.util.Optional;
 @Repository
 public interface EntryRepository extends JpaRepository<Entry, Long>, EntryRepositoryCustom {
 
+    // topicId filtreli, sayfalı sonuç döndürecek metot
+    Page<Entry> findByTopicId(Long topicId, Pageable pageable);
+
     Optional<Entry> findByTopicIdAndDateMillisYmd(Long topicId, Long dateMillisYmd);
 
     // Veya eğer birden fazla varsa:
@@ -40,8 +45,9 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     // bu alanın "id"si üzerinden filtre yapmak için:
     List<Entry> findByTopicId(Long topicId);
 
-    List<Entry> findAllByOrderByDateMillisYmdDesc();
-    List<Entry> findByTopicIdOrderByDateMillisYmdDesc(Long topicId);
+    Page<Entry> findAllByOrderByDateMillisYmdDesc(Pageable pageable);
+    Page<Entry> findByTopicIdOrderByDateMillisYmdDesc(Long topicId, Pageable pageable);
+
 
 
 }
