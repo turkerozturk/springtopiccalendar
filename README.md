@@ -8,7 +8,7 @@ Extract its contents to an empty folder.
 
 No installation required. It will work if Java is installed on your computer.
 
-https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.1/daily-topic-tracker.zip
+https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.2/daily-topic-tracker.zip
 
 ## HOW TO RUN:
 
