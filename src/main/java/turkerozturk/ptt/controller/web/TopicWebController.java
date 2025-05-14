@@ -52,18 +52,18 @@ public class TopicWebController {
         var categoryList = categoryService.getAllCategories();
 
         // Eğer kategori ID geldiyse filtreli liste, yoksa tüm liste
-        List<Topic> topicDTOList;
+        List<Topic> topicList;
         if (categoryId != null) {
-            topicDTOList = topicService.getTopicsByCategoryId(categoryId);
+            topicList = topicService.getTopicsByCategoryId(categoryId);
             model.addAttribute("selectedCategoryId", categoryId);
         } else {
-            topicDTOList = topicService.getAllTopics();
+            topicList = topicService.getAllTopics();
             // Seçili kategori yoksa null bırakabiliriz
             model.addAttribute("selectedCategoryId", null);
         }
 
         // Modele eklemeler
-        model.addAttribute("topics", topicDTOList);
+        model.addAttribute("topics", topicList);
         model.addAttribute("categories", categoryList);
 
         return "topics"; // templates/topics.html
@@ -93,7 +93,7 @@ public class TopicWebController {
 
 
         // Boş bir DTO
-        model.addAttribute("topicDTO", topic);
+        model.addAttribute("topic", topic);
 
         // Kategori seçimi için tüm kategorileri DTO olarak modele ekleyelim
         var categoryDTOList = categoryService.getAllCategories()
@@ -109,7 +109,7 @@ public class TopicWebController {
 
     // Yeni topic kaydetme
     @PostMapping
-    public String saveTopic(@ModelAttribute("topicDTO") Topic topic,
+    public String saveTopic(@ModelAttribute("topic") Topic topic,
                             @RequestParam(name="returnPage", required=false) String returnPage
                             ) {
         // Seçilen category'yi veritabanından bul
@@ -163,29 +163,32 @@ public class TopicWebController {
                 .collect(Collectors.toList());
         model.addAttribute("categories", categoryDTOList);
 
-        model.addAttribute("topicDTO", topic);
+        model.addAttribute("topic", topic);
         return "topic-form"; // Aynı formu kullanacağız
     }
 
     // Mevcut topic'i güncelleme
     @PostMapping("/update/{id}")
     public String updateTopic(@PathVariable Long id,
-                              @ModelAttribute("topicDTO") Topic topicDTO) {
+                              @ModelAttribute("topic") Topic topic) {
         // Veritabanından topic bul
         Topic existingTopic = topicService
                 .getTopicById(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found!"));
 
         // Topic bilgilerini güncelle
-        existingTopic.setName(topicDTO.getName());
-        existingTopic.setDescription(topicDTO.getDescription());
+        existingTopic.setName(topic.getName());
+        existingTopic.setDescription(topic.getDescription());
+
 
         // Kategori güncelle
-        var categoryId = topicDTO.getCategory().getId();
+        var categoryId = topic.getCategory().getId();
         Category category = categoryService
                 .getCategoryById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
         existingTopic.setCategory(category);
+
+        existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
 
         // Kayıt
         topicService.saveTopic(existingTopic);

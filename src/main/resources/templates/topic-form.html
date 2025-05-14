@@ -20,12 +20,12 @@
 
 <div class="container my-4" style="max-width: 600px;">
     <!-- Başlık (Edit / Create) -->
-    <h1 th:if="${topicDTO.id != null}" class="mb-4">Edit Topic</h1>
-    <h1 th:if="${topicDTO.id == null}" class="mb-4">Create Topic</h1>
+    <h1 th:if="${topic.id != null}" class="mb-4">Edit Topic</h1>
+    <h1 th:if="${topic.id == null}" class="mb-4">Create Topic</h1>
 
     <!-- Form -->
-    <form th:object="${topicDTO}"
-          th:action="${topicDTO.id != null} ? @{/topics/update/{id}(id=${topicDTO.id})} : @{/topics}"
+    <form th:object="${topic}"
+          th:action="${topic.id != null} ? @{/topics/update/{id}(id=${topic.id})} : @{/topics}"
           method="post">
 
         <!-- preserve returnPage -->
@@ -52,6 +52,18 @@
         </div>
 
 
+        <div class="mb-3">
+            <label for="someTimeLater" class="form-label">Some Time Later (gün)</label>
+            <input type="number"
+                   id="someTimeLater"
+                   th:field="*{someTimeLater}"
+                   class="form-control"
+                   min="0"
+                   placeholder="Kaç gün sonra synthetic entry eklensin?" />
+        </div>
+
+
+
 
         <button type="submit" class="btn btn-primary w-100">Save</button>
 
@@ -63,7 +75,7 @@
     </form>
 
     <div class="mt-3">
-        <a th:href="@{/topics(categoryId=${topicDTO.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+        <a th:href="@{/topics(categoryId=${topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
     </div>
 </div>
 
