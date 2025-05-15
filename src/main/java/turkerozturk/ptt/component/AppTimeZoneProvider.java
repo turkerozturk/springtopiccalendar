@@ -28,11 +28,23 @@ import java.time.ZoneId;
 @Component
 public class AppTimeZoneProvider {
 
-    @Value("${app.timezone:UTC}")
-    private String timeZoneId;
+    // bu alan Spring başlatılırken doldurulacak
+    private static ZoneId ZONE;
 
+    @Value("${app.timezone:UTC}")
+    public void setZoneId(String timeZoneId) {
+        ZONE = ZoneId.of(timeZoneId);
+    }
+
+    /** Diğer yerlerden bu metotla erişeceğiz */
+    public static ZoneId getZone() {
+        return ZONE;
+    }
+
+    /** retrofit-style erişim (injection gerekirse) */
     public ZoneId getZoneId() {
-        return ZoneId.of(timeZoneId);
+        return ZONE;
     }
 }
+
 
