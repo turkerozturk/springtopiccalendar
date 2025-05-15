@@ -41,6 +41,7 @@ import turkerozturk.ptt.helper.DateUtils;
 import turkerozturk.ptt.repository.CategoryRepository;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
+import turkerozturk.ptt.service.TopicService;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -58,13 +59,16 @@ public class EntryController {
     private final EntryRepository entryRepository;
     private final TopicRepository topicRepository;
 
+    private final TopicService topicService;
+
     private final CategoryRepository categoryRepository;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, TopicRepository topicRepository, CategoryRepository categoryRepository) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.topicRepository = topicRepository;
+        this.topicService = topicService;
         this.categoryRepository = categoryRepository;
     }
 
@@ -211,6 +215,14 @@ public class EntryController {
             // c) Artık güvenle kaydedebiliriz
             entryRepository.save(formEntry);
 
+            // ---> BURASI: kaydettiğimiz entry'nin topic'i için predictionDate'ı yeniden hesapla
+            //Topic t = formEntry.getTopic();
+            // eğer formEntry.getTopic() güncel bir Topic objesi değilse,
+            // topicService.getTopicById(...) ile çekebilirsiniz.
+            Topic t = topicService.getTopicById(topicId).get();
+            topicService.recalcPredictionDate(t);
+            topicService.saveTopic(t);
+
         } else {
             // *** GÜNCELLEME SENARYOSU ***
 
@@ -246,6 +258,15 @@ public class EntryController {
 
             // d) DB'ye güncellenmiş halini kaydet
             entryRepository.save(dbEntry);
+
+            // ---> BURASI: kaydettiğimiz entry'nin topic'i için predictionDate'ı yeniden hesapla
+            //Topic t = formEntry.getTopic();
+            // eğer formEntry.getTopic() güncel bir Topic objesi değilse,
+            // topicService.getTopicById(...) ile çekebilirsiniz.
+            Topic t = topicService.getTopicById(topicId).get();
+            topicService.recalcPredictionDate(t);
+            topicService.saveTopic(t);
+
         }
 
         // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
@@ -337,8 +358,26 @@ public class EntryController {
 
     @GetMapping("/delete/{id}")
     public String deleteEntry(@PathVariable Long id, HttpSession session) {
+        // 1) Silinecek entry'yi çek, topicId'yi al
+        Entry entry = entryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
+        Long topicId = entry.getTopic() != null
+                ? entry.getTopic().getId()
+                : null;
+
+        // 2) Entry'yi sil
         entryRepository.deleteById(id);
 
+        // 3) Eğer topicId varsa, predictionDate'i tekrar hesapla ve kaydet
+        if (topicId != null) {
+            Topic t = topicService.getTopicById(topicId)
+                    .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
+            // topicService içinde daha önce eklemiş olduğunuz yardımcı metot
+            topicService.recalcPredictionDate(t);
+            topicService.saveTopic(t);
+        }
+
+        // 4) Yönlendirmeyi mevcut session filtresine göre yap
         // Session'da currentFilterDto var mı, kontrol et
         FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
         if (filterDto != null) {

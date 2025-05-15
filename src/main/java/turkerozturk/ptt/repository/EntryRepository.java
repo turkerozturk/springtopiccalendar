@@ -50,4 +50,5 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
 
 
 
+    List<Entry> findByTopicIdAndStatus(Long topicId, int i);
 }

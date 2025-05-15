@@ -190,6 +190,9 @@ public class TopicWebController {
 
         existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
 
+        // ---> BURASI: predictionDateMillisYmd hesaplamasını çağırıyoruz
+        topicService.recalcPredictionDate(existingTopic);
+
         // Kayıt
         topicService.saveTopic(existingTopic);
 

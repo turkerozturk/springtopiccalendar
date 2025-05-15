@@ -21,18 +21,30 @@
 package turkerozturk.ptt.service;
 
 
+
+import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
+import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+// 1) Controller sınıfınıza ekleyin:
+
+
 
 @Service
 public class TopicService {
     @Autowired
     private TopicRepository topicRepository;
+
+    @Autowired
+    private EntryRepository entryRepository;
 
     public List<Topic> getAllTopics() {
         return topicRepository.findAll();
@@ -61,5 +73,51 @@ public class TopicService {
             topicRepository.delete(topic);
         }
     }
+
+
+
+
+// ...
+
+    /**
+     * someTimeLater ve status=1 entry'ler üzerinden
+     * topic.predictionDateMillisYmd değerini günceller.
+     */
+    public void recalcPredictionDate(Topic topic) {
+        Long days = topic.getSomeTimeLater();
+        if (days == null || days == 0) {
+            topic.setPredictionDateMillisYmd(null);
+            return;
+        }
+
+        // EntryRepository'de böyle bir metot yoksa
+        // List<Entry> entries = entryRepository.findByTopicId(topic.getId());
+        // olarak alıp filtreleyebilirsiniz.
+        List<Entry> entries = entryRepository.findByTopicIdAndStatus(topic.getId(), 1);
+        if (entries.isEmpty()) {
+            topic.setPredictionDateMillisYmd(null);
+            return;
+        }
+
+        long maxDateMillis = entries.stream()
+                .mapToLong(Entry::getDateMillisYmd)
+                .max()
+                .getAsLong();
+
+        LocalDate lastDate = Instant
+                .ofEpochMilli(maxDateMillis)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate predDate = lastDate.plusDays(days);
+        long predMillis = predDate
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli();
+
+        topic.setPredictionDateMillisYmd(predMillis);
+    }
+
+
 
 }
