@@ -540,6 +540,8 @@
 
             <th class="text-center" style="vertical-align: middle;">#</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="Prediction">P</th>
+
 
         </tr>
         </thead>
@@ -623,7 +625,44 @@
                 class="text-center"></td>
 
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <td th:text="${iStat.index + 1}">
+            <td th:text="${iStat.index + 1}"></td>
+
+
+
+
+             <!-- predictionDate varsa -->
+            <th:block th:if="${topic.predictionDate != null or !#strings.isEmpty(topic.predictionDate)}">
+
+                <!-- predictionDate dateRange içinde yoksa -->
+                <th:block th:if="${not #lists.contains(pivotData.dateRange, topic.predictionDate)}"
+                >
+                    <td th:title="${topic.predictionDate}" class="status-3" style="text-align: center">
+                        <span>→</span>
+                    </td>
+                </th:block>
+
+                <!-- predictionDate dateRange içinde varsa -->
+                <th:block th:if="${#lists.contains(pivotData.dateRange, topic.predictionDate)}"
+                >
+                    <td th:title="${topic.predictionDate}" style="text-align: center">
+                        <span>←</span>
+                    </td>
+                </th:block>
+
+
+            </th:block>
+
+
+            <!-- predictionDate yoksa -->
+            <th:block th:if="${topic.predictionDate == null or #strings.isEmpty(topic.predictionDate)}"
+            >
+                <td title="You can manually add the next date prediction on topic settings." style="text-align: center">
+                    ⓘ
+                </td>
+            </th:block>
+
+
+
 
         </tr>
         </tbody>
