@@ -23,7 +23,10 @@ package turkerozturk.ptt.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import turkerozturk.ptt.component.AppTimeZoneProvider;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +51,54 @@ public class Topic {
 
     @Column(name = "some_time_later")
     private Long someTimeLater;
+
+    // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Column(name = "prediction_date_millis_ymd")
+    private Long predictionDateMillisYmd;
+
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate predictionDate;
+
+    /** Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için */
+    /*
+    @Transient
+    private String predictionDateFormatted;
+    */
+
+    // --- normal getter/setter for predictionDateMillisYmd ---
+
+    public Long getPredictionDateMillisYmd() {
+        return predictionDateMillisYmd;
+    }
+
+    public void setPredictionDateMillisYmd(Long predictionDateMillisYmd) {
+        this.predictionDateMillisYmd = predictionDateMillisYmd;
+        // isteğe bağlı: burada da güncelleyebilirsiniz
+        this.predictionDate = null;
+    }
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getPredictionDate() {
+        if (predictionDate == null && predictionDateMillisYmd != null) {
+            predictionDate = Instant
+                    .ofEpochMilli(predictionDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return predictionDate;
+    }
+
+    /**
+     * Eğer JPA load sonrası otomatik set etmek isterseniz:
+     */
+    @PostLoad
+    private void onPostLoad() {
+        getPredictionDate();
+    }
 
     public Topic() {
     }
