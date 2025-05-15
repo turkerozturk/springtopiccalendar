@@ -473,7 +473,9 @@ public class EntryFilterController {
                     .add(e);
         }
 
+        // ---- deprecated -----------------------------------------------------
         // --- 4) inject synthetic "someTimeLater" entries without conflicts ---
+        /*
         for (Map.Entry<Long, Topic> me : topicMap.entrySet()) {
             Long tid = me.getKey();
             Topic topic = me.getValue();
@@ -514,7 +516,31 @@ public class EntryFilterController {
             dayMap.computeIfAbsent(newDate, d -> new ArrayList<>())
                     .add(synthetic);
         }
+        */
 
+        // --- 4b) inject synthetic "predictionDate" entries if no entry on that date ---
+        for (Map.Entry<Long, Topic> me : topicMap.entrySet()) {
+            Long tid = me.getKey();
+            Topic topic = me.getValue();
+            LocalDate predDate = topic.getPredictionDate();  // your @Transient hesaplanan tarih
+            if (predDate == null) continue;
+
+            Map<LocalDate, List<Entry>> dayMap = pivotMap.get(tid);
+            List<Entry> entriesAtPred = dayMap.get(predDate);
+            // o tarihte hiç entry (gerçek ya da synthetic) yoksa ekle
+            if (entriesAtPred != null && !entriesAtPred.isEmpty()) continue;
+
+            Entry syntheticPred = new Entry();
+            syntheticPred.setTopic(topic);
+            syntheticPred.setStatus(3);
+            syntheticPred.setDateMillisYmd(
+                    predDate.atStartOfDay(ZoneId.systemDefault())
+                            .toInstant().toEpochMilli()
+            );
+
+            dayMap.computeIfAbsent(predDate, d -> new ArrayList<>())
+                    .add(syntheticPred);
+        }
 
         // --- 5) sorted topic list for the UI ---
         List<Topic> topicList = new ArrayList<>(topicMap.values());
