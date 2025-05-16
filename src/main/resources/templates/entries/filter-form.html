@@ -78,6 +78,8 @@
                   height: 20px;
                   padding: 0px;
 
+                  background-color: WhiteSmoke !important;
+
               }
 
               .pivot-table-entry-cell a {
@@ -153,6 +155,12 @@
               }
               .status-3 {
                   background-color: LightBlue !important;
+              }
+              .status-4 {
+                  background-color: WhiteSmoke !important;
+              }
+              .status-5 {
+                  background-color: LightSteelBlue !important;
               }
 
               /* gelecekte yeni status değerleri eklemek kolaylaşır */
@@ -636,17 +644,62 @@
                 <!-- predictionDate dateRange içinde yoksa -->
                 <th:block th:if="${not #lists.contains(pivotData.dateRange, topic.predictionDate)}"
                 >
-                    <td th:title="${topic.predictionDate}" class="status-3" style="text-align: center">
-                        <span>→</span>
-                    </td>
+
+                    <!-- Eğer topic.predictionDate dateRange'deki en küçük tarihten küçükse -->
+                    <th:block th:if="${topic.predictionDate.isBefore(pivotData.dateRange[0])}">
+                        <!-- Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin -->
+                        <td th:title="${topic.predictionDate}"   class="status-3" style="text-align: center">
+                            <span>🔥🔥</span>
+                        </td>
+                    </th:block>
+
+                    <!-- Eğer topic.predictionDate dateRange'deki en büyük tarihten büyükse -->
+                    <th:block th:if="${topic.predictionDate.isAfter(pivotData.dateRange[pivotData.dateRange.size() - 1])}">
+                        <!-- Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin -->
+                        <td th:title="${topic.predictionDate}" class="status-3" style="text-align: center">
+                            <span>💧💧</span>
+                        </td>
+                    </th:block>
+
                 </th:block>
 
                 <!-- predictionDate dateRange içinde varsa -->
                 <th:block th:if="${#lists.contains(pivotData.dateRange, topic.predictionDate)}"
                 >
-                    <td th:title="${topic.predictionDate}" style="text-align: center">
-                        <span>←</span>
-                    </td>
+                    <!-- topic.predictionDate today'e eşitse -->
+                    <th:block th:if="${topic.predictionDate.equals(today)}">
+                        <!-- Bugünün tarihine denk gelen durum için buraya içerik ekleyin -->
+                        <td th:title="${topic.predictionDate}"  class="status-5" style="text-align: center">
+                            <span>🔔</span>
+                        </td>
+                    </th:block>
+
+                    <!-- topic.predictionDate today'e eşit değilse -->
+                    <th:block th:if="${!topic.predictionDate.equals(today)}">
+                        <!-- DateRange içinde ama bugünden farklı tarih için buraya içerik ekleyin -->
+
+                        <!-- topic.predictionDate bugün’den küçükse -->
+                        <th:block th:if="${topic.predictionDate.isBefore(today)}">
+                            <td th:title="${topic.predictionDate}"
+                                class="status-5"
+                                style="text-align: center">
+                                <span>🔥</span>
+                            </td>
+                        </th:block>
+
+                        <!-- topic.predictionDate bugün’den büyükse -->
+                        <th:block th:if="${topic.predictionDate.isAfter(today)}">
+                            <td th:title="${topic.predictionDate}"
+                                class="status-5"
+                                style="text-align: center">
+                                <span>💧</span>
+                            </td>
+                        </th:block>
+
+
+
+                    </th:block>
+
                 </th:block>
 
 
@@ -657,7 +710,7 @@
             <th:block th:if="${topic.predictionDate == null or #strings.isEmpty(topic.predictionDate)}"
             >
                 <td title="You can manually add the next date prediction on topic settings." style="text-align: center">
-                    ⓘ
+                    ℹ️
                 </td>
             </th:block>
 
