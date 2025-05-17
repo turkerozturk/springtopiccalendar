@@ -389,4 +389,14 @@ public class EntryController {
         }
     }
 
+    // EntriesController veya uygun controller
+    @GetMapping("/{id}/note-full")
+    @ResponseBody
+    public String getFullNote(@PathVariable Long id) {
+        return entryRepository.findById(id)
+                .map(e -> e.getNote() != null ? e.getNote().getContent() : "")
+                .orElse("");
+    }
+
+
 }
