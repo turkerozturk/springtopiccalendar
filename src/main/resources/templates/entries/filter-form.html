@@ -14,7 +14,11 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <!-- TODO make it local file, use it from resources folder. -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <style>
@@ -277,12 +281,8 @@
     <p style="color:red" th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
 </div>
 -->
-<!-- Accordion container -->
-<div class="accordion-container">
 
-    <!-- Accordion wrapper (Bootstrap 5 yapısı) -->
-    <div>
-        <div>
+
             <h2 >
 
 
@@ -344,26 +344,39 @@
                         </div>
 
                         <!-- Tarih Aralığı: Başlangıç Tarihi -->
-                        <div class="row mb-3">
-                            <label for="startDate" class="col-sm-4 col-form-label">
-                                Start Date:
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="date" id="startDate"
-                                       class="form-control"
-                                       th:field="*{startDate}"/>
+                        <div class="row mb-3" id="startDateContainer">
+                            <div class="input-group startDateStyle date">
+                                <label for="startDate" class="col-sm-4 col-form-label">
+                                    Start Date:
+                                </label>
+                                <input type="text" id="startDate"
+                                       class="col-sm-8 form-control"
+                                       th:field="*{startDate}"
+                                />
+                                <span class="input-group-append">
+                                         <button class="btn btn-outline-secondary" type="button">
+                                             <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                                             <i class="far fa-calendar" aria-hidden="true"></i>
+                                         </button>
+                                </span>
                             </div>
                         </div>
 
                         <!-- Tarih Aralığı: Bitiş Tarihi -->
-                        <div class="row mb-3">
-                            <label for="endDate" class="col-sm-4 col-form-label">
-                                End Date:
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="date" id="endDate"
-                                       class="form-control"
-                                       th:field="*{endDate}"/>
+                        <div class="row mb-3" id="endDateContainer">
+                            <div class="input-group endDateStyle date">
+                                <label for="endDate" class="col-sm-4 col-form-label">
+                                    End Date:
+                                </label>
+                                <input type="text" id="endDate"
+                                       class="col-sm-8 form-control"
+                                       th:field="*{endDate}"
+                                />
+                                <span class="input-group-append">
+                                         <button class="btn btn-outline-secondary" type="button">
+                                             <i class="far fa-calendar" aria-hidden="true"></i>
+                                         </button>
+                                </span>
                             </div>
                         </div>
 
@@ -437,9 +450,7 @@
 
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+
 
 <div class="align-center-horizontal">
 
@@ -787,6 +798,19 @@
 
 <!-- AJAX / JavaScript Kısmı -->
 
+
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<!-- TODO make it local file, use it from resources folder. -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+
+
 <script>
     function onCategoryChange(categoryId) {
         // Kategori seçilmediyse, topic alanını temizle
@@ -975,8 +999,38 @@ function sortPivotTableByColumn(colIndex) {
       .addEventListener('input', updateThresholdValue);
 </script>
 
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+
+
+
+<!-- https://uxsolutions.github.io/bootstrap-datepicker/ -->
+<!-- "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range. -->
+<!-- calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers -->
+<script>
+    $(function() {
+      $('#startDateContainer .startDateStyle.date').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          daysOfWeekHighlighted: "0,6",
+          calendarWeeks: false,
+          autoclose: true,
+          todayHighlight: true
+      });
+  });
+
+    $(function() {
+      $('#endDateContainer .endDateStyle.date').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          daysOfWeekHighlighted: "0,6",
+          calendarWeeks: false,
+          autoclose: true,
+          todayHighlight: true
+      });
+  });
+</script>
+
+
 
 </body>
 </html>
