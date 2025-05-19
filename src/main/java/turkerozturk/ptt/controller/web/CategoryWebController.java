@@ -88,6 +88,8 @@ public class CategoryWebController {
 
         // Sadece adını güncellesin diye basit bir şekilde yazıyoruz
         category.setName(dto.getName());
+        category.setArchived(dto.isArchived());
+
         // Topics liste gibi daha fazlası varsa burada set edebilirsiniz.
         categoryService.saveCategory(category);
 

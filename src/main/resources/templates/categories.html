@@ -35,6 +35,10 @@
         #topicsTable input.form-control {
             width: 100%; /* Hücrenin tamamını kaplasın */
         }
+
+        .css-archived {
+           background-color: Salmon !important;
+        }
     </style>
 </head>
 <body>
@@ -74,6 +78,8 @@
 
             <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)">Topics Count</th>
 
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, false)">Archived</th>
+
 
             <th scope="col">Actions</th>
             <th scope="col">Add Topic</th>
@@ -99,6 +105,7 @@
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
         </tr>
 
         </thead>
@@ -113,6 +120,13 @@
                 </a>
             </td>
             <td th:text="${cat.topics.size()}" class="text-center">0</td>
+
+            <td
+                    th:text="${cat.archived ? 'Yes' : 'No'}"
+                    class="text-center"
+                    th:classappend="${cat.archived} ? ' css-archived' : ''">
+            </td>
+
             <td class="text-center">
                 <a th:href="@{/categories/edit/{id}(id=${cat.id})}" class="btn btn-sm btn-warning">
                     Edit
