@@ -660,7 +660,8 @@
                     <th:block th:if="${topic.predictionDate.isBefore(pivotData.dateRange[0])}">
                         <!-- Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin -->
                         <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"   class="status-3" style="text-align: center">
-                            <span>🔥🔥</span>
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                               style="">🔥🔥️</a>
                         </td>
                     </th:block>
 
@@ -668,7 +669,8 @@
                     <th:block th:if="${topic.predictionDate.isAfter(pivotData.dateRange[pivotData.dateRange.size() - 1])}">
                         <!-- Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin -->
                         <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}" class="status-3" style="text-align: center">
-                            <span>💧💧</span>
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                               style="">💧💧</a>
                         </td>
                     </th:block>
 
@@ -681,7 +683,8 @@
                     <th:block th:if="${topic.predictionDate.equals(today)}">
                         <!-- Bugünün tarihine denk gelen durum için buraya içerik ekleyin -->
                         <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"  class="status-5" style="text-align: center">
-                            <span>🔔</span>
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                               style="">🔔</a>
                         </td>
                     </th:block>
 
@@ -694,7 +697,8 @@
                             <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
-                                <span>🔥</span>
+                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                                   style="">🔥</a>
                             </td>
                         </th:block>
 
@@ -703,7 +707,8 @@
                             <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
-                                <span>💧</span>
+                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                                   style="">💧</a>
                             </td>
                         </th:block>
 
@@ -721,7 +726,8 @@
             <th:block th:if="${topic.predictionDate == null or #strings.isEmpty(topic.predictionDate)}"
             >
                 <td title="You can manually add the next date prediction on topic settings." style="text-align: center">
-                    ℹ️
+                    <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                       style="">ℹ️</a>
                 </td>
             </th:block>
 
