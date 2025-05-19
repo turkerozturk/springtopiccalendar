@@ -43,7 +43,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
@@ -148,7 +147,7 @@ public class EntryFilterController {
 
         model.addAttribute("allTopics", topicRepository.findAll());
 
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory", List.of());
 
         model.addAttribute("zoneId", zoneId);
@@ -216,7 +215,7 @@ public class EntryFilterController {
                                               HttpSession session,
                                               @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+            model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
                     topicRepository.findByCategoryId(filterDto.getCategoryId()));
@@ -264,7 +263,7 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -326,7 +325,7 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -386,7 +385,7 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -616,7 +615,7 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
@@ -678,7 +677,7 @@ public class EntryFilterController {
         model.addAttribute("today", LocalDate.now(timeZoneProvider.getZoneId()));
         model.addAttribute("filterDto", filterDto);
 
-        model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
+        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
         // … gerekirse allTopics vs.
@@ -704,7 +703,7 @@ public class EntryFilterController {
                                    Model model,
                                    HttpSession session,
                                    @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
-        List<Category> cats = categoryRepository.findAllByOrderByNameAsc();
+        List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByNameAsc();
         int size = cats.size();
 
         // mevcut indexi bul
@@ -736,7 +735,7 @@ public class EntryFilterController {
                                @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
 
-        List<Category> cats = categoryRepository.findAllByOrderByNameAsc();
+        List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByNameAsc();
         int size = cats.size();
 
         Long current = filterDto.getCategoryId();
