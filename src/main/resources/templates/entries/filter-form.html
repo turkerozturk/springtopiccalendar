@@ -483,10 +483,13 @@
 
     <table id="pivot-table" class="table-bordered table-sm caption-top">
         <caption>Pivot Table
-              <span th:each="cat : ${allCategories}"
+              <a th:each="cat : ${allCategories}"
                     th:if="${cat.id} == ${filterDto.categoryId}"
-                    th:text="${'-&nbsp;' + cat.name}">
-              </span>
+                    th:text="${'-&nbsp;' + cat.name}"
+                    th:title="${'Click to rename'}"
+                    th:href="@{/categories/edit/{id}(id=${cat.id})}"
+              >
+              </a>
         </caption>
 
         <!-- Tablonun başlığı (thead) -->
