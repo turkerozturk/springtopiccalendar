@@ -223,7 +223,9 @@
 
 "> + </a>)
                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                        th:text="${topic.name}" style="margin-top: 1.33em;
+                   th:text="${topic.name}"
+                   th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
+                   style="margin-top: 1.33em;
     margin-bottom: 1.33em;
     margin-left: 0;
     margin-right: 0;
