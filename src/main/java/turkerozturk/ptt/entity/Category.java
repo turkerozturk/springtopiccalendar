@@ -37,6 +37,9 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "is_archived", nullable = false)
+    private boolean archived;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics = new ArrayList<>();
 
@@ -46,8 +49,6 @@ public class Category {
     public Category(String name) {
         this.name = name;
     }
-
-
 
 }
 
