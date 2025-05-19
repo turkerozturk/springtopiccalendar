@@ -659,7 +659,7 @@
                     <!-- Eğer topic.predictionDate dateRange'deki en küçük tarihten küçükse -->
                     <th:block th:if="${topic.predictionDate.isBefore(pivotData.dateRange[0])}">
                         <!-- Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate}"   class="status-3" style="text-align: center">
+                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"   class="status-3" style="text-align: center">
                             <span>🔥🔥</span>
                         </td>
                     </th:block>
@@ -667,7 +667,7 @@
                     <!-- Eğer topic.predictionDate dateRange'deki en büyük tarihten büyükse -->
                     <th:block th:if="${topic.predictionDate.isAfter(pivotData.dateRange[pivotData.dateRange.size() - 1])}">
                         <!-- Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate}" class="status-3" style="text-align: center">
+                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}" class="status-3" style="text-align: center">
                             <span>💧💧</span>
                         </td>
                     </th:block>
@@ -680,7 +680,7 @@
                     <!-- topic.predictionDate today'e eşitse -->
                     <th:block th:if="${topic.predictionDate.equals(today)}">
                         <!-- Bugünün tarihine denk gelen durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate}"  class="status-5" style="text-align: center">
+                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"  class="status-5" style="text-align: center">
                             <span>🔔</span>
                         </td>
                     </th:block>
@@ -691,7 +691,7 @@
 
                         <!-- topic.predictionDate bugün’den küçükse -->
                         <th:block th:if="${topic.predictionDate.isBefore(today)}">
-                            <td th:title="${topic.predictionDate}"
+                            <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
                                 <span>🔥</span>
@@ -700,7 +700,7 @@
 
                         <!-- topic.predictionDate bugün’den büyükse -->
                         <th:block th:if="${topic.predictionDate.isAfter(today)}">
-                            <td th:title="${topic.predictionDate}"
+                            <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
                                 <span>💧</span>
