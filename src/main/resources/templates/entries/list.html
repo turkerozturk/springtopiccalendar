@@ -222,14 +222,31 @@
 
 
 "> + </a>)
-                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                   th:text="${topic.name}"
-                   th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
-                   style="margin-top: 1.33em;
-    margin-bottom: 1.33em;
-    margin-left: 0;
-    margin-right: 0;
-    font-weight: normal;">Topic Name</a>
+
+                <th:block th:if="${topic.predictionDate != null and topic.someTimeLater != null and topic.someTimeLater != 0}">
+                    <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                       th:text="${topic.name}"
+                       th:title="${T(java.time.format.DateTimeFormatter)
+                                .ofPattern('yyyy-MM-dd')
+                                .format(topic.predictionDate.atStartOfDay(zoneId))
+                              + ' (every ' + topic.someTimeLater + ' days)'}"
+                       style="margin-top: 1.33em;
+                            margin-bottom: 1.33em;
+                            margin-left: 0;
+                            margin-right: 0;
+                            font-weight: normal;">Topic Name</a>
+                </th:block>
+
+                <th:block th:if="${topic.predictionDate == null or topic.someTimeLater == null or topic.someTimeLater == 0}">
+                    <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                       th:text="${topic.name}"
+                       th:title="${'You can manually add the next date prediction on topic settings.'}"
+                       style="margin-top: 1.33em;
+                            margin-bottom: 1.33em;
+                            margin-left: 0;
+                            margin-right: 0;
+                            font-weight: normal;">Topic Name</a>
+                </th:block>
 
             </th:block>
         </caption>

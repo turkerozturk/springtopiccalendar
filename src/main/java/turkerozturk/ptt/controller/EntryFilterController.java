@@ -97,8 +97,8 @@ public class EntryFilterController {
         // 2) Bu haftanın başı ve sonu (örneğin pazartesi - pazar)
         // Özellikten gelen değeri DayOfWeek'e dönüştür
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
-        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
-        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
         LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
 
         // By default, the initial date range is 3 weeks(21 days);
@@ -150,6 +150,8 @@ public class EntryFilterController {
 
         model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory", List.of());
+
+        model.addAttribute("zoneId", zoneId);
         return "entries/filter-form";
 
 
@@ -254,8 +256,8 @@ public class EntryFilterController {
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
-        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
-        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -267,6 +269,7 @@ public class EntryFilterController {
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
 
 
+        model.addAttribute("zoneId", zoneId);
 
 
         return "entries/filter-form";
@@ -314,8 +317,8 @@ public class EntryFilterController {
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
-        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
-        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -326,6 +329,8 @@ public class EntryFilterController {
         model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
+        model.addAttribute("zoneId", zoneId);
 
         // 6) Aynı form sayfasına dön
         return "entries/filter-form";
@@ -373,8 +378,8 @@ public class EntryFilterController {
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
-        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
-        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -384,6 +389,9 @@ public class EntryFilterController {
         model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
+        model.addAttribute("zoneId", zoneId);
+
 
         return "entries/filter-form";
     }
@@ -530,11 +538,13 @@ public class EntryFilterController {
             // o tarihte hiç entry (gerçek ya da synthetic) yoksa ekle
             if (entriesAtPred != null && !entriesAtPred.isEmpty()) continue;
 
+            ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+
             Entry syntheticPred = new Entry();
             syntheticPred.setTopic(topic);
             syntheticPred.setStatus(3);
             syntheticPred.setDateMillisYmd(
-                    predDate.atStartOfDay(ZoneId.systemDefault())
+                    predDate.atStartOfDay(zoneId)
                             .toInstant().toEpochMilli()
             );
 
@@ -561,8 +571,10 @@ public class EntryFilterController {
      */
     private LocalDate convertMillisToLocalDate(Long dateMillis) {
         if (dateMillis == null) return null;
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+
         return Instant.ofEpochMilli(dateMillis)
-                .atZone(ZoneId.systemDefault())
+                .atZone(zoneId)
                 .toLocalDate();
     }
 
@@ -595,8 +607,8 @@ public class EntryFilterController {
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
-        ZoneId zone = timeZoneProvider.getZoneId();  // Hazır metodunuz
-        LocalDate today = LocalDate.now(zone);       // Şu anki tarih ve saat dilimini kullan
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -607,6 +619,8 @@ public class EntryFilterController {
         model.addAttribute("allCategories", categoryRepository.findAllByOrderByNameAsc());
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
+
+        model.addAttribute("zoneId", zoneId);
 
         return "entries/filter-form";
     }
@@ -668,6 +682,11 @@ public class EntryFilterController {
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryId(filterDto.getCategoryId()));
         // … gerekirse allTopics vs.
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+
+        model.addAttribute("zoneId", zoneId);
+
 
         return "entries/filter-form";
     }

@@ -659,16 +659,21 @@
                     <!-- Eğer topic.predictionDate dateRange'deki en küçük tarihten küçükse -->
                     <th:block th:if="${topic.predictionDate.isBefore(pivotData.dateRange[0])}">
                         <!-- Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"   class="status-3" style="text-align: center">
-                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                               style="">🔥🔥️</a>
+                        <td th:title="${T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.predictionDate.atStartOfDay(zoneId))
+                                      + ' (every ' + topic.someTimeLater + ' days)'}"
+                            class="status-3" style="text-align: center">
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}">🔥🔥️</a>
                         </td>
                     </th:block>
 
                     <!-- Eğer topic.predictionDate dateRange'deki en büyük tarihten büyükse -->
                     <th:block th:if="${topic.predictionDate.isAfter(pivotData.dateRange[pivotData.dateRange.size() - 1])}">
                         <!-- Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}" class="status-3" style="text-align: center">
+                        <td th:title="${T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}" class="status-3" style="text-align: center">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">💧💧</a>
                         </td>
@@ -682,7 +687,9 @@
                     <!-- topic.predictionDate today'e eşitse -->
                     <th:block th:if="${topic.predictionDate.equals(today)}">
                         <!-- Bugünün tarihine denk gelen durum için buraya içerik ekleyin -->
-                        <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"  class="status-5" style="text-align: center">
+                        <td th:title="${T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"  class="status-5" style="text-align: center">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">🔔</a>
                         </td>
@@ -694,7 +701,9 @@
 
                         <!-- topic.predictionDate bugün’den küçükse -->
                         <th:block th:if="${topic.predictionDate.isBefore(today)}">
-                            <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
+                            <td th:title="${T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
@@ -704,7 +713,9 @@
 
                         <!-- topic.predictionDate bugün’den büyükse -->
                         <th:block th:if="${topic.predictionDate.isAfter(today)}">
-                            <td th:title="${topic.predictionDate + ' (every ' + topic.someTimeLater + ' days)'}"
+                            <td th:title="${T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="status-5"
                                 style="text-align: center">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
@@ -763,7 +774,7 @@
             <td th:text="${entry.topic != null ? entry.topic.name : 'N/A'}"></td>
             <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
                 .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
-                .atZone(T(java.time.ZoneId).systemDefault())
+                .atZone(zoneId)
                 .toLocalDate())}"
                 th:title="${entry.dateMillisYmd}"
             >

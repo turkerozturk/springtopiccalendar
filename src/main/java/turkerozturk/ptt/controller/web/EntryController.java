@@ -101,6 +101,9 @@ public class EntryController {
         model.addAttribute("startPage", start);
         model.addAttribute("endPage",   end);
 
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+
+        model.addAttribute("zoneId", zoneId);
 
 
 
