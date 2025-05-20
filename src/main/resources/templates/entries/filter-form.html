@@ -564,6 +564,8 @@
 
             <th class="text-center" style="vertical-align: middle;" title="Prediction">P</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
+
 
         </tr>
         </thead>
@@ -745,6 +747,10 @@
                 </td>
             </th:block>
 
+
+            <td class="text-center">
+                <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
+            </td>
 
 
 

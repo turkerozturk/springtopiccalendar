@@ -134,6 +134,8 @@
             <th>Entry</th>
             <th style="cursor: pointer;" onclick="sortTable(4)">Topic Name</th>
             <th style="cursor: pointer;" onclick="sortTable(5)">Description</th>
+            <th style="cursor: pointer;" onclick="sortTable(6)" title="Pinned">📌</th>
+
             <th>Entries</th>
             <th>#</th>
 
@@ -173,6 +175,7 @@
             </th>
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
         </tr>
         </thead>
 
@@ -205,6 +208,10 @@
             <td th:text="${topic.name}" class="crop-text">Sample Topic</td>
             <!-- Description -->
             <td th:text="${topic.description}" class="crop-text">Sample Description</td>
+
+            <td class="text-center">
+                <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
+            </td>
 
             <td>
                 <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
