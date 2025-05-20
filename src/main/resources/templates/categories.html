@@ -78,8 +78,9 @@
 
             <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)">Topics Count</th>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, false)">Archived</th>
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)">Group Num</th>
 
+            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)">Archived</th>
 
             <th scope="col">Actions</th>
             <th scope="col">Add Topic</th>
@@ -121,11 +122,16 @@
             </td>
             <td th:text="${cat.topics.size()}" class="text-center">0</td>
 
+            <td th:text="${cat.categoryGroupNumber}" class="text-center">0</td>
+
+
             <td
                     th:text="${cat.archived ? 'Yes' : 'No'}"
                     class="text-center"
                     th:classappend="${cat.archived} ? ' css-archived' : ''">
             </td>
+
+
 
             <td class="text-center">
                 <a th:href="@{/categories/edit/{id}(id=${cat.id})}" class="btn btn-sm btn-warning">

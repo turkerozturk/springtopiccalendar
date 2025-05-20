@@ -41,6 +41,16 @@
             <input type="text" th:field="*{name}" id="name" class="form-control" />
         </div>
 
+        <div class="mb-3">
+            <label for="categoryGroupNumber" class="form-label">Category Group Number</label>
+            <input type="number"
+                   id="categoryGroupNumber"
+                   th:field="*{categoryGroupNumber}"
+                   class="form-control"
+                   min="0"
+                   placeholder="Optional, higher number has high priority." />
+        </div>
+
         <div class="form-check form-switch mb-3">
             <input
                     class="form-check-input"
