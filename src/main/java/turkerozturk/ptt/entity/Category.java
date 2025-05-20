@@ -40,6 +40,9 @@ public class Category {
     @Column(name = "is_archived", nullable = false)
     private boolean archived;
 
+    @Column(name = "category_group_number", nullable = false)
+    private int categoryGroupNumber = 0;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics = new ArrayList<>();
 
