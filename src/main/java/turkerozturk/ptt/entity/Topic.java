@@ -52,6 +52,9 @@ public class Topic {
     @Column(name = "some_time_later")
     private Long someTimeLater;
 
+    @Column(name = "is_pinned", nullable = false)
+    private boolean pinned;
+
     // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
     @Column(name = "prediction_date_millis_ymd")
     private Long predictionDateMillisYmd;
