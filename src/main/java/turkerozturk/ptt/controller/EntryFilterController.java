@@ -38,11 +38,13 @@ import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
 import turkerozturk.ptt.service.FilterService;
 
+import java.text.Collator;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
@@ -55,6 +57,9 @@ public class EntryFilterController {
     @Value("${pivot.table.date.format.title:yyyy-MM-dd EEEE}")
     private String dateFormatTitle;
 
+    // topiclist satirlarini dile gore dogru siralamak icin
+    @Value("${app.locale:en}")
+    private String appLocale;
 
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -521,7 +526,20 @@ public class EntryFilterController {
                 */
         );
 
-        return new PivotData(dateRange, topicList, pivotMap, topicEntryCount);
+        // 1) Locale nesnesi
+        Locale locale = Locale.forLanguageTag(appLocale);
+
+        // 2) Collator: case-insensitive ve aksansız karşılaştırma
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+
+        // 3) Listeyi ada göre sıralayıp tekrar set edin
+        List<Topic> sortedTopics = topicList.stream()
+                .sorted(Comparator.comparing(Topic::getName, collator))
+                .collect(Collectors.toList());
+
+
+        return new PivotData(dateRange, sortedTopics, pivotMap, topicEntryCount);
     }
 
 
