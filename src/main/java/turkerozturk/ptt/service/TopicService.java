@@ -51,7 +51,7 @@ public class TopicService {
     }
 
     public List<Topic> getTopicsByCategoryId(Long categoryId) {
-        return topicRepository.findByCategoryId(categoryId);
+        return topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
     }
 
 

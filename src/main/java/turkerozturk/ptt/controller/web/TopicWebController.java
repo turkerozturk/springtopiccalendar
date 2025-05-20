@@ -189,6 +189,7 @@ public class TopicWebController {
         existingTopic.setCategory(category);
 
         existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
+        existingTopic.setPinned(topic.isPinned());
 
         // ---> BURASI: predictionDateMillisYmd hesaplamasını çağırıyoruz
         topicService.recalcPredictionDate(existingTopic);

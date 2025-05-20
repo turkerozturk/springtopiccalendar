@@ -148,7 +148,7 @@ public class EntryController {
         model.addAttribute("categories", categories);
 // categoryId doluysa sadece o kategoriye ait topicleri çekelim:
         List<Topic> topics = (categoryId != null)
-                ? topicRepository.findByCategoryId(categoryId)
+                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
                 : topicRepository.findAll();
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
@@ -168,7 +168,7 @@ public class EntryController {
         if (categoryId == null) {
             return List.of();
         }
-        List<Topic> topics = topicRepository.findByCategoryId(categoryId);
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
 
 
 
@@ -349,7 +349,7 @@ public class EntryController {
         List<Category> categories = categoryRepository.findAll();
         model.addAttribute("categories", categories);
         List<Topic> topics = (categoryId != null)
-                ? topicRepository.findByCategoryId(categoryId)
+                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
                 : topicRepository.findAll();
         model.addAttribute("entry", entry);
         model.addAttribute("entry", entry);

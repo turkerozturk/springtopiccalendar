@@ -173,7 +173,7 @@ public class EntryFilterController {
         if (categoryId == null) {
             return List.of();
         }
-        List<Topic> topics = topicRepository.findByCategoryIdOrderByNameAsc(categoryId);
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
 
         // Entity -> DTO dönüştürme
         return topics.stream()
@@ -195,7 +195,7 @@ public class EntryFilterController {
     public String topicsByCategory(
             @RequestParam Long categoryId,
             Model model) {
-        List<Topic> topics = topicRepository.findByCategoryIdOrderByNameAsc(categoryId);
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
         model.addAttribute("topics", topics);
         model.addAttribute("categoryId", categoryId);
         return "entries/fragments/_topics-by-category :: topicList";
@@ -218,7 +218,7 @@ public class EntryFilterController {
             model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
-                    topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                    topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
             return "entries/filter-form";
         }
 
@@ -265,7 +265,7 @@ public class EntryFilterController {
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
 
         model.addAttribute("zoneId", zoneId);
@@ -327,7 +327,7 @@ public class EntryFilterController {
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
@@ -387,7 +387,7 @@ public class EntryFilterController {
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
@@ -480,51 +480,6 @@ public class EntryFilterController {
                     .add(e);
         }
 
-        // ---- deprecated -----------------------------------------------------
-        // --- 4) inject synthetic "someTimeLater" entries without conflicts ---
-        /*
-        for (Map.Entry<Long, Topic> me : topicMap.entrySet()) {
-            Long tid = me.getKey();
-            Topic topic = me.getValue();
-            Long offsetDays = topic.getSomeTimeLater();
-            if (offsetDays == null || offsetDays <= 0) continue;
-
-            // gerçek status=1 entry’leri al
-            List<Entry> doneEntries = filteredEntries.stream()
-                    .filter(e -> e.getTopic() != null
-                            && e.getTopic().getId().equals(tid)
-                            && e.getStatus() == 1)
-                    .collect(Collectors.toList());
-            if (doneEntries.isEmpty()) continue;
-
-            // en son yapılan entry’nin tarihi
-            Entry lastDone = doneEntries.stream()
-                    .max(Comparator.comparing(Entry::getDateMillisYmd))
-                    .get();
-            LocalDate lastDate = convertMillisToLocalDate(lastDone.getDateMillisYmd());
-            LocalDate newDate = lastDate.plusDays(offsetDays);
-
-            // aynı tarihte, status != 1 olan gerçek entry var mı diye bak
-            Map<LocalDate, List<Entry>> dayMap = pivotMap.get(tid);
-            List<Entry> entriesAtNewDate = dayMap.get(newDate);
-            boolean conflict = entriesAtNewDate != null && entriesAtNewDate.stream()
-                    .anyMatch(e -> e.getStatus() != 1);
-            if (conflict) continue;
-
-            // conflict yoksa, yeni geçici entry’yi ekle
-            Entry synthetic = new Entry();
-            synthetic.setTopic(topic);
-            synthetic.setStatus(3);
-            synthetic.setDateMillisYmd(
-                    newDate.atStartOfDay(ZoneId.systemDefault())
-                            .toInstant().toEpochMilli()
-            );
-
-            dayMap.computeIfAbsent(newDate, d -> new ArrayList<>())
-                    .add(synthetic);
-        }
-        */
-
         // --- 4b) inject synthetic "predictionDate" entries if no entry on that date ---
         for (Map.Entry<Long, Topic> me : topicMap.entrySet()) {
             Long tid = me.getKey();
@@ -553,7 +508,18 @@ public class EntryFilterController {
 
         // --- 5) sorted topic list for the UI ---
         List<Topic> topicList = new ArrayList<>(topicMap.values());
-        topicList.sort(Comparator.comparing(Topic::getName));
+        // Önce pinned = 1 olanlar (true/int 1) -> sonra pinned = 0
+        // Her iki grubun içinde de name A→Z
+        topicList.sort(
+                // eğer pinned bir boolean ise:
+                Comparator.comparing(Topic::isPinned).reversed()
+                        .thenComparing(Topic::getName)
+
+                /* eğer pinned bir int/Integer ise, şu satırı kullanın:
+                Comparator.comparingInt(Topic::getPinned).reversed()
+                  .thenComparing(Topic::getName)
+                */
+        );
 
         return new PivotData(dateRange, topicList, pivotMap, topicEntryCount);
     }
@@ -617,7 +583,7 @@ public class EntryFilterController {
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
@@ -643,7 +609,7 @@ public class EntryFilterController {
                                                String reportType) {
 
         // start. We need to get topic ID's and set to filterDto. Because this method is for category shift.
-        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByNameAsc(filterDto.getCategoryId());
+        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
         List<Long> topicIds = new ArrayList<>();
         for(Topic topic : topicsOfTheCategory) {
             topicIds.add(topic.getId());
@@ -679,7 +645,7 @@ public class EntryFilterController {
 
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupNumberDescNameAsc());
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryId(filterDto.getCategoryId()));
+                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
         // … gerekirse allTopics vs.
 
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
