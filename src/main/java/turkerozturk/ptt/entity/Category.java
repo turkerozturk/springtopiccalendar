@@ -40,11 +40,17 @@ public class Category {
     @Column(name = "is_archived", nullable = false)
     private boolean archived;
 
-    @Column(name = "category_group_number", nullable = false)
-    private int categoryGroupNumber = 0;
+    //@Column(name = "category_group_number", nullable = false)
+    //private int categoryGroupNumber = 0;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Topic> topics = new ArrayList<>();
+
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_group_number", nullable = false)
+    private CategoryGroup categoryGroup;
+
 
     public Category() {
     }

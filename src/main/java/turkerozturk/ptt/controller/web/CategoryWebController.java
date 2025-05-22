@@ -27,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import turkerozturk.ptt.entity.Category;
+import turkerozturk.ptt.repository.CategoryGroupRepository;
 import turkerozturk.ptt.service.CategoryService;
 
 import java.util.stream.Collectors;
@@ -37,6 +38,9 @@ public class CategoryWebController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private CategoryGroupRepository categoryGroupRepository;
 
     // Tüm kategorileri listeleyen sayfa
     @GetMapping
@@ -54,6 +58,8 @@ public class CategoryWebController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("categoryDTO", new Category());
+        model.addAttribute("allGroups", categoryGroupRepository.findAll());
+
         return "category-form"; // templates/category-form.html
     }
 
@@ -72,9 +78,9 @@ public class CategoryWebController {
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
 
 
-
-
+        model.addAttribute("allGroups", categoryGroupRepository.findAll());
         model.addAttribute("categoryDTO", category);
+
         return "category-form"; // Aynı formu kullanacağız
     }
 
@@ -89,11 +95,12 @@ public class CategoryWebController {
         // Sadece adını güncellesin diye basit bir şekilde yazıyoruz
         category.setName(dto.getName());
         category.setArchived(dto.isArchived());
-        category.setCategoryGroupNumber(dto.getCategoryGroupNumber());
+       // category.setCategoryGroupNumber(dto.getCategoryGroupNumber());
+
+        category.setCategoryGroup(dto.getCategoryGroup());
 
         // Topics liste gibi daha fazlası varsa burada set edebilirsiniz.
         categoryService.saveCategory(category);
-
         return "redirect:/categories";
     }
 
