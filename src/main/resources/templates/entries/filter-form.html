@@ -482,15 +482,26 @@
     <div style="overflow-x: auto; max-width: 100%;">
 
     <table id="pivot-table" class="table-bordered table-sm caption-top">
-        <caption>Pivot Table
-              <a th:each="cat : ${allCategories}"
-                    th:if="${cat.id} == ${filterDto.categoryId}"
-                    th:text="${'-&nbsp;' + cat.name}"
-                    th:title="${'Click to rename'}"
-                    th:href="@{/categories/edit/{id}(id=${cat.id})}"
-              >
-              </a>
+        <caption>
+            Pivot Table
+            <!-- iterate with status -->
+            <span th:each="cat, iStats : ${allCategories}"
+                  th:if="${cat.id} == ${filterDto.categoryId}">
+
+            <!-- your existing link -->
+            <a th:text="${'-&nbsp;' + cat.name}"
+               th:title="${'Click to rename'}"
+               th:href="@{/categories/edit/{id}(id=${cat.id})}">
+            </a>
+
+                        <!-- position / total -->
+            <span class="ms-2"
+                  th:text=" '(' + ${iStats.count} + ' / ' + ${allCategories.size() + ')' }">
+              <!-- e.g. “3 / 10” -->
+            </span>
+          </span>
         </caption>
+
 
         <!-- Tablonun başlığı (thead) -->
         <thead>
