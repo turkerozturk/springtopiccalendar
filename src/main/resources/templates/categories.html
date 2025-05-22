@@ -122,7 +122,9 @@
             </td>
             <td th:text="${cat.topics.size()}" class="text-center">0</td>
 
-            <td th:text="${cat.categoryGroupNumber}" class="text-center">0</td>
+            <td th:text="${cat.categoryGroup.id}"
+                th:title="${cat.categoryGroup.name}"
+                class="text-center">0</td>
 
 
             <td
