@@ -21,6 +21,7 @@
 package turkerozturk.ptt.controller;
 
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -67,19 +68,13 @@ public class CategoryGroupController {
             @ModelAttribute("group") CategoryGroup group,
             RedirectAttributes redirectAttrs
     ) {
-        try {
+        if (repo.existsByName(group.getName())) {
+            redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
+        } else {
             repo.save(group);
-            redirectAttrs.addFlashAttribute(
-                    "success",
-                    "Category group saved successfully."
-            );
-        } catch (Exception ex) {
-            // unique-name violation
-            redirectAttrs.addFlashAttribute(
-                    "error",
-                    "Cannot create duplicate category group."
-            );
+            redirectAttrs.addFlashAttribute("success", "Category group saved successfully.");
         }
+
         return "redirect:/category-groups";
     }
 

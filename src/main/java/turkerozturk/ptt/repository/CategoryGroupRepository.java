@@ -28,6 +28,10 @@ import java.util.List;
 
 public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Long> {
 
-
+    /**
+     * Returns true if a CategoryGroup with the given name already exists.
+     * Spring Data derives the query automatically from the method name.
+     */
+    boolean existsByName(String name);
 
 }
