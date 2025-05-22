@@ -513,18 +513,6 @@ public class EntryFilterController {
 
         // --- 5) sorted topic list for the UI ---
         List<Topic> topicList = new ArrayList<>(topicMap.values());
-        // Önce pinned = 1 olanlar (true/int 1) -> sonra pinned = 0
-        // Her iki grubun içinde de name A→Z
-        topicList.sort(
-                // eğer pinned bir boolean ise:
-                Comparator.comparing(Topic::isPinned).reversed()
-                        .thenComparing(Topic::getName)
-
-                /* eğer pinned bir int/Integer ise, şu satırı kullanın:
-                Comparator.comparingInt(Topic::getPinned).reversed()
-                  .thenComparing(Topic::getName)
-                */
-        );
 
         // 1) Locale nesnesi
         Locale locale = Locale.forLanguageTag(appLocale);
@@ -537,6 +525,22 @@ public class EntryFilterController {
         List<Topic> sortedTopics = topicList.stream()
                 .sorted(Comparator.comparing(Topic::getName, collator))
                 .collect(Collectors.toList());
+
+
+        // Önce pinned = 1 olanlar (true/int 1) -> sonra pinned = 0
+        // Her iki grubun içinde de name A→Z
+        sortedTopics.sort(
+                // eğer pinned bir boolean ise:
+                Comparator.comparing(Topic::isPinned).reversed()
+                       // .thenComparing(Topic::getName)
+
+                /* eğer pinned bir int/Integer ise, şu satırı kullanın:
+                Comparator.comparingInt(Topic::getPinned).reversed()
+                  .thenComparing(Topic::getName)
+                */
+        );
+
+
 
 
         return new PivotData(dateRange, sortedTopics, pivotMap, topicEntryCount);
