@@ -1,0 +1,49 @@
+<!-- src/main/resources/templates/category-groups/list.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Category Groups</title>
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+</head>
+<body class="p-4">
+<div class="container">
+    <h1>Category Groups</h1>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <a href="/category-groups/new" class="btn btn-primary mb-3">New Group</a>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th class="text-end">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="grp : ${groups}">
+            <td th:text="${grp.id}">1</td>
+            <td th:text="${grp.name}">Group Name</td>
+            <td class="text-end">
+                <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
+                   class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
+                   class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Delete this group?');">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+</body>
+</html>

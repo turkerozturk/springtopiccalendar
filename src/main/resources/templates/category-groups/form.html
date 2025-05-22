@@ -1,0 +1,35 @@
+<!-- src/main/resources/templates/category-groups/form.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${group.id} != null ? 'Edit Group' : 'New Group'">Group Form</title>
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+</head>
+<body class="p-4">
+<div class="container">
+    <h1 th:text="${group.id} != null ? 'Edit Category Group' : 'New Category Group'">Form</h1>
+    <form th:action="@{/category-groups/save}" th:object="${group}" method="post">
+        <input type="hidden" th:if="${group.id != null}" th:field="*{id}" />
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text"
+                   id="name"
+                   th:field="*{name}"
+                   class="form-control"
+                   placeholder="Enter unique group name"
+                   required />
+        </div>
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="/category-groups" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+</body>
+</html>
