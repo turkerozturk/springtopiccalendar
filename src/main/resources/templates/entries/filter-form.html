@@ -22,56 +22,113 @@
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <style>
-        .entry-with-content {
-            color: blue !important;
-            font-weight:bold;
-        }
 
-
-        #topic-name {
-          white-space: nowrap;
-          overflow: hidden;
-          position: relative;
-          max-width: 200px;
-        }
-
-        #category-name {
-          white-space: nowrap;
-          overflow: hidden;
-          position: relative;
-          max-width: 100px;
-        }
-
-
-        .highlighted-day {
-            background-color: yellow; /* Örnek */
-            font-weight: bold;
-        }
+        body {
+      margin: 0px;
+  }
 
 
 
-                      a {
-                  text-decoration: none;
-                  color: inherit;
+  #pivot-table {
+     background-color: WhiteSmoke;
+  }
+
+/* https://css-pattern.com/cubes-illusion/ */
+ body {
+  --s: 210px; /* control the size*/
+  --c1: #1d1d1d;
+  --c2: #4e4f51;
+  --c3: #3c3c3c;
+
+  background:
+    repeating-conic-gradient(from 30deg,#0000 0 120deg,var(--c3) 0 50%)
+     calc(var(--s)/2) calc(var(--s)*tan(30deg)/2),
+    repeating-conic-gradient(from 30deg,var(--c1) 0 60deg,var(--c2) 0 120deg,var(--c3) 0 50%);
+  background-size: var(--s) calc(var(--s)*tan(30deg));
+}
+          .entry-with-content {
+              color: blue !important;
+              font-weight:bold;
+          }
+
+
+          #topic-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            max-width: 200px;
+          }
+
+          #category-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            max-width: 100px;
+          }
+
+
+          .highlighted-day {
+              background-color: yellow; /* Örnek */
+              font-weight: bold;
+          }
+
+
+
+                        a {
+                    text-decoration: none;
+                    color: inherit;
+                    }
+
+                    a:visited {
+                        color: inherit;
+                    }
+
+                    a:hover {
+                        color: blue;
+                    }
+
+                .centered {
+                max-width: fit-content;
+                  margin-left: auto;
+                  margin-right: auto;
                   }
 
-                  a:visited {
-                      color: inherit;
-                  }
+                .pivot-table-entry-cell {
+                    text-align: center;      /* yatay ortalama */
+                    vertical-align: middle;  /* dikey ortalama */
+                    min-width: 20px;
+                    min-height: 20px;
 
-                  a:hover {
-                      color: blue;
-                  }
+                    max-width: 20px;         /* Maksimum genişlik  */
+                    max-height: 20px;         /* Maksimum genişlik  */
 
-              .centered {
-              max-width: fit-content;
-                margin-left: auto;
-                margin-right: auto;
+                    width: 20px;             /* Sabit genişlik  */
+                    height: 20px;
+                    padding: 0px;
+
+                    background-color: WhiteSmoke !important;
+
                 }
 
-              .pivot-table-entry-cell {
-                  text-align: center;      /* yatay ortalama */
-                  vertical-align: middle;  /* dikey ortalama */
+                .pivot-table-entry-cell a {
+                text-decoration: none;   /* alt çizgiyi kaldır */
+                color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                    padding: 0px;
+
+                }
+
+                .pivot-table-entry-cell a:visited {
+                    color: inherit;          /* tıklanmış linkin rengini değiştirme */
+                }
+
+                 caption {
+                    color: WhiteSmoke !important;
+                }
+
+                a.add-new-entry {
+                  color: transparent;
+                  transition: color 0.3s ease;
+
                   min-width: 20px;
                   min-height: 20px;
 
@@ -81,115 +138,89 @@
                   width: 20px;             /* Sabit genişlik  */
                   height: 20px;
                   padding: 0px;
+                }
 
-                  background-color: WhiteSmoke !important;
+                a.add-new-entry:hover {
+                  color: black;
+                  background-color:honeydew;
+                  font-size: 16px;
+                  font-weight: bold;
 
-              }
+                  min-width: 20px;
+                  min-height: 20px;
 
-              .pivot-table-entry-cell a {
-              text-decoration: none;   /* alt çizgiyi kaldır */
-              color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                  max-width: 20px;         /* Maksimum genişlik  */
+                  max-height: 20px;         /* Maksimum genişlik  */
+
+                  width: 20px;             /* Sabit genişlik  */
+                  height: 20px;
                   padding: 0px;
+                }
 
-              }
+                .pivot-table-entry-header {
 
-              .pivot-table-entry-cell a:visited {
-                  color: inherit;          /* tıklanmış linkin rengini değiştirme */
-              }
+                    text-align: center;
 
-              a.add-new-entry {
-                color: transparent;
-                transition: color 0.3s ease;
+                }
 
-                min-width: 20px;
-                min-height: 20px;
+                .vertical-text {
+                    writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
+                    transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
+                    vertical-align: middle;
+                    padding: 0px;
+                    margin: 0px;
+                    white-space: nowrap;
 
-                max-width: 20px;         /* Maksimum genişlik  */
-                max-height: 20px;         /* Maksimum genişlik  */
+                    max-width: 20px;
+                    width: 20px;
 
-                width: 20px;             /* Sabit genişlik  */
-                height: 20px;
-                padding: 0px;
-              }
+                }
 
-              a.add-new-entry:hover {
-                color: black;
-                background-color:honeydew;
-                font-size: 16px;
-                font-weight: bold;
+                .status-0 {
+                    background-color: gainsboro !important;
+                }
+                .status-1 {
+                    background-color: palegreen !important;
+                }
+                .status-2 {
+                    background-color: tomato !important;
+                }
+                .status-3 {
+                    background-color: LightBlue !important;
+                }
+                .status-4 {
+                    background-color: WhiteSmoke !important;
+                }
+                .status-5 {
+                    background-color: LightSteelBlue !important;
+                }
 
-                min-width: 20px;
-                min-height: 20px;
+                /* gelecekte yeni status değerleri eklemek kolaylaşır */
 
-                max-width: 20px;         /* Maksimum genişlik  */
-                max-height: 20px;         /* Maksimum genişlik  */
+                        .accordion-container {
+                          max-width: 400px;
+                          margin: 0 auto; /* Ortalansın diye */
+                        }
 
-                width: 20px;             /* Sabit genişlik  */
-                height: 20px;
-                padding: 0px;
-              }
-
-              .pivot-table-entry-header {
-
-                  text-align: center;
-
-              }
-
-              .vertical-text {
-                  writing-mode: vertical-rl; /* dikey yazım yönü: sağdan sola yukarı */
-                  transform: rotate(180deg); /* metni yukarı çevirmek için 180 derece çevir */
-                  vertical-align: middle;
-                  padding: 0px;
-                  margin: 0px;
-                  white-space: nowrap;
-
-                  max-width: 20px;
-                  width: 20px;
-
-              }
-
-              .status-0 {
-                  background-color: gainsboro !important;
-              }
-              .status-1 {
-                  background-color: palegreen !important;
-              }
-              .status-2 {
-                  background-color: tomato !important;
-              }
-              .status-3 {
-                  background-color: LightBlue !important;
-              }
-              .status-4 {
-                  background-color: WhiteSmoke !important;
-              }
-              .status-5 {
-                  background-color: LightSteelBlue !important;
-              }
-
-              /* gelecekte yeni status değerleri eklemek kolaylaşır */
-
-                      .accordion-container {
-                        max-width: 400px;
-                        margin: 0 auto; /* Ortalansın diye */
-                      }
-
-                      .align-center-horizontal {
-                        max-width: 400px;
-                        margin: 0 auto; /* Ortalansın diye */
-                      }
+                        .align-center-horizontal {
+                          max-width: 400px;
+                          margin: 0 auto; /* Ortalansın diye */
+                        }
 
 
-   /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
-  .scrollable-topics-table {
-    max-height: 600px;      /* ~20 satırlık yükseklik, ihtiyaca göre ayarlayın */
-    overflow-y: auto;       /* dikey kaydırma */
-    /* isterseniz yatay kaydırma da istemiyorsanız overflow-x: hidden; ekleyin */
-  }
+     /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
+    .scrollable-topics-table {
+      max-height: 600px;      /* ~20 satırlık yükseklik, ihtiyaca göre ayarlayın */
+      overflow-y: auto;       /* dikey kaydırma */
+      /* isterseniz yatay kaydırma da istemiyorsanız overflow-x: hidden; ekleyin */
+    }
 
     </style>
 </head>
 <body>
+
+<div  class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:500px;">
+
 
 <div class="align-center-horizontal">
     <a href="/" class="btn btn-secondary btn-sm">Home</a>
@@ -268,6 +299,7 @@
 </div>
 
 
+</div> <!-- end div of background css pattern -->
 
 
 
