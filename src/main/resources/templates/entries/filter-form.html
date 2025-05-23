@@ -72,6 +72,10 @@
               font-weight: bold;
           }
 
+            /* Haftanın geri kalan günü için */
+            .highlighted-week {
+              background-color: #e2f0d9; /* örnek yeşil */
+            }
 
 
                         a {
@@ -595,16 +599,31 @@
             </th>
 
             <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
-            <th th:each="day : ${pivotData.dateRange}"
-                th:classappend="${day.equals(today)} ? 'highlighted-day' : ''"
-                class="pivot-table-entry-header">
+            <th:block th:each="day : ${pivotData.dateRange}">
+                <td th:if="${day.equals(today)}"
+                class="pivot-table-entry-header highlighted-day">
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
                       class="vertical-text"
                       th:title="${#temporals.format(day, dateFormatTitle)}">
                     Gün
                 </span>
-            </th>
+                </td>
+
+                <td  th:if="${not day.equals(today)}"
+                     th:classappend="
+                    ${#temporals.dayOfWeek(day) >= 1 && #temporals.dayOfWeek(day) <= 7 &&
+                     day.isAfter(today.minusDays(today.getDayOfWeek().getValue())) &&
+                     day.isBefore(today.plusDays(8 - today.getDayOfWeek().getValue()))} ? 'highlighted-week' : ''"
+                    class="pivot-table-entry-header">
+
+                <span th:text="${#temporals.format(day, dateFormat)}"
+                      class="vertical-text"
+                      th:title="${#temporals.format(day, dateFormatTitle)}">
+                    Gün
+                </span>
+                </td>
+            </th:block>
 
 
             <th class="text-center" style="vertical-align: middle;">Total</th>
