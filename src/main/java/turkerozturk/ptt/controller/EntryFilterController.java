@@ -615,6 +615,11 @@ public class EntryFilterController {
         // Bugünün tarihini modele ekleyelim
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
+
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
