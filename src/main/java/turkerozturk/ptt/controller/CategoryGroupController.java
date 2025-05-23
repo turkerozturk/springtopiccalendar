@@ -43,7 +43,7 @@ public class CategoryGroupController {
     // LIST
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("groups", repo.findAll());
+        model.addAttribute("groups", repo.findAllByOrderByIdDesc());
         return "category-groups/list";
     }
 
@@ -52,6 +52,21 @@ public class CategoryGroupController {
     public String createForm(Model model) {
         model.addAttribute("group", new CategoryGroup());
         return "category-groups/form";
+    }
+
+    // HANDLE CREATE
+    @PostMapping("/new")
+    public String create(
+            @ModelAttribute("group") CategoryGroup formGroup,
+            RedirectAttributes redirectAttrs
+    ) {
+        if (repo.existsByName(formGroup.getName())) {
+            redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
+            return "redirect:/category-groups/new";
+        }
+        repo.save(formGroup);
+        redirectAttrs.addFlashAttribute("success", "Category group created successfully.");
+        return "redirect:/category-groups";
     }
 
     // SHOW EDIT FORM
@@ -68,26 +83,29 @@ public class CategoryGroupController {
         binder.setDisallowedFields("categories");
     }
 
-    // SAVE OR UPDATE
 
-    @PostMapping("/save")
-    public String save(
+
+    // HANDLE UPDATE
+    @PostMapping("/edit/{id}")
+    public String update(
+            @PathVariable Long id,
             @ModelAttribute("group") CategoryGroup formGroup,
             RedirectAttributes redirectAttrs
     ) {
-        if (repo.existsByName(formGroup.getName())) {
+        if (repo.existsByName(formGroup.getName())
+                && !repo.findByName(formGroup.getName()).get().getId().equals(id)) {
+            // if a different group already uses that name
             redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
-        } else {
-            CategoryGroup managed = repo.findById(formGroup.getId())
-                    .orElseThrow(() ->
-                            new IllegalArgumentException("Invalid CategoryGroup id: " + formGroup.getId())
-                    );
-            managed.setName(formGroup.getName());
-            repo.save(managed);
-            redirectAttrs.addFlashAttribute("success", "Category group saved successfully.");
+            return "redirect:/category-groups/edit/" + id;
         }
+        CategoryGroup managed = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid CategoryGroup id: " + id));
+        managed.setName(formGroup.getName());
+        repo.save(managed);
+        redirectAttrs.addFlashAttribute("success", "Category group updated successfully.");
         return "redirect:/category-groups";
     }
+
     // DELETE
     @GetMapping("/delete/{id}")
     public String delete(

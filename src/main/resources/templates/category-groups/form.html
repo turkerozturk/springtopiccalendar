@@ -12,8 +12,14 @@
 <body class="p-4">
 <div class="container">
     <h1 th:text="${group.id} != null ? 'Edit Category Group' : 'New Category Group'">Form</h1>
-    <form th:action="@{/category-groups/save}" th:object="${group}" method="post">
+    <form th:action="@{${group.id} != null
+                   ? '/category-groups/edit/' + ${group.id}
+                   : '/category-groups/new'}"
+          th:object="${group}" method="post">
+
+        <!-- only include hidden id for edit (optional) -->
         <input type="hidden" th:if="${group.id != null}" th:field="*{id}" />
+
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
             <input type="text"
@@ -26,6 +32,7 @@
         <button type="submit" class="btn btn-success">Save</button>
         <a href="/category-groups" class="btn btn-secondary ms-2">Cancel</a>
     </form>
+
 </div>
 
 

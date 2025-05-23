@@ -15,6 +15,9 @@
     <div class="align-center-horizontal">
         <a href="/" class="btn btn-secondary btn-sm">Home</a>
         <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
+        <a href="entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">
+            Tracker
+        </a>
         <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
         <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
 
@@ -42,7 +45,7 @@
             <td th:text="${grp.name}">Group Name</td>
             <td>
                 <th:block th:each="cat : ${grp.categories}">
-                    <span th:text="${cat.name}"></span>,
+                    <a th:href="@{/categories/edit/{id}(id=${cat.id})}" th:text="${cat.name}"></a>,
                 </th:block>
             </td>
             <td class="text-end">

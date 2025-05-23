@@ -23,8 +23,11 @@ package turkerozturk.ptt.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.CategoryGroup;
+import turkerozturk.ptt.entity.Entry;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Long> {
 
@@ -33,5 +36,11 @@ public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Lo
      * Spring Data derives the query automatically from the method name.
      */
     boolean existsByName(String name);
+
+    List<CategoryGroup> findAllByOrderByIdDesc();
+
+
+
+    Optional<CategoryGroup> findByName(String name);
 
 }
