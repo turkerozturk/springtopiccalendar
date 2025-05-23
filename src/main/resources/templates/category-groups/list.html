@@ -12,6 +12,15 @@
 </head>
 <body class="p-4">
 <div class="container">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm">Home</a>
+        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
+
+    </div>
+
+
     <h1>Category Groups</h1>
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
@@ -23,6 +32,7 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Categories</th>
             <th class="text-end">Actions</th>
         </tr>
         </thead>
@@ -30,6 +40,11 @@
         <tr th:each="grp : ${groups}">
             <td th:text="${grp.id}">1</td>
             <td th:text="${grp.name}">Group Name</td>
+            <td>
+                <th:block th:each="cat : ${grp.categories}">
+                    <span th:text="${cat.name}"></span>,
+                </th:block>
+            </td>
             <td class="text-end">
                 <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
                    class="btn btn-sm btn-outline-secondary">Edit</a>
