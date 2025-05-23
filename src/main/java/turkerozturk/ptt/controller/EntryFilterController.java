@@ -99,11 +99,12 @@ public class EntryFilterController {
 
 
         // 2) Bu haftanın başı ve sonu (örneğin pazartesi - pazar)
-        // Özellikten gelen değeri DayOfWeek'e dönüştür
-        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
 
         // By default, the initial date range is 3 weeks(21 days);
         // This week (7 days of date range)
@@ -148,6 +149,8 @@ public class EntryFilterController {
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
         // Bugünün tarihini modele ekleyelim
+
+
         model.addAttribute("today", today);
 
         model.addAttribute("allTopics", topicRepository.findAll());
@@ -262,6 +265,11 @@ public class EntryFilterController {
         // Bugünün tarihini modele ekleyelim
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
+
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -323,6 +331,11 @@ public class EntryFilterController {
         // Bugünün tarihini modele ekleyelim
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
+
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -384,6 +397,12 @@ public class EntryFilterController {
         // Bugünün tarihini modele ekleyelim
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         LocalDate today = LocalDate.now(zoneId);       // Şu anki tarih ve saat dilimini kullan
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
+
+
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
@@ -662,7 +681,13 @@ public class EntryFilterController {
         // 5) ortak model attrs
         model.addAttribute("dateFormat", dateFormat);
         model.addAttribute("dateFormatTitle", dateFormatTitle);
-        model.addAttribute("today", LocalDate.now(timeZoneProvider.getZoneId()));
+        // Özellikten gelen değeri DayOfWeek'e dönüştür
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        LocalDate today = LocalDate.now(timeZoneProvider.getZoneId());
+        LocalDate startOfWeek = filterService.getStartOfWeek(today, startDay);
+        model.addAttribute("startOfWeek", startOfWeek);
+
+        model.addAttribute("today", today);
         model.addAttribute("filterDto", filterDto);
 
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc());

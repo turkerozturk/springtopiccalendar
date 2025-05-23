@@ -613,8 +613,8 @@
                 <td  th:if="${not day.equals(today)}"
                      th:classappend="
                     ${#temporals.dayOfWeek(day) >= 1 && #temporals.dayOfWeek(day) <= 7 &&
-                     day.isAfter(today.minusDays(today.getDayOfWeek().getValue())) &&
-                     day.isBefore(today.plusDays(8 - today.getDayOfWeek().getValue()))} ? 'highlighted-week' : ''"
+                     day.isAfter( startOfWeek.minusDays(1) ) &&
+                     day.isBefore(startOfWeek.plusDays(7))} ? 'highlighted-week' : ''"
                     class="pivot-table-entry-header">
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
