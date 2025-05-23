@@ -24,6 +24,7 @@ package turkerozturk.ptt.controller;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import turkerozturk.ptt.entity.CategoryGroup;
@@ -62,22 +63,31 @@ public class CategoryGroupController {
         return "category-groups/form";
     }
 
-    // SAVE OR UPDATE
-    @PostMapping("/save")
-    public String save(
-            @ModelAttribute("group") CategoryGroup group,
-            RedirectAttributes redirectAttrs
-    ) {
-        if (repo.existsByName(group.getName())) {
-            redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
-        } else {
-            repo.save(group);
-            redirectAttrs.addFlashAttribute("success", "Category group saved successfully.");
-        }
-
-        return "redirect:/category-groups";
+    @InitBinder("group")
+    public void initGroupBinder(WebDataBinder binder) {
+        binder.setDisallowedFields("categories");
     }
 
+    // SAVE OR UPDATE
+
+    @PostMapping("/save")
+    public String save(
+            @ModelAttribute("group") CategoryGroup formGroup,
+            RedirectAttributes redirectAttrs
+    ) {
+        if (repo.existsByName(formGroup.getName())) {
+            redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
+        } else {
+            CategoryGroup managed = repo.findById(formGroup.getId())
+                    .orElseThrow(() ->
+                            new IllegalArgumentException("Invalid CategoryGroup id: " + formGroup.getId())
+                    );
+            managed.setName(formGroup.getName());
+            repo.save(managed);
+            redirectAttrs.addFlashAttribute("success", "Category group saved successfully.");
+        }
+        return "redirect:/category-groups";
+    }
     // DELETE
     @GetMapping("/delete/{id}")
     public String delete(
