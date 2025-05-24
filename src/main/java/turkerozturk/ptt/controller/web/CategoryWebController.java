@@ -58,7 +58,7 @@ public class CategoryWebController {
     @GetMapping("/create")
     public String showCreateForm(Model model) {
         model.addAttribute("categoryDTO", new Category());
-        model.addAttribute("allGroups", categoryGroupRepository.findAll());
+        model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
 
         return "category-form"; // templates/category-form.html
     }
@@ -78,7 +78,7 @@ public class CategoryWebController {
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
 
 
-        model.addAttribute("allGroups", categoryGroupRepository.findAll());
+        model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("categoryDTO", category);
 
         return "category-form"; // Aynı formu kullanacağız
