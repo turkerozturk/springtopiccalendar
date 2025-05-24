@@ -21,20 +21,32 @@
 package turkerozturk.ptt.controller;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.CategoryGroup;
 import turkerozturk.ptt.repository.CategoryGroupRepository;
+
+import java.text.Collator;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/category-groups")
 public class CategoryGroupController {
 
     private final CategoryGroupRepository repo;
+
+    //  satirlari dile gore dogru siralamak icin
+    @Value("${app.locale:en}")
+    private String appLocale;
 
     public CategoryGroupController(CategoryGroupRepository repo) {
         this.repo = repo;
@@ -43,7 +55,20 @@ public class CategoryGroupController {
     // LIST
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("groups", repo.findAllByOrderByIdDesc());
+        List<CategoryGroup> groups = repo.findAllByOrderByIdDesc();
+
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+
+        groups.forEach(g -> {
+            List<Category> sorted = g.getCategories().stream()
+                    .sorted(Comparator.comparing(Category::getName, collator))
+                    .collect(Collectors.toList());
+            g.setCategories(sorted);
+        });
+
+        model.addAttribute("groups", groups);
         return "category-groups/list";
     }
 
