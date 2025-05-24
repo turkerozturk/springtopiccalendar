@@ -47,16 +47,11 @@
     <!-- Geri dönmek için ana sayfaya link -->
     <div class="mb-3">
         <a href="/" class="btn btn-secondary btn-sm">Home</a>
-        <a href="entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">
-            Tracker
-        </a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}">Category Groups</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
         <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
-
         <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
-
-
         <a th:href="@{/categories/create}" class="btn btn-success">Create New Category</a>
-
     </div>
 
     <h1 class="mb-4">Categories</h1>

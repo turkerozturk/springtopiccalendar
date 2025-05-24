@@ -9,17 +9,32 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
+    <style>
+
+        a {
+        text-decoration: none;
+        color: inherit;
+        }
+
+        a:visited {
+            color: inherit;
+        }
+
+        a:hover {
+            color: blue;
+        }
+    </style>
+
 </head>
 <body class="p-4">
 <div class="container">
     <div class="align-center-horizontal">
         <a href="/" class="btn btn-secondary btn-sm">Home</a>
         <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
-        <a href="entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">
-            Tracker
-        </a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
         <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
         <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
+        <a href="/category-groups/new" class="btn btn-success mb-3">New Group</a>
 
     </div>
 
@@ -29,7 +44,6 @@
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <a href="/category-groups/new" class="btn btn-primary mb-3">New Group</a>
     <table class="table table-striped">
         <thead>
         <tr>
@@ -43,9 +57,17 @@
         <tr th:each="grp : ${groups}">
             <td th:text="${grp.id}">1</td>
             <td th:text="${grp.name}">Group Name</td>
-            <td>
+            <td>&nbsp;|&nbsp;
                 <th:block th:each="cat : ${grp.categories}">
-                    <a th:href="@{/categories/edit/{id}(id=${cat.id})}" th:text="${cat.name}"></a>,
+                    <a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
+                       th:text="${cat.name}"></a>
+                    <a th:href="@{/categories/edit/{id}(id=${cat.id})}"
+                       th:title="${cat.name} + ' [click to edit this category on a new page]' "
+                       target="_blank"
+                    >✎</a>
+
+                    &nbsp;|&nbsp;
+
                 </th:block>
             </td>
             <td class="text-end">

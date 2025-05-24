@@ -49,7 +49,7 @@
                 <option th:value="0">-- default 0 --</option>
                 <option th:each="grp : ${allGroups}"
                         th:value="${grp.id}"
-                        th:text="${grp.name}">
+                        th:text=" '(' + ${grp.id} + ') ' + ${grp.name}">
                 </option>
             </select>
         </div>
