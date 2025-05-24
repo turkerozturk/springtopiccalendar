@@ -90,7 +90,8 @@ public class EntryFilterController {
     @GetMapping("/form")
     public String filterForm(Model model,
                              HttpSession session,
-                             @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
+                             @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType,
+                             @RequestParam(value = "categoryId", required = false) Long categoryId)  {
 
         FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
         if (filterDto == null) {
@@ -116,9 +117,20 @@ public class EntryFilterController {
 
         // topicIds/statuses boş => “hepsi” gibi davranacak
 
-        // 3) Filter sorgusunu çalıştır (ilk açılışta da verileri gösterelim)
-        // 1) Filtre ile gelen kayıtlardan "entries" listesi
-        List<Entry> filteredEntries = filterService.filterEntries(filterDto);
+        List<Entry> filteredEntries;
+        if(categoryId!=null) {
+            filterDto.setCategoryId(categoryId);
+            List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
+            List<Long> topicIds = new ArrayList<>();
+            for (Topic topic : topicsOfTheCategory) {
+                topicIds.add(topic.getId());
+            }
+            filterDto.setTopicIds(topicIds);
+
+        }
+            // 3) Filter sorgusunu çalıştır (ilk açılışta da verileri gösterelim)
+            // 1) Filtre ile gelen kayıtlardan "entries" listesi
+            filteredEntries = filterService.filterEntries(filterDto);
 
 
 
