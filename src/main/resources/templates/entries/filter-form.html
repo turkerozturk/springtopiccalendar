@@ -630,12 +630,13 @@
 
             <th class="text-center" style="vertical-align: middle;">#</th>
 
-            <th class="text-center" style="vertical-align: middle;" title="Prediction">P</th>
+            <th class="text-center status-3" style="vertical-align: middle;" title="Prediction">P</th>
 
             <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
-            <th class="text-center" style="vertical-align: middle;" title="Last Past Entry Date: Shows the date of the 'done(green colored)' entry closest to the current day in the past">Last</th>
+            <th class="text-center status-1" style="vertical-align: middle;" title="Last Past Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last</th>
 
+            <th class="text-center status-2" style="vertical-align: middle;" title="First Warning Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First</th>
 
 
         </tr>
@@ -823,6 +824,7 @@
                 <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
             </td>
 
+            <!-- lastPastEntryDate varsa -->
             <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
                 <td th:title="${'Last done: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -846,6 +848,36 @@
             <th:block th:if="${topic.lastPastEntryDate == null or #strings.isEmpty(topic.lastPastEntryDate)}"
             >
                 <td title="At least one entry with the status 'done(green colored)' closest to the current day in the past is required." style="text-align: center">
+                    &nbsp;
+                </td>
+            </th:block>
+
+
+
+            <!-- firstWarningEntryDate varsa -->
+            <th:block th:if="${topic.firstWarningEntryDate != null or !#strings.isEmpty(topic.firstWarningEntryDate)}">
+                <td th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate )
+                                        + ' days)' }"
+                    class="status-5"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate ) }">
+                    </span>
+                </td>
+            </th:block>
+
+            <!-- firstWarningEntryDate yoksa -->
+            <th:block th:if="${topic.firstWarningEntryDate == null or #strings.isEmpty(topic.firstWarningEntryDate)}"
+            >
+                <td title="At least one entry with the status 'warning(red colored)' is required." style="text-align: center">
                     &nbsp;
                 </td>
             </th:block>
