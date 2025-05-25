@@ -121,6 +121,33 @@ public class Topic {
         return lastPastEntryDate;
     }
 
+    // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Column(name = "first_warning_entry_date_millis_ymd")
+    private Long firstWarningEntryDateMillisYmd;
+
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate firstWarningEntryDate;
+
+    public void setFirstWarningEntryDateMillisYmd(Long firstWarningEntryDateMillisYmd) {
+        this.firstWarningEntryDateMillisYmd = firstWarningEntryDateMillisYmd;
+        // isteğe bağlı: burada da güncelleyebilirsiniz
+        this.firstWarningEntryDate = null;
+    }
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getFirstWarningEntryDate() {
+        if (firstWarningEntryDate == null && firstWarningEntryDateMillisYmd != null) {
+            firstWarningEntryDate = Instant
+                    .ofEpochMilli(firstWarningEntryDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return firstWarningEntryDate;
+    }
 
     /**
      * Eğer JPA load sonrası otomatik set etmek isterseniz:
@@ -129,6 +156,7 @@ public class Topic {
     private void onPostLoad() {
         getPredictionDate();
         getLastPastEntryDate();
+        getFirstWarningEntryDate();
     }
 
     public Topic() {
