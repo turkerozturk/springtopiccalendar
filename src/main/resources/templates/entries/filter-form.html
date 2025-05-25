@@ -634,6 +634,9 @@
 
             <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="Last Past Entry Date: Shows the date of the 'done(green colored)' entry closest to the current day in the past">Last</th>
+
+
 
         </tr>
         </thead>
@@ -820,6 +823,32 @@
                 <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
             </td>
 
+            <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
+                <td th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
+                                        + ' days before)' }"
+                    class="status-5"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))}">
+                    </span>
+                </td>
+            </th:block>
+
+            <!-- lastPastEntryDate yoksa -->
+            <th:block th:if="${topic.lastPastEntryDate == null or #strings.isEmpty(topic.lastPastEntryDate)}"
+            >
+                <td title="At least one entry with the status 'done(green colored)' closest to the current day in the past is required." style="text-align: center">
+                    &nbsp;
+                </td>
+            </th:block>
 
 
         </tr>
