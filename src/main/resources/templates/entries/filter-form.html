@@ -626,17 +626,19 @@
             </th:block>
 
 
-            <th class="text-center" style="vertical-align: middle;">Total</th>
+            <th class="text-center" style="vertical-align: middle;">Visible<br />Total<br />Done</th>
 
             <th class="text-center" style="vertical-align: middle;">#</th>
 
-            <th class="text-center status-3" style="vertical-align: middle;" title="Prediction">P</th>
+            <th class="text-center status-3" style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion</th>
 
             <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
-            <th class="text-center status-1" style="vertical-align: middle;" title="Last Past Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last</th>
+            <th class="text-center status-1" style="vertical-align: middle;" title="Last Past Done Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last<br />Done</th>
 
-            <th class="text-center status-2" style="vertical-align: middle;" title="First Warning Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First</th>
+            <th class="text-center status-2" style="vertical-align: middle;" title="First Warning Entry Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First<br />Warn</th>
+
+            <th class="text-center status-0" style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note</th>
 
 
         </tr>
@@ -878,6 +880,34 @@
             <th:block th:if="${topic.firstWarningEntryDate == null or #strings.isEmpty(topic.firstWarningEntryDate)}"
             >
                 <td title="At least one entry with the status 'warning(red colored)' is required." style="text-align: center">
+                    &nbsp;
+                </td>
+            </th:block>
+
+            <!-- firsFutureNeutralEntryDate varsa -->
+            <th:block th:if="${topic.firstFutureNeutralEntryDate != null or !#strings.isEmpty(topic.firstFutureNeutralEntryDate)}">
+                <td th:title="${'Upcoming in: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate )
+                                        + ' days)' }"
+                    class="status-5"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate ) }">
+                    </span>
+                </td>
+            </th:block>
+
+            <!-- firsFutureNeutralEntryDate yoksa -->
+            <th:block th:if="${topic.firstFutureNeutralEntryDate == null or #strings.isEmpty(topic.firstFutureNeutralEntryDate)}"
+            >
+                <td title="At least one entry with the status 'not marked(gray colored)' in the future is required." style="text-align: center">
                     &nbsp;
                 </td>
             </th:block>
