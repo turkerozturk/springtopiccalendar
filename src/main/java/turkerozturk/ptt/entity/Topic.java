@@ -23,6 +23,7 @@ package turkerozturk.ptt.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 
 import java.time.Instant;
@@ -55,25 +56,22 @@ public class Topic {
     @Column(name = "is_pinned", nullable = false)
     private boolean pinned;
 
+    /**
+     * -- GETTER --
+     * Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için
+     */ /*
+    @Transient
+    private String predictionDateFormatted;
+    */ // --- normal getter/setter for predictionDateMillisYmd ---
     // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Getter
     @Column(name = "prediction_date_millis_ymd")
     private Long predictionDateMillisYmd;
+
 
     /** Veritabanında kaydı yok, sadece hesaplamak için */
     @Transient
     private LocalDate predictionDate;
-
-    /** Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için */
-    /*
-    @Transient
-    private String predictionDateFormatted;
-    */
-
-    // --- normal getter/setter for predictionDateMillisYmd ---
-
-    public Long getPredictionDateMillisYmd() {
-        return predictionDateMillisYmd;
-    }
 
     public void setPredictionDateMillisYmd(Long predictionDateMillisYmd) {
         this.predictionDateMillisYmd = predictionDateMillisYmd;
@@ -95,12 +93,42 @@ public class Topic {
         return predictionDate;
     }
 
+    // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Column(name = "last_past_entry_date_millis_ymd")
+    private Long lastPastEntryDateMillisYmd;
+
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate lastPastEntryDate;
+
+    public void setLastPastEntryDateMillisYmd(Long lastPastEntryDateMillisYmd) {
+        this.lastPastEntryDateMillisYmd = lastPastEntryDateMillisYmd;
+        // isteğe bağlı: burada da güncelleyebilirsiniz
+        this.lastPastEntryDate = null;
+    }
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getLastPastEntryDate() {
+        if (lastPastEntryDate == null && lastPastEntryDateMillisYmd != null) {
+            lastPastEntryDate = Instant
+                    .ofEpochMilli(lastPastEntryDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return lastPastEntryDate;
+    }
+
+
     /**
      * Eğer JPA load sonrası otomatik set etmek isterseniz:
      */
     @PostLoad
     private void onPostLoad() {
         getPredictionDate();
+        getLastPastEntryDate();
     }
 
     public Topic() {
