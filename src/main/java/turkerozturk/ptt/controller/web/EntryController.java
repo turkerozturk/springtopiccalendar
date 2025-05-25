@@ -224,6 +224,8 @@ public class EntryController {
             // topicService.getTopicById(...) ile çekebilirsiniz.
             Topic t = topicService.getTopicById(topicId).get();
             topicService.recalcPredictionDate(t);
+            topicService.recalcLastPastEntryDate(t);
+
             topicService.saveTopic(t);
 
         } else {
@@ -268,6 +270,8 @@ public class EntryController {
             // topicService.getTopicById(...) ile çekebilirsiniz.
             Topic t = topicService.getTopicById(topicId).get();
             topicService.recalcPredictionDate(t);
+            topicService.recalcLastPastEntryDate(t);
+
             topicService.saveTopic(t);
 
         }
@@ -377,6 +381,8 @@ public class EntryController {
                     .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
             // topicService içinde daha önce eklemiş olduğunuz yardımcı metot
             topicService.recalcPredictionDate(t);
+            topicService.recalcLastPastEntryDate(t);
+
             topicService.saveTopic(t);
         }
 

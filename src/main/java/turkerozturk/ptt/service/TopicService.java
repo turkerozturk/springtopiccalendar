@@ -22,6 +22,7 @@ package turkerozturk.ptt.service;
 
 
 
+import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.repository.EntryRepository;
@@ -90,9 +91,7 @@ public class TopicService {
             return;
         }
 
-        // EntryRepository'de böyle bir metot yoksa
-        // List<Entry> entries = entryRepository.findByTopicId(topic.getId());
-        // olarak alıp filtreleyebilirsiniz.
+
         List<Entry> entries = entryRepository.findByTopicIdAndStatus(topic.getId(), 1);
         if (entries.isEmpty()) {
             topic.setPredictionDateMillisYmd(null);
@@ -118,6 +117,34 @@ public class TopicService {
         topic.setPredictionDateMillisYmd(predMillis);
     }
 
+
+    public void recalcLastPastEntryDate(Topic topic) {
+        List<Entry> entries = entryRepository.findByTopicIdAndStatus(topic.getId(), 1);
+        if (entries.isEmpty()) {
+            topic.setLastPastEntryDateMillisYmd(null);
+            return;
+        }
+
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate today = LocalDate.now(zoneId);
+
+        // Geçmişte kalan, bugüne en yakın tarihli entry'yi bul
+        Optional<Long> closestPastMillisOpt = entries.stream()
+                .map(Entry::getDateMillisYmd)
+                .filter(millis -> {
+                    LocalDate entryDate = Instant.ofEpochMilli(millis)
+                            .atZone(zoneId)
+                            .toLocalDate();
+                    return entryDate.isBefore(today);
+                })
+                .max(Long::compareTo); // bugüne en yakın olanı almak için max kullanıyoruz
+
+        if (closestPastMillisOpt.isPresent()) {
+            topic.setLastPastEntryDateMillisYmd(closestPastMillisOpt.get());
+        } else {
+            topic.setLastPastEntryDateMillisYmd(null);
+        }
+    }
 
 
 }
