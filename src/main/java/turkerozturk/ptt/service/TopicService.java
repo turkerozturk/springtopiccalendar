@@ -175,5 +175,26 @@ public class TopicService {
     }
 
 
+    public void recalcFirstFutureNeutralEntryDate(Topic topic) {
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate today = LocalDate.now(zoneId);
+
+        // status = 0 olan ve tarihi bugünden büyük olan ilk activity tarihi
+        Optional<LocalDate> firstFutureNeutralDateOpt = topic.getActivities().stream()
+                .filter(activity -> activity.getStatus() == 0)
+                .map(activity -> Instant.ofEpochMilli(activity.getDateMillisYmd()).atZone(zoneId).toLocalDate())
+                .filter(entryDate -> entryDate.isAfter(today))
+                .sorted()
+                .findFirst();
+
+        if (firstFutureNeutralDateOpt.isPresent()) {
+            LocalDate firstDate = firstFutureNeutralDateOpt.get();
+            long millisYmd = firstDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+            topic.setFirsFutureNeutralEntryDateMillisYmd(millisYmd);
+        } else {
+            topic.setFirsFutureNeutralEntryDateMillisYmd(null);
+        }
+    }
+
 
 }

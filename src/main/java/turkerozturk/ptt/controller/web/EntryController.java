@@ -226,6 +226,7 @@ public class EntryController {
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
             topicService.recalcLastWarningEntryDate(t);
+            topicService.recalcFirstFutureNeutralEntryDate(t);
 
             topicService.saveTopic(t);
 
@@ -273,6 +274,7 @@ public class EntryController {
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
             topicService.recalcLastWarningEntryDate(t);
+            topicService.recalcFirstFutureNeutralEntryDate(t);
 
             topicService.saveTopic(t);
 
@@ -385,6 +387,7 @@ public class EntryController {
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
             topicService.recalcLastWarningEntryDate(t);
+            topicService.recalcFirstFutureNeutralEntryDate(t);
 
             topicService.saveTopic(t);
         }

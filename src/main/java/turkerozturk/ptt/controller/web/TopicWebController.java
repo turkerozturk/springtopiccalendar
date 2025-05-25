@@ -195,6 +195,7 @@ public class TopicWebController {
         topicService.recalcPredictionDate(existingTopic);
         topicService.recalcLastPastEntryDate(existingTopic);
         topicService.recalcLastWarningEntryDate(existingTopic);
+        topicService.recalcFirstFutureNeutralEntryDate(existingTopic);
 
         // Kayıt
         topicService.saveTopic(existingTopic);
