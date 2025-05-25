@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 // 1) Controller sınıfınıza ekleyin:
@@ -145,6 +146,34 @@ public class TopicService {
             topic.setLastPastEntryDateMillisYmd(null);
         }
     }
+
+
+    public void recalcLastWarningEntryDate(Topic topic) {
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+
+        Optional<LocalDate> maybeEarliestDate = topic.getActivities().stream()
+                .filter(activity -> activity.getStatus() == 2)
+                .map(activity -> Instant.ofEpochMilli(activity.getDateMillisYmd())
+                        .atZone(zoneId)
+                        .toLocalDate())
+                .min(Comparator.naturalOrder());
+
+        if (maybeEarliestDate.isPresent()) {
+            LocalDate earliestDate = maybeEarliestDate.get();
+
+            // Saat kısmı 00:00 olacak şekilde epoch millis
+            long epochMillisYmd = earliestDate
+                    .atStartOfDay(zoneId)
+                    .toInstant()
+                    .toEpochMilli();
+
+            topic.setFirstWarningEntryDateMillisYmd(epochMillisYmd);
+        } else {
+            // Uygun entry yoksa null atanabilir
+            topic.setFirstWarningEntryDateMillisYmd(null);
+        }
+    }
+
 
 
 }

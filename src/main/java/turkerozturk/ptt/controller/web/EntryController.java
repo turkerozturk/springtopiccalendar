@@ -225,6 +225,7 @@ public class EntryController {
             Topic t = topicService.getTopicById(topicId).get();
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
+            topicService.recalcLastWarningEntryDate(t);
 
             topicService.saveTopic(t);
 
@@ -271,6 +272,7 @@ public class EntryController {
             Topic t = topicService.getTopicById(topicId).get();
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
+            topicService.recalcLastWarningEntryDate(t);
 
             topicService.saveTopic(t);
 
@@ -382,6 +384,7 @@ public class EntryController {
             // topicService içinde daha önce eklemiş olduğunuz yardımcı metot
             topicService.recalcPredictionDate(t);
             topicService.recalcLastPastEntryDate(t);
+            topicService.recalcLastWarningEntryDate(t);
 
             topicService.saveTopic(t);
         }
