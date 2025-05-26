@@ -26,6 +26,7 @@ import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,41 @@ import java.util.Map;
 @AllArgsConstructor
 public class PivotData {
     private List<LocalDate> dateRange;
-    private List<Topic> topicList;
+    private List<Topic> topicList;  // İsim değişikliği
     private Map<Long, Map<LocalDate, List<Entry>>> pivotMap;
     private Map<Long, Integer> topicEntryCount;
+    private Map<Long, Integer> status1Counts;  // Her topic için toplam status=1 sayısı
+
+    public PivotData(List<LocalDate> dateRange,
+                     List<Topic> topicList,
+                     Map<Long, Map<LocalDate, List<Entry>>> pivotMap,
+                     Map<Long, Integer> topicEntryCount) {
+        this.dateRange = dateRange;
+        this.topicList = topicList;
+        this.pivotMap = pivotMap;
+        this.topicEntryCount = topicEntryCount;
+        this.status1Counts = calculateStatus1Counts(pivotMap);
+    }
+
+    private Map<Long, Integer> calculateStatus1Counts(
+            Map<Long, Map<LocalDate, List<Entry>>> pivotMap) {
+
+        Map<Long, Integer> counts = new HashMap<>();
+
+        pivotMap.forEach((topicId, dateMap) -> {
+            int total = dateMap.values().stream()
+                    .flatMap(List::stream)
+                    .filter(e -> e.getStatus() == 1)
+                    .mapToInt(e -> 1)
+                    .sum();
+            counts.put(topicId, total);
+        });
+
+        return counts;
+    }
+
+    // Getter'lar
+    public List<Topic> getTopicList() { return topicList; }
+    public Map<Long, Integer> getStatus1Counts() { return status1Counts; }
+    // Diğer getter'lar...
 }
