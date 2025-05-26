@@ -27,11 +27,70 @@
       margin: 0px;
   }
 
+  #navigation-panel button, a{
+    margin-bottom: 5px;
+        margin-top:5px;
+
+    border-radius:10px !important;
+}
+
+    #navigation-panel {
+
+     margin-top: 10px;
+     margin-bottom: 5px;
+     padding: 3px;
+     border: 2px solid DarKGray;
+       border-radius: 7px 7px 7px 7px;
+
+           /* https://cssgradient.io/ */
+
+       background: #a7d6e8;
+background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+  }
+
+
+#header-next-prediction {
+background: linear-gradient(180deg, LightBlue 0%, rgba(255, 255, 255, 1) 20%);
+}
+
+#header-last-done {
+background: linear-gradient(180deg, palegreen 0%, rgba(255, 255, 255, 1) 20%);
+}
+
+#header-first-warn {
+background: linear-gradient(180deg, Tomato 0%, rgba(255, 255, 255, 1) 20%);
+}
+
+#header-upcoming-note {
+background: linear-gradient(180deg, gainsboro 0%, rgba(255, 255, 255, 1) 20%);
+}
+
+
+
+
+
+.last-done {
+background: radial-gradient(circle, palegreen 30%, rgba(255, 255, 255, 1) 100%);
+}
+
+.first-warn {
+background: radial-gradient(circle, Tomato 30%, rgba(255, 255, 255, 1) 100%);
+}
+
+.upcoming-note {
+background: #CDD3CE;
+background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
+}
+
 
 
   #pivot-table {
      background-color: WhiteSmoke;
+     border: 3px solid black;
+
   }
+
+
 
 /* https://css-pattern.com/cubes-illusion/ */
  body {
@@ -164,7 +223,7 @@
                 .pivot-table-entry-header {
 
                     text-align: center;
-
+                    font-family: "Courier", Courier, monospace;
                 }
 
                 .vertical-text {
@@ -223,15 +282,15 @@
 </head>
 <body>
 
-<div  class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:500px;">
 
+<div  id="navigation-panel" class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:500px;">
 
 <div class="align-center-horizontal">
-    <a href="/" class="btn btn-secondary btn-sm">Home</a>
-    <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}">Category Groups</a>
-    <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
-    <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm">Topics</a>
-    <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
+    <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+    <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+    <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+    <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+    <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
 </div>
 <div class="align-center-horizontal">
 
@@ -249,7 +308,7 @@
         <input type="hidden" th:field="*{categoryId}"/>
         <input type="hidden" th:field="*{entriesThreshold}" />
 
-        <button type="submit" title="Previous Date Range">◀️date</button>
+        <button type="submit" title="Previous Date Range" class="btn btn-secondary btn-sm">◀️date</button>
     </form>
 
 
@@ -263,10 +322,10 @@
         <input type="hidden" th:field="*{categoryId}"/>
         <input type="hidden" th:field="*{entriesThreshold}" />
 
-        <button type="submit" title="Next Date Range">date▶️</button>
+        <button type="submit" title="Next Date Range" class="btn btn-secondary btn-sm">date▶️</button>
     </form>
 
-    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
             aria-controls="offcanvasTop">Toggle Filter</button>
 
     <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
@@ -280,8 +339,8 @@
         <input type="hidden" th:field="*{categoryId}" />
         <input type="hidden" th:field="*{entriesThreshold}" />
 
-        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Previous Category">
-            ◀️cat
+        <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
+            ◀️categ
         </button>
     </form>
 
@@ -294,8 +353,8 @@
         <input type="hidden" th:field="*{categoryId}" />
         <input type="hidden" th:field="*{entriesThreshold}" />
 
-        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Next Category">
-            cat▶️
+        <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
+            categ▶️
         </button>
     </form>
 
@@ -518,7 +577,19 @@
 
 <!-- Pivot tablo -->
 
-<div th:if="${pivotData != null}" class="centered">
+<th:block th:if="${filterDto.categoryId == null}" >
+    <br /><br />
+    <div class="alert alert-success centered">
+        <p>You can use the category navigation buttons to view the tables.</p>
+        <p>Or select a category from filter. To see the filter interface, click toggle filter button.</p>
+        <p>Or select a category from the category groups page.</p>
+        <p>If you haven't created any categories yet, create one from the categories page first. Then add a few topics.</p>
+    </div>
+    <br />
+
+</th:block>
+
+<div th:if="${filterDto.categoryId != null}" class="centered">
 
     <!-- Tabloyu sarmalayan scrollable container -->
     <div style="overflow-x: auto; max-width: 100%;">
@@ -626,25 +697,37 @@
             </th:block>
 
 
-            <th class="text-center" style="vertical-align: middle;">Visible<br />Total<br />Done</th>
+            <th class="text-center" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
 
-            <th class="text-center" style="vertical-align: middle;">#</th>
+            <th class="text-center" style="vertical-align: middle;">Visible<br />Row<br />Num</th>
 
-            <th class="text-center status-3" style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion</th>
+            <th class="text-center status-3"
+                id="header-next-prediction"
+                style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion<br />(day)</th>
 
             <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
-            <th class="text-center status-1" style="vertical-align: middle;" title="Last Past Done Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last<br />Done</th>
+            <th class="text-center status-1" style="vertical-align: middle;"
+                id="header-last-done"
+                title="Last Past Done Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last<br />Done<br />(day)</th>
 
-            <th class="text-center status-2" style="vertical-align: middle;" title="First Warning Entry Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First<br />Warn</th>
+            <th class="text-center status-2"
+                id="header-first-warn"
+                style="vertical-align: middle;" title="First Warning Entry Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First<br />Warn<br />(day)</th>
 
-            <th class="text-center status-0" style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note</th>
+            <th class="text-center status-0"
+                id="header-upcoming-note"
+                style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note<br />(day)</th>
 
 
         </tr>
         </thead>
 
         <tbody>
+
+
+
+        <!-- Eger en az bir topic varsa -->
         <!-- Her topic için bir satır -->
         <tr th:each="topic, iStat : ${pivotData.topicList}">
 
@@ -718,12 +801,13 @@
             </th:block>
 
 
-            <!-- Son sütun: o topic'in toplam entry sayısı -->
-            <td th:text="${pivotData.topicEntryCount[topic.id] != null ? pivotData.topicEntryCount[topic.id] : 0}"
-                class="text-center"></td>
+            <!-- turker topic'in toplam görünen "done" entry sayısı -->
+            <td class="text-center">
+                <span th:text="${pivotData.status1Counts[topic.id]} ?: 0">0</span>
+            </td>
 
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <td th:text="${iStat.index + 1}"></td>
+            <td th:text="${iStat.index + 1}" class="text-center"></td>
 
 
 
@@ -836,7 +920,7 @@
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
                                         + ' days before)' }"
-                    class="status-5"
+                    class="last-done"
                     style="text-align: center">
 
                     <!-- how many days has past until today -->
@@ -866,7 +950,7 @@
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate )
                                         + ' days)' }"
-                    class="status-5"
+                    class="first-warn"
                     style="text-align: center">
 
                     <!-- how many days has past until today -->
@@ -894,7 +978,7 @@
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate )
                                         + ' days)' }"
-                    class="status-5"
+                    class="upcoming-note"
                     style="text-align: center">
 
                     <!-- how many days has past until today -->
@@ -914,8 +998,22 @@
 
 
         </tr>
+
+
         </tbody>
     </table>
+
+        <!-- Eger hic topic yoksa bilgilendirici mesaj goster-->
+        <th:block th:if="${pivotData.topicList == null or #lists.isEmpty(pivotData.topicList)}">
+            <br />
+            <div class="alert alert-success centered">
+                <p>Add topics to this category.</p>
+                <p>To view the newly added topics, navigate to another category and return back.</p>
+                <p>Rrefreshing the page does not work for newly added topics.</p>
+            </div>
+            <br />
+        </th:block>
+
 
 
     </div>
