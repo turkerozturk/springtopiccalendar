@@ -136,7 +136,7 @@ public class TopicService {
                     LocalDate entryDate = Instant.ofEpochMilli(millis)
                             .atZone(zoneId)
                             .toLocalDate();
-                    return entryDate.isBefore(today);
+                    return (entryDate.isBefore(today) || entryDate.isEqual(today));
                 })
                 .max(Long::compareTo); // bugüne en yakın olanı almak için max kullanıyoruz
 
@@ -183,7 +183,7 @@ public class TopicService {
         Optional<LocalDate> firstFutureNeutralDateOpt = topic.getActivities().stream()
                 .filter(activity -> activity.getStatus() == 0)
                 .map(activity -> Instant.ofEpochMilli(activity.getDateMillisYmd()).atZone(zoneId).toLocalDate())
-                .filter(entryDate -> entryDate.isAfter(today))
+                .filter(entryDate -> (entryDate.isAfter(today) || entryDate.isEqual(today)))
                 .sorted()
                 .findFirst();
 
