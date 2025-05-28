@@ -20,6 +20,9 @@
  */
 package turkerozturk.ptt.repository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import turkerozturk.ptt.entity.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -30,4 +33,40 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByCategoryId(Long categoryId);
 
     List<Topic> findByCategoryIdOrderByPinnedDescNameAsc(Long categoryId);
+
+
+    @Query(value = "SELECT t FROM Topic t " +
+            "WHERE t.firstFutureNeutralEntryDateMillisYmd IS NOT NULL " +
+            "AND t.firstFutureNeutralEntryDateMillisYmd >= :todayEpochMillis " +
+            "ORDER BY t.firstFutureNeutralEntryDateMillisYmd DESC")
+    List<Topic> findTop10FutureNeutralTopicsFromToday(@Param("todayEpochMillis") Long todayEpochMillis);
+
+    @Query("SELECT t FROM Topic t " +
+            "WHERE t.predictionDateMillisYmd IS NOT NULL " +
+            "AND t.predictionDateMillisYmd <= :todayEpochMillis " +
+            "ORDER BY t.predictionDateMillisYmd DESC")
+    List<Topic> findTopicsWithPredictionDateBeforeOrEqualToday(@Param("todayEpochMillis") Long todayEpochMillis);
+
+    @Query("SELECT t FROM Topic t " +
+            "WHERE t.firstWarningEntryDateMillisYmd IS NOT NULL " +
+            "ORDER BY t.firstWarningEntryDateMillisYmd DESC")
+    List<Topic> findAllByWarningDateNotNullOrderByWarningDateDesc();
+
+    @Query("SELECT t FROM Topic t " +
+            "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findAllByLastPastEntryDateNotNullOrderByDesc();
+
+    @Query("SELECT t FROM Topic t " +
+            "WHERE t.lastPastEntryDateMillisYmd = :todayEpochMillis " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findAllByLastPastEntryDateIsToday(@Param("todayEpochMillis") Long todayEpochMillis);
+
+    @Query("SELECT t FROM Topic t " +
+            "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
+            "AND t.lastPastEntryDateMillisYmd < :todayEpochMillis " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findTopNByLastPastEntryDateBeforeToday(@Param("todayEpochMillis") Long todayEpochMillis, Pageable pageable);
+
+
 }

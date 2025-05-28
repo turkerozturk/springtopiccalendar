@@ -45,6 +45,7 @@ import turkerozturk.ptt.service.TopicService;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -311,8 +312,11 @@ public class EntryController {
                     return "redirect:/entry-filter/return?categoryId=" + categoryId;
                 case "entries":
                     return "redirect:/entries?topicId=" + topicId;
+                case "reporttable":
+                    return "redirect:/reports/all";
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
+                    // BURASI hata verir, case kosullarina yeni bir tane eklemen lazim normalde, burasi kullanilmiyor.
                     return "redirect:/" + returnPage + "?categoryId=" + categoryId;
             }
         }
@@ -360,12 +364,49 @@ public class EntryController {
                 ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
                 : topicRepository.findAll();
         model.addAttribute("entry", entry);
+        model.addAttribute("topics", topics);
+        model.addAttribute("returnPage", returnPage);
+        model.addAttribute("categoryId", categoryId);
+        return "entries/form";
+    }
+
+    @GetMapping("/editByDate")
+    public String showEditFormByDate(@RequestParam(name="ymd", required=true) String ymd,
+                               @RequestParam(name="returnPage", required=true) String returnPage,
+                               @RequestParam(name="topicId", required=true) Long topicId,
+                               Model model) {
+
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate localDate = LocalDate.parse(ymd);
+        ZonedDateTime zdt = localDate.atStartOfDay(zoneId);
+        long dateMillisYmd = zdt.toInstant().toEpochMilli();
+
+        Entry entry = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd)
+                .orElseThrow(() -> new RuntimeException("Entry bulunamadı: topicId=" + topicId + ", date=" + ymd));
+
+
+        // Not nesnesi null ise formda null dönmemesi için burda oluşturabilirsiniz.
+        if (entry.getNote() == null) {
+            Note note = new Note();
+            note.setEntry(entry);
+            entry.setNote(note);
+        }
+
+        Long categoryId = entry.getTopic().getCategory().getId();
+
+        // to make topic selection easier from gui, we are sending categories to selection box:
+        List<Category> categories = categoryRepository.findAll();
+        model.addAttribute("categories", categories);
+        List<Topic> topics = (categoryId != null)
+                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
+                : topicRepository.findAll();
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
         return "entries/form";
     }
+
 
     @GetMapping("/delete/{id}")
     public String deleteEntry(@PathVariable Long id, HttpSession session) {

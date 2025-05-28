@@ -22,6 +22,7 @@ package turkerozturk.ptt.service;
 
 
 
+import org.springframework.data.domain.PageRequest;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -195,6 +197,57 @@ public class TopicService {
             topic.setFirsFutureNeutralEntryDateMillisYmd(null);
         }
     }
+
+// TODO asagidaki metodlari ornegin bir topic raporlama servisine tasi
+
+    public List<Topic> getNextNeutralTopics(int limit) {
+        ZoneId zoneId = AppTimeZoneProvider.getZone(); // ZoneId dynamic
+        LocalDate today = LocalDate.now(zoneId);
+
+        // Saat 00:00 epoch millis
+        long todayEpochMillis = today
+                .atStartOfDay(zoneId)
+                .toInstant()
+                .toEpochMilli();
+
+        List<Topic> result = topicRepository.findTop10FutureNeutralTopicsFromToday(todayEpochMillis);
+
+        // elle LIMIT 10 uygula (ekstra güvenlik için)
+        return result.stream().limit(limit).toList();
+    }
+
+    // Yeni metod: prediction_date_millis_ymd <= bugünün millis değeri olanlar
+    public List<Topic> getTopicsWithPredictionDateBeforeOrEqualToday() {
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate today = LocalDate.now(zoneId);
+        long todayEpochMillis = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        return topicRepository.findTopicsWithPredictionDateBeforeOrEqualToday(todayEpochMillis);
+    }
+
+    public List<Topic> getAllUrgentTopicsSortedByMostRecentWarning() {
+        return topicRepository.findAllByWarningDateNotNullOrderByWarningDateDesc();
+    }
+
+    public List<Topic> getLastActivitiesLimitedToN(int limit) {
+        List<Topic> result = topicRepository.findAllByLastPastEntryDateNotNullOrderByDesc();
+        return result.stream().limit(limit).toList();
+    }
+
+    public List<Topic> getLastActivitiesLimitedToTodayAndThenToN(int limit) {
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate today = LocalDate.now(zoneId);
+        long todayEpochMillis = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(todayEpochMillis);
+        List<Topic> previousList = topicRepository.findTopNByLastPastEntryDateBeforeToday(todayEpochMillis, PageRequest.of(0, limit));
+
+        List<Topic> combined = new ArrayList<>();
+        combined.addAll(todayList);
+        combined.addAll(previousList);
+        return combined;
+    }
+
 
 
 }
