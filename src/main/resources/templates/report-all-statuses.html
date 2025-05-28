@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Intelligent Report - Daily Topic Tracker</title>
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <!-- TODO make it local file, use it from resources folder. -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+
+    <style>
+
+        .highlight-today {
+            background-color: #fff9c4; /* açık sarı */
+        }
+
+
+
+        body {
+      margin: 0px;
+  }
+
+  #navigation-panel button, a{
+    margin-bottom: 5px;
+        margin-top:5px;
+
+    border-radius:10px !important;
+}
+
+    #navigation-panel {
+
+     margin-top: 10px;
+     margin-bottom: 5px;
+     padding: 3px;
+     border: 2px solid DarKGray;
+       border-radius: 7px 7px 7px 7px;
+
+           /* https://cssgradient.io/ */
+
+       background: #a7d6e8;
+background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+  }
+
+
+
+
+                        .align-center-horizontal {
+                          max-width: 600px;
+                          margin: 0 auto; /* Ortalansın diye */
+                        }
+
+
+     /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
+    .scrollable-topics-table {
+      max-height: 600px;      /* ~20 satırlık yükseklik, ihtiyaca göre ayarlayın */
+      overflow-y: auto;       /* dikey kaydırma */
+      /* isterseniz yatay kaydırma da istemiyorsanız overflow-x: hidden; ekleyin */
+    }
+
+
+
+
+
+
+  #status-table {
+     background-color: WhiteSmoke;
+     border: 3px solid black;
+
+  }
+
+
+
+/* https://css-pattern.com/cubes-illusion/ */
+ body {
+  --s: 300px; /* control the size*/
+  --c1: #5e8c6a;
+  --c2: #bfb35a;
+
+  --_s: calc(2*var(--s)) calc(2*var(--s));
+  --_g: 35.36% 35.36% at;
+  --_c: #0000 66%,var(--c2) 68% 70%,#0000 72%;
+  background:
+    radial-gradient(var(--_g) 100% 25%,var(--_c)) var(--s) var(--s)/var(--_s),
+    radial-gradient(var(--_g) 0    75%,var(--_c)) var(--s) var(--s)/var(--_s),
+    radial-gradient(var(--_g) 100% 25%,var(--_c)) 0 0/var(--_s),
+    radial-gradient(var(--_g) 0    75%,var(--_c)) 0 0/var(--_s),
+    repeating-conic-gradient(var(--c1) 0 25%,#0000 0 50%) 0 0/var(--_s),
+    radial-gradient(var(--_c)) 0 calc(var(--s)/2)/var(--s) var(--s)
+    var(--c1);
+}
+          .entry-with-content {
+              color: blue !important;
+              font-weight:bold;
+          }
+
+
+          #topic-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            max-width: 200px;
+          }
+
+          #category-name {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            max-width: 100px;
+          }
+
+
+
+
+                        a {
+                    text-decoration: none;
+                    color: inherit;
+                    }
+
+                    a:visited {
+                        color: inherit;
+                    }
+
+                    a:hover {
+                        color: blue;
+                    }
+
+                .centered {
+                max-width: fit-content;
+                  margin-left: auto;
+                  margin-right: auto;
+                  }
+
+                .pivot-table-entry-cell {
+                    text-align: center;      /* yatay ortalama */
+                    vertical-align: middle;  /* dikey ortalama */
+                    min-width: 20px;
+                    min-height: 20px;
+
+                    max-width: 20px;         /* Maksimum genişlik  */
+                    max-height: 20px;         /* Maksimum genişlik  */
+
+                    width: 20px;             /* Sabit genişlik  */
+                    height: 20px;
+                    padding: 0px;
+
+                    background-color: WhiteSmoke !important;
+
+                }
+
+                .pivot-table-entry-cell a {
+                text-decoration: none;   /* alt çizgiyi kaldır */
+                color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                    padding: 0px;
+
+                }
+
+                .pivot-table-entry-cell a:visited {
+                    color: inherit;          /* tıklanmış linkin rengini değiştirme */
+                }
+
+                 caption {
+                    color: WhiteSmoke !important;
+                }
+
+
+
+                .status-0 {
+                 /*   background-color: gainsboro !important; */
+                 background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
+
+                }
+                .status-1 {
+                   /* background-color: palegreen !important; */
+                    background: radial-gradient(circle, palegreen 30%, rgba(255, 255, 255, 1) 100%);
+
+                }
+                .status-2 {
+                /*    background-color: tomato !important; */
+                background: radial-gradient(circle, Tomato 30%, rgba(255, 255, 255, 1) 100%);
+
+                }
+                .status-3 {
+                    background-color: LightBlue !important;
+                }
+
+    </style>
+</head>
+<body>
+
+
+<div  id="navigation-panel" class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:600px;">
+
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+
+    </div>
+
+</div>
+
+<div class="align-center-horizontal">
+    <h1>Intelligent Report</h1>
+
+<table id="status-table" class="status-table">
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Topic</th>
+        <th>Category</th>
+        <th>Category Group</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${allTopics}"
+        th:class="${item.dateLocal} == ${today} ? 'highlight-today' : ''">
+
+        <th:block th:if="${item.status != 3}">
+            <td>
+                <a th:href="@{/entries/editByDate
+                                        (
+                                        ymd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                         topicId=${item.topic.id},
+                                         returnPage='reporttable'
+                                         )
+                                         }"
+                   th:text="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}">Edit Existing Entry</a>
+            </td>
+        </th:block>
+
+
+        <th:block th:if="${item.status == 3}">
+
+            <td>
+
+                <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                        <a th:href="@{/entries/new(topicId=${item.topic.id},
+                                           dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                           categoryId=${item.topic.category.id},
+                                           returnPage=reporttable)}"
+                           title="Add New Entry"
+                           th:text="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}">New Entry (From Prediction)</a>
+            </td>
+        </th:block>
+
+
+        <td>
+            <a th:href="@{/entries(topicId=${item.topic.id})}"
+               th:text="${#strings.abbreviate(item.topic.name, 20)}"
+               th:title="${item.topic.name + (!#strings.isEmpty(item.topic.description) ? ': ' + item.topic.description : '')}">
+                Topic
+            </a>
+        </td>
+
+        <td>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
+               th:text="${#strings.abbreviate(item.topic.category.name, 20)}">Category</a>
+        </td>
+
+        <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}">Category Group</td>
+
+
+        <td th:title=" 'status: ' + ${item.status}" th:class=" 'status-' + ${item.status} ">&nbsp;</td>
+    </tr>
+    </tbody>
+</table>
+
+</div>
+</body>
+</html>
