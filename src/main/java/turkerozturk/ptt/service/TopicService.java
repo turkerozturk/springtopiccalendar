@@ -83,11 +83,24 @@ public class TopicService {
 
 // ...
 
+    /*
+      We need to run this on each topic or entry related event.
+      Also run this for both old and new topic, if we move an existing entry to another topic.
+     */
+    public void updateTopicStatus(Long topicId) {
+        Topic t = getTopicById(topicId).get();
+        recalcPredictionDate(t);
+        recalcLastPastEntryDate(t);
+        recalcLastWarningEntryDate(t);
+        recalcFirstFutureNeutralEntryDate(t);
+        saveTopic(t);
+    }
+
     /**
      * someTimeLater ve status=1 entry'ler üzerinden
      * topic.predictionDateMillisYmd değerini günceller.
      */
-    public void recalcPredictionDate(Topic topic) {
+    private void recalcPredictionDate(Topic topic) {
         Long days = topic.getSomeTimeLater();
         if (days == null || days == 0) {
             topic.setPredictionDateMillisYmd(null);
@@ -121,7 +134,7 @@ public class TopicService {
     }
 
 
-    public void recalcLastPastEntryDate(Topic topic) {
+    private void recalcLastPastEntryDate(Topic topic) {
         List<Entry> entries = entryRepository.findByTopicIdAndStatus(topic.getId(), 1);
         if (entries.isEmpty()) {
             topic.setLastPastEntryDateMillisYmd(null);
@@ -150,7 +163,7 @@ public class TopicService {
     }
 
 
-    public void recalcLastWarningEntryDate(Topic topic) {
+    private void recalcLastWarningEntryDate(Topic topic) {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
         Optional<LocalDate> maybeEarliestDate = topic.getActivities().stream()
@@ -177,7 +190,7 @@ public class TopicService {
     }
 
 
-    public void recalcFirstFutureNeutralEntryDate(Topic topic) {
+    private void recalcFirstFutureNeutralEntryDate(Topic topic) {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
         LocalDate today = LocalDate.now(zoneId);
 

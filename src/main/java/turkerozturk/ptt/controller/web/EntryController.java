@@ -48,6 +48,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -219,17 +220,7 @@ public class EntryController {
             // c) Artık güvenle kaydedebiliriz
             entryRepository.save(formEntry);
 
-            // ---> BURASI: kaydettiğimiz entry'nin topic'i için predictionDate'ı yeniden hesapla
-            //Topic t = formEntry.getTopic();
-            // eğer formEntry.getTopic() güncel bir Topic objesi değilse,
-            // topicService.getTopicById(...) ile çekebilirsiniz.
-            Topic t = topicService.getTopicById(topicId).get();
-            topicService.recalcPredictionDate(t);
-            topicService.recalcLastPastEntryDate(t);
-            topicService.recalcLastWarningEntryDate(t);
-            topicService.recalcFirstFutureNeutralEntryDate(t);
-
-            topicService.saveTopic(t);
+            topicService.updateTopicStatus(topicId);
 
         } else {
             // *** GÜNCELLEME SENARYOSU ***
@@ -249,6 +240,9 @@ public class EntryController {
                 //return "entries/form";
             }
 
+            Long oldTopicId = dbEntry.getTopic().getId(); // this is required. We will use this after entry save.
+            boolean topicHasChanged = !Objects.equals(oldTopicId, formEntry.getTopic().getId());
+
             // b) Güncellenecek alanları setle
             dbEntry.setTopic(formEntry.getTopic());
             dbEntry.setDateMillisYmd(formEntry.getDateMillisYmd());
@@ -267,18 +261,11 @@ public class EntryController {
             // d) DB'ye güncellenmiş halini kaydet
             entryRepository.save(dbEntry);
 
-            // ---> BURASI: kaydettiğimiz entry'nin topic'i için predictionDate'ı yeniden hesapla
-            //Topic t = formEntry.getTopic();
-            // eğer formEntry.getTopic() güncel bir Topic objesi değilse,
-            // topicService.getTopicById(...) ile çekebilirsiniz.
-            Topic t = topicService.getTopicById(topicId).get();
-            topicService.recalcPredictionDate(t);
-            topicService.recalcLastPastEntryDate(t);
-            topicService.recalcLastWarningEntryDate(t);
-            topicService.recalcFirstFutureNeutralEntryDate(t);
-
-            topicService.saveTopic(t);
-
+            // we need to update both of the topic statuses(for old and new topic) after saving the entry.
+            if(topicHasChanged) {
+                topicService.updateTopicStatus(oldTopicId);
+            }
+            topicService.updateTopicStatus(topicId);
         }
 
         // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
@@ -422,15 +409,8 @@ public class EntryController {
 
         // 3) Eğer topicId varsa, predictionDate'i tekrar hesapla ve kaydet
         if (topicId != null) {
-            Topic t = topicService.getTopicById(topicId)
-                    .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
             // topicService içinde daha önce eklemiş olduğunuz yardımcı metot
-            topicService.recalcPredictionDate(t);
-            topicService.recalcLastPastEntryDate(t);
-            topicService.recalcLastWarningEntryDate(t);
-            topicService.recalcFirstFutureNeutralEntryDate(t);
-
-            topicService.saveTopic(t);
+            topicService.updateTopicStatus(topicId);
         }
 
         // 4) Yönlendirmeyi mevcut session filtresine göre yap

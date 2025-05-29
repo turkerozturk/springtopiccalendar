@@ -191,14 +191,8 @@ public class TopicWebController {
         existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
         existingTopic.setPinned(topic.isPinned());
 
-        // ---> BURASI: predictionDateMillisYmd hesaplamasını çağırıyoruz
-        topicService.recalcPredictionDate(existingTopic);
-        topicService.recalcLastPastEntryDate(existingTopic);
-        topicService.recalcLastWarningEntryDate(existingTopic);
-        topicService.recalcFirstFutureNeutralEntryDate(existingTopic);
-
-        // Kayıt
-        topicService.saveTopic(existingTopic);
+        // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
+        topicService.updateTopicStatus(existingTopic.getId());
 
         return "redirect:/topics?categoryId=" + categoryId;
     }
