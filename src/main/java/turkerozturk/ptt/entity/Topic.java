@@ -178,6 +178,11 @@ public class Topic {
     }
 
     /**
+     *  indicates the importance of a topic. user can use it manually for severity or something else.
+    **/
+    private int weight;
+
+    /**
      * Eğer JPA load sonrası otomatik set etmek isterseniz:
      */
     @PostLoad
