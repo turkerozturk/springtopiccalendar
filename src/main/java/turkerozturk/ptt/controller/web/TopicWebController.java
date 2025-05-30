@@ -136,7 +136,9 @@ public class TopicWebController {
                  //   return "redirect:/entry-filter/return?categoryId=" + categoryId;
                     return "redirect:/entry-filter/return";
                 case "entries":
-                    //   return "redirect:/entries?topicId=" + topicId;
+                    return "redirect:/entries?topicId=" + topic.getId();
+                case "reporttable":
+                    return "redirect:/reports/all";
                     // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;
@@ -190,6 +192,7 @@ public class TopicWebController {
 
         existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
         existingTopic.setPinned(topic.isPinned());
+        existingTopic.setWeight(topic.getWeight());
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());

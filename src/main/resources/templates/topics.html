@@ -136,7 +136,10 @@
             <th style="cursor: pointer;" onclick="sortTable(6)" title="Pinned">📌</th>
 
             <th>Entries</th>
+            <th>Prediction</th>
+            <th>Weight</th>
             <th>#</th>
+
 
         </tr>
 
@@ -175,6 +178,8 @@
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
+            <th><!-- no filter --></th>
         </tr>
         </thead>
 
@@ -194,7 +199,13 @@
                 </a>
             </td>
             <!-- Category Name -->
-            <td th:text="${topic.category.name}" class="crop-text">Category Name</td>
+            <td class="crop-text">
+                <a th:href="@{/categories/edit/{id}(id=${topic.category.id})}"
+                   th:text="${topic.category.name}">
+                    Edit Category Name
+                </a>
+            </td>
+
 
             <!-- Quick Add Entry -->
             <td class="add-entry-column">
@@ -219,9 +230,15 @@
                 </a>
             </td>
 
+            <td th:text="${topic.someTimeLater}">Prediction as Number</td>
+            <td th:text="${topic.weight}">Weight as Number</td>
+
+
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
             <td th:text="${iStat.index + 1}">
             </td>
+
+
 
         </tr>
         </tbody>
