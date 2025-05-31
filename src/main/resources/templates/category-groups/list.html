@@ -11,40 +11,98 @@
 
     <style>
 
-        a {
-        text-decoration: none;
-        color: inherit;
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-        a:visited {
-            color: inherit;
-        }
+        #category-groups-table {
 
-        a:hover {
-            color: blue;
-        }
+          background-color: WhiteSmoke;
+          border: 3px solid black;
+
+       }
+
+       a {
+       text-decoration: none;
+       color: inherit;
+       }
+
+       a:visited {
+           color: inherit;
+       }
+
+       a:hover {
+           color: blue;
+       }
+
+       /* https://css-pattern.com/equal-sign/ */
+       body {
+         --s: 200px; /* control the size*/
+         --c1: #ffffff;
+         --c2: #bcebfa;
+
+         --_g: #0000 8%,var(--c1) 0 17%,#0000 0 58%;
+         background:
+           linear-gradient(135deg,#0000 20.5%,var(--c1) 0 29.5%,#0000 0) 0 calc(var(--s)/4),
+           linear-gradient( 45deg,var(--_g)) calc(var(--s)/2) 0,
+           linear-gradient(135deg,var(--_g),var(--c1) 0 67%,#0000 0),
+           linear-gradient( 45deg,var(--_g),var(--c1) 0 67%,#0000 0 83%,var(--c1) 0 92%,#0000 0),
+           var(--c2);
+         background-size: var(--s) var(--s);
+       }
+
+
+ #navigation-panel button, a{
+   border-radius:10px !important;
+ }
+
+       #navigation-panel {
+    max-width: 640px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3px;
+    border: 2px solid DarKGray;
+    border-radius: 7px 7px 7px 7px;
+
+    /* https://cssgradient.io/ */
+
+    background: #a7d6e8;
+    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+ }
     </style>
 
 </head>
-<body class="p-4">
-<div class="container">
+<body>
+
+
+<div  id="navigation-panel">
     <div class="align-center-horizontal">
-        <a href="/" class="btn btn-secondary btn-sm">Home</a>
-        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
-        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
-        <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
-        <a href="/category-groups/new" class="btn btn-success mb-3">New Group</a>
-
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
     </div>
+    <div style="margin-top:4px;">
+        <a href="/category-groups/new" class="btn btn-secondary btn-sm" style="color:white;">New Category Group</a>
+    </div>
+</div>
 
 
-    <h1>Category Groups</h1>
+<div class="container my-2">
+
+
+
+    <h1><span class="fonbg">Category Groups</span></h1>
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <table class="table table-striped">
+    <table id="category-groups-table" class="table table-striped">
         <thead>
         <tr>
             <th>ID</th>
