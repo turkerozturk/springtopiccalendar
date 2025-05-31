@@ -15,46 +15,97 @@
     <title>Categories</title>
 
     <style>
-        /* Mevcut link stilleri korundu */
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        a:visited {
-            color: inherit;
-        }
-        a:hover {
-            color: blue;
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-        th {
-            text-align: center;
-        }
+        #categoriesTable {
 
-        /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
-        #topicsTable input.form-control {
-            width: 100%; /* Hücrenin tamamını kaplasın */
-        }
+          background-color: WhiteSmoke;
+          border: 3px solid black;
+       }
+       /* Mevcut link stilleri korundu */
+       a {
+           text-decoration: none;
+           color: inherit;
+       }
+       a:visited {
+           color: inherit;
+       }
+       a:hover {
+           color: blue;
+       }
 
-        .css-archived {
-           background-color: Salmon !important;
-        }
+       th {
+           text-align: center;
+       }
+
+       /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
+       #topicsTable input.form-control {
+           width: 100%; /* Hücrenin tamamını kaplasın */
+       }
+
+       .css-archived {
+          background-color: Salmon !important;
+       }
+
+       /* https://css-pattern.com/rhombus-stripes/ */
+       body {
+         --s: 143px; /* control the size*/
+         --c1: #f4b09d;
+         --c2: #f8eab8;
+
+         background:
+           conic-gradient(from -45deg,var(--c1) 90deg,#0000 0 180deg,var(--c2) 0 270deg,#0000 0)
+             0 calc(var(--s)/2)/var(--s) var(--s),
+           conic-gradient(from 135deg at 50% 0,var(--c1) 90deg,var(--c2) 0)
+             0 0/calc(2*var(--s)) var(--s);
+       }
+
+
+ #navigation-panel button, a{
+   border-radius:10px !important;
+ }
+
+
+#navigation-panel {
+    max-width: 640px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3px;
+    border: 2px solid DarKGray;
+    border-radius: 7px 7px 7px 7px;
+
+    /* https://cssgradient.io/ */
+
+    background: #a7d6e8;
+    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+ }
     </style>
 </head>
 <body>
 
-<div class="container my-5" style="max-width: 800px;">
-    <!-- Geri dönmek için ana sayfaya link -->
-    <div class="mb-3">
-        <a href="/" class="btn btn-secondary btn-sm">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}">Category Groups</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
-        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
-        <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
-        <a th:href="@{/categories/create}" class="btn btn-success">Create New Category</a>
+<div  id="navigation-panel">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
     </div>
+    <div style="margin-top:4px;">
+        <a th:href="@{/categories/create}" class="btn btn-secondary btn-sm" style="color:white;">Create New Category</a>
+    </div>
+</div>
 
-    <h1 class="mb-4">Categories</h1>
+<div class="container my-2" style="max-width: 800px;">
+
+    <h1><span class="fonbg">Categories</span></h1>
 
     <!-- Hata mesajı varsa göster -->
     <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
@@ -69,19 +120,19 @@
         <thead>
         <tr>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 0, false)">ID</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 0, false)">ID</th>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Name</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Name</th>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)">Topics Count</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)" title="Topics Count">T</th>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)">Group Num</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)" title="Group Number">G</th>
 
-            <th scope="col" style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)">Archived</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)" title="Is Archived">A</th>
 
-            <th scope="col">Actions</th>
-            <th scope="col">Add Topic</th>
-            <th scope="col">#</th>
+            <th>Actions</th>
+
+            <th>#</th>
         </tr>
 
         <!-- Filtre kutuları (header'larla aynı hizada) -->
@@ -89,17 +140,20 @@
             <th>
                 <input type="text"
                        id="filterId"
-                       class="form-control"
                        onkeyup="filterRows()"
-                       placeholder="Filter ID"/>
+                       size="4"
+                       title="Filter ID"
+                       placeholder=""/>
             </th>
             <th>
                 <input type="text"
                        id="filterCategoryName"
-                       class="form-control"
                        onkeyup="filterRows()"
-                       placeholder="Filter Category"/>
+                       size="15"
+                       title="Filter Category"
+                       placeholder=""/>
             </th>
+            <th><!-- no filter --></th>
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
             <th><!-- no filter --></th>
@@ -114,8 +168,10 @@
             <td>
                 <a th:href="@{/topics(categoryId=${cat.id})}"
                    target="_self" th:text="${cat.name}" th:title="${cat.name}">
+                </a>&nbsp;/&nbsp;
 
-                </a>
+                <a href="/category-groups" th:text="${cat.categoryGroup.name}">Category Group</a>
+
             </td>
             <td th:text="${cat.topics.size()}" class="text-center">0</td>
 
@@ -133,22 +189,23 @@
 
 
             <td class="text-center">
-                <a th:href="@{/categories/edit/{id}(id=${cat.id})}" class="btn btn-sm btn-warning">
-                    Edit
+                <a th:href="@{/categories/edit/{id}(id=${cat.id})}">
+                    ✎
                 </a>
+                &nbsp;
                 <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
-                   class="btn btn-sm btn-danger"
+
                    onclick="return confirmDelete()">
-                    Del
+                    🗑
                 </a>
-            </td>
-            <!-- Her kategori satırında, yeni topic oluşturma linki -->
-            <td class="text-center">
-                <a th:href="@{/topics/create(categoryId=${cat.id})}" class="btn btn-sm btn-primary"
+                &nbsp;
+                <!-- Her kategori satırında, yeni topic oluşturma linki -->
+                <a th:href="@{/topics/create(categoryId=${cat.id})}"
                    target="_blank" title="Add Topic">
-                    +
+                    ＋
                 </a>
             </td>
+
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
             <td th:text="${iStat.index + 1}">
             </td>
