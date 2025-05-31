@@ -16,54 +16,158 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
+    <style>
+
+        /* https://css-pattern.com/quatrefoils/ */
+        body {
+       --s: 250px; /* control the size*/
+       --c1: #b09f79;
+       --c2: #476074;
+
+       --_g: #0000 83%,var(--c1) 85% 99%,#0000 101%;
+       background:
+         radial-gradient(27% 29% at right ,var(--_g)) calc(var(--s)/ 2) var(--s),
+         radial-gradient(27% 29% at left  ,var(--_g)) calc(var(--s)/-2) var(--s),
+         radial-gradient(29% 27% at top   ,var(--_g)) 0 calc(var(--s)/ 2),
+         radial-gradient(29% 27% at bottom,var(--_g)) 0 calc(var(--s)/-2)
+         var(--c2);
+       background-size: calc(2*var(--s)) calc(2*var(--s));
+     }
+
+               .fonbg {
+                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+
+               #navigation-panel button, a{
+                 border-radius:10px !important;
+               }
+
+
+               #navigation-panel {
+                  max-width: 640px;
+                  margin-top: 10px;
+                  margin-bottom: 5px;
+                  margin-left: auto;
+                  margin-right: auto;
+                  padding: 3px;
+                  border: 2px solid DarKGray;
+                  border-radius: 7px 7px 7px 7px;
+
+                  /* https://cssgradient.io/ */
+
+                  background: #a7d6e8;
+                  background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+    </style>
+
 
 </head>
 <body>
 
-<div class="container my-5 mx-auto" style="max-width: 600px;">
-    <h1 class="mb-4" th:text="#{software.name}">Daily Topic Tracker</h1>
 
-    <!-- Lorem Ipsum Açıklama -->
-    <p>
-        <span th:text="#{welcome.message}">
-            This is the main page. For more info, visit the website.
-        You need to create one or more categories, one or more topics, and then you can add entries for the topics.
-        </span>
-    </p>
+<div  id="navigation-panel">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+    </div>
+</div>
+
+<div class="container my-2" style="max-width: 600px;">
+
+
+    <h1><span class="fonbg" th:text="#{software.name}">Daily Topic Tracker</span></h1>
+
+
+
+
 
     <!-- Bağlantılar (List Group) -->
-    <div class="list-group">
+    <table class="table" style="border: solid 3px; background-color:WhiteSmoke;">
+        <tr>
+            <th colspan="2">
+
+        <span th:text="#{welcome.message}">
+            This is the main page. For more info, visit the website.
+        </span>
+
+
+            </th>
+
+        </tr>
+
+        <tr>
+        <td>
         <a href="category-groups" class="list-group-item list-group-item-action" th:text="#{category.groups}">
             Category Groups
         </a>
+        </td>
+            <td th:text="${categoryGroupsCount}">#</td>
+        </tr>
+        <tr>
+        <td>
         <a href="categories" class="list-group-item list-group-item-action" th:text="#{categories}">
             Categories
         </a>
+
+            <td th:text="${categoriesCount}">#</td>
+
+        </tr>
+        <tr>
+        <td>
         <a href="topics" class="list-group-item list-group-item-action" th:text="#{topics}">
             Topics
         </a>
+        </td>
+            <td th:text="${topicsCount}">#</td>
 
+        </tr>
+        <tr>
+        <td>
         <a href="entries" class="list-group-item list-group-item-action" th:text="#{entries}">
             Entries
         </a>
+        </td>
+            <td th:text="${entriesCount}">#</td>
 
+        </tr>
+        <tr>
+        <td colspan="2" class="text-center">
         <a href="entry-filter/form" class="list-group-item list-group-item-action link-primary" th:text="#{tracker}">
             Tracker - Categorised Pivot Tables
         </a>
+        </td>
 
 
+        </tr>
+        <tr>
+        <td colspan="2" class="text-center">
         <a href="/reports/all" class="list-group-item list-group-item-action link-primary" >
             Intelligent Report View
         </a>
+        </td>
 
+        </tr>
+        <tr>
+        <td colspan="2" class="text-center">
         <a href="languages" class="list-group-item list-group-item-action link-success" th:text="#{change.language}">
             Change Language
         </a>
+        </td>
 
+        </tr>
+        <tr>
+        <td colspan="2" class="text-center">
         <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
            class="list-group-item list-group-item-action link-secondary"
            th:text="#{website} + ' - DailyTopicTracker V1.0.2 - Türker Öztürk'">Website</a>.
+        </td>
 
+        </tr>
 <!--
         <a href="/reports/neutral" class="list-group-item list-group-item-action" >
             Reports - Neutral
@@ -86,7 +190,7 @@
 -->
 
 
-    </div>
+    </table>
 </div>
 
 <script type="text/javascript"
