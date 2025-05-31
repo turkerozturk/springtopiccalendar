@@ -21,58 +21,117 @@
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" /> -->
 
     <style>
-        /* Mevcut link stilleriniz */
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        a:visited {
-            color: inherit;
-        }
-        a:hover {
-            color: blue;
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-        /* Kolonları koruyoruz */
-        .edit-entry-column {
-            text-align: center;
-        }
-        .delete-entry-column {
-            text-align: center;
+        #entries-table {
+
+           background-color: WhiteSmoke;
+           border: 3px solid black;
+
         }
 
-        .status-0 {
-          background-color: gainsboro !important;
+              /* Mevcut link stilleriniz */
+              a {
+                  text-decoration: none;
+                  color: inherit;
+              }
+              a:visited {
+                  color: inherit;
+              }
+              a:hover {
+                  color: blue;
+              }
+
+              /* Kolonları koruyoruz */
+              .edit-entry-column {
+                  text-align: center;
+              }
+              .delete-entry-column {
+                  text-align: center;
+              }
+
+              .status-0 {
+                background-color: gainsboro !important;
+              }
+              .status-1 {
+                background-color: palegreen !important;
+              }
+              .status-2 {
+                background-color: tomato !important;
+              }
+
+
+
+            /* https://css-pattern.com/zig-zag-pixel/ */
+        body {
+  --s: 217px; /* control the size*/
+  --c1: #8b98bc;
+  --c2: #edb4ad;
+
+  --c:var(--c1) 0 25%,#0000 0;
+  --p:0 0/calc(3*var(--s)) calc(2*var(--s));
+  background:
+    conic-gradient(from -45deg at 75% 62.5%,var(--c)) var(--p),
+    conic-gradient(from 135deg at 25% 37.5%,var(--c)) var(--p),
+    repeating-conic-gradient(from 90deg,var(--c),var(--c2) 0 50%)
+     0 0/var(--s) var(--s);
+}
+
+
+        #navigation-panel button, a{
+          border-radius:10px !important;
         }
-        .status-1 {
-          background-color: palegreen !important;
+
+              #navigation-panel {
+           max-width: 640px;
+           margin-top: 10px;
+           margin-bottom: 5px;
+           margin-left: auto;
+           margin-right: auto;
+           padding: 3px;
+           border: 2px solid DarKGray;
+           border-radius: 7px 7px 7px 7px;
+
+           /* https://cssgradient.io/ */
+
+           background: #a7d6e8;
+           background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
-        .status-2 {
-          background-color: tomato !important;
-        }
+
     </style>
 </head>
 <body>
 
-<div class="container my-4" style="max-width: 1000px;">
 
-    <!-- Ana sayfaya dön linki -->
-    <div class="mb-3">
-        <a href="/" class="btn btn-secondary btn-sm">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}">Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
-        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
-        <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
+<div  id="navigation-panel">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
     </div>
-
-    <h1 class="mb-4">Entries</h1>
-
-
     <!-- Yeni Entry Butonu -->
-    <div th:if="${topic == null}" class="mb-3">
-        <a th:href="@{/entries/new}" class="btn btn-primary">Add New Entry</a>
+    <div th:if="${topic == null}" style="margin-top:4px;">
+        <a th:href="@{/entries/new}" class="btn btn-secondary btn-sm" style="color:white;">Add New Entry</a>
     </div>
+</div>
+
+
+<div class="container my-2" style="max-width: 1000px;">
+
+
+
+    <h1><span class="fonbg">Entries</span></h1>
+
+<div style="background-color:WhiteSmoke;">
+
+
 
     <div th:if="${topic != null}" class="mb-3">
         <p>
@@ -187,9 +246,10 @@
     </span>
     </div>
 
+</div>
 
     <!-- Entries Tablosu -->
-    <table class="table table-sm table-striped table-bordered align-middle caption-top">
+    <table id="entries-table" class="table table-sm table-striped table-bordered align-middle caption-top">
         <caption>
 
             <th:block th:if="${topic != null}">
