@@ -23,29 +23,43 @@
 
     <style>
 
+
+        /* https://stackoverflow.com/questions/3203252/unicode-character-as-bullet-for-list-item-in-css */
+        ul li {
+          list-style: none;
+          padding: 0px;
+        }
+        ul li:before {
+          content: "\2606";
+          margin: 0 1em;    /* any design */
+        }
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
+
         body {
       margin: 0px;
   }
 
   #navigation-panel button, a{
-    margin-bottom: 5px;
-        margin-top:5px;
-
     border-radius:10px !important;
-}
+  }
 
-    #navigation-panel {
-
+ #navigation-panel {
+     max-width: 640px;
      margin-top: 10px;
      margin-bottom: 5px;
+     margin-left: auto;
+     margin-right: auto;
      padding: 3px;
      border: 2px solid DarKGray;
-       border-radius: 7px 7px 7px 7px;
+     border-radius: 7px 7px 7px 7px;
 
-           /* https://cssgradient.io/ */
+     /* https://cssgradient.io/ */
 
-       background: #a7d6e8;
-background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+     background: #a7d6e8;
+     background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
   }
 
 
@@ -266,7 +280,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         }
 
                         .align-center-horizontal {
-                          max-width: 400px;
+                          /* max-width: 400px; */
                           margin: 0 auto; /* Ortalansın diye */
                         }
 
@@ -283,16 +297,19 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 <body>
 
 
-<div  id="navigation-panel" class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:500px;">
+<div  id="navigation-panel">
 
-<div class="align-center-horizontal">
+<div>
     <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
     <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
     <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
     <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
     <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+    <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+    <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
 </div>
-<div class="align-center-horizontal">
+<div style="margin-top:4px;">
+
 
 
 
@@ -340,7 +357,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <input type="hidden" th:field="*{entriesThreshold}" />
 
         <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
-            ◀️categ
+            ◀️category
         </button>
     </form>
 
@@ -354,7 +371,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <input type="hidden" th:field="*{entriesThreshold}" />
 
         <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
-            categ▶️
+            category▶️
         </button>
     </form>
 
@@ -578,12 +595,15 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 <!-- Pivot tablo -->
 
 <th:block th:if="${filterDto.categoryId == null}" >
-    <br /><br />
+
     <div class="alert alert-success centered">
-        <p>You can use the category navigation buttons to view the tables.</p>
-        <p>Or select a category from filter. To see the filter interface, click toggle filter button.</p>
-        <p>Or select a category from the category groups page.</p>
-        <p>If you haven't created any categories yet, create one from the categories page first. Then add a few topics.</p>
+        <h1><span class="fonbg">Tracker</span></h1>
+        <ul>
+            <li>You can use the <b>◀️category▶️</b> navigation buttons to view the tables.</li>
+            <li>Or select a category from filter. To see the filter interface, click <b>Toggle Filter</b> button.</li>
+        <li>Or select a category from the <b>Category Groups</b> page.</li>
+        <li>If you haven't created any categories yet, create one from the <b>Categories</b> page first. Then add a few <b>Topics</b>.</li>
+        </ul>
     </div>
     <br />
 
