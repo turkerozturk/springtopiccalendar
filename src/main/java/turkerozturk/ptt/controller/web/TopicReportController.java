@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -92,33 +93,122 @@ public class TopicReportController {
         List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(10);
 
         List<DatedTopicViewModel> allItems = new ArrayList<>();
+        List<DatedTopicViewModel> negativeWeightItems = new ArrayList<>();
 
         importants.forEach(t -> {
-            if (t.getFirstWarningEntryDateMillisYmd() != null)
+            if (t.getFirstWarningEntryDateMillisYmd() != null) {
                 allItems.add(new DatedTopicViewModel(t, t.getFirstWarningEntryDateMillisYmd(), 2, zoneId));
+
+
+                Iterator<Topic> predIterator = predictions.iterator();
+                while (predIterator.hasNext()) {
+                    Topic predTopic = predIterator.next();
+                    if (t.getFirstWarningEntryDateMillisYmd() != null && t.getFirstWarningEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
+                            && t.getId().equals(predTopic.getId())
+                    ) {
+                        predIterator.remove(); // Güvenli şekilde siler
+                    }
+                }
+
+            }
         });
 
         neutrals.forEach(t -> {
             if (t.getFirstFutureNeutralEntryDateMillisYmd() != null)
                 allItems.add(new DatedTopicViewModel(t, t.getFirstFutureNeutralEntryDateMillisYmd(), 0, zoneId));
+
+
+            Iterator<Topic> predIterator = predictions.iterator();
+            while (predIterator.hasNext()) {
+                Topic predTopic = predIterator.next();
+                if (t.getFirstFutureNeutralEntryDateMillisYmd() != null && t.getFirstFutureNeutralEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
+                        && t.getId().equals(predTopic.getId())
+                ) {
+                    predIterator.remove(); // Güvenli şekilde siler
+                }
+            }
+
+
         });
+
+        finisheds.forEach(t -> {
+            if (t.getLastPastEntryDateMillisYmd() != null)
+                allItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId));
+
+            Iterator<Topic> predIterator = predictions.iterator();
+            while (predIterator.hasNext()) {
+                Topic predTopic = predIterator.next();
+                if (t.getLastPastEntryDateMillisYmd() != null && t.getLastPastEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
+                        && t.getId().equals(predTopic.getId())
+                ) {
+                    predIterator.remove(); // Güvenli şekilde siler
+                }
+            }
+
+
+
+        });
+
 
         predictions.forEach(t -> {
             if (t.getPredictionDateMillisYmd() != null)
                 allItems.add(new DatedTopicViewModel(t, t.getPredictionDateMillisYmd(), 3, zoneId));
         });
 
-        finisheds.forEach(t -> {
-            if (t.getLastPastEntryDateMillisYmd() != null)
-                allItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId));
-        });
 
 
         allItems.sort(Comparator.comparing(DatedTopicViewModel::getDateLocal).reversed());
 
+        // predictionlar cakisiyorsa:
+        /*
+        predictions.forEach(t -> {
+            Iterator<DatedTopicViewModel> iteratorForDuplicates = allItems.iterator();
+            while (iteratorForDuplicates.hasNext()) {
+                DatedTopicViewModel dt = iteratorForDuplicates.next();
+                if (dt.getTopic().getFirstFutureNeutralEntryDate() !=null && dt.getTopic().getFirstFutureNeutralEntryDate().equals(t.getPredictionDate())
+                && dt.getTopic().getId().equals(t.getId())
+
+                ) {
+
+                    iteratorForDuplicates.remove();
+                } else
+                if (dt.getTopic().getFirstWarningEntryDate() !=null && dt.getTopic().getFirstWarningEntryDate().equals(t.getPredictionDate())
+                        && dt.getTopic().getId().equals(t.getId())
+
+                ) {
+                    iteratorForDuplicates.remove();
+                } else
+                if (dt.getTopic().getLastPastEntryDate() !=null && dt.getTopic().getLastPastEntryDate().equals(t.getPredictionDate())
+
+                        && dt.getTopic().getId().equals(t.getId())
+
+                ) {
+                    iteratorForDuplicates.remove();
+                }
+            }
+        });
+        */
+
+
+        // default 0, weight = -1 olarak belirledigim topicleri listeden cikarir:
+        Iterator<DatedTopicViewModel> iterator = allItems.iterator();
+        while (iterator.hasNext()) {
+            DatedTopicViewModel t = iterator.next();
+            if (t.getTopic().getWeight() < 0) {
+                negativeWeightItems.add(t);
+                iterator.remove(); // Güvenli şekilde siler
+            }
+        }
+
+        negativeWeightItems.sort(Comparator.comparing(DatedTopicViewModel::getDateLocal).reversed());
+
+        allItems.addAll(negativeWeightItems);
+
         model.addAttribute("allTopics", allItems);
         model.addAttribute("today", LocalDate.now(zoneId));
         model.addAttribute("zoneId", zoneId);
+        model.addAttribute("negativeWeightItems", negativeWeightItems);
+
         return "report-all-statuses";
     }
 

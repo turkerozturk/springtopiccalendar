@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Future Neutral Topics</title>
+</head>
+<body>
+<h1>Next Neutral Topics</h1>
+<table>
+    <tr>
+        <th>Prediction Date</th>
+        <th>Name</th>
+    </tr>
+    <tr th:each="topic : ${topics}">
+        <td th:text="${topic.firstFutureNeutralEntryDate}"></td>
+        <td th:text="${topic.name}"></td>
+    </tr>
+</table>
+</body>
+</html>
