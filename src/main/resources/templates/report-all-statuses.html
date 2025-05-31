@@ -33,27 +33,35 @@
     border-radius:10px !important;
 }
 
-    #navigation-panel {
 
+  #navigation-panel button, a{
+    border-radius:10px !important;
+  }
+
+
+    #navigation-panel {
+     max-width: 640px;
      margin-top: 10px;
      margin-bottom: 5px;
+     margin-left: auto;
+     margin-right: auto;
      padding: 3px;
      border: 2px solid DarKGray;
-       border-radius: 7px 7px 7px 7px;
+     border-radius: 7px 7px 7px 7px;
 
-           /* https://cssgradient.io/ */
+     /* https://cssgradient.io/ */
 
-       background: #a7d6e8;
-background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+     background: #a7d6e8;
+     background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
   }
 
 
 
 
-                        .align-center-horizontal {
-                          max-width: 600px;
-                          margin: 0 auto; /* Ortalansın diye */
-                        }
+    .align-center-horizontal {
+      max-width: 600px;
+      margin: 0 auto; /* Ortalansın diye */
+    }
 
 
      /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
@@ -64,7 +72,9 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
     }
 
 
-
+.fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
 
 
 
@@ -194,8 +204,7 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 <body>
 
 
-<div  id="navigation-panel" class="align-center-horizontal" style="background-color:WhiteSmoke;max-width:600px;">
-
+<div  id="navigation-panel">
     <div class="align-center-horizontal">
         <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
         <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
@@ -203,28 +212,34 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
         <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
         <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
         <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
-
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
     </div>
-
 </div>
 
 <div class="align-center-horizontal">
-    <h1>Intelligent Report</h1>
+    <h1><span class="fonbg">Intelligent Report</span></h1>
 
 <table id="status-table" class="status-table">
     <thead>
     <tr>
+        <th title="row counter">#</th>
         <th>Date</th>
         <th>Topic</th>
         <th>Category</th>
         <th>Category Group</th>
         <th>Status</th>
+
     </tr>
     </thead>
     <tbody>
-    <tr th:each="item : ${allTopics}"
+    <tr th:each="item, iStats : ${allTopics}"
         th:class="${item.dateLocal} == ${today} ? 'highlight-today' : ''">
 
+        <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+        <td th:text="${iStats.index + 1}" th:title=" 'Topic Weight = ' + ${item.topic.weight} "></td>
+
+
+        <!-- entry gercekse bu td yi koy-->
         <th:block th:if="${item.status != 3}">
             <td>
                 <a th:href="@{/entries/editByDate
@@ -238,7 +253,7 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
             </td>
         </th:block>
 
-
+        <!-- entry degil de tahmin ise bu td yi koy-->
         <th:block th:if="${item.status == 3}">
 
             <td>
@@ -264,13 +279,94 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
         <td>
             <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
-               th:text="${#strings.abbreviate(item.topic.category.name, 20)}">Category</a>
+               th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
+               th:title="${item.topic.category.name}">Category</a>
         </td>
 
-        <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}">Category Group</td>
+        <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}"
+            th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
 
 
-        <td th:title=" 'status: ' + ${item.status}" th:class=" 'status-' + ${item.status} ">&nbsp;</td>
+        <td th:title=" 'status: ' + ${item.status}"
+            th:class=" 'status-' + ${item.status} "
+            style="text-align: center;">
+
+            <!-- firsFutureNeutralEntryDate varsa -->
+            <th:block th:if="${item.status == 0}">
+                <span th:title="${'Upcoming in: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate )
+                                        + ' days)' }"
+                    class="upcoming-note"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate ) }">
+                    </span>
+                </span>
+            </th:block>
+
+            <!-- lastPastEntryDate varsa -->
+            <th:block th:if="${item.status == 1 && item.topic.lastPastEntryDate!= null}">
+                <span th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between(item.topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
+                                        + ' days before)' }"
+                    class="last-done"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between(item.topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))}">
+                    </span>
+                </span>
+            </th:block>
+
+            <!-- firstWarningEntryDate varsa -->
+            <th:block th:if="${item.status == 2}">
+                <span th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.firstWarningEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate )
+                                        + ' days)' }"
+                    class="first-warn"
+                    style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate ) }">
+                    </span>
+                </span>
+            </th:block>
+
+            <!-- predictionDate varsa -->
+            <th:block th:if="${item.status == 3}">
+
+                <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.predictionDate ) }">
+                    </span>
+
+                </th:block>
+            </th:block>
+
+
+
+        </td>
+
     </tr>
     </tbody>
 </table>
