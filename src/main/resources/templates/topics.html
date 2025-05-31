@@ -17,72 +17,130 @@
 
 
     <style>
-        /* Mevcut link stilleri korundu */
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        a:visited {
-            color: inherit;
-        }
-        a:hover {
-            color: blue;
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-        /* Mevcut sütun hizalama stilleri */
-        .add-entry-column {
-            text-align: center;
-        }
-        .edit-topic-column {
-            text-align: center;
-        }
-        .delete-topic-column {
-            text-align: center;
-        }
+        #topicsTable {
 
-        /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
-        #topicsTable input.form-control {
-            width: 100%; /* Hücrenin tamamını kaplasın */
-        }
 
-        .crop-text {
-          white-space: nowrap;
-          overflow: hidden;
-          position: relative;
-          max-width: 200px;
-        }
+          background-color: WhiteSmoke;
+          border: 3px solid black;
+       }
+       /* Mevcut link stilleri korundu */
+       a {
+           text-decoration: none;
+           color: inherit;
+       }
+       a:visited {
+           color: inherit;
+       }
+       a:hover {
+           color: blue;
+       }
+
+       /* Mevcut sütun hizalama stilleri */
+       .add-entry-column {
+           text-align: center;
+       }
+       .edit-topic-column {
+           text-align: center;
+       }
+       .delete-topic-column {
+           text-align: center;
+       }
+
+       /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
+       #topicsTable input.form-control {
+           width: 100%; /* Hücrenin tamamını kaplasın */
+       }
+
+       .crop-text {
+         white-space: nowrap;
+         overflow: hidden;
+         position: relative;
+         max-width: 200px;
+       }
+
+
+
+/* https://css-pattern.com/checkerboard-optical-illusion/ */
+body {
+  --s: 300px; /* control the size*/
+  --c1: #d7c9a8;
+  --c2: #f1eccf;
+
+  --c:var(--c1) 0;
+  --g:conic-gradient(at 50% 25%,#0000 75%,var(--c));
+  background:
+    repeating-linear-gradient(#0000 0 48%,var(--c) 50%),var(--g),
+    conic-gradient(#0000 75%,var(--c)) calc(var(--s)/4) calc(var(--s)/2),
+    var(--g) calc(var(--s)/2) var(--s) var(--c2);
+  background-size: var(--s) var(--s),var(--s) calc(2*var(--s));
+}
+
+
+ #navigation-panel button, a{
+   border-radius:10px !important;
+ }
+
+
+       #navigation-panel {
+    max-width: 640px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3px;
+    border: 2px solid DarKGray;
+    border-radius: 7px 7px 7px 7px;
+
+    /* https://cssgradient.io/ */
+
+    background: #a7d6e8;
+    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+ }
+
     </style>
 </head>
 <body>
 
-<div class="container my-4" style="max-width: 1000px;">
 
-    <!-- Ana sayfaya dön linki -->
-    <div class="mb-3">
-        <a href="/" class="btn btn-secondary btn-sm">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}">Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm">Categories</a>
-        <a href="/topics" class="btn btn-secondary btn-sm">Topics</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" th:text="#{tracker}">Tracker</a>
-        <a href="/entries" class="btn btn-secondary btn-sm">Entries</a>
-
-
+<div  id="navigation-panel">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
+        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
+        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+    </div>
+    <div>
         <!-- "Create New Topic" butonu -->
         <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
              seçiliyse ?catId=xxx şeklinde gönder -->
         <a th:if="${selectedCategoryId != null}"
            th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
-           class="btn btn-success">
+           class="btn btn-secondary btn-sm" style="color:white;">
             Create New Topic
         </a>
         <a th:if="${selectedCategoryId == null}"
            th:href="@{/topics/create}"
-           class="btn btn-success">
+           class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
             Create New Topic
         </a>
     </div>
+</div>
 
-    <h1 class="mb-4">Topics</h1>
+
+<div class="container my-2" style="max-width: 1000px;">
+
+
+    <h1><span class="fonbg">Topics</span></h1>
+
+    <div style="background-color:WhiteSmoke;">
 
     <!-- Hata mesajı varsa göster -->
     <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
@@ -119,6 +177,9 @@
             </select>
         </div>
     </div>
+
+</div>
+
 
     <!-- Topics Tablosu -->
     <table id="topicsTable"
