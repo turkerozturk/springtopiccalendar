@@ -74,13 +74,14 @@
         </div>
 
         <div class="mb-3">
-            <label for="weight" class="form-label">Weight(to disable: leave blank or set 0)</label>
+            <label for="weight" class="form-label">Weight(default 0, ignore -1)</label>
             <input type="number"
                    id="weight"
                    th:field="*{weight}"
                    class="form-control"
-                   min="0"
-                   placeholder="The numerical importance of the topic" />
+                   min="-1"
+                   placeholder="The numerical importance of the topic"
+                   title="The numerical importance of the topic" />
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Save</button>
