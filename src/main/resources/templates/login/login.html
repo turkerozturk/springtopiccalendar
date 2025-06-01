@@ -1,17 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Login - Daily Topic Tracker</title>
-</head>
-<body>
-<h2>Login</h2>
-<form th:action="@{/login}" method="post">
-    <label>Username: <input type="text" name="username" /></label><br>
-    <label>Password: <input type="password" name="password" /></label><br>
-    <button type="submit">Login</button>
-</form>
 
-<div th:if="${param.error}">❌ Invalid username or password.</div>
-<div th:if="${param.logout}">✅ You have been logged out.</div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <style>
+
+        /* https://css-pattern.com/two-color-brick/ */
+        body {
+          --s: 32px; /* control the size*/
+          --c1: #dad1c2;
+          --c2: #c9cccd;
+          --c3: #b3b6af;
+
+          --p:at 45% 40%,#0000 75%,;
+          --g1:conic-gradient(var(--p) var(--c1) 0);
+          --g2:conic-gradient(var(--p) var(--c2) 0);
+          background:
+            var(--g1),var(--g2) calc(2*var(--s)) 0,
+            var(--g2) calc(3*var(--s)) var(--s),
+            var(--g1) var(--s) var(--s) var(--c3);
+          background-size: calc(4*var(--s)) calc(2*var(--s));
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+<div class="container d-flex justify-content-center align-items-center" style="margin-top:50px;">
+    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
+        <div class="text-center mb-4">
+            <i class="fas fa-user-circle fa-3x text-primary"></i>
+            <h4 class="mt-2">Daily Topic Tracker</h4>
+            <p class="text-muted">Login to your account</p>
+        </div>
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt me-2"></i>Login</button>
+            </div>
+        </form>
+
+        <!-- Feedback Messages -->
+        <div th:if="${param.error}" class="alert alert-danger mt-3" role="alert">
+            <i class="fas fa-exclamation-circle me-1"></i> Invalid username or password.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success mt-3" role="alert">
+            <i class="fas fa-check-circle me-1"></i> You have been logged out.
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS (optional for interactivity) -->
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
 </body>
 </html>
+
