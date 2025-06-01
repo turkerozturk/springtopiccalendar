@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login - Daily Topic Tracker</title>
+</head>
+<body>
+<h2>Login</h2>
+<form th:action="@{/login}" method="post">
+    <label>Username: <input type="text" name="username" /></label><br>
+    <label>Password: <input type="password" name="password" /></label><br>
+    <button type="submit">Login</button>
+</form>
+
+<div th:if="${param.error}">❌ Invalid username or password.</div>
+<div th:if="${param.logout}">✅ You have been logged out.</div>
+</body>
+</html>
