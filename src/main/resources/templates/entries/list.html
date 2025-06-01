@@ -115,6 +115,11 @@
         <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
         <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
         <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                Logout
+            </button>
+        </form>
     </div>
     <!-- Yeni Entry Butonu -->
     <div th:if="${topic == null}" style="margin-top:4px;">
