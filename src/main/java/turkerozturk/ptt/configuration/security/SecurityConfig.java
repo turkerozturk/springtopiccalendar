@@ -22,7 +22,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/img/**")
+                        .requestMatchers("/actuator/health", "/img/**", "/webjars/**", "/static/css/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
