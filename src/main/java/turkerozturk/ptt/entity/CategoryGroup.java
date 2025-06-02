@@ -41,4 +41,10 @@ public class CategoryGroup {
     @OneToMany(mappedBy = "categoryGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories = new ArrayList<>();
 
+    public CategoryGroup() {
+    }
+
+    public CategoryGroup(String name) {
+        this.name = name;
+    }
 }

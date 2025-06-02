@@ -27,12 +27,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import turkerozturk.ptt.entity.*;
-import turkerozturk.ptt.repository.CategoryRepository;
-import turkerozturk.ptt.repository.TopicRepository;
-import turkerozturk.ptt.repository.EntryRepository;
-import turkerozturk.ptt.repository.NoteRepository;
+import turkerozturk.ptt.repository.*;
 
 import java.io.File;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -46,6 +44,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DummyDataLoader implements CommandLineRunner {
 
+    private final CategoryGroupRepository categoryGroupRepository;
     private final CategoryRepository categoryRepository;
     private final TopicRepository topicRepository;
     private final EntryRepository entryRepository;
@@ -66,11 +65,11 @@ public class DummyDataLoader implements CommandLineRunner {
     @Value("${dummy.entry.count:500}")
     private String randomEntryCount;
 
-    @Value("${dummy.start.date:2025-03-01}")
-    private String randomStartDate;
+    @Value("${dummy.start.date.days.count:90}")
+    private String daysCountBeforeToday;
 
-    @Value("${dummy.end.date:2025-05-01}")
-    private String randomEndDate;
+    @Value("${dummy.end.date.days.count:90}")
+    private String daysCountAfterToday;
 
     @Override
     public void run(String... args) throws Exception {
@@ -113,15 +112,45 @@ public class DummyDataLoader implements CommandLineRunner {
 // --- 1) Kategorileri ayarla ---
         Faker faker = new Faker();
 
+
+        // *** CATEGORY_GROUPS ***
+        int categoryGroupsCount = 4; // TODO properties file
+        List<String> availableCategoryGroupNames = new ArrayList<>(
+                Arrays.asList("Home Group", "Work Group", "Hobby Group", "Priority Group")
+        );
+        Collections.shuffle(availableCategoryGroupNames);
+
+        // Kategori gruplarinin lerin isim tekrarini engellemek için
+        Set<String> usedCategoryGroupNames = new HashSet<>();
+        List<CategoryGroup> categoryGroups = new ArrayList<>();
+
+        for (int i = 0; i < categoryGroupsCount; i++) {
+            // Eğer listede yeterli kategori kalmadıysa, ek kategori isimlerini
+            // datafaker’dan üretmek istiyorsanız (örneğin commerce().department),
+            // aşağıdaki gibi bir fallback kullanabilirsiniz; burada opsiyonel bırakıyorum:
+            String candidateName = i < availableCategoryGroupNames.size()
+                    ? availableCategoryGroupNames.get(i)
+                    : faker.commerce().department();
+
+            while (usedCategoryGroupNames.contains(candidateName)) {
+                candidateName = candidateName + "_" + faker.bothify("??##");
+            }
+
+            usedCategoryGroupNames.add(candidateName);
+            CategoryGroup c = new CategoryGroup(candidateName);
+            categoryGroups.add(categoryGroupRepository.save(c));
+        }
+
+        // *** CATEGORIES ***
         int categoryCount = Integer.parseInt(randomCategoryCount);
 
-// Örnek olarak kullanmak istediğimiz kategoriler:
+        // Örnek olarak kullanmak istediğimiz kategoriler:
         List<String> availableCategoryNames = new ArrayList<>(
                 Arrays.asList("App", "Book", "Hobby", "Medication", "Movie", "Food", "Olympic Sport", "Music")
         );
         Collections.shuffle(availableCategoryNames);
 
-// Kategorilerin isim tekrarını engellemek için
+        // Kategorilerin isim tekrarını engellemek için
         Set<String> usedCategoryNames = new HashSet<>();
         List<Category> categories = new ArrayList<>();
 
@@ -138,11 +167,23 @@ public class DummyDataLoader implements CommandLineRunner {
             }
 
             usedCategoryNames.add(candidateName);
+
+            // %20 ihtimalle is_archived = true
+            boolean isArchived = faker.random().nextInt(1, 100) <= 20;
+
+            // Rastgele bir categoryGroup seç (categoryGroups listesi dolu varsayılıyor)
+            CategoryGroup randomGroup = categoryGroups.get(faker.random().nextInt(0, categoryGroups.size() - 1));
+
+            // Yeni Category nesnesini oluştur ve gerekli alanları ata
             Category c = new Category(candidateName);
+            c.setArchived(isArchived);
+            c.setCategoryGroup(randomGroup);
+
+
             categories.add(categoryRepository.save(c));
         }
 
-// --- 2) Topic ekle ---
+        // *** TOPIC ***
         List<Topic> topics = new ArrayList<>();
 
         for (int i = 0; i < Integer.parseInt(randomTopicCount); i++) {
@@ -188,15 +229,51 @@ public class DummyDataLoader implements CommandLineRunner {
 
             // Kısa bir açıklama
             t.setDescription(faker.lorem().sentence());
+
+            // %80 oranında 0, %15 oranında 1-7, %5 oranında 8-31
+            int chance = faker.random().nextInt(1, 100);
+            long someTimeLater;
+            if (chance <= 80) {
+                someTimeLater = 0L;
+            } else if (chance <= 95) { // 80 < x <= 95
+                someTimeLater = faker.number().numberBetween(1L, 8L); // 1-7 dahil
+            } else { // 95 < x <= 100
+                someTimeLater = faker.number().numberBetween(8L, 32L); // 8-31 dahil
+            }
+            t.setSomeTimeLater(someTimeLater);
+
+            // %4 oranında true
+            boolean pinned = faker.random().nextInt(1, 100) <= 4;
+            t.setPinned(pinned);
+
+            // %50 oranında -1, %30 oranında 0, %20 oranında 1-20 arası
+            int weightChance = faker.random().nextInt(1, 100);
+            int weight;
+            if (weightChance <= 50) {
+                weight = -1;
+            } else if (weightChance <= 80) { // 50 < x <= 80
+                weight = 0;
+            } else { // 80 < x <= 100
+                weight = faker.number().numberBetween(1, 21); // 1-20 dahil
+            }
+            t.setWeight(weight);
+
+
+
             topics.add(topicRepository.save(t));
         }
 
-// --- 3) Entry'leri, tarih aralığı + status + note içerikleriyle ekle ---
-        LocalDate startDate = LocalDate.parse(randomStartDate);
-        LocalDate endDate   = LocalDate.parse(randomEndDate);
+        // --- 3) Entry'leri, tarih aralığı + status + note içerikleriyle ekle ---
+        //LocalDate startDate = LocalDate.parse(randomStartDate);
+        //LocalDate endDate   = LocalDate.parse(randomEndDate);
+        //long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(Integer.parseInt(daysCountBeforeToday));
+        LocalDate endDate = today.plusDays(Integer.parseInt(daysCountAfterToday));
         long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
 
-// Uniq. constraint set: "topicId:dateMillis"
+        // Uniq. constraint set: "topicId:dateMillis"
         Set<String> usedTopicDatePairs = new HashSet<>();
 
         for (int i = 0; i < Integer.parseInt(randomEntryCount); i++) {
@@ -226,11 +303,41 @@ public class DummyDataLoader implements CommandLineRunner {
             Entry entry = new Entry();
             entry.setTopic(randomTopic);
             entry.setDateMillisYmd(dateMillis);
-            entry.setStatus(faker.number().numberBetween(0, 3)); // 0=not marked,1=done,2=warning
 
-            // Note ilişkisi
+            // Bugünden önce mi sonra mı kontrolü
+            LocalDate entryDate = Instant.ofEpochMilli(dateMillis).atZone(ZoneId.systemDefault()).toLocalDate();
+            int statusChance = faker.random().nextInt(1, 100);
+
+            if (!entryDate.isAfter(today)) {
+                // date <= today
+                if (statusChance <= 90) {
+                    entry.setStatus(1); // done
+                } else if (statusChance > 90 && statusChance <= 97) {
+                    entry.setStatus(0); // not marked
+                } else {
+                    entry.setStatus(2); // warning
+                }
+            } else {
+                // date > today
+                if (statusChance <= 99) {
+                    entry.setStatus(0); // not marked
+                } else {
+                    entry.setStatus(2); // warning
+                }
+            }
+
+            // *** NOTES ***
             Note note = new Note();
-            note.setContent(faker.lorem().paragraph());
+
+            int contentChance = faker.random().nextInt(1, 100);
+            if (contentChance <= 70) {
+                note.setContent(""); // %70 boş
+            } else if (contentChance <= 90) {
+                note.setContent(faker.lorem().characters(5, 20)); // %20 kısa metin
+            } else {
+                note.setContent(String.valueOf(faker.number().numberBetween(1, 51))); // %10 sayısal
+            }
+
             note.setEntry(entry);
             entry.setNote(note);
 
@@ -238,7 +345,52 @@ public class DummyDataLoader implements CommandLineRunner {
         }
 
 
-        System.out.println("Dummy data yüklemesi tamamlandı!");
+        // *** FILL TOPIC dates: {prediction, done, warn, not marked} ***
+
+        long todayMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        for (Topic topic : topics) {
+
+            Long someTimeLater = topic.getSomeTimeLater();
+            if (someTimeLater == null) {
+                someTimeLater = 0L;
+            }
+
+            // 1. predictionDateMillisYmd = today + someTimeLater gün
+            LocalDate predictionDate = LocalDate.now().plusDays(someTimeLater);
+            long predictionDateMillis = predictionDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            topic.setPredictionDateMillisYmd(predictionDateMillis);
+
+            // 2. Entry listesini çek
+            List<Entry> topicEntries = entryRepository.findByTopicId(topic.getId());
+
+            // 3. lastPastEntryDateMillisYmd: status = 1 && date <= today → max date
+            topicEntries.stream()
+                    .filter(e -> e.getStatus() == 1 && e.getDateMillisYmd() <= todayMillis)
+                    .map(Entry::getDateMillisYmd)
+                    .max(Long::compareTo)
+                    .ifPresent(topic::setLastPastEntryDateMillisYmd);
+
+            // 4. firstWarningEntryDateMillisYmd: status = 2 → min date
+            topicEntries.stream()
+                    .filter(e -> e.getStatus() == 2)
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .ifPresent(topic::setFirstWarningEntryDateMillisYmd);
+
+            // 5. firstFutureNeutralEntryDateMillisYmd: status = 0 && date >= today → min date
+            topicEntries.stream()
+                    .filter(e -> e.getStatus() == 0 && e.getDateMillisYmd() >= todayMillis)
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .ifPresent(topic::setFirstFutureNeutralEntryDateMillisYmd);
+
+            // Kaydet
+            topicRepository.save(topic);
+        }
+
+
+        System.out.println("Dummy data created.");
     }
 }
 
