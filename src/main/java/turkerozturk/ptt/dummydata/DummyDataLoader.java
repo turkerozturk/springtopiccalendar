@@ -230,23 +230,25 @@ public class DummyDataLoader implements CommandLineRunner {
             // Kısa bir açıklama
             t.setDescription(faker.lorem().sentence());
 
-            // %80 oranında 0, %15 oranında 1-7, %5 oranında 8-31
+            //
             int chance = faker.random().nextInt(1, 100);
             long someTimeLater;
-            if (chance <= 80) {
+            if (chance <= 50) {
                 someTimeLater = 0L;
-            } else if (chance <= 95) { // 80 < x <= 95
-                someTimeLater = faker.number().numberBetween(1L, 8L); // 1-7 dahil
-            } else { // 95 < x <= 100
-                someTimeLater = faker.number().numberBetween(8L, 32L); // 8-31 dahil
+            } else if (chance <= 75) { // 80 < x <= 95
+                someTimeLater = faker.number().numberBetween(1L, 2L);
+            }  else if (chance <= 85) { // 80 < x <= 95
+                someTimeLater = faker.number().numberBetween(3L, 8L);
+            } else {
+                someTimeLater = faker.number().numberBetween(8L, 32L);
             }
             t.setSomeTimeLater(someTimeLater);
 
-            // %4 oranında true
-            boolean pinned = faker.random().nextInt(1, 100) <= 4;
+            //
+            boolean pinned = faker.random().nextInt(1, 100) <= 15;
             t.setPinned(pinned);
 
-            // %50 oranında -1, %30 oranında 0, %20 oranında 1-20 arası
+            //
             int weightChance = faker.random().nextInt(1, 100);
             int weight;
             if (weightChance <= 50) {
@@ -263,10 +265,7 @@ public class DummyDataLoader implements CommandLineRunner {
             topics.add(topicRepository.save(t));
         }
 
-        // --- 3) Entry'leri, tarih aralığı + status + note içerikleriyle ekle ---
-        //LocalDate startDate = LocalDate.parse(randomStartDate);
-        //LocalDate endDate   = LocalDate.parse(randomEndDate);
-        //long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        // *** ENTRIES ***
 
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(Integer.parseInt(daysCountBeforeToday));
@@ -279,16 +278,42 @@ public class DummyDataLoader implements CommandLineRunner {
         for (int i = 0; i < Integer.parseInt(randomEntryCount); i++) {
             Topic randomTopic = topics.get(faker.random().nextInt(topics.size()));
 
-            long randomOffset = faker.number().numberBetween(0L, totalDays);
-            LocalDate randomDate = startDate.plusDays(randomOffset);
+            LocalDate randomDate;
+            int chance = faker.number().numberBetween(1, 101); // 1–100 arası
+
+            if (chance <= 92) {
+                // Geçmiş tarih: startDate ~ yesterday
+                long pastDays = ChronoUnit.DAYS.between(startDate, today.minusDays(1));
+                long offset = faker.number().numberBetween(0L, Math.max(pastDays, 1L));
+                randomDate = startDate.plusDays(offset);
+            } else if (chance <= 93) {
+                // Bugün
+                randomDate = today;
+            } else {
+                // Gelecek tarih: tomorrow ~ endDate
+                long futureDays = ChronoUnit.DAYS.between(today.plusDays(1), endDate);
+                long offset = faker.number().numberBetween(0L, Math.max(futureDays, 1L));
+                randomDate = today.plusDays(1 + offset);
+            }
 
             long dateMillis = randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
             String pairKey = randomTopic.getId() + ":" + dateMillis;
 
             int attempt = 0;
             while (usedTopicDatePairs.contains(pairKey) && attempt < 10) {
-                randomOffset = faker.number().numberBetween(0L, totalDays);
-                randomDate = startDate.plusDays(randomOffset);
+                chance = faker.number().numberBetween(1, 101);
+                if (chance <= 92) {
+                    long pastDays = ChronoUnit.DAYS.between(startDate, today.minusDays(1));
+                    long offset = faker.number().numberBetween(0L, Math.max(pastDays, 1L));
+                    randomDate = startDate.plusDays(offset);
+                } else if (chance <= 95) {
+                    randomDate = today;
+                } else {
+                    long futureDays = ChronoUnit.DAYS.between(today.plusDays(1), endDate);
+                    long offset = faker.number().numberBetween(0L, Math.max(futureDays, 1L));
+                    randomDate = today.plusDays(1 + offset);
+                }
+
                 dateMillis = randomDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
                 pairKey = randomTopic.getId() + ":" + dateMillis;
                 attempt++;
@@ -312,34 +337,20 @@ public class DummyDataLoader implements CommandLineRunner {
                 // date <= today
                 if (statusChance <= 90) {
                     entry.setStatus(1); // done
-                } else if (statusChance > 90 && statusChance <= 97) {
+                } else if (statusChance > 90 && statusChance <= 99) {
                     entry.setStatus(0); // not marked
                 } else {
                     entry.setStatus(2); // warning
                 }
             } else {
-                // date > today
-                if (statusChance <= 99) {
+                // date => today
+                if (statusChance <= 95) {
                     entry.setStatus(0); // not marked
                 } else {
                     entry.setStatus(2); // warning
                 }
             }
 
-            // *** NOTES ***
-            Note note = new Note();
-
-            int contentChance = faker.random().nextInt(1, 100);
-            if (contentChance <= 70) {
-                note.setContent(""); // %70 boş
-            } else if (contentChance <= 90) {
-                note.setContent(faker.lorem().characters(5, 20)); // %20 kısa metin
-            } else {
-                note.setContent(String.valueOf(faker.number().numberBetween(1, 51))); // %10 sayısal
-            }
-
-            note.setEntry(entry);
-            entry.setNote(note);
 
             entryRepository.save(entry);
         }
@@ -351,15 +362,7 @@ public class DummyDataLoader implements CommandLineRunner {
 
         for (Topic topic : topics) {
 
-            Long someTimeLater = topic.getSomeTimeLater();
-            if (someTimeLater == null) {
-                someTimeLater = 0L;
-            }
 
-            // 1. predictionDateMillisYmd = today + someTimeLater gün
-            LocalDate predictionDate = LocalDate.now().plusDays(someTimeLater);
-            long predictionDateMillis = predictionDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-            topic.setPredictionDateMillisYmd(predictionDateMillis);
 
             // 2. Entry listesini çek
             List<Entry> topicEntries = entryRepository.findByTopicId(topic.getId());
@@ -370,6 +373,22 @@ public class DummyDataLoader implements CommandLineRunner {
                     .map(Entry::getDateMillisYmd)
                     .max(Long::compareTo)
                     .ifPresent(topic::setLastPastEntryDateMillisYmd);
+
+            Long someTimeLater = topic.getSomeTimeLater();
+            if (someTimeLater == null) {
+                someTimeLater = 0L;
+            }
+
+            if (someTimeLater > 0L && topic.getLastPastEntryDateMillisYmd() != null) {
+                LocalDate baseDate = Instant.ofEpochMilli(topic.getLastPastEntryDateMillisYmd())
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+                LocalDate predictionDate = baseDate.plusDays(someTimeLater);
+                long predictionDateMillis = predictionDate.atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli();
+                topic.setPredictionDateMillisYmd(predictionDateMillis);
+            }
 
             // 4. firstWarningEntryDateMillisYmd: status = 2 → min date
             topicEntries.stream()
@@ -388,6 +407,76 @@ public class DummyDataLoader implements CommandLineRunner {
             // Kaydet
             topicRepository.save(topic);
         }
+
+
+        // *** NOTES ***
+
+        for (Topic topic : topics) {
+
+            // Entry listesini çek
+            List<Entry> topicEntries = entryRepository.findByTopicId(topic.getId());
+
+            if (topicEntries.isEmpty()) {
+                continue;
+            }
+
+            // Her topic için içerik tipi belirle
+
+            String contentType = null;
+                int contentTypeChance = faker.number().numberBetween(1, 4); // 1-3: integer, double, string
+                switch (contentTypeChance) {
+                    case 1: contentType = "integer"; break;
+                    case 2: contentType = "double"; break;
+                    case 3: contentType = "string"; break;
+                }
+
+            // System.out.println(topic.getCategory().getName() + " / " + topic.getName() + " / " + contentType);
+            for (Entry entry : topicEntries) {
+
+                int contentChance = faker.number().numberBetween(1, 101); // 1–100
+
+
+                
+                
+                Note note = new Note();
+
+                if (contentChance > 70) {
+
+                    switch (contentType) {
+                    /*
+                    case "empty":
+                        note.setContent("");
+                        break;
+                        */
+                        case "integer":
+                            int intValue = faker.number().numberBetween(0, 10001);
+                            note.setContent(String.valueOf(intValue));
+                            break;
+                        case "double":
+                            double doubleValue = 20.0 + faker.random().nextDouble() * (130.0 - 20.0);
+                            note.setContent(String.format(Locale.US, "%.2f", doubleValue)); // Nokta formatlı
+                            break;
+                        case "string":
+                            note.setContent(faker.lorem().sentence(1, 5)
+                                    .replaceAll("\\.$", "") + ".");
+                            break;
+                    }
+                    
+                } else {
+                    
+                    note.setContent("");
+                    
+                }
+                    
+
+                note.setEntry(entry);
+                entry.setNote(note);
+                entryRepository.save(entry); // veya topluca kaydetmek için dışarı alabilirsin
+            }
+        }
+
+
+
 
 
         System.out.println("Dummy data created.");
