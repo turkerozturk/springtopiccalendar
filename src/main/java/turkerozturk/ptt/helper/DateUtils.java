@@ -20,9 +20,6 @@
  */
 package turkerozturk.ptt.helper;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import turkerozturk.ptt.component.AppTimeZoneProvider;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 

@@ -1,15 +1,3 @@
-package turkerozturk.ptt.service;
-
-import org.springframework.context.i18n.LocaleContextHolder;
-import turkerozturk.ptt.entity.Category;
-import turkerozturk.ptt.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.text.Collator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 /*
  * This file is part of the DailyTopicTracker project.
  * Please refer to the project's README.md file for additional details.
@@ -30,6 +18,19 @@ import java.util.Optional;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
+package turkerozturk.ptt.service;
+
+import org.springframework.context.i18n.LocaleContextHolder;
+import turkerozturk.ptt.entity.Category;
+import turkerozturk.ptt.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.text.Collator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
 @Service
 public class CategoryService {
     @Autowired
