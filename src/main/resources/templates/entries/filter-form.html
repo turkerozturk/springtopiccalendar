@@ -303,7 +303,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
        th:text="#{category.groups}" style="color:white;">Category Groups</a>
     <a href="/categories" class="btn btn-secondary btn-sm"
        th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
-    <a href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm"
+    <a th:href="@{/topics(categoryId=${filterDto.categoryId})}" class="btn btn-secondary btn-sm"
        th:if="${hasCategories}" style="color:white;">Topics</a>
     <th:block th:if="${hasTopics}">
         <a href="/entries" class="btn btn-secondary btn-sm"
