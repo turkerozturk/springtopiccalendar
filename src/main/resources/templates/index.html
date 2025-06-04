@@ -15,8 +15,17 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
     <style>
+
+    .blink {
+          animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+          50% {
+            opacity: 0;
+          }
+        }
 
         /* https://css-pattern.com/quatrefoils/ */
         body {
@@ -65,17 +74,24 @@
 <body>
 
 
-<div  id="navigation-panel">
+<div id="navigation-panel">
     <div class="align-center-horizontal">
         <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
-        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
-        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
-        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm"
+           th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm"
+           th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm"
+           th:if="${hasCategories}" style="color:white;">Topics</a>
+        <th:block th:if="${hasTopics}">
+            <a href="/entries" class="btn btn-secondary btn-sm"
+               style="color:white;">Entries</a>
+            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        </th:block>
         <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+            <button type="submit"
+                    style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
                 Logout
             </button>
         </form>
@@ -86,9 +102,6 @@
 
 
     <h1><span class="fonbg" th:text="#{software.name}">Daily Topic Tracker</span></h1>
-
-
-
 
 
     <!-- Bağlantılar (List Group) -->
@@ -106,74 +119,144 @@
         </tr>
 
         <tr>
-        <td>
-        <a href="category-groups" class="list-group-item list-group-item-action" th:text="#{category.groups}">
-            Category Groups
-        </a>
-        </td>
+            <td>
+                <a th:if="${hasCategoryGroups}" href="/category-groups" class="list-group-item list-group-item-action"
+                   th:text="#{category.groups}">
+                    Category Groups
+                </a>
+                <a th:if="${!hasCategoryGroups}" href="/category-groups/new?returnPage=home"
+                   class="list-group-item list-group-item-action blink"
+                   th:text="' Category Groups - Create a Category Group'">
+
+                </a>
+            </td>
             <td th:text="${categoryGroupsCount}">#</td>
         </tr>
         <tr>
-        <td>
-        <a href="categories" class="list-group-item list-group-item-action" th:text="#{categories}">
-            Categories
-        </a>
+            <td>
+                <th:block th:if="${hasCategoryGroups}">
 
+
+                    <a th:if="${categoriesCount > 0}" href="/categories"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{categories}">
+                    </a>
+
+                    <a th:if="${categoriesCount == 0}" href="/categories/create?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Categories - Create a Category'">
+                    </a>
+
+                </th:block>
+
+
+                <span th:if="${!hasCategoryGroups}" class="list-group-item list-group-item-action"
+                      style="color:gray;" th:text="'Categories [Create at least one category group]'">
+
+            </span>
+            </td>
             <td th:text="${categoriesCount}">#</td>
 
         </tr>
         <tr>
-        <td>
-        <a href="topics" class="list-group-item list-group-item-action" th:text="#{topics}">
-            Topics
-        </a>
-        </td>
+            <td>
+
+
+                <th:block th:if="${hasCategories}">
+
+
+                    <a th:if="${topicsCount > 0}" href="/topics"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{topics}">
+                    </a>
+
+                    <a th:if="${topicsCount == 0}" href="/topics/create?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Topics - Create a Topic'">
+                    </a>
+
+                </th:block>
+
+
+                <span th:if="${!hasCategories}" class="list-group-item list-group-item-action"
+                      style="color: gray;" th:text="'Topics [Create at least one category]'">
+
+            </span>
+            </td>
             <td th:text="${topicsCount}">#</td>
 
         </tr>
+        <th:block th:if="${hasTopics}">
+            <tr>
+                <td>
+                    <a th:if="${entriesCount > 0}" href="/entries"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{entries}">
+                    </a>
+
+                    <a th:if="${entriesCount == 0}" href="/entries/new?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Entries - Create an Entry'">
+                    </a>
+
+                </td>
+                <td th:text="${entriesCount}">#</td>
+
+            </tr>
+            <tr th:if="${entriesCount == 0}">
+               <td colspan="2">It is better to create one entry, before clicking to tracker or intelligent report</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <a href="/entry-filter/form"
+                       class="list-group-item list-group-item-action link-primary"
+                       th:classappend="${categoryGroupsCount > 0 and categoriesCount > 0 and topicsCount > 0 and entriesCount == 1} ? ' blink' : ''"
+                       th:text="#{tracker}"
+                       title="Categorised Pivot Tables">
+                        Tracker
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <a href="/reports/all" class="list-group-item list-group-item-action link-primary">
+                        Intelligent Report View
+                    </a>
+                </td>
+            </tr>
+
+        </th:block>
+        <th:block th:if="${!hasTopics}">
+            <tr>
+                <td colspan="2">
+                     <span th:if="${!hasEntries}" class="list-group-item list-group-item-action"
+                           style="color: gray;" th:text="'Entries [Create at least one Entry]'"></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">Perform the necessary operations to view the entries, tracker and report pages.</td>
+            </tr>
+        </th:block>
+
         <tr>
-        <td>
-        <a href="entries" class="list-group-item list-group-item-action" th:text="#{entries}">
-            Entries
-        </a>
-        </td>
-            <td th:text="${entriesCount}">#</td>
+            <td colspan="2" class="text-center">
+                <a href="/languages" class="list-group-item list-group-item-action link-success"
+                   th:text="#{change.language}">
+                    Change Language
+                </a>
+            </td>
 
         </tr>
         <tr>
-        <td colspan="2" class="text-center">
-        <a href="entry-filter/form" class="list-group-item list-group-item-action link-primary" th:text="#{tracker}">
-            Tracker - Categorised Pivot Tables
-        </a>
-        </td>
-
-
-        </tr>
-        <tr>
-        <td colspan="2" class="text-center">
-        <a href="/reports/all" class="list-group-item list-group-item-action link-primary" >
-            Intelligent Report View
-        </a>
-        </td>
+            <td colspan="2" class="text-center">
+                <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
+                   class="list-group-item list-group-item-action link-secondary"
+                   th:text="'DailyTopicTracker V1.0.2 - Türker Öztürk'">Website</a>.
+            </td>
 
         </tr>
-        <tr>
-        <td colspan="2" class="text-center">
-        <a href="languages" class="list-group-item list-group-item-action link-success" th:text="#{change.language}">
-            Change Language
-        </a>
-        </td>
-
-        </tr>
-        <tr>
-        <td colspan="2" class="text-center">
-        <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
-           class="list-group-item list-group-item-action link-secondary"
-           th:text="#{website} + ' - DailyTopicTracker V1.0.2 - Türker Öztürk'">Website</a>.
-        </td>
-
-        </tr>
-<!--
+        <!--
         <a href="/reports/neutral" class="list-group-item list-group-item-action" >
             Reports - Neutral
         </a>
@@ -200,5 +283,6 @@
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
 </body>
 </html>
