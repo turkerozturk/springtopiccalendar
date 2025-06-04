@@ -130,6 +130,8 @@ public class TopicWebController {
         // Hangi sayfadan gelindiğini kontrol ediyoruz.
         if (returnPage != null) {
             switch (returnPage) {
+                case "home":
+                    return "redirect:/";
                 case "topics":
                     //   return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":

@@ -293,6 +293,8 @@ public class EntryController {
         String returnPage = request.getParameter("returnPage");
         if (returnPage != null) {
             switch (returnPage) {
+                case "home":
+                    return "redirect:/";
                 case "topics":
                     return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":

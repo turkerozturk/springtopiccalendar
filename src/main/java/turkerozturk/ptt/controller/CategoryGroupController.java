@@ -21,6 +21,7 @@
 package turkerozturk.ptt.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -74,8 +75,11 @@ public class CategoryGroupController {
 
     // SHOW CREATE FORM
     @GetMapping("/new")
-    public String createForm(Model model) {
+    public String createForm(Model model,
+                             @RequestParam(name="returnPage", required=false) String returnPage) {
         model.addAttribute("group", new CategoryGroup());
+        model.addAttribute("returnPage", returnPage);
+
         return "category-groups/form";
     }
 
@@ -83,7 +87,9 @@ public class CategoryGroupController {
     @PostMapping("/new")
     public String create(
             @ModelAttribute("group") CategoryGroup formGroup,
-            RedirectAttributes redirectAttrs
+            RedirectAttributes redirectAttrs,
+            HttpServletRequest request,
+            Model model
     ) {
         if (repo.existsByName(formGroup.getName())) {
             redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
@@ -91,6 +97,17 @@ public class CategoryGroupController {
         }
         repo.save(formGroup);
         redirectAttrs.addFlashAttribute("success", "Category group created successfully.");
+
+        String returnPage = request.getParameter("returnPage");
+
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "home":
+                    return "redirect:/";
+                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+            }
+        }
         return "redirect:/category-groups";
     }
 

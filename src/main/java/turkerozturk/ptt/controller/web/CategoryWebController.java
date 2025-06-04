@@ -21,6 +21,7 @@
 package turkerozturk.ptt.controller.web;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -56,17 +57,34 @@ public class CategoryWebController {
 
     // Yeni kategori oluşturma formunu getiren endpoint
     @GetMapping("/create")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(Model model,
+                                 @RequestParam(name="returnPage", required=false) String returnPage) {
         model.addAttribute("categoryDTO", new Category());
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
+        model.addAttribute("returnPage", returnPage);
 
         return "category-form"; // templates/category-form.html
     }
 
     // Yeni kategori kaydetmek için (form post)
     @PostMapping
-    public String saveCategory(@ModelAttribute("categoryDTO") Category category) {
+    public String saveCategory(@ModelAttribute("categoryDTO") Category category,
+                               RedirectAttributes redirectAttrs,
+                               HttpServletRequest request,
+                               Model model) {
         categoryService.saveCategory(category);
+        redirectAttrs.addFlashAttribute("success", "Category created successfully.");
+
+        String returnPage = request.getParameter("returnPage");
+
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "home":
+                    return "redirect:/";
+                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+            }
+        }
         return "redirect:/categories";
     }
 
