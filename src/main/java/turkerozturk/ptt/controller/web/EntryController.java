@@ -206,10 +206,10 @@ public class EntryController {
             Optional<Entry> existing = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd);
             if (existing.isPresent()) {
                 // Kayıt varsa formu tekrar göster ve hata mesajı ver
-                model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
+                model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                //return "entries/form";
+                return "entries/form";
             }
 
             // b) Not'u da two-way ilişkiyle bağla
@@ -234,10 +234,10 @@ public class EntryController {
             Optional<Entry> existing = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd);
             if (existing.isPresent() && !existing.get().getId().equals(formEntry.getId())) {
                 // Yine hata mesajını modele ekleyip formu gösteriyoruz
-                model.addAttribute("errorMessage", "Bu topic için bu tarihte zaten bir kayıt var!");
+                model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                //return "entries/form";
+                return "entries/form";
             }
 
             Long oldTopicId = dbEntry.getTopic().getId(); // this is required. We will use this after entry save.
