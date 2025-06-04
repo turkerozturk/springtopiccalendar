@@ -163,6 +163,13 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.webjars.npm/bootstrap-datepicker -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>bootstrap-datepicker</artifactId>
+      <version>1.10.0</version>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.webjars/popper.js -->
     <dependency>
       <groupId>org.webjars</groupId>
