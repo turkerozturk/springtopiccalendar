@@ -16,10 +16,8 @@
 
      <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
-    <!-- TODO make it local file, use it from resources folder. -->
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
 
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
     <style>
 
@@ -1113,7 +1111,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 <!-- AJAX / JavaScript Kısmı -->
 
 
-<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
 
@@ -1121,8 +1124,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}">
+
+
 <!-- TODO make it local file, use it from resources folder. -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
+<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script> -->
 
 
 <script>
