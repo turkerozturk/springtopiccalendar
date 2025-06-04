@@ -17,6 +17,9 @@
                    : '/category-groups/new'}"
           th:object="${group}" method="post">
 
+        <input type="hidden" name="returnPage" th:value="${returnPage}">
+
+
         <!-- only include hidden id for edit (optional) -->
         <input type="hidden" th:if="${group.id != null}" th:field="*{id}" />
 
