@@ -100,7 +100,7 @@
         <div class="mb-3 row">
             <label for="status" class="col-sm-4 col-form-label">Status:</label>
             <div class="col-sm-8">
-                <select th:field="*{status}" id="status" class="form-select">
+                <select th:field="*{status}" id="status" class="form-select" autofocus>
                     <option value="0">Not Marked</option>
                     <option value="1">Done</option>
                     <option value="2">Warning</option>
@@ -133,7 +133,9 @@
     </div>
 
     <div class="mt-3">
-        <a th:href="@{/topics(categoryId=${entry.topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+        <th:block th:if="${categoryId}">
+            <a th:href="@{/topics(categoryId=${entry.topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+        </th:block>
     </div>
 </div>
 
