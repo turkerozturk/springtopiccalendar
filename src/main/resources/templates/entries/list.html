@@ -14,7 +14,6 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
     <title>Entry Listesi</title>
 
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 
 
     <!-- Bootstrap CSS (Örnek 5.x sürümü) -->
@@ -416,10 +415,12 @@
 
 
 
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 
 
-<!-- Bootstrap JS (opsiyonel) -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
 
 <script>
     function confirmDelete() {
@@ -449,7 +450,5 @@
 
 
 
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
 </body>
 </html>
