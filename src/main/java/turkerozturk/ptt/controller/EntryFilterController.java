@@ -120,14 +120,21 @@ public class EntryFilterController {
         List<Entry> filteredEntries;
         if(categoryId!=null) {
             filterDto.setCategoryId(categoryId);
-            List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
-            List<Long> topicIds = new ArrayList<>();
-            for (Topic topic : topicsOfTheCategory) {
-                topicIds.add(topic.getId());
+        } else {
+            List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc();
+            if (!cats.isEmpty()) {
+                categoryId = cats.get(0).getId();
+                filterDto.setCategoryId(categoryId);
             }
-            filterDto.setTopicIds(topicIds);
-
         }
+        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
+
+        List<Long> topicIds = new ArrayList<>();
+        for (Topic topic : topicsOfTheCategory) {
+            topicIds.add(topic.getId());
+        }
+        filterDto.setTopicIds(topicIds);
+
             // 3) Filter sorgusunu çalıştır (ilk açılışta da verileri gösterelim)
             // 1) Filtre ile gelen kayıtlardan "entries" listesi
             filteredEntries = filterService.filterEntries(filterDto);
