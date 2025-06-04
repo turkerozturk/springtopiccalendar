@@ -110,12 +110,18 @@ body {
 <div  id="navigation-panel">
     <div class="align-center-horizontal">
         <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm" th:text="#{category.groups}" style="color:white;">Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm" style="color:white;">Categories</a>
-        <a href="/topics" class="btn btn-secondary btn-sm" style="color:white;">Topics</a>
-        <a href="/entries" class="btn btn-secondary btn-sm" style="color:white;">Entries</a>
-        <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
-        <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm"
+           th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm"
+           th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm"
+           th:if="${hasCategories}" style="color:white;">Topics</a>
+        <th:block th:if="${hasTopics}">
+            <a href="/entries" class="btn btn-secondary btn-sm"
+               style="color:white;">Entries</a>
+            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        </th:block>
         <form th:action="@{/logout}" method="post" style="display:inline;">
             <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
                 Logout
