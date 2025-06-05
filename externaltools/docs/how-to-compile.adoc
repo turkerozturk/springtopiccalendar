@@ -68,7 +68,8 @@ Type these two commands below and press ENTER;
 .Commands to compile LaunchDTT.java file to LaunchDTT.java
 -----
 javac LaunchDTT.java
-jar cfe LaunchDTT.jar LaunchDTT *.class
+jar cfe LaunchDTT.jar LaunchDTT *.class launcher-app-icon.png
+
 -----
 
 Delete *.class files that start with the string "LaunchDTT", as they are no longer needed.

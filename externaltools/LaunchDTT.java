@@ -41,7 +41,7 @@ import java.net.URI;
 /**
  * Commands to compile to jar and run:
  * javac LaunchDTT.java
- * jar cfe LaunchDTT.jar LaunchDTT *.class
+ * jar cfe LaunchDTT.jar LaunchDTT *.class launcher-app-icon.png
  * java -jar LaunchDTT.jar
  * To not get "Could not find or load main class LaunchDTT" error while trying to run the jar file,
  * make sure that there is no "package " line in the beginning of this file. If it exists, delete it.
@@ -198,6 +198,10 @@ public class LaunchDTT extends JFrame {
         setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/launcher-app-icon.png"));
+        setIconImage(icon.getImage());
+
 
         // Thread scheduler (log okuma, health check vb. işlerde kullanacağız)
         scheduler = Executors.newScheduledThreadPool(2);
