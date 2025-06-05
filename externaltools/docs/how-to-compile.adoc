@@ -138,3 +138,8 @@ image::screenshot-launcher-7.jpg[]
 It may also give the same error as in the screenshot below. The difference is that the port is idle when the Launcher starts, then another application that occupies that port is started and then you press the start button. The steps to be taken are as explained in the previous screenshot.
 
 image::screenshot-launcher-8.jpg[]
+
+Asking for user confirmation when closing the application window.
+
+image::screenshot-launcher-9.jpg[]
+
