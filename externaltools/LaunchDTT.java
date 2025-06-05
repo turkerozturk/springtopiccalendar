@@ -26,6 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +34,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.Properties;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
 
 /**
  * Commands to compile to jar and run:
  * javac LaunchDTT.java
  * jar cfe LaunchDTT.jar LaunchDTT *.class
  * java -jar LaunchDTT.jar
+ * To not get "Could not find or load main class LaunchDTT" error while trying to run the jar file,
+ * make sure that there is no "package " line in the beginning of this file. If it exists, delete it.
  */
 public class LaunchDTT extends JFrame {
     // Durumlar
@@ -54,9 +60,9 @@ public class LaunchDTT extends JFrame {
 
     // Parçalar
     private final JButton btnStartStop = new JButton("Start");
-    private final JButton openBtn = new JButton("Open App Folder");
+    private final JButton btnOpenApplicationFolder = new JButton("Open App Folder");
 
-    private final JComboBox<String> dbList = new JComboBox<>();
+    private final JComboBox<String> cmbDatabaseList = new JComboBox<>();
     private final JLabel lblAppVersion = new JLabel("DailyTopicTracker V1.0.2 - Turker Ozturk");
     private final JTextArea textAreaLogs = new JTextArea();
 
@@ -80,7 +86,7 @@ public class LaunchDTT extends JFrame {
     }
 
     public LaunchDTT() {
-        super("Daily Topic Tracker Control");
+        super("Daily Topic Tracker Launcher");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -94,12 +100,24 @@ public class LaunchDTT extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                stopApplication();
-                if (scheduler != null && !scheduler.isShutdown()) {
-                    scheduler.shutdownNow();
+
+                int result = JOptionPane.showConfirmDialog(
+                        LaunchDTT.this,
+                        "The application will be closed, stopping the web server while closing. Are you sure?",
+                        "Closing confirmation",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (result == JOptionPane.YES_OPTION) {
+                    stopApplication();
+                    if (scheduler != null && !scheduler.isShutdown()) {
+                        scheduler.shutdownNow();
+                    }                    dispose();
+                    System.exit(0);
                 }
-                dispose();
-                System.exit(0);
+
+
+
             }
         });
 
@@ -124,17 +142,57 @@ public class LaunchDTT extends JFrame {
             }
         });
 
+
+        JLabel linkLabel = new JLabel("<html><a href=''>Open Website</a></html>");
+        linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        linkLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://github.com/turkerozturk/springtopiccalendar"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+
         // Basit layout
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(btnStartStop);
 
-        openBtn.addActionListener( e -> {
+        btnOpenApplicationFolder.addActionListener(e -> {
                 onOpenDirectory(e);
         });
-        topPanel.add(openBtn);
+        topPanel.add(btnOpenApplicationFolder);
 
-        topPanel.add(dbList);
+        topPanel.add(cmbDatabaseList);
         topPanel.add(lblAppVersion);
+        topPanel.add(linkLabel);
+
+        JButton licenseButton = new JButton("License");
+        licenseButton.addActionListener((ActionEvent e) -> {
+            showLicenseDialog(this, "These LaunchDTT and DailyTopicTracker applications are part of the DailyTopicTracker project.\n" +
+                    "Please refer to the project's README.md file for additional details.\n" +
+                    "https://github.com/turkerozturk/springtopiccalendar\n" +
+                    "\n" +
+                    "Copyright (c) 2025 Turker Ozturk\n" +
+                    "\n" +
+                    "This program is free software: you can redistribute it and/or modify\n" +
+                    "it under the terms of the GNU General Public License as published by\n" +
+                    "the Free Software Foundation, either version 3 of the License, or\n" +
+                    "(at your option) any later version.\n" +
+                    "\n" +
+                    "This program is distributed in the hope that it will be useful,\n" +
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n" +
+                    "GNU General Public License for more details.\n" +
+                    "\n" +
+                    "You should have received a copy of the GNU General Public License\n" +
+                    "along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.");
+        });
+        topPanel.add(licenseButton);
+
 
         // Ana panel
         setLayout(new BorderLayout());
@@ -143,6 +201,55 @@ public class LaunchDTT extends JFrame {
 
         // Thread scheduler (log okuma, health check vb. işlerde kullanacağız)
         scheduler = Executors.newScheduledThreadPool(2);
+
+
+        if (isPortInUse(serverPort)) {
+            appendLog("[ERROR] Port " + serverPort + " is already in use.\n");
+            btnStartStop.setEnabled(false);
+            cmbDatabaseList.setEnabled(false);
+            StringBuilder sb = new StringBuilder();
+            sb.append("You can try running the application with a different port number.");
+            sb.append("\n");
+            sb.append("To do that;");
+            sb.append("\n");
+            sb.append("Open the application.properties file with a text editor.");
+            sb.append("\n");
+            sb.append("Change the port number in the line starting with;");
+            sb.append("\n");
+            sb.append("server.port=");
+            sb.append("\n");
+            sb.append("and save it. Then run this application again.");
+            sb.append("\n");
+            sb.append("\n");
+            sb.append("\n");
+            sb.append("Finding out the port allocation of an application:");
+            sb.append("\n");
+            sb.append("From Windows commandline, type:");
+            sb.append("\n");
+            sb.append("netstat -ano | find \"" + serverPort + "\"");
+            sb.append("\n");
+            sb.append("Note down the corresponding process ID number.");
+            sb.append("\n");
+            sb.append("Go to Processes/Services in the Task Manager (for processes, select \"Show processes of all users\").");
+            sb.append("\n");
+            sb.append("\"Select View\\Columns -> Enable PID (Process ID)\".");
+            sb.append("\n");
+            sb.append("Now you can see which program or service uses which PID and you know what occupies the corresponding port.");
+            sb.append("\n");
+            sb.append("\n");
+            sb.append("From Linux commandline, type:");
+            sb.append("\n");
+            sb.append("lsof -i :" + serverPort);
+            sb.append("\n");
+            sb.append("Note down the corresponding process ID number.");
+            sb.append("\n");
+            sb.append("To find which program is listening on port " + serverPort);
+            sb.append("\n");
+            sb.append("ps -fp WritePIDNumberHere");
+            appendLog(sb.toString());
+
+            return;
+        }
     }
 
     private synchronized void startApplication() {
@@ -159,8 +266,8 @@ public class LaunchDTT extends JFrame {
         cmd.add("daily-topic-tracker.jar");
 
         // Eğer dbList görünür ve bir öğe seçiliyse, ek parametre olarak ekle
-        if (dbList.isVisible()) {
-            String selectedDb = dbList.getSelectedItem().toString();
+        if (cmbDatabaseList.isVisible()) {
+            String selectedDb = cmbDatabaseList.getSelectedItem().toString();
             if (selectedDb != null && !selectedDb.isEmpty()) {
                 cmd.add(selectedDb);
             }
@@ -243,12 +350,12 @@ public class LaunchDTT extends JFrame {
                 case STOPPED:
                     btnStartStop.setText("Start");
                     btnStartStop.setBackground(COLOR_STOPPED);
-                    dbList.setEnabled(true);
+                    cmbDatabaseList.setEnabled(true);
                     break;
                 case STARTING:
                     btnStartStop.setText("Starting...");
                     btnStartStop.setBackground(COLOR_STARTING);
-                    dbList.setEnabled(false);
+                    cmbDatabaseList.setEnabled(false);
                     break;
                 case RUNNING:
                     btnStartStop.setText("Stop");
@@ -353,11 +460,11 @@ public class LaunchDTT extends JFrame {
             for (File f : dbFiles) {
                 model.addElement(f.getName());
             }
-            dbList.setModel(model);
-            dbList.setVisible(true);
+            cmbDatabaseList.setModel(model);
+            cmbDatabaseList.setVisible(true);
         } else {
             // Hiç .db yoksa tamamen gizle
-            dbList.setVisible(false);
+            cmbDatabaseList.setVisible(false);
         }
 
 
@@ -385,5 +492,36 @@ public class LaunchDTT extends JFrame {
         return DEFAULT_SERVER_PORT;
     }
 
+    private boolean isPortInUse(int port) {
+        try (ServerSocket socket = new ServerSocket(port)) {
+            return false; // Port boş
+        } catch (IOException e) {
+            return true; // Port kullanımda
+        }
+    }
+
+    private static void showLicenseDialog(JFrame parent, String licenseText) {
+        JDialog dialog = new JDialog(parent, "License", true); // modal
+
+        JTextArea textArea = new JTextArea(licenseText);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(closeButton);
+
+        dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
+        dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+    }
 
 }
