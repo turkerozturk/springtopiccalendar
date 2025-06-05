@@ -57,6 +57,10 @@ Therefore we need to compile it from command line.
 
 . Open a new terminal window on your operating system.
 
+==== Before Compile:
+
+To not get "Could not find or load main class LaunchDTT" error while trying to run the jar file, make sure that there is no "package " line in the beginning of this file. If it exists, delete it.
+
 ==== How to Compile:
 
 Type these two commands below and press ENTER;
@@ -123,3 +127,14 @@ Example: Uncomment and change the default server port in the application.propert
 
 image::screenshot-launcher-5.jpg[]
 
+In which case do you get the error message and how to solve it?
+
+When the Launcher is run, it reads the server port value from the application.properties file and checks whether that port number is free in the operating system.
+
+If it is not idle, the application will give you written information about what to do, as in the screenshot below.
+
+image::screenshot-launcher-7.jpg[]
+
+It may also give the same error as in the screenshot below. The difference is that the port is idle when the Launcher starts, then another application that occupies that port is started and then you press the start button. The steps to be taken are as explained in the previous screenshot.
+
+image::screenshot-launcher-8.jpg[]
