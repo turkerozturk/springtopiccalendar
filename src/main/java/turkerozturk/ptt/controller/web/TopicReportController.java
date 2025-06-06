@@ -21,6 +21,7 @@
 package turkerozturk.ptt.controller.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,15 @@ public class TopicReportController {
 
     private final AppTimeZoneProvider timeZoneProvider;
 
+    @Value("${neutral.items.limit:99999}")
+    int neutralItemsLimit;
 
+    /**
+     * this limit is only for finished items "before today".
+     * Today's finished items has no limit.
+     */
+    @Value("${finished.items.limit:99999}")
+    int finishedItemsLimit;
 
     @Autowired
     private TopicService topicService;
@@ -54,7 +63,7 @@ public class TopicReportController {
 
     @GetMapping("/neutral")
     public String showFutureNeutralTopics(Model model) {
-        List<Topic> topics = topicService.getNextNeutralTopics(10);
+        List<Topic> topics = topicService.getNextNeutralTopics(neutralItemsLimit);
         model.addAttribute("topics", topics);
         return "future-neutral-topics";
     }
@@ -77,7 +86,7 @@ public class TopicReportController {
 
     @GetMapping("/done")
     public String showDoneTopics(Model model) {
-        List<Topic> topics = topicService.getLastActivitiesLimitedToN(1000);
+        List<Topic> topics = topicService.getLastActivitiesLimitedToN(finishedItemsLimit);
         model.addAttribute("topics", topics);
         return "future-neutral-topics";
     }
@@ -88,9 +97,9 @@ public class TopicReportController {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
         List<Topic> importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
-        List<Topic> neutrals = topicService.getNextNeutralTopics(10);
+        List<Topic> neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
         List<Topic> predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
-        List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(10);
+        List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
 
         List<DatedTopicViewModel> allItems = new ArrayList<>();
 
