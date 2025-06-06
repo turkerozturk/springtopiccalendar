@@ -26,6 +26,16 @@
 
     <style>
 
+        .negative-weighted-entry {
+            background-color: #e6ccff; /* Açık mor tonu */
+        }
+        .normal-weighted-entry {
+            background-color: #ccffe6;
+        }
+        .positive-weighted-entry {
+            background-color: #ffe6cc;
+        }
+
         .highlight-today {
             background-color: #fff9c4; /* açık sarı */
         }
@@ -86,13 +96,25 @@
             background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-
-
+/* https://www.computerhope.com/htmcolor.htm#color-codes */
+/* https://www.htmltables.io/blog/html-table-borders */
   #status-table {
-     background-color: WhiteSmoke;
-     border: 3px solid black;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+         border: 3px solid  black;
+  border-collapse: separate;
 
-  }
+    }
+    .#status-table td,
+    #status-table th{
+        border: 1px solid black;
+    }
+     #status-table th{
+        color: WhiteSmoke;
+    }
+    .normal-table-row{
+         background-color: WhiteSmoke;
+
+    }
 
 
 
@@ -246,18 +268,34 @@
         <th title="row counter">#</th>
         <th>Date</th>
         <th>Topic</th>
+        <th>Days</th>
         <th>Category</th>
         <th>Category Group</th>
-        <th>Status</th>
 
     </tr>
     </thead>
     <tbody>
     <tr th:each="item, iStats : ${allTopics}"
-        th:class="${item.dateLocal} == ${today} ? 'highlight-today' : ''">
+        th:class="${item.dateLocal} == ${today} ? 'highlight-today' : 'normal-table-row'">
 
         <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-        <td th:text="${iStats.index + 1}" th:title=" 'Topic Weight = ' + ${item.topic.weight} "></td>
+        <td th:if="${item.topic.weight < 0}"
+            th:text="${iStats.index + 1}"
+            th:title="'Topic Weight = ' + ${item.topic.weight}"
+            th:classappend="${item.topic.weight} < 0 ? 'negative-weighted-entry' : ''">
+        </td>
+
+        <td th:if="${item.topic.weight == 0}"
+            th:text="${iStats.index + 1}"
+            th:title="'Topic Weight = ' + ${item.topic.weight}"
+            th:classappend="${item.topic.weight} == 0 ? 'normal-weighted-entry' : ''">
+        </td>
+
+        <td th:if="${item.topic.weight > 0}"
+            th:text="${iStats.index + 1}"
+            th:title="'Topic Weight = ' + ${item.topic.weight}"
+            th:classappend="${item.topic.weight} > 0 ? 'positive-weighted-entry' : ''">
+        </td>
 
 
         <!-- entry gercekse bu td yi koy-->
@@ -298,14 +336,7 @@
             </a>
         </td>
 
-        <td>
-            <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
-               th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
-               th:title="${item.topic.category.name}">Category</a>
-        </td>
 
-        <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}"
-            th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
 
 
         <td th:title=" 'status: ' + ${item.status}"
@@ -387,6 +418,21 @@
 
 
         </td>
+
+
+
+
+
+
+        <td>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
+               th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
+               th:title="${item.topic.category.name}">Category</a>
+        </td>
+
+        <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}"
+            th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
+
 
     </tr>
     </tbody>
