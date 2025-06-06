@@ -93,13 +93,14 @@ public class TopicReportController {
         List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(10);
 
         List<DatedTopicViewModel> allItems = new ArrayList<>();
-        List<DatedTopicViewModel> negativeWeightItems = new ArrayList<>();
 
+        List<DatedTopicViewModel> importantItems = new ArrayList<>();
         importants.forEach(t -> {
             if (t.getFirstWarningEntryDateMillisYmd() != null) {
-                allItems.add(new DatedTopicViewModel(t, t.getFirstWarningEntryDateMillisYmd(), 2, zoneId));
+                importantItems.add(new DatedTopicViewModel(t, t.getFirstWarningEntryDateMillisYmd(), 2, zoneId));
 
 
+                // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
                 Iterator<Topic> predIterator = predictions.iterator();
                 while (predIterator.hasNext()) {
                     Topic predTopic = predIterator.next();
@@ -113,11 +114,12 @@ public class TopicReportController {
             }
         });
 
+        List<DatedTopicViewModel> neutralItems = new ArrayList<>();
         neutrals.forEach(t -> {
             if (t.getFirstFutureNeutralEntryDateMillisYmd() != null)
-                allItems.add(new DatedTopicViewModel(t, t.getFirstFutureNeutralEntryDateMillisYmd(), 0, zoneId));
+                neutralItems.add(new DatedTopicViewModel(t, t.getFirstFutureNeutralEntryDateMillisYmd(), 0, zoneId));
 
-
+            // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
             Iterator<Topic> predIterator = predictions.iterator();
             while (predIterator.hasNext()) {
                 Topic predTopic = predIterator.next();
@@ -131,10 +133,12 @@ public class TopicReportController {
 
         });
 
+        List<DatedTopicViewModel> finishedItems = new ArrayList<>();
         finisheds.forEach(t -> {
             if (t.getLastPastEntryDateMillisYmd() != null)
-                allItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId));
+                finishedItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId));
 
+            // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
             Iterator<Topic> predIterator = predictions.iterator();
             while (predIterator.hasNext()) {
                 Topic predTopic = predIterator.next();
@@ -145,51 +149,33 @@ public class TopicReportController {
                 }
             }
 
-
-
         });
 
-
+        List<DatedTopicViewModel> predictionItems = new ArrayList<>();
         predictions.forEach(t -> {
             if (t.getPredictionDateMillisYmd() != null)
-                allItems.add(new DatedTopicViewModel(t, t.getPredictionDateMillisYmd(), 3, zoneId));
+                predictionItems.add(new DatedTopicViewModel(t, t.getPredictionDateMillisYmd(), 3, zoneId));
         });
+
+        // kodlarin siralamasi onemli bu metodda. Once important, sonra neutral, sonra predictions, en son done olanlar.
+        allItems.addAll(importantItems);
+        allItems.addAll(neutralItems);
+        allItems.addAll(predictionItems);
+        allItems.addAll(finishedItems);
 
 
 
         allItems.sort(Comparator.comparing(DatedTopicViewModel::getDateLocal).reversed());
 
-        // predictionlar cakisiyorsa:
-        /*
-        predictions.forEach(t -> {
-            Iterator<DatedTopicViewModel> iteratorForDuplicates = allItems.iterator();
-            while (iteratorForDuplicates.hasNext()) {
-                DatedTopicViewModel dt = iteratorForDuplicates.next();
-                if (dt.getTopic().getFirstFutureNeutralEntryDate() !=null && dt.getTopic().getFirstFutureNeutralEntryDate().equals(t.getPredictionDate())
-                && dt.getTopic().getId().equals(t.getId())
 
-                ) {
-
-                    iteratorForDuplicates.remove();
-                } else
-                if (dt.getTopic().getFirstWarningEntryDate() !=null && dt.getTopic().getFirstWarningEntryDate().equals(t.getPredictionDate())
-                        && dt.getTopic().getId().equals(t.getId())
-
-                ) {
-                    iteratorForDuplicates.remove();
-                } else
-                if (dt.getTopic().getLastPastEntryDate() !=null && dt.getTopic().getLastPastEntryDate().equals(t.getPredictionDate())
-
-                        && dt.getTopic().getId().equals(t.getId())
-
-                ) {
-                    iteratorForDuplicates.remove();
-                }
-            }
-        });
-        */
-
-
+        // simdi asagida ekstra bir filtreleme yapiyoruz. weight yani onem degeri negatif olanlari once allItems
+        // listesinden cikarip baska listeye ekliyoruz. Ardindan allItems listesinin en sonuna yeniden ekliyoruz.
+        // Boylece az once warn,not marked,prediction,done olarak siralanmis olan liste, artik o sirayi bozmadan
+        // sifir ve pozitif onemi olanlar olarak gorunecek, hemen ardindan yine kendi icinde o siralamada olan
+        // fakat onem derecesi negatif olan liste elemanlari gorunecek. Goruncecek derken bu liste frontend'de
+        // tablo olarak goruntuleniyor. Butun ogeler en ustte en yeni tarih olmak uzere eskiye dogru gider.
+        // frontendde bulunan renklendirme kodlari ile bakildiginda ne ise yaradiklarini anlamak kolay olacaktir.
+        List<DatedTopicViewModel> negativeWeightItems = new ArrayList<>();
         // default 0, weight = -1 olarak belirledigim topicleri listeden cikarir:
         Iterator<DatedTopicViewModel> iterator = allItems.iterator();
         while (iterator.hasNext()) {
