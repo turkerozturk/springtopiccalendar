@@ -66,7 +66,7 @@ public class TopicWebController {
         model.addAttribute("topics", topicList);
         model.addAttribute("categories", categoryList);
 
-        return "topics"; // templates/topics.html
+        return "topics/topic-list"; // templates/topics.html
     }
 
 
@@ -104,7 +104,7 @@ public class TopicWebController {
         // pass returnPage back into the template
         model.addAttribute("returnPage", returnPage);
 
-        return "topic-form"; // templates/topic-form.html
+        return "topics/topic-form"; // templates/topic-form.html
     }
 
     // Yeni topic kaydetme
@@ -168,7 +168,7 @@ public class TopicWebController {
         model.addAttribute("categories", categoryDTOList);
 
         model.addAttribute("topic", topic);
-        return "topic-form"; // Aynı formu kullanacağız
+        return "topics/topic-form"; // Aynı formu kullanacağız
     }
 
     // Mevcut topic'i güncelleme

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8"/>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <title>Topic Form</title>
+
+
+</head>
+<body>
+
+<div class="container my-4" style="max-width: 600px;">
+    <!-- Başlık (Edit / Create) -->
+    <h1 th:if="${topic.id != null}" class="mb-4">Edit Topic</h1>
+    <h1 th:if="${topic.id == null}" class="mb-4">Create Topic</h1>
+
+    <!-- Form -->
+    <form th:object="${topic}"
+          th:action="${topic.id != null} ? @{/topics/update/{id}(id=${topic.id})} : @{/topics}"
+          method="post">
+
+        <!-- preserve returnPage -->
+        <input type="hidden" name="returnPage" th:value="${returnPage}"/>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Category:</label>
+            <select id="category" th:field="*{category.id}" class="form-select">
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Topic Name:</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control"  required autofocus/>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea id="description" th:field="*{description}" class="form-control" rows="3"></textarea>
+        </div>
+
+
+        <div class="mb-3">
+            <label for="someTimeLater" class="form-label">Next Prediction Day Count(to disable: leave blank or set 0)</label>
+            <input type="number"
+                   id="someTimeLater"
+                   th:field="*{someTimeLater}"
+                   class="form-control"
+                   min="0"
+                   placeholder="After how many days should a ghost entry be added" />
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            <input
+                    class="form-check-input"
+                    type="checkbox"
+                    th:field="*{pinned}"
+                    id="pinned" />
+            <label class="form-check-label" for="pinned">
+                Pinned
+            </label>
+        </div>
+
+        <div class="mb-3">
+            <label for="weight" class="form-label">Weight(default 0, ignore -1)</label>
+            <input type="number"
+                   id="weight"
+                   th:field="*{weight}"
+                   class="form-control"
+                   min="-1"
+                   placeholder="The numerical importance of the topic"
+                   title="The numerical importance of the topic" />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Save</button>
+
+        <!-- if user hits “cancel,” send them back -->
+        <a th:if="${returnPage=='pivottable'}"
+           th:href="@{/entry-filter/return}">
+            Cancel
+        </a>
+    </form>
+
+    <div class="mt-3">
+        <a th:href="@{/topics(categoryId=${topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+    </div>
+</div>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+</body>
+</html>
+

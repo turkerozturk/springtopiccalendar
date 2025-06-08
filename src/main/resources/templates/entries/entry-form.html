@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8"/>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <title>Entry Formu</title>
+</head>
+
+
+<body>
+
+<div class="container mx-auto mt-4" style="max-width: 400px;">
+    <h1 th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry'}"></h1>
+
+    <!-- HATA MESAJI GÖSTERME ALANI -->
+    <div th:if="${errorMessage != null}" class="text-danger mb-3">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <form th:action="@{/entries/save}" th:object="${entry}" method="post">
+
+
+
+        <!-- Kaynak URL'deki parametreyle gelen categoryId'yi burada saklıyoruz -->
+        <!-- <input type="hidden" name="origCategoryId" th:value="${categoryId}"/> -->
+
+        <!-- kaydolunca geri donecegi sayfayi belirten bir placeholer string. bkz. save metodu.(gizli alan) -->
+        <input type="hidden" name="returnPage" th:value="${returnPage}">
+
+
+        <!-- topic ID (gizli alan) -->
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- dateMillisYmd (artık gizli) -->
+        <input type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
+
+        <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
+        <div class="mb-3 row">
+            <label for="categoryFilter" class="col-sm-4 col-form-label">Select a Category:</label>
+            <div class="col-sm-8">
+                <select id="categoryFilter" class="form-select" name="categoryId" onchange="loadTopicsByCategory(this.value)">
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}"
+                            th:selected="${cat.id} == ${categoryId}"></option>
+                </select>
+            </div>
+        </div>
+
+        <!-- (2) ARAMA METNİ İLE FİLTRE -->
+        <div class="mb-3 row">
+            <label for="topicSearch" class="col-sm-4 col-form-label">Search Topic:</label>
+            <div class="col-sm-8">
+                <input type="text" id="topicSearch" class="form-control" oninput="filterTopics()"/>
+            </div>
+        </div>
+
+        <!-- (3) TOPIC SEÇİM ALANI -->
+        <div class="mb-3 row">
+            <label for="topicSelect" class="col-sm-4 col-form-label">Topic:</label>
+            <div class="col-sm-8">
+                <select th:field="*{topic.id}" id="topicSelect" class="form-select">
+                    <option th:each="t : ${topics}"
+                            th:value="${t.id}"
+                            th:text="${t.name}"
+                            th:attr="data-category=${t.category != null ? t.category.name : ''}">
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Alternatif: Date Picker (tıklayarak seçim) -->
+        <div class="mb-3 row">
+            <label for="datePicker" class="col-sm-4 col-form-label">Select Date:</label>
+            <div class="col-sm-8">
+                <input type="date"
+                       id="datePicker"
+                       class="form-control"
+                       onchange="convertDateToEpoch()"
+                       th:value="${
+                           entry.dateMillisYmd != null
+                             ? T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                                .atZone(T(java.time.ZoneId).systemDefault())
+                                .toLocalDate()
+                             : ''
+                       }" />
+            </div>
+        </div>
+
+        <!-- status -->
+        <div class="mb-3 row">
+            <label for="status" class="col-sm-4 col-form-label">Status:</label>
+            <div class="col-sm-8">
+                <select th:field="*{status}" id="status" class="form-select" autofocus>
+                    <option value="0">Not Marked</option>
+                    <option value="1">Done</option>
+                    <option value="2">Warning</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- NOTE CONTENT -->
+        <div class="mb-3 row">
+            <label for="note_content" class="col-sm-4 col-form-label">Note:</label>
+            <div class="col-sm-8">
+                <textarea th:field="*{note.content}" id="note_content" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Kaydet</button>
+    </form>
+
+    <!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
+    <div th:if="${entry.id != null}" class="mt-3">
+        <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+           onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');"
+           class="btn btn-danger w-100">
+            Delete Entry
+        </a>
+    </div>
+
+    <div class="mt-3">
+        <a th:href="@{/entries}" class="btn btn-secondary w-100">Listeye Dön</a>
+    </div>
+
+    <div class="mt-3">
+        <th:block th:if="${categoryId}">
+            <a th:href="@{/topics(categoryId=${entry.topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
+        </th:block>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script>
+    /**
+     * Date Picker’da tarih seçilince,
+     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
+     * dateMillisYmd input’una yazan basit fonksiyon.
+     */
+    function convertDateToEpoch() {
+        const selectedDate = document.getElementById('datePicker').value; // yyyy-MM-dd
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            const dateObj = new Date(year, month - 1, day);
+            const epochMillis = dateObj.getTime();
+            document.getElementById('dateMillisYmd').value = epochMillis;
+        }
+    }
+
+
+
+
+    /**
+     * Kategori seçimi veya arama metni değiştiğinde
+     * selectbox içindeki 'option'ları filtrele
+     */
+    function filterTopics() {
+        const searchText = document.getElementById('topicSearch').value.toLowerCase();
+        //const selectedCategory = document.getElementById('categoryFilter').value;
+        const topicSelect = document.getElementById('topicSelect');
+
+        // Tüm <option> elemanlarını dolaş
+        const options = topicSelect.querySelectorAll('option');
+        options.forEach(option => {
+            // Option yazısı
+            const optionText = option.textContent.toLowerCase();
+            // Option'ın data-category değeri
+            //const optionCategory = option.getAttribute('data-category');
+
+            // Arama metnine uyuyor mu?
+            const matchesText = !searchText || optionText.includes(searchText);
+            // Kategori seçimine uyuyor mu? (Boş ise tüm kategorileri göster)
+            //const matchesCategory = !selectedCategory || optionCategory === selectedCategory;
+
+            // İkisi de uyuyorsa göster, yoksa gizle
+            if (matchesText) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+<script>
+    async function loadTopicsByCategory(categoryId) {
+        // Kategori seçimi boşaldıysa topic listesini temizleyebilir veya tüm topicleri tekrar çağırabilirsiniz.
+        if (!categoryId) {
+            clearTopicSelect();
+            return;
+        }
+
+        try {
+            const response = await fetch('/entries/api/topicsByCategory?categoryId=' + categoryId);
+            if (!response.ok) throw new Error('Topic listesi çekilemedi.');
+
+            const data = await response.json(); // JSON array of topics
+
+            populateTopicSelect(data);
+        } catch (err) {
+            console.error(err);
+        }
+        filterTopics(); // kategori degistigi icin arama kutusu filtresini yeni topiclere gore tekrar calistiriyoruz.
+    }
+
+    // topicSelect'i temizle
+    function clearTopicSelect() {
+        const topicSelect = document.getElementById('topicSelect');
+        topicSelect.innerHTML = ''; // tüm option'ları sil
+    }
+
+    // topicSelect'i gelen verilerle güncelle
+    function populateTopicSelect(topics) {
+        const topicSelect = document.getElementById('topicSelect');
+        topicSelect.innerHTML = '';
+
+        topics.forEach(topic => {
+            const option = document.createElement('option');
+            option.value = topic.id;
+            option.textContent = topic.name;
+            topicSelect.appendChild(option);
+        });
+    }
+</script>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+</body>
+</html>

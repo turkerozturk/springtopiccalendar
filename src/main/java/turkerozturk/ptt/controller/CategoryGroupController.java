@@ -70,7 +70,7 @@ public class CategoryGroupController {
         });
 
         model.addAttribute("groups", groups);
-        return "category-groups/list";
+        return "category-groups/category-group-list";
     }
 
     // SHOW CREATE FORM
@@ -80,7 +80,7 @@ public class CategoryGroupController {
         model.addAttribute("group", new CategoryGroup());
         model.addAttribute("returnPage", returnPage);
 
-        return "category-groups/form";
+        return "category-groups/category-group-form";
     }
 
     // HANDLE CREATE
@@ -117,7 +117,7 @@ public class CategoryGroupController {
         CategoryGroup grp = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id:"+id));
         model.addAttribute("group", grp);
-        return "category-groups/form";
+        return "category-groups/category-group-form";
     }
 
     @InitBinder("group")

@@ -52,7 +52,7 @@ public class CategoryWebController {
                 .collect(Collectors.toList());
 
         model.addAttribute("categories", categoryDTOs);
-        return "categories"; // templates/categories.html
+        return "/categories/category-list";
     }
 
     // Yeni kategori oluşturma formunu getiren endpoint
@@ -63,7 +63,7 @@ public class CategoryWebController {
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("returnPage", returnPage);
 
-        return "category-form"; // templates/category-form.html
+        return "/categories/category-form"; // templates/category-form.html
     }
 
     // Yeni kategori kaydetmek için (form post)
@@ -99,7 +99,7 @@ public class CategoryWebController {
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("categoryDTO", category);
 
-        return "category-form"; // Aynı formu kullanacağız
+        return "/categories/category-form"; // Aynı formu kullanacağız
     }
 
     // Mevcut kategoriyi güncellemek için (form post)

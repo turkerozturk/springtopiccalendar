@@ -178,7 +178,7 @@ public class EntryFilterController {
         model.addAttribute("topicsForSelectedCategory", List.of());
 
         model.addAttribute("zoneId", zoneId);
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
 
 
 
@@ -246,7 +246,7 @@ public class EntryFilterController {
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
                     topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
-            return "entries/filter-form";
+            return "view-tracker/filter-form";
         }
 
 
@@ -303,7 +303,7 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
 
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
     }
 
     /**
@@ -369,7 +369,7 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
         // 6) Aynı form sayfasına dön
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
     }
 
 
@@ -435,7 +435,7 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
 
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
     }
 
     /**
@@ -652,7 +652,7 @@ public class EntryFilterController {
 
         model.addAttribute("zoneId", zoneId);
 
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
     }
 
 
@@ -724,7 +724,7 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
 
-        return "entries/filter-form";
+        return "view-tracker/filter-form";
     }
 
     /**

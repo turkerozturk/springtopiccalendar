@@ -204,7 +204,7 @@ public class TopicReportController {
         model.addAttribute("zoneId", zoneId);
         model.addAttribute("negativeWeightItems", negativeWeightItems);
 
-        return "report-all-statuses";
+        return "view-intelligent/report-all-statuses";
     }
 
 

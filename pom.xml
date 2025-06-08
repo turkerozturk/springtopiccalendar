@@ -191,6 +191,9 @@
       <version>3.7.1</version>
     </dependency>
 
+    <!-- https://docs.spring.io/spring-boot/how-to/hotswapping.html devtools sayesinde cache'yi development modda.
+    disable etmek icin Thymeleaf vs. icin ayrica properties degiskenleri yazmaya gerek kalmaz. Intellij ayari da lazim
+    " How to make auto reload with Spring-boot on IDEA Intellij SpringBoot DevTools Auto Restart " -->
     <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

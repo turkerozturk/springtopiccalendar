@@ -109,7 +109,7 @@ public class EntryController {
 
 
 
-        return "entries/list";
+        return "entries/entry-list";
     }
 
     @GetMapping("/new")
@@ -158,7 +158,7 @@ public class EntryController {
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
 
-        return "entries/form";
+        return "entries/entry-form";
     }
 
     @GetMapping("/api/topicsByCategory")
@@ -209,7 +209,7 @@ public class EntryController {
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                return "entries/form";
+                return "entries/entry-form";
             }
 
             // b) Not'u da two-way ilişkiyle bağla
@@ -237,7 +237,7 @@ public class EntryController {
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
-                return "entries/form";
+                return "entries/entry-form";
             }
 
             Long oldTopicId = dbEntry.getTopic().getId(); // this is required. We will use this after entry save.
@@ -356,7 +356,7 @@ public class EntryController {
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
-        return "entries/form";
+        return "entries/entry-form";
     }
 
     @GetMapping("/editByDate")
@@ -393,7 +393,7 @@ public class EntryController {
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
-        return "entries/form";
+        return "entries/entry-form";
     }
 
 
