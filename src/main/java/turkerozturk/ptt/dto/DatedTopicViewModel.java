@@ -20,20 +20,32 @@
  */
 package turkerozturk.ptt.dto;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
+import turkerozturk.ptt.repository.EntryRepository;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Optional;
+
 public class DatedTopicViewModel {
     private Topic topic;
     private LocalDate dateLocal;
     private int status;
 
-    public DatedTopicViewModel(Topic topic, Long dateMillis, int status, ZoneId zoneId) {
+    private Entry entry;
+
+    @Autowired
+    EntryRepository entryRepository;
+
+    public DatedTopicViewModel(Topic topic, Long dateMillis, int status, ZoneId zoneId, Entry entry) {
         this.topic = topic;
         this.dateLocal = Instant.ofEpochMilli(dateMillis).atZone(zoneId).toLocalDate();
         this.status = status;
+        this.entry = entry;
+
     }
 
     public Topic getTopic() {
@@ -46,5 +58,9 @@ public class DatedTopicViewModel {
 
     public int getStatus() {
         return status;
+    }
+
+    public Entry getEntry() {
+        return entry;
     }
 }

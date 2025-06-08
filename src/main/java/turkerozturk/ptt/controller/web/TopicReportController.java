@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.DatedTopicViewModel;
+import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
+import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.service.TopicService;
 
 import java.time.LocalDate;
@@ -41,6 +43,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/reports")
 public class TopicReportController {
+
+    @Autowired
+    EntryRepository entryRepository;
 
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -106,7 +111,9 @@ public class TopicReportController {
         List<DatedTopicViewModel> importantItems = new ArrayList<>();
         importants.forEach(t -> {
             if (t.getFirstWarningEntryDateMillisYmd() != null) {
-                importantItems.add(new DatedTopicViewModel(t, t.getFirstWarningEntryDateMillisYmd(), 2, zoneId));
+
+                Entry entry = entryRepository.findByTopicIdAndDateMillisYmd(t.getId(), t.getFirstWarningEntryDateMillisYmd()).get();
+                importantItems.add(new DatedTopicViewModel(t, t.getFirstWarningEntryDateMillisYmd(), 2, zoneId, entry));
 
 
                 // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
@@ -125,37 +132,44 @@ public class TopicReportController {
 
         List<DatedTopicViewModel> neutralItems = new ArrayList<>();
         neutrals.forEach(t -> {
-            if (t.getFirstFutureNeutralEntryDateMillisYmd() != null)
-                neutralItems.add(new DatedTopicViewModel(t, t.getFirstFutureNeutralEntryDateMillisYmd(), 0, zoneId));
+            if (t.getFirstFutureNeutralEntryDateMillisYmd() != null) {
 
-            // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
-            Iterator<Topic> predIterator = predictions.iterator();
-            while (predIterator.hasNext()) {
-                Topic predTopic = predIterator.next();
-                if (t.getFirstFutureNeutralEntryDateMillisYmd() != null && t.getFirstFutureNeutralEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
-                        && t.getId().equals(predTopic.getId())
-                ) {
-                    predIterator.remove(); // Güvenli şekilde siler
+                Entry entry = entryRepository.findByTopicIdAndDateMillisYmd(t.getId(), t.getFirstFutureNeutralEntryDateMillisYmd()).get();
+
+                neutralItems.add(new DatedTopicViewModel(t, t.getFirstFutureNeutralEntryDateMillisYmd(), 0, zoneId, entry));
+
+                // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
+                Iterator<Topic> predIterator = predictions.iterator();
+                while (predIterator.hasNext()) {
+                    Topic predTopic = predIterator.next();
+                    if (t.getFirstFutureNeutralEntryDateMillisYmd() != null && t.getFirstFutureNeutralEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
+                            && t.getId().equals(predTopic.getId())
+                    ) {
+                        predIterator.remove(); // Güvenli şekilde siler
+                    }
                 }
             }
-
 
         });
 
         List<DatedTopicViewModel> finishedItems = new ArrayList<>();
         finisheds.forEach(t -> {
-            if (t.getLastPastEntryDateMillisYmd() != null)
-                finishedItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId));
+            if (t.getLastPastEntryDateMillisYmd() != null) {
+                Entry entry = entryRepository.findByTopicIdAndDateMillisYmd(t.getId(), t.getLastPastEntryDateMillisYmd()).get();
 
-            // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
-            Iterator<Topic> predIterator = predictions.iterator();
-            while (predIterator.hasNext()) {
-                Topic predTopic = predIterator.next();
-                if (t.getLastPastEntryDateMillisYmd() != null && t.getLastPastEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
-                        && t.getId().equals(predTopic.getId())
-                ) {
-                    predIterator.remove(); // Güvenli şekilde siler
+                finishedItems.add(new DatedTopicViewModel(t, t.getLastPastEntryDateMillisYmd(), 1, zoneId, entry));
+
+                // Ayni gun prediction da varsa, o predictionu listeden cikariyoruz ki iki farkli kayit gibi anlasilmasin.
+                Iterator<Topic> predIterator = predictions.iterator();
+                while (predIterator.hasNext()) {
+                    Topic predTopic = predIterator.next();
+                    if (t.getLastPastEntryDateMillisYmd() != null && t.getLastPastEntryDateMillisYmd().equals(predTopic.getPredictionDateMillisYmd())
+                            && t.getId().equals(predTopic.getId())
+                    ) {
+                        predIterator.remove(); // Güvenli şekilde siler
+                    }
                 }
+
             }
 
         });
@@ -163,7 +177,7 @@ public class TopicReportController {
         List<DatedTopicViewModel> predictionItems = new ArrayList<>();
         predictions.forEach(t -> {
             if (t.getPredictionDateMillisYmd() != null)
-                predictionItems.add(new DatedTopicViewModel(t, t.getPredictionDateMillisYmd(), 3, zoneId));
+                predictionItems.add(new DatedTopicViewModel(t, t.getPredictionDateMillisYmd(), 3, zoneId, null));
         });
 
         // kodlarin siralamasi onemli bu metodda. Once important, sonra neutral, sonra predictions, en son done olanlar.
