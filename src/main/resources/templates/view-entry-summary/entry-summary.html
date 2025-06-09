@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8">
+    <title>Daily Topic Tracker</title>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+</head>
+<body>
+<form method="post" th:action="@{/entries/entry-summary-report}">
+    <label>Status:</label>
+    <select name="status">
+        <option value="0" th:selected="${selectedStatus == 0}">0</option>
+        <option value="1" th:selected="${selectedStatus == 1}">1</option>
+        <option value="2" th:selected="${selectedStatus == 2}">2</option>
+    </select>
+
+    <label>Weight:</label>
+    <input type="number" name="weight" th:value="${selectedWeight}"/>
+
+    <!-- Tarih Aralığı: Başlangıç Tarihi -->
+    <div  id="startDateContainer">
+        <div class="input-group startDateStyle date">
+            <label for="startDate" class="col-sm-4 col-form-label">
+                Start Date:
+            </label>
+            <input type="text" id="startDate"
+                   class="col-sm-8 form-control"
+                   name="startDate"
+                   th:value="${selectedStartDate}"
+            />
+            <span class="input-group-append">
+                                         <button class="btn btn-outline-secondary" type="button">
+                                             <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                                             <i class="far fa-calendar" aria-hidden="true"></i>
+                                         </button>
+                                </span>
+        </div>
+    </div>
+
+    <!-- Tarih Aralığı: Bitiş Tarihi -->
+    <div  id="endDateContainer">
+        <div class="input-group endDateStyle date">
+            <label for="endDate" class="col-sm-4 col-form-label">
+                End Date:
+            </label>
+            <input type="text" id="endDate"
+                   class="col-sm-8 form-control"
+                   name="endDate"
+                   th:value="${selectedEndDate}"
+            />
+            <span class="input-group-append">
+                                         <button class="btn btn-outline-secondary" type="button">
+                                             <i class="far fa-calendar" aria-hidden="true"></i>
+                                         </button>
+                                </span>
+        </div>
+    </div>
+
+
+
+    <button type="submit">Filter</button>
+</form>
+
+<table class="table table-bordered table-sm table-striped">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Category Group</th>
+        <th>Category</th>
+        <th>Topic</th>
+        <th title="Success Ratio Over Date Interval As Percentage">Percentage</th>
+        <th>Weight</th>
+        <th>Status</th>
+        <th>Prediction<br/>Days</th>
+        <th>Counter</th>
+        <th>Next Prediction</th>
+        <th>Last Done</th>
+        <th>First Warn</th>
+        <th>Upcoming Note</th>
+        <th>(Topic)<br/>Pinned</th>
+        <th>(Category)<br/>Archived</th>
+
+
+
+
+        <!-- diğer tarih sütunları -->
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry, iStats : ${entries}">
+
+        <td th:text="${iStats.index + 1}">
+        <td th:text="${entry.categoryGroupName}"></td>
+        <td th:text="${entry.categoryName}"></td>
+        <td th:text="${entry.topicName}"></td>
+        <td th:text="${#numbers.formatDecimal( entry.ratio, 3, 3)}"></td>
+        <td th:text="${entry.weight}"></td>
+        <td th:text="${entry.status}"></td>
+        <td th:text="${entry.someTimeLater}"></td>
+        <td th:text="${entry.itemCount}"></td>
+
+        <td>
+        <span th:if="${entry.predictionDateMillisYmd}"
+              th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.predictionDateMillisYmd)
+                .atZone(zoneId)
+                .toLocalDate())}"
+            th:title="${entry.predictionDateMillisYmd}"
+        ></span>
+        </td>
+
+        <td>
+        <span th:if="${entry.lastPastEntryDateMillisYmd}"
+              th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.lastPastEntryDateMillisYmd)
+                .atZone(zoneId)
+                .toLocalDate())}"
+              th:title="${entry.lastPastEntryDateMillisYmd}"
+        ></span>
+        </td>
+
+        <td>
+        <span th:if="${entry.firstWarningEntryDateMillisYmd}"
+              th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.firstWarningEntryDateMillisYmd)
+                .atZone(zoneId)
+                .toLocalDate())}"
+              th:title="${entry.firstWarningEntryDateMillisYmd}"
+        ></span>
+        </td>
+
+        <td>
+        <span th:if="${entry.firstFutureNeutralEntryDateMillisYmd}"
+              th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                .format(T(java.time.Instant).ofEpochMilli(entry.firstFutureNeutralEntryDateMillisYmd)
+                .atZone(zoneId)
+                .toLocalDate())}"
+              th:title="${entry.firstFutureNeutralEntryDateMillisYmd}"
+        ></span>
+        </td>
+
+        <td th:text="${entry.pinned}"></td>
+        <td th:text="${entry.archived}"></td>
+
+
+
+
+        <!--
+        <td th:text="${entry.someTimeLater != null and entry.itemCount != null && entry.itemCount != 0 ?
+        #numbers.formatDecimal( (entry.someTimeLater * 1.0) / entry.itemCount, 3, 3)
+         : 'N/A'}"></td>
+        <td th:text="${entry.ratio != null ?
+        #numbers.formatDecimal( entry.ratio, 3, 3)
+         : 'N/A'}"></td>
+        -->
+    </tr>
+    </tbody>
+</table>
+
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}">
+
+</script>
+
+<!-- https://uxsolutions.github.io/bootstrap-datepicker/ -->
+<!-- "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range. -->
+<!-- calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers -->
+<script>
+    $(function() {
+      $('#startDateContainer .startDateStyle.date').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          daysOfWeekHighlighted: "0,6",
+          calendarWeeks: false,
+          autoclose: true,
+          todayHighlight: true
+      });
+  });
+
+    $(function() {
+      $('#endDateContainer .endDateStyle.date').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          daysOfWeekHighlighted: "0,6",
+          calendarWeeks: false,
+          autoclose: true,
+          todayHighlight: true
+      });
+  });
+</script>
+
+</body>
+
+
+</html>
