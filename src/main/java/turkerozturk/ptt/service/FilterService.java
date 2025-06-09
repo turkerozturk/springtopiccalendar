@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
+import turkerozturk.ptt.dto.TopicEntrySummaryDTO;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.repository.EntryRepository;
 
@@ -90,4 +91,11 @@ public class FilterService {
                 filterDto.getStatuses()
         );
     }
+
+
+
+    public List<TopicEntrySummaryDTO> getFilteredEntries(Integer status, Integer weight, Long startDate, Long endDate) {
+        return entryRepository.findFilteredSummaries(status, weight, startDate, endDate);
+    }
+
 }

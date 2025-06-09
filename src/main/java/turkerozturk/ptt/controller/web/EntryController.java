@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.dto.TopicDto;
+import turkerozturk.ptt.dto.TopicEntrySummaryDTO;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Note;
@@ -41,6 +42,7 @@ import turkerozturk.ptt.helper.DateUtils;
 import turkerozturk.ptt.repository.CategoryRepository;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
+import turkerozturk.ptt.service.FilterService;
 import turkerozturk.ptt.service.TopicService;
 
 import java.time.LocalDate;
@@ -59,6 +61,8 @@ public class EntryController {
 
     private final AppTimeZoneProvider timeZoneProvider;
     private final EntryRepository entryRepository;
+
+    private final FilterService entryService;
     private final TopicRepository topicRepository;
 
     private final TopicService topicService;
@@ -66,9 +70,10 @@ public class EntryController {
     private final CategoryRepository categoryRepository;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
+        this.entryService = entryService;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.categoryRepository = categoryRepository;
@@ -436,5 +441,67 @@ public class EntryController {
                 .orElse("");
     }
 
+
+
+
+
+
+    @RequestMapping(value={"/entry-summary-report"},
+            method={RequestMethod.GET,RequestMethod.POST})
+    public String showFilteredEntries(
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) Integer weight,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            Model model
+    ) {
+        if (status == null) status = 1;
+        if (weight == null) weight = 0;
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+        LocalDate defaultStart = today.minusDays(30);
+        LocalDate defaultEnd = today;
+
+        LocalDate startLocalDate = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : defaultStart;
+        LocalDate endLocalDate = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : defaultEnd;
+
+        long startingDate = startLocalDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        long endingDate = endLocalDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<TopicEntrySummaryDTO> summaries = entryService.getFilteredEntries(status, weight, startingDate, endingDate);
+        System.out.println(summaries.get(0).getPinned());
+        model.addAttribute("entries", summaries);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedWeight", weight);
+        model.addAttribute("selectedStartDate", startLocalDate.toString());
+        model.addAttribute("selectedEndDate", endLocalDate.toString());
+        model.addAttribute("zoneId", zoneId);
+
+        return "view-entry-summary/entry-summary";
+    }
+
+
+    /* these methods below are working, but we did it in SQLite query.
+
+    public static long convertToMillis(String dateStr, ZoneId zoneId) {
+        LocalDate localDate = LocalDate.parse(dateStr); // "2025-06-30"
+        ZonedDateTime zonedDateTime = localDate.atStartOfDay(zoneId); // 2025-06-30T00:00 at zone
+        return zonedDateTime.toInstant().toEpochMilli(); // milisaniye cinsinden
+    }
+
+    private Double calculateSuccessPercentage(Integer dayInterval, Integer doneCount, Integer someTimeLater) {
+        if (dayInterval == null || doneCount == null || someTimeLater == null) return null;
+        if (dayInterval <= 0 || doneCount < 0 || someTimeLater <= 0) return null;
+
+        double expectedCount = (double) dayInterval / someTimeLater;
+        if (expectedCount == 0) return null;
+
+        double actualCount = doneCount;
+        double successRate = actualCount / expectedCount;
+        return successRate * 100;
+    }
+    */
 
 }
