@@ -31,6 +31,7 @@ import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.repository.CategoryGroupRepository;
 import turkerozturk.ptt.service.CategoryService;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -131,6 +132,20 @@ public class CategoryWebController {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
         return "redirect:/categories";
+    }
+
+    @GetMapping("/info/{id}")
+    public String info(@PathVariable Long id, Model model) {
+        Optional<Category> optionalCategory = categoryService.getCategoryById(id);
+        if (optionalCategory.isPresent()) {
+            Category category = optionalCategory.get();
+
+            model.addAttribute("category", category);
+            return "categories/category-info";
+        } else {
+            // Eğer kategori bulunamazsa bir hata sayfasına veya yönlendirmeye gidebilirsiniz
+            return "redirect:/categories?error=notfound";
+        }
     }
 
 }

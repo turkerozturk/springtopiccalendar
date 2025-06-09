@@ -306,7 +306,7 @@
         <th>Date</th>
         <th>Topic</th>
         <th title="Status">S</th>
-        <th>Note</th>
+        <th>Entry Note</th>
 
 
     </tr>
@@ -319,11 +319,10 @@
             th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
 
         <td>
-            <span
+            <a th:href="'/categories/info/' + ${item.topic.category.id}"
                th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
-               th:title="${item.topic.category.name}">Category</span>
+               th:title="${item.topic.category.name}">Category</a>
         </td>
-
 
 
 
