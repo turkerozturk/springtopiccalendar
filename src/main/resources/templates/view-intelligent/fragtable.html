@@ -1,4 +1,4 @@
-<div th:fragment="fragtable" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+<div th:fragment="fragtable(filteredItems)" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
 
 
@@ -6,30 +6,31 @@
     <table id="status-table" class="status-table" style="white-space: nowrap;">
         <thead>
         <tr>
-            <th>Category Group</th>
+            <th style="min-width:200px; max-width:200px;">Category Group</th>
 
-            <th>Category</th>
+            <th style="min-width:200px; max-width:200px;">Category</th>
             <th title="row counter">#</th>
             <th>Days</th>
             <th>Date</th>
-            <th>Topic</th>
+            <th style="min-width:200px; max-width:200px;">Topic</th>
             <th title="Status">S</th>
-            <th>Entry Note</th>
+            <th style="min-width:300px; max-width:300px;">Entry Note</th>
 
 
         </tr>
         </thead>
         <tbody>
-        <tr th:each="item, iStats : ${allTopics}"
+        <tr th:each="item, iStats : ${filteredItems}"
             th:class="${item.dateLocal} == ${today} ? 'highlight-today' : 'normal-table-row'">
 
-            <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}"
+            <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 27)}"
                 th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
 
             <td>
                 <a th:href="'/categories/info/' + ${item.topic.category.id}"
-                   th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
-                   th:title="${item.topic.category.name}">Category</a>
+                   th:text="${#strings.abbreviate(item.topic.category.name, 27)}"
+                   th:title="${item.topic.category.name}"
+                   th:classappend="${item.topic.category.archived} ? ' css-archived' : ''">Category</a>
             </td>
 
 
@@ -185,7 +186,7 @@
             <!-- TOPIC sutunu -->
             <td>
                 <a th:href="@{/entries(topicId=${item.topic.id})}"
-                   th:text="${#strings.abbreviate(item.topic.name, 20)}"
+                   th:text="${#strings.abbreviate(item.topic.name, 27)}"
                    th:title="${item.topic.name + (!#strings.isEmpty(item.topic.description) ? ': ' + item.topic.description : '')}">
                     Topic
                 </a>
@@ -251,7 +252,7 @@
             <td>
             <span th:if="${item.entry != null && item.entry.note != null}"
                   th:title="${item.entry.note.content}"
-                  th:text="${#strings.abbreviate(item.entry.note.content, 20)}">Entry Note</span>
+                  th:text="${#strings.abbreviate(item.entry.note.content, 37)}">Entry Note</span>
 
             </td>
 

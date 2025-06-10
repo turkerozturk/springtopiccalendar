@@ -26,6 +26,10 @@
 
     <style>
 
+        .css-archived {
+          background-color: LightGray !important;
+       }
+
         .negative-weighted-entry {
             background-color: #e6ccff; /* Açık mor tonu */
         }
@@ -110,6 +114,7 @@
     .#status-table td,
     #status-table th{
         border: 1px solid black;
+        white-space: nowrap;
     }
      #status-table th{
         color: WhiteSmoke;
@@ -299,9 +304,23 @@
     <h1><span class="fonbg">Intelligent Report</span></h1>
 
     <!-- thymeleaf icin "templates/" dizini root dizindir. HTML relative pathleri oradan itibaren yazmak gerekir. -->
-    <div th:replace="~{view-intelligent/fragtable :: fragtable}"></div>
+
+    <h3 title="If topic weight is more than or equal to zero and category is not archived"><span class="fonbg">Items</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${allItems})}"></div>
+    <br/>
 
 
+    <h3 title="If topic weight is more than or equal to zero and category is archived"><span class="fonbg">Archived Items</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${archivedItems})}"></div>
+    <br/>
+
+    <h3 title="If topic weight is less than zero and category is not archived"><span class="fonbg">Items (Not Important)</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightItems})}"></div>
+    <br/>
+
+    <h3 title="If topic weight is less than zero and category is archived"><span class="fonbg">Archived Items (Not Important)</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightArchivedItems})}"></div>
+    <br/>
 
 </div>
 </body>

@@ -211,12 +211,42 @@ public class TopicReportController {
 
         negativeWeightItems.sort(Comparator.comparing(DatedTopicViewModel::getDateLocal).reversed());
 
-        allItems.addAll(negativeWeightItems);
 
-        model.addAttribute("allTopics", allItems);
+
+        // Arsivlenmis categorilere ait topicleri allItems'den cikarip archivedItems listesine ekliyoruz.
+        // Bu allItems icinde negatif weight itemler yok, onlari ayirmistik, sonra onlar icin de aynisini yapiyoruz daha ileride.
+        List<DatedTopicViewModel> archivedItems = new ArrayList<>();
+        // archived olarak belirledigim categorylerdeki topicleri listeden cikarir:
+        Iterator<DatedTopicViewModel> iter = allItems.iterator();
+        while (iter.hasNext()) {
+            DatedTopicViewModel t = iter.next();
+            if (t.getTopic().getCategory().isArchived()) {
+                archivedItems.add(t);
+                iter.remove(); // Güvenli şekilde siler
+            }
+        }
+
+        // Arsivlenmis categorilere ait topicleri negativeWeightItems'den cikarip negativeWeightArchivedItems listesine ekliyoruz.
+        List<DatedTopicViewModel> negativeWeightArchivedItems = new ArrayList<>();
+        // archived olarak belirledigim categorylerdeki topicleri listeden cikarir:
+        Iterator<DatedTopicViewModel> iterrr = negativeWeightItems.iterator();
+        while (iterrr.hasNext()) {
+            DatedTopicViewModel t = iterrr.next();
+            if (t.getTopic().getCategory().isArchived()) {
+                negativeWeightArchivedItems.add(t);
+                iterrr.remove(); // Güvenli şekilde siler
+            }
+        }
+
+        model.addAttribute("allItems", allItems);
         model.addAttribute("today", LocalDate.now(zoneId));
         model.addAttribute("zoneId", zoneId);
+
+        // bu ikisini simdilik frontendde dogrudan kullanmiyoruz. TODO Kullanacagin zaman yukaridaki  su satiri sil: allItems.addAll(negativeWeightItems);
         model.addAttribute("negativeWeightItems", negativeWeightItems);
+        model.addAttribute("archivedItems", archivedItems);
+        model.addAttribute("negativeWeightArchivedItems", negativeWeightArchivedItems);
+
 
         return "view-intelligent/report-all-statuses";
     }
