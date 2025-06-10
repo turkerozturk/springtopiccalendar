@@ -35,6 +35,10 @@
 
        }
 
+       .css-archived {
+         background-color: gray;
+       }
+
        a {
        text-decoration: none;
        color: inherit;
@@ -141,6 +145,7 @@
             <td th:text="${grp.name}">Group Name</td>
             <td>&nbsp;|&nbsp;
                 <th:block th:each="cat : ${grp.categories}">
+                    <span th:classappend="${cat.archived} ? ' css-archived' : ''">
                     <a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
                        th:text="${cat.name}"></a>
                     <a th:href="@{/categories/edit/{id}(id=${cat.id})}"
@@ -149,7 +154,7 @@
                     >✎</a>
 
                     &nbsp;|&nbsp;
-
+                    </span>
                 </th:block>
             </td>
             <td class="text-end">

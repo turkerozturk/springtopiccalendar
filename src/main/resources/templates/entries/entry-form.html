@@ -19,6 +19,10 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+
     <title>Entry Formu</title>
 </head>
 
@@ -86,11 +90,10 @@
         </div>
 
         <!-- Alternatif: Date Picker (tıklayarak seçim) -->
-        <div class="mb-3 row">
-            <label for="datePicker" class="col-sm-4 col-form-label">Select Date:</label>
-            <div class="col-sm-8">
-                <input type="date"
-                       id="datePicker"
+        <div class="row mb-3" id="entryDateContainer">
+            <div class="input-group entryDateStyle date">
+                <label for="entryDatePicker" class="col-sm-4 col-form-label">Select Date:</label>
+                <input type="text" id="entryDatePicker"
                        class="form-control"
                        onchange="convertDateToEpoch()"
                        th:value="${
@@ -99,9 +102,18 @@
                                 .atZone(T(java.time.ZoneId).systemDefault())
                                 .toLocalDate()
                              : ''
-                       }" />
+                       }"
+                />
+                <span class="input-group-append">
+                                         <button class="btn btn-outline-secondary" type="button">
+                                             <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                                             <i class="far fa-calendar" aria-hidden="true"></i>
+                                         </button>
+                                </span>
             </div>
         </div>
+
+
 
         <!-- status -->
         <div class="mb-3 row">
@@ -119,7 +131,7 @@
         <div class="mb-3 row">
             <label for="note_content" class="col-sm-4 col-form-label">Note:</label>
             <div class="col-sm-8">
-                <textarea th:field="*{note.content}" id="note_content" class="form-control"></textarea>
+                <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control"></textarea>
             </div>
         </div>
 
@@ -146,8 +158,18 @@
     </div>
 </div>
 
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+</body>
 
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
 
 
 
@@ -159,7 +181,7 @@
      * dateMillisYmd input’una yazan basit fonksiyon.
      */
     function convertDateToEpoch() {
-        const selectedDate = document.getElementById('datePicker').value; // yyyy-MM-dd
+        const selectedDate = document.getElementById('entryDatePicker').value; // yyyy-MM-dd
         if (selectedDate) {
             const [year, month, day] = selectedDate.split('-');
             const dateObj = new Date(year, month - 1, day);
@@ -167,6 +189,22 @@
             document.getElementById('dateMillisYmd').value = epochMillis;
         }
     }
+
+    /** https://uxsolutions.github.io/bootstrap-datepicker/
+    * "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range.
+    * calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers
+    */
+
+        $(function() {
+          $('#entryDateContainer .entryDateStyle.date').datepicker({
+              format: "yyyy-mm-dd",
+              todayBtn: "linked",
+              daysOfWeekHighlighted: "0,6",
+              calendarWeeks: false,
+              autoclose: true,
+              todayHighlight: true
+          });
+      });
 
 
 
@@ -201,9 +239,8 @@
             }
         });
     }
-</script>
 
-<script>
+
     async function loadTopicsByCategory(categoryId) {
         // Kategori seçimi boşaldıysa topic listesini temizleyebilir veya tüm topicleri tekrar çağırabilirsiniz.
         if (!categoryId) {
@@ -244,7 +281,8 @@
     }
 </script>
 
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
-</body>
+
+
+
+
 </html>
