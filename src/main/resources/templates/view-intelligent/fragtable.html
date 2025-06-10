@@ -1,0 +1,274 @@
+<div th:fragment="fragtable" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+
+
+
+    <table id="status-table" class="status-table" style="white-space: nowrap;">
+        <thead>
+        <tr>
+            <th>Category Group</th>
+
+            <th>Category</th>
+            <th title="row counter">#</th>
+            <th>Days</th>
+            <th>Date</th>
+            <th>Topic</th>
+            <th title="Status">S</th>
+            <th>Entry Note</th>
+
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item, iStats : ${allTopics}"
+            th:class="${item.dateLocal} == ${today} ? 'highlight-today' : 'normal-table-row'">
+
+            <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 20)}"
+                th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
+
+            <td>
+                <a th:href="'/categories/info/' + ${item.topic.category.id}"
+                   th:text="${#strings.abbreviate(item.topic.category.name, 20)}"
+                   th:title="${item.topic.category.name}">Category</a>
+            </td>
+
+
+
+
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:if="${item.topic.weight < 0}"
+                th:text="${#numbers.formatInteger(iStats.index + 1, 3)}"
+                th:title="'Topic Weight = ' + ${item.topic.weight}"
+                th:classappend="${item.topic.weight} < 0 ? 'negative-weighted-entry' : ''">
+            </td>
+
+            <td th:if="${item.topic.weight == 0}"
+                th:text="${#numbers.formatInteger(iStats.index + 1, 3)}"
+                th:title="'Topic Weight = ' + ${item.topic.weight}"
+                th:classappend="${item.topic.weight} == 0 ? 'normal-weighted-entry' : ''">
+            </td>
+
+            <td th:if="${item.topic.weight > 0}"
+                th:text="${#numbers.formatInteger(iStats.index + 1, 3)}"
+                th:title="'Topic Weight = ' + ${item.topic.weight}"
+                th:classappend="${item.topic.weight} > 0 ? 'positive-weighted-entry' : ''">
+            </td>
+
+
+            <!-- DAYS sutunu. -->
+            <td th:title=" 'status: ' + ${item.status}"
+
+                style="text-align: center;">
+
+                <!-- firsFutureNeutralEntryDate varsa -->
+                <th:block th:if="${item.status == 0}">
+                <span th:title="${'Upcoming in: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate )
+                                        + ' days)' }"
+                      class="upcoming-note"
+                      style="text-align: center">
+
+                    <!-- how many days has past until today -->
+                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate) > 0
+                   ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate), 3)
+                   : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate) < 0
+                      ? '-&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate) * -1, 3)
+                      : '  0') }">
+                    </span>
+
+                </span>
+                </th:block>
+
+                <!-- lastPastEntryDate varsa -->
+                <th:block th:if="${item.status == 1 && item.topic.lastPastEntryDate!= null}">
+                <span th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between(item.topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
+                                        + ' days before)' }"
+                      class="last-done"
+                      style="text-align: center">
+
+                    <!-- how many days has past until today -->
+
+                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate) > 0
+                   ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate), 3)
+                   : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate) < 0
+                      ? '-&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate) * -1, 3)
+                      : '  0') }">
+                    </span>
+
+                </span>
+                </th:block>
+
+                <!-- firstWarningEntryDate varsa -->
+                <th:block th:if="${item.status == 2}">
+                <span th:title="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(item.topic.firstWarningEntryDate.atStartOfDay(zoneId))
+                                        + ' ('
+                                        +  T(java.time.temporal.ChronoUnit)
+                            .DAYS.between( T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate )
+                                        + ' days)' }"
+                      class="first-warn"
+                      style="text-align: center">
+
+                    <!-- how many days has past until today -->
+
+                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate) > 0
+                   ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate), 3)
+                   : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate) < 0
+                      ? '-&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate) * -1, 3)
+                      : '  0') }">
+                    </span>
+
+                </span>
+                </th:block>
+
+                <!-- predictionDate varsa -->
+                <th:block th:if="${item.status == 3}">
+
+                    <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+                        <!-- how many days has past until today -->
+                        <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate) > 0
+                   ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate), 3)
+                   : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate) < 0
+                      ? '-&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate) * -1, 3)
+                      : '  0') }">
+                    </span>
+
+                        <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+
+
+
+
+
+                    </th:block>
+                </th:block>
+
+
+
+
+
+
+
+            </td>
+
+
+
+
+
+
+
+            <!-- DATE sutunu -->
+            <!-- entry gercekse bu td yi koy-->
+
+            <td>
+                <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
+                   title="Click to open the Tracker gage"
+                   th:text="${#temporals.format(item.dateLocal, 'yyyy-MM-dd EEE')}">Edit Existing Entry</a>
+            </td>
+
+
+
+
+
+            <!-- TOPIC sutunu -->
+            <td>
+                <a th:href="@{/entries(topicId=${item.topic.id})}"
+                   th:text="${#strings.abbreviate(item.topic.name, 20)}"
+                   th:title="${item.topic.name + (!#strings.isEmpty(item.topic.description) ? ': ' + item.topic.description : '')}">
+                    Topic
+                </a>
+            </td>
+
+
+
+            <!-- Renkli STATUS sutunu-->
+            <td th:title=" 'status: ' + ${item.status}"
+                th:class=" 'status-' + ${item.status} "
+                style="text-align: center;">
+
+
+
+
+                <!-- eger gercek entry ise edit linki gosterilir -->
+                <th:block th:if="${item.status != 3}">
+
+                    <a th:href="@{/entries/editByDate
+                                        (
+                                        ymd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                         topicId=${item.topic.id},
+                                         returnPage='reporttable'
+                                         )
+                                         }"
+                       th:title="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}"
+                       class="add-new-entry">&nbsp;✎&nbsp;</a>
+
+
+
+                </th:block>
+
+                <!-- predictionDate varsa -->
+                <th:block th:if="${item.status == 3}">
+
+                    <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+
+
+                        <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                        <a th:href="@{/entries/new(topicId=${item.topic.id},
+                                           dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                           categoryId=${item.topic.category.id},
+                                           returnPage=reporttable)}"
+                           title="Add New Entry"
+                           class="add-new-entry">&nbsp;+&nbsp;</a>
+
+
+
+                    </th:block>
+                </th:block>
+
+
+
+
+
+
+
+            </td>
+
+
+
+            <!-- ENTRY NOTE -->
+            <td>
+            <span th:if="${item.entry != null && item.entry.note != null}"
+                  th:title="${item.entry.note.content}"
+                  th:text="${#strings.abbreviate(item.entry.note.content, 20)}">Entry Note</span>
+
+            </td>
+
+
+
+
+
+        </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+</div>
