@@ -471,7 +471,6 @@ public class EntryController {
         long endingDate = endLocalDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
 
         List<TopicEntrySummaryDTO> summaries = entryService.getFilteredEntries(status, weight, startingDate, endingDate);
-        System.out.println(summaries.get(0).getPinned());
         model.addAttribute("entries", summaries);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedWeight", weight);
