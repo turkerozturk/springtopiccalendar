@@ -28,12 +28,22 @@
             background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
+/* https://www.computerhope.com/htmcolor.htm#color-codes */
+/* https://www.htmltables.io/blog/html-table-borders */
         #category-groups-table {
 
           background-color: WhiteSmoke;
-          border: 3px solid black;
+         border: 3px solid black;
+           border-collapse: separate;
 
+           min-width:1280px;
+           max-width:1280px;
        }
+       #category-groups-table td
+    {
+        border: 1px solid gray;
+
+    }
 
        .css-archived {
          background-color: gray;
@@ -130,39 +140,54 @@
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <table id="category-groups-table" class="table table-striped">
+    <table id="category-groups-table">
+        <colgroup>
+            <col style="width: 22px;background-color: white;">
+            <col style="width: 200px;">
+            <col style="width: 978px;background-color: white;">
+            <col style="width: 80px;">
+        </colgroup>
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Categories</th>
-            <th class="text-end">Actions</th>
+            <th class="text-center" style="background-color: lightgray;"
+                title="Categories in the category group with a high ID number appear first in the tracker view.">ID</th>
+            <th class="text-center" style="background-color: lightgray;">Group Name</th>
+            <th class="text-center" style="background-color: lightgray;">Categories</th>
+            <th class="text-center" style="background-color: lightgray;">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="grp : ${groups}">
-            <td th:text="${grp.id}">1</td>
-            <td th:text="${grp.name}">Group Name</td>
-            <td>&nbsp;|&nbsp;
-                <th:block th:each="cat : ${grp.categories}">
-                    <span th:classappend="${cat.archived} ? ' css-archived' : ''">
-                    <a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
-                       th:text="${cat.name}"></a>
-                    <a th:href="@{/categories/edit/{id}(id=${cat.id})}"
-                       th:title="${cat.name} + ' [click to edit this category on a new page]' "
-                       target="_blank"
-                    >✎</a>
 
-                    &nbsp;|&nbsp;
-                    </span>
+        <tr th:each="grp : ${groups}">
+            <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
+            th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
+            <td th:text="${grp.name}">Group Name</td>
+            <td>
+                <a th:if="${grp.categories.size == 0}"
+                   th:href="@{/categories/create(categoryGroupId=${grp.id})}"
+                   target="_blank" title="Add Category">Add Category</a>
+                <th:block th:each="cat, iStats : ${grp.categories}">
+                    <span th:classappend="${cat.archived} ? ' css-archived' : ''"
+                          style="display: inline-block; white-space: normal;">
+                            [<a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
+                                 th:text="${cat.name}"></a>
+                              <a th:href="@{/categories/edit/{id}(id=${cat.id})}"
+                                 th:title="${cat.name} + ' [click to edit this category on a new page]' "
+                                 target="_blank"
+                              >✎</a>]
+                            </span>
+                    <span th:if="${grp.categories.size != iStats.index + 1}">&nbsp;</span>
                 </th:block>
             </td>
-            <td class="text-end">
+            <td class="text-center">
                 <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
-                   class="btn btn-sm btn-outline-secondary">Edit</a>
+                   class=" btn-sm btn-outline-secondary" title="Edit Category Group">✎&nbsp;</a>
                 <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
-                   class="btn btn-sm btn-outline-danger"
-                   onclick="return confirm('Delete this group?');">Delete</a>
+                   class=" btn-sm btn-outline-danger"
+                   onclick="return confirm('Delete this group?');"
+                   title="Delete Category Group">&nbsp;🗑&nbsp;</a>
+                <a th:href="@{/categories/create(categoryGroupId=${grp.id})}"
+                   target="_blank" title="Add Category">＋</a>
             </td>
         </tr>
         </tbody>
