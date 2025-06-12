@@ -16,9 +16,20 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
+
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
+
+
+
+
+
+
+
     <title>Topic List</title>
 
 
@@ -158,6 +169,9 @@ body {
 
     <h1><span class="fonbg">Topics</span></h1>
 
+
+
+
     <div style="background-color:WhiteSmoke;">
 
     <!-- Hata mesajı varsa göster -->
@@ -222,44 +236,7 @@ body {
 
         </tr>
 
-        <!-- Filtre kutuları (header'larla aynı hizada) -->
-        <tr>
-            <th><!-- no filter --></th>
-            <th>
-                <input type="text"
-                       id="filterId"
-                       class="form-control"
-                       onkeyup="filterRows()"
-                       placeholder="Filter ID"/>
-            </th>
-            <th>
-                <input type="text"
-                       id="filterCategoryName"
-                       class="form-control"
-                       onkeyup="filterRows()"
-                       placeholder="Filter Category"/>
-            </th>
-            <th><!-- no filter --></th>
-            <th>
-                <input type="text"
-                       id="filterTopicName"
-                       class="form-control"
-                       onkeyup="filterRows()"
-                       placeholder="Filter Topic"/>
-            </th>
-            <th>
-                <input type="text"
-                       id="filterDescription"
-                       class="form-control"
-                       onkeyup="filterRows()"
-                       placeholder="Filter Description"/>
-            </th>
-            <th><!-- no filter --></th>
-            <th><!-- no filter --></th>
-            <th><!-- no filter --></th>
-            <th><!-- no filter --></th>
-            <th><!-- no filter --></th>
-        </tr>
+
         </thead>
 
         <tbody>
@@ -324,101 +301,32 @@ body {
     </table>
 </div>
 
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
+<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
+<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+
+<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+
+
 <script>
-    // Filtreleme fonksiyonu
-    function filterRows() {
-        // Kategori select değeri
-        var categorySelect = document.getElementById("categorySelect").value.toLowerCase();
 
-        // Textbox filtre değerleri
-        var filterId = document.getElementById("filterId").value.toLowerCase();
-        var filterCategoryName = document.getElementById("filterCategoryName").value.toLowerCase();
-        var filterTopicName = document.getElementById("filterTopicName").value.toLowerCase();
-        var filterDescription = document.getElementById("filterDescription").value.toLowerCase();
+    $(document).ready( function () {
+    let table = new DataTable('#topicsTable');
 
-        var table = document.getElementById("topicsTable");
-        var tbody = table.getElementsByTagName("tbody")[0];
-        var rows = tbody.getElementsByTagName("tr");
-
-        for (var i = 0; i < rows.length; i++) {
-            var tds = rows[i].getElementsByTagName("td");
-
-            // td[1] -> ID
-            // td[2] -> Category Name
-            // td[4] -> Topic Name
-            // td[5] -> Description
-            var idText = tds[1].textContent.toLowerCase();
-            var categoryText = tds[2].textContent.toLowerCase();
-            var topicText = tds[4].textContent.toLowerCase();
-            var descText = tds[5].textContent.toLowerCase();
-
-
-
-
-            // Diğer textbox filtrelerini contains mantığıyla karşılaştır
-            var idMatch = idText.includes(filterId);
-            var categoryNameMatch = categoryText.includes(filterCategoryName);
-            var topicNameMatch = topicText.includes(filterTopicName);
-            var descMatch = descText.includes(filterDescription);
-
-            // Tüm koşulları AND ile birleştiriyoruz
-            if (idMatch && categoryNameMatch && topicNameMatch && descMatch) {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
-    }
-
-    // Sıralama fonksiyonu (tıklanan sütuna göre A-Z / Z-A sırala)
-    // columnIndex: tablo header'ındaki kolona göre,
-    // örneğin ID sütunu = 1, CategoryName sütunu = 2 vb.
-    function sortTable(columnIndex) {
-        var table = document.getElementById("topicsTable");
-        var switching = true;
-        var direction = "asc"; // ilk tıklamada asc başlasın
-        var switchCount = 0;
-
-        while (switching) {
-            switching = false;
-            var rows = table.getElementsByTagName("tbody")[0].rows;
-
-            for (var i = 0; i < rows.length - 1; i++) {
-                var shouldSwitch = false;
-                var x = rows[i].getElementsByTagName("td")[columnIndex];
-                var y = rows[i + 1].getElementsByTagName("td")[columnIndex];
-
-                var xText = x.textContent.toLowerCase();
-                var yText = y.textContent.toLowerCase();
-
-                if (direction === "asc") {
-                    // A-Z
-                    if (xText > yText) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                } else {
-                    // Z-A
-                    if (xText < yText) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                }
-            }
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
-                switchCount++;
-            } else {
-                // Hiç switch olmadıysa ve yön ASC ise, yönü DESC yapıp tekrar dene
-                if (switchCount === 0 && direction === "asc") {
-                    direction = "desc";
-                    switching = true;
-                }
-            }
-        }
-    }
+    } );
 </script>
+
 <script th:inline="javascript">
     function onCategoryChange() {
         var categoryId = document.getElementById("categorySelect").value;
@@ -465,7 +373,6 @@ body {
     })();
 </script>
 
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
 </body>
 </html>
