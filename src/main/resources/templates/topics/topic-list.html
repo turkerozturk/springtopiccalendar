@@ -33,8 +33,15 @@
     <title>Topic List</title>
 
 
-
     <style>
+        #categorySelect {
+          max-width: 250px; /* Genişliği sınırla */
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+
 
         .fonbg {
             background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
@@ -202,10 +209,11 @@ body {
                 <!-- Tüm kategoriler listeleniyor -->
                 <option th:each="cat : ${categories}"
                         th:value="${cat.id}"
+                        th:attr="data-fulltext=${cat.name}, title=${cat.name}"
                         th:text="${cat.name}"
                         th:selected="${cat.id} == ${selectedCategoryId}">
-                >
                 </option>
+
             </select>
         </div>
     </div>
@@ -347,10 +355,13 @@ WebJars path'leri şu yapıyı izler:
       const selectEl    = document.getElementById('categorySelect');
 
       // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
-      const dummyOption = { value: '', text: '--Select--' };
+      const dummyOption = { value: '', text: 'All' };
       const categoryOptions = Array.from(selectEl.options)
         .filter(opt => opt.value !== '')    // value="" olan dummy'yi at
-        .map(opt => ({ value: opt.value, text: opt.text }));
+        .map(opt => ({
+              value: opt.value,
+              text: opt.dataset.fulltext || opt.text
+            }));
 
       filterInput.addEventListener('input', function(){
         const term = this.value.trim().toLowerCase();
@@ -363,11 +374,12 @@ WebJars path'leri şu yapıyı izler:
 
         // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
         categoryOptions
-          .filter(({ text }) =>
-            term === '' || text.toLowerCase().includes(term)
-          )
+          .filter(({ text }) => term === '' || text.toLowerCase().includes(term))
           .forEach(({ text, value }) => {
-            selectEl.add(new Option(text, value));
+            const opt = new Option(text, value);
+            opt.dataset.fulltext = text;
+            opt.title = text;
+            selectEl.add(opt);
           });
       });
     })();
