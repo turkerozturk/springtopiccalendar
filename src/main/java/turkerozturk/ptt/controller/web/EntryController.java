@@ -128,6 +128,7 @@ public class EntryController {
         // System.out.println("dateYmd: " + dateString );
         Entry entry = new Entry();
         entry.setNote(new Note());
+        entry.setStatus(0); // default olarak "not marked".
 
         // Topic set
         if (topicId != null) {
