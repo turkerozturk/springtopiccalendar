@@ -425,7 +425,14 @@ public class EntryController {
                 case "pivottable":
                     return "redirect:/entry-filter/return?categoryId=" + categoryId;
                 case "entries":
-                    return "redirect:/entries?topicId=" + topicId;
+                    if(topicId != null) {
+                        return "redirect:/entries?topicId=" + topicId;
+                    } else {
+                        // on entries page, there is an add new entry button, beacuse at that state there is no topicId,
+                        // if you press cancel button on new entry form page, we are redirecting to entries page without
+                        // topic id parameter. This is fix for the mentioned error.
+                        return "redirect:/entries";
+                    }
                 case "reporttable":
                     return "redirect:/reports/all";
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa

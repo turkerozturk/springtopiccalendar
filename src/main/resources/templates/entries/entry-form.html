@@ -170,6 +170,7 @@
         <input type="hidden" name="returnPage" th:value="${returnPage}">
         <input type="hidden" name="categoryId" th:value="${categoryId}" th:if="${categoryId}">
         <input type="hidden" name="entryId" th:value="${entry.id}" th:if="${entry.id != null}">
+        <input type="hidden" name="topicId" th:value="${entry.topic.id}" th:if="${entry.topic != null}">
 
         <button type="submit" class="btn btn-sm btn-secondary col-sm-2">Cancel</button>
 
