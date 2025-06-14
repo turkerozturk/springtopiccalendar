@@ -337,13 +337,22 @@
         <tbody>
         <tr th:each="entry, iStat : ${entriesPage.content}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
             <td class="delete-entry-column">
-                <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+                <a th:href="@{/entries/delete/{id}(id=${entry.id},
+                                            categoryId=${entry.topic.category.id},
+                                            topicId=${entry.topic.id},
+                                            returnPage=entries
+                                            )}"
+
                    onclick="return confirmDelete()">
                     Delete
                 </a>
             </td>
             <td class="edit-entry-column">
-                <a th:href="@{/entries/edit/{id}(id=${entry.id})}"
+                <a th:href="@{/entries/edit/{id}(id=${entry.id},
+                                            categoryId=${entry.topic.category.id},
+                                            topicId=${entry.topic.id},
+                                            returnPage=entries
+                                            )}"
                    th:text="${zeroPaddedEntryId}"
                    target="_blank" rel="noopener noreferrer">
                     Edit

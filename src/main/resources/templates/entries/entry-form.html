@@ -166,21 +166,25 @@
     </form>
 
 
+    <form th:action="@{/entries/redirect}" id="cancelForm" method="post">
+        <input type="hidden" name="returnPage" th:value="${returnPage}">
+        <input type="hidden" name="categoryId" th:value="${categoryId}" th:if="${categoryId}">
+        <input type="hidden" name="entryId" th:value="${entry.id}" th:if="${entry.id != null}">
 
-    <div class="mt-3">
-        <a th:href="@{/entries}" class="btn btn-sm btn-secondary w-100">Back to Entry List</a>
-    </div>
+        <button type="submit" class="btn btn-sm btn-secondary col-sm-2">Cancel</button>
 
-    <div class="mt-3">
-        <th:block th:if="${categoryId}">
-            <a th:href="@{/topics(categoryId=${entry.topic.category.id})}" class="btn btn-sm btn-secondary w-100">Back to Topic List</a>
-        </th:block>
-    </div>
+    </form>
+
 
     <!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
     <div th:if="${entry.id != null}" class="mt-3">
 
-        <a th:href="@{/entries/delete/{id}(id=${entry.id})}"
+        <a th:href="@{/entries/delete/{id}(
+                                            id=${entry.id},
+                                            categoryId=${entry.topic.category.id},
+                                            topicId=${entry.topic.id},
+                                            returnPage=${returnPage}
+                                            )}"
            onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');"
            class="btn btn-sm btn-danger col-sm-3">
             Delete Entry

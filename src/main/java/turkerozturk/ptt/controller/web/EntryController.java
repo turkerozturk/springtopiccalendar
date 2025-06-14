@@ -293,47 +293,16 @@ public class EntryController {
         }
 
 
-
-
-        // Hangi sayfadan gelindiğini kontrol ediyoruz.
         String returnPage = request.getParameter("returnPage");
-        if (returnPage != null) {
-            switch (returnPage) {
-                case "home":
-                    return "redirect:/";
-                case "topics":
-                    return "redirect:/topics?categoryId=" + categoryId;
-                case "pivottable":
-                    return "redirect:/entry-filter/return?categoryId=" + categoryId;
-                case "entries":
-                    return "redirect:/entries?topicId=" + topicId;
-                case "reporttable":
-                    return "redirect:/reports/all";
-                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
-                default:
-                    // BURASI hata verir, case kosullarina yeni bir tane eklemen lazim normalde, burasi kullanilmiyor.
-                    return "redirect:/" + returnPage + "?categoryId=" + categoryId;
-            }
-        }
 
-        // (1) Session'da filtre bilgisi var mı?
-        FilterDto currentFilter = (FilterDto) session.getAttribute("currentFilterDto");
-        if (currentFilter != null) {
-            // Kullanıcı pivot'tan geldiyse oraya geri dönmek istiyoruz.
-            // Ama pivot'ta tabloyu yeniden oluşturmak için applyFilter benzeri bir işlem yapmamız lazım.
+        return "redirect:/entries/redirect"
+                + "?returnPage=" + returnPage
+                + (categoryId != null ? "&categoryId=" + categoryId : "")
+                + (topicId != null ? "&topicId=" + topicId : "");
 
-            // Yöntem A: Sadece redirect "/entry-filter/return" gibi bir endpoint açar, orada
-            // filter'ı tekrar applyFilter benzeri kodla çalıştırır.
-            return "redirect:/entry-filter/return?categoryId=" + categoryId;
-            //return "entry-filter/return";
 
-            // Yöntem B: Direct "/entry-filter/form" a gider, ama orada filter'ı tekrar uygular.
-            // => Bunu bir endpoint'te handle etmek daha temiz olur.
-        }
 
-        // (2) Session'da filtre yoksa normal entries listesine
-        // Kayıt başarılı, listeye dön.
-        return "redirect:/entries?categoryId=" + categoryId;
+
     }
 
 
@@ -404,33 +373,23 @@ public class EntryController {
 
 
     @GetMapping("/delete/{id}")
-    public String deleteEntry(@PathVariable Long id, HttpSession session) {
-        // 1) Silinecek entry'yi çek, topicId'yi al
+    public String deleteEntry(@PathVariable Long id,
+                              @RequestParam(name="returnPage", required=true) String returnPage) {
+
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
-        Long topicId = entry.getTopic() != null
-                ? entry.getTopic().getId()
-                : null;
+        Long topicId = entry.getTopic().getId();
+        Long categoryId = entry.getTopic().getCategory().getId();
 
-        // 2) Entry'yi sil
         entryRepository.deleteById(id);
 
-        // 3) Eğer topicId varsa, predictionDate'i tekrar hesapla ve kaydet
-        if (topicId != null) {
-            // topicService içinde daha önce eklemiş olduğunuz yardımcı metot
-            topicService.updateTopicStatus(topicId);
-        }
+        // predictionDate'i tekrar hesapla ve kaydet
+        topicService.updateTopicStatus(topicId);
 
-        // 4) Yönlendirmeyi mevcut session filtresine göre yap
-        // Session'da currentFilterDto var mı, kontrol et
-        FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
-        if (filterDto != null) {
-            // Pivot'tan gelindiğini varsay => tekrar pivot görünümüne dön
-            return "redirect:/entry-filter/return";
-        } else {
-            // Pivot bilgisi yok, normal entries listesine dön
-            return "redirect:/entries";
-        }
+        return "redirect:/entries/redirect"
+                + "?returnPage=" + returnPage
+                + (categoryId != null ? "&categoryId=" + categoryId : "")
+                + (topicId != null ? "&topicId=" + topicId : "");
     }
 
     // EntriesController veya uygun controller
@@ -443,8 +402,40 @@ public class EntryController {
     }
 
 
+    /**
+     * entry form sayfasinda new veya update veya delete entry veya cancel islemleri sonrasinda
+     * nereden gelindiyse oraya donmesi
+     * icin genel bir yonlendirme metodu.
+     * @param returnPage
+     * @param categoryId
+     * @param topicId
+     * @return
+     */
+    @RequestMapping(value = "/redirect", method = {RequestMethod.GET, RequestMethod.POST})
+    public String redirect(@RequestParam(required = false) String returnPage,
+                           @RequestParam(required = false) Long categoryId,
+                           @RequestParam(required = false) Long topicId) {
 
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "home":
+                    return "redirect:/";
+                case "topics":
+                    return "redirect:/topics?categoryId=" + categoryId;
+                case "pivottable":
+                    return "redirect:/entry-filter/return?categoryId=" + categoryId;
+                case "entries":
+                    return "redirect:/entries?topicId=" + topicId;
+                case "reporttable":
+                    return "redirect:/reports/all";
+                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+                    return "redirect:/";
+            }
+        }
 
+        return "redirect:/";
+    }
 
 
     @RequestMapping(value={"/entry-summary-report"},
