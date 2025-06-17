@@ -208,6 +208,18 @@ WebJars path'leri şu yapıyı izler:
 
 <script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
 
+<noscript>
+    Please enable JavaScript.
+</noscript>
+<script>
+    // Webbrowser'in back dugmesine tiklandiginda bu sayfadaki cancelForm dugmesine
+    // tiklanmasini saglayan script. Cunku geldigi sayfa geri gidince calismaya uygun olmayabiliyor.
+    // Ama bu yolla istenildigi bicimde tracker sayfasina donmus oluyor.
+    if (performance.navigation.type === 2) { // 2 = Back/Forward
+        const form = document.getElementById('cancelForm');
+        if (form) form.submit();
+    }
+</script>
 
 
 
