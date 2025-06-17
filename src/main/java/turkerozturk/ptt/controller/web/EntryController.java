@@ -190,9 +190,28 @@ public class EntryController {
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry,
                             Model model,
-                            HttpSession session,
                             HttpServletRequest request) {
 
+        String returnPage = request.getParameter("returnPage");
+        List<Category> categories = categoryRepository.findAll(); // ayni tarihte cakisma varsa lazim oluyor formu tekrar gosterirken.
+
+        // start **** category id nin elde edilmesi (ugly code)
+        // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
+        String paramCategoryId = request.getParameter("categoryId");
+        Long categoryIdFromForm = null;
+        if (paramCategoryId != null && !paramCategoryId.isEmpty()) {
+            categoryIdFromForm = Long.valueOf(paramCategoryId);
+        }
+        // 2) Elinizde hem "topic üzerinden gelen" hem de "formdan gizli input ile gelen"
+        // categoryId bilgisi var. Hangisini kullanmak istediğinize karar verin:
+        Long categoryId = formEntry.getTopic() != null && formEntry.getTopic().getCategory() != null
+                ? formEntry.getTopic().getCategory().getId()
+                : null;
+        // Eğer "topic.category" null ise, en azından formdan gelen categoryId'yi kullanın
+        if (categoryId == null && categoryIdFromForm != null) {
+            categoryId = categoryIdFromForm;
+        }
+        // end   **** category id nin elde edilmesi (ugly code)
 
 
         // 1) Duplicate kayıt kontrolü için gerekli bilgileri alıyoruz
@@ -215,6 +234,9 @@ public class EntryController {
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
+                model.addAttribute("categories", categories);
+                model.addAttribute("returnPage", returnPage);
+                model.addAttribute("categoryId", categoryId);
                 return "entries/entry-form";
             }
 
@@ -243,6 +265,9 @@ public class EntryController {
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
                 model.addAttribute("topics", topicRepository.findAll());
+                model.addAttribute("categories", categories);
+                model.addAttribute("returnPage", returnPage);
+                model.addAttribute("categoryId", categoryId);
                 return "entries/entry-form";
             }
 
@@ -274,26 +299,9 @@ public class EntryController {
             topicService.updateTopicStatus(topicId);
         }
 
-        // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
-        String paramCategoryId = request.getParameter("categoryId");
-        Long categoryIdFromForm = null;
-        if (paramCategoryId != null && !paramCategoryId.isEmpty()) {
-            categoryIdFromForm = Long.valueOf(paramCategoryId);
-        }
-
-        // 2) Elinizde hem "topic üzerinden gelen" hem de "formdan gizli input ile gelen"
-        // categoryId bilgisi var. Hangisini kullanmak istediğinize karar verin:
-        Long categoryId = formEntry.getTopic() != null && formEntry.getTopic().getCategory() != null
-                ? formEntry.getTopic().getCategory().getId()
-                : null;
-
-        // Eğer "topic.category" null ise, en azından formdan gelen categoryId'yi kullanın
-        if (categoryId == null && categoryIdFromForm != null) {
-            categoryId = categoryIdFromForm;
-        }
 
 
-        String returnPage = request.getParameter("returnPage");
+
 
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
@@ -307,12 +315,13 @@ public class EntryController {
 
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id,
+    public String showEditForm(@PathVariable(name="id") Long entryId,
+                               @RequestParam(name="topicId", required=false) Long topicId,
                                @RequestParam(name="returnPage", required=false) String returnPage,
                                @RequestParam(name="categoryId", required=false) Long categoryId,
                                Model model) {
-        Entry entry = entryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
+        Entry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + entryId));
 
         // Not nesnesi null ise formda null dönmemesi için burda oluşturabilirsiniz.
         if (entry.getNote() == null) {
@@ -330,7 +339,12 @@ public class EntryController {
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
+
+        //Long topicId = entry.getTopic().getId();
+        categoryId = entry.getTopic().getCategory().getId();
         model.addAttribute("categoryId", categoryId);
+        model.addAttribute("topicId", topicId);
+
         return "entries/entry-form";
     }
 
@@ -368,6 +382,8 @@ public class EntryController {
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
+        model.addAttribute("topicId", topicId);
+
         return "entries/entry-form";
     }
 

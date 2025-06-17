@@ -55,7 +55,7 @@
         <input type="hidden" name="returnPage" th:value="${returnPage}">
 
 
-        <!-- topic ID (gizli alan) -->
+        <!-- entry ID (gizli alan) -->
         <input type="hidden" th:field="*{id}"/>
 
         <!-- dateMillisYmd (artık gizli) -->
@@ -182,7 +182,7 @@
 
         <a th:href="@{/entries/delete/{id}(
                                             id=${entry.id},
-                                            categoryId=${entry.topic.category.id},
+                                            categoryId=${categoryId},
                                             topicId=${entry.topic.id},
                                             returnPage=${returnPage}
                                             )}"
