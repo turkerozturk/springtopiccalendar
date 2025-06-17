@@ -11,12 +11,12 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.5</version> <!-- Spring Boot versiyonunu ihtiyacınıza göre ayarlayın -->
+    <version>3.5.0</version>
     <relativePath/>
   </parent>
 
   <properties>
-    <java.version>17</java.version> <!-- Versiyon ihtiyacınıza göre -->
+    <java.version>17</java.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
