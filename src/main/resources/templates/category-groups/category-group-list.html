@@ -144,8 +144,8 @@
         <colgroup>
             <col style="width: 22px;background-color: white;">
             <col style="width: 200px;">
-            <col style="width: 978px;background-color: white;">
-            <col style="width: 80px;">
+            <col style="width: 948px;background-color: white;">
+            <col style="width: 110px;">
         </colgroup>
         <thead>
         <tr>
@@ -185,9 +185,12 @@
                 <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
                    class=" btn-sm btn-outline-danger"
                    onclick="return confirm('Delete this group?');"
-                   title="Delete Category Group">&nbsp;🗑&nbsp;</a>
+                   title="Delete Category Group">&nbsp;🗑</a>
                 <a th:href="@{/categories/create(categoryGroupId=${grp.id})}"
-                   target="_blank" title="Add Category">＋</a>
+                   target="_blank" title="Add Category">&nbsp;＋</a>
+                <!-- intelligent report for only one category group -->
+                <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
+                >&nbsp;🧠</a>
             </td>
         </tr>
         </tbody>

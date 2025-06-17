@@ -41,32 +41,118 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
             "ORDER BY t.firstFutureNeutralEntryDateMillisYmd DESC")
     List<Topic> findTop10FutureNeutralTopicsFromToday(@Param("todayEpochMillis") Long todayEpochMillis);
 
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param todayEpochMillis
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.firstFutureNeutralEntryDateMillisYmd IS NOT NULL " +
+            "AND t.firstFutureNeutralEntryDateMillisYmd >= :todayEpochMillis " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.firstFutureNeutralEntryDateMillisYmd DESC")
+    List<Topic> findFutureNeutralTopicsFromTodayForCategoryGroup(
+            @Param("todayEpochMillis") Long todayEpochMillis,
+            @Param("categoryGroupNumber") Long categoryGroupNumber);
+
+
     @Query("SELECT t FROM Topic t " +
             "WHERE t.predictionDateMillisYmd IS NOT NULL " +
             "AND t.predictionDateMillisYmd <= :todayEpochMillis " +
             "ORDER BY t.predictionDateMillisYmd DESC")
     List<Topic> findTopicsWithPredictionDateBeforeOrEqualToday(@Param("todayEpochMillis") Long todayEpochMillis);
 
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param todayEpochMillis
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.predictionDateMillisYmd IS NOT NULL " +
+            "AND t.predictionDateMillisYmd <= :todayEpochMillis " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.predictionDateMillisYmd DESC")
+    List<Topic> findTopicsWithPredictionDateBeforeOrEqualTodayForCategoryGroup(@Param("todayEpochMillis") Long todayEpochMillis,
+                                                                               @Param("categoryGroupNumber") Long categoryGroupNumber);
+
     @Query("SELECT t FROM Topic t " +
             "WHERE t.firstWarningEntryDateMillisYmd IS NOT NULL " +
             "ORDER BY t.firstWarningEntryDateMillisYmd DESC")
     List<Topic> findAllByWarningDateNotNullOrderByWarningDateDesc();
+
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.firstWarningEntryDateMillisYmd IS NOT NULL " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.firstWarningEntryDateMillisYmd DESC")
+    List<Topic> findAllByWarningDateNotNullOrderByWarningDateDescForCategoryGroup(@Param("categoryGroupNumber") Long categoryGroupNumber);
 
     @Query("SELECT t FROM Topic t " +
             "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
     List<Topic> findAllByLastPastEntryDateNotNullOrderByDesc();
 
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findAllByLastPastEntryDateNotNullOrderByDescForCategoryGroup(@Param("categoryGroupNumber") Long categoryGroupNumber);
+
     @Query("SELECT t FROM Topic t " +
             "WHERE t.lastPastEntryDateMillisYmd = :todayEpochMillis " +
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
     List<Topic> findAllByLastPastEntryDateIsToday(@Param("todayEpochMillis") Long todayEpochMillis);
+
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param todayEpochMillis
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.lastPastEntryDateMillisYmd = :todayEpochMillis " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findAllByLastPastEntryDateIsTodayForCategoryGroup(@Param("todayEpochMillis") Long todayEpochMillis,
+                                                  @Param("categoryGroupNumber") Long categoryGroupNumber);
 
     @Query("SELECT t FROM Topic t " +
             "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
             "AND t.lastPastEntryDateMillisYmd < :todayEpochMillis " +
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
     List<Topic> findTopNByLastPastEntryDateBeforeToday(@Param("todayEpochMillis") Long todayEpochMillis, Pageable pageable);
+
+    /**
+     * The difference from the query above is that it only contains one category group.
+     * @param todayEpochMillis
+     * @param pageable
+     * @param categoryGroupNumber
+     * @return
+     */
+    @Query("SELECT t FROM Topic t " +
+            "LEFT JOIN t.category c " +
+            "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
+            "AND t.lastPastEntryDateMillisYmd < :todayEpochMillis " +
+            "AND c.categoryGroup.id = :categoryGroupNumber " +
+            "ORDER BY t.lastPastEntryDateMillisYmd DESC")
+    List<Topic> findTopNByLastPastEntryDateBeforeTodayForCategoryGroup(@Param("todayEpochMillis") Long todayEpochMillis, Pageable pageable,
+                                                                       @Param("categoryGroupNumber") Long categoryGroupNumber);
 
 
 }
