@@ -289,8 +289,12 @@ body {
 
             <td>
                 <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
-                   th:text="list">
+                   th:text="'☰'">
                     Entries List
+                </a>
+                <a th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                   th:text="'📅'">
+                    Entries Weekly Calendar View
                 </a>
             </td>
 

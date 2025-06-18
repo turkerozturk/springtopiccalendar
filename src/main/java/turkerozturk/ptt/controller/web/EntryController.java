@@ -22,7 +22,7 @@ package turkerozturk.ptt.controller.web;
 
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
-import turkerozturk.ptt.dto.FilterDto;
 import turkerozturk.ptt.dto.TopicDto;
 import turkerozturk.ptt.dto.TopicEntrySummaryDTO;
 import turkerozturk.ptt.entity.Category;
@@ -45,13 +44,10 @@ import turkerozturk.ptt.repository.TopicRepository;
 import turkerozturk.ptt.service.FilterService;
 import turkerozturk.ptt.service.TopicService;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -68,6 +64,9 @@ public class EntryController {
     private final TopicService topicService;
 
     private final CategoryRepository categoryRepository;
+
+    @Value("${week.start.day:MONDAY}")
+    private String startDayOfWeek;
 
 
     public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
@@ -115,6 +114,123 @@ public class EntryController {
 
 
         return "entries/entry-list";
+    }
+
+    @GetMapping("weekly-calendar")
+    public String listEntriesWeekView(
+            @RequestParam(name = "topicId", required = false) Long topicId,
+            @RequestParam(name = "page",    defaultValue = "0")  int page,
+            @RequestParam(name = "size",    defaultValue = "20") int size,
+            Model model) {
+
+        // sayfa isteğini oluşturuyoruz (tarih alanına göre azalan)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> entriesPage;
+
+        if (topicId != null) {
+            entriesPage = entryRepository.findByTopicId(topicId, pageable);
+            model.addAttribute("topic", topicRepository.findById(topicId).orElseThrow());
+        } else {
+            entriesPage = entryRepository.findAll(pageable);
+        }
+
+        model.addAttribute("entriesPage", entriesPage);
+        model.addAttribute("topicId",     topicId);
+
+        int current = entriesPage.getNumber();
+        int total   = entriesPage.getTotalPages();
+        int start   = Math.max(0, current - 5);
+        int end     = Math.min(total - 1, current + 5);
+
+        model.addAttribute("startPage", start);
+        model.addAttribute("endPage",   end);
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+
+        model.addAttribute("zoneId", zoneId);
+
+
+
+
+
+
+
+
+
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+
+        model.addAttribute("startDayOfWeek", startDay); // Enum, örn: MONDAY
+
+
+
+
+        // start *****
+
+
+
+// 1. Entry listesini tarihsel olarak sırala
+        List<Entry> entries = new ArrayList<>(entriesPage.getContent());
+        entries.sort(Comparator.comparingLong(Entry::getDateMillisYmd));
+
+// 2. En erken ve en geç tarihleri al
+        LocalDate firstEntryDate = Instant.ofEpochMilli(entries.get(0).getDateMillisYmd())
+                .atZone(zoneId)
+                .toLocalDate();
+        LocalDate lastEntryDate = Instant.ofEpochMilli(entries.get(entries.size() - 1).getDateMillisYmd())
+                .atZone(zoneId)
+                .toLocalDate();
+
+// 3. Başlangıç tarihini haftanın başlangıcına çek
+        int diffToStartOfWeek = (7 + firstEntryDate.getDayOfWeek().getValue() - startDay.getValue()) % 7;
+        LocalDate mapStartDate = firstEntryDate.minusDays(diffToStartOfWeek);
+
+// 4. Bitiş tarihini haftanın sonuna çek
+        int diffToEndOfWeek = (7 - ((lastEntryDate.getDayOfWeek().getValue() - startDay.getValue() + 7) % 7) - 1);
+        LocalDate mapEndDate = lastEntryDate.plusDays(diffToEndOfWeek);
+
+// 5. Entry'leri hızlı erişim için Map'e koy
+        Map<Long, Entry> dateToEntryMap = entries.stream()
+                .collect(Collectors.toMap(
+                        Entry::getDateMillisYmd,
+                        e -> e,
+                        (e1, e2) -> e1)); // aynı tarihe denk gelirse ilkini al
+
+// 6. entriesMap oluştur
+        Map<Long, Entry> entriesMap = new LinkedHashMap<>();
+        LocalDate currentDate = mapStartDate;
+
+        while (!currentDate.isAfter(mapEndDate)) {
+            long millisYmd = currentDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+            entriesMap.put(millisYmd, dateToEntryMap.getOrDefault(millisYmd, null));
+            currentDate = currentDate.plusDays(1);
+        }
+
+        // end  *****
+
+    // Thymeleaf’in 2D tablo olusturabilmesi icin entriesMap'i haftalik liste listesine cevirelim:
+        // *********** start
+        List<List<Entry>> weeklyRows = new ArrayList<>();
+
+        List<Entry> currentWeek = new ArrayList<>();
+        int dayCounter = 0;
+
+        for (Map.Entry<Long, Entry> mapEntry : entriesMap.entrySet()) {
+            currentWeek.add(mapEntry.getValue());
+            dayCounter++;
+
+            if (dayCounter == 7) {
+                weeklyRows.add(new ArrayList<>(currentWeek));
+                currentWeek.clear();
+                dayCounter = 0;
+            }
+        }
+
+        model.addAttribute("weeklyRows", weeklyRows);
+        // *********** end
+
+
+
+        return "entries/entry-list-weekly-calendar";
     }
 
     @GetMapping("/new")

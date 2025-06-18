@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8"/>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <title>Entry List - Weekly Calendar</title>
+
+
+
+    <!-- Bootstrap CSS (Örnek 5.x sürümü) -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" /> -->
+
+    <style>
+
+        .pivot-table-entry-cell {
+                    text-align: center;      /* yatay ortalama */
+                    vertical-align: middle;  /* dikey ortalama */
+                    min-width: 20px;
+                    min-height: 20px;
+
+                    max-width: 20px;         /* Maksimum genişlik  */
+                    max-height: 20px;         /* Maksimum genişlik  */
+
+                    width: 20px;             /* Sabit genişlik  */
+                    height: 20px;
+                    padding: 0px;
+
+                    background-color: WhiteSmoke !important;
+
+                }
+
+                .pivot-table-entry-cell a {
+                text-decoration: none;   /* alt çizgiyi kaldır */
+                color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                    padding: 0px;
+
+                }
+
+                .pivot-table-entry-cell a:visited {
+                    color: inherit;          /* tıklanmış linkin rengini değiştirme */
+                }
+
+
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
+
+        #entries-table {
+
+           background-color: WhiteSmoke;
+           border: 3px solid black;
+
+        }
+
+              /* Mevcut link stilleriniz */
+              a {
+                  text-decoration: none;
+                  color: inherit;
+              }
+              a:visited {
+                  color: inherit;
+              }
+              a:hover {
+                  color: blue;
+              }
+
+              /* Kolonları koruyoruz */
+              .edit-entry-column {
+                  text-align: center;
+              }
+              .delete-entry-column {
+                  text-align: center;
+              }
+
+              .status-0 {
+                background-color: gainsboro !important;
+              }
+              .status-1 {
+                background-color: palegreen !important;
+              }
+              .status-2 {
+                background-color: tomato !important;
+              }
+
+
+
+            /* https://css-pattern.com/zig-zag-pixel/ */
+        body {
+  --s: 217px; /* control the size*/
+  --c1: #8b98bc;
+  --c2: #edb4ad;
+
+  --c:var(--c1) 0 25%,#0000 0;
+  --p:0 0/calc(3*var(--s)) calc(2*var(--s));
+  background:
+    conic-gradient(from -45deg at 75% 62.5%,var(--c)) var(--p),
+    conic-gradient(from 135deg at 25% 37.5%,var(--c)) var(--p),
+    repeating-conic-gradient(from 90deg,var(--c),var(--c2) 0 50%)
+     0 0/var(--s) var(--s);
+}
+
+
+        #navigation-panel button, a{
+          border-radius:10px !important;
+        }
+
+              #navigation-panel {
+           max-width: 640px;
+           margin-top: 10px;
+           margin-bottom: 5px;
+           margin-left: auto;
+           margin-right: auto;
+           padding: 3px;
+           border: 2px solid DarKGray;
+           border-radius: 7px 7px 7px 7px;
+
+           /* https://cssgradient.io/ */
+
+           background: #a7d6e8;
+           background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
+
+    </style>
+</head>
+<body>
+
+
+<div  id="navigation-panel">
+    <div class="align-center-horizontal">
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm"
+           th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm"
+           th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
+        <a href="/topics" class="btn btn-secondary btn-sm"
+           th:if="${hasCategories}" style="color:white;">Topics</a>
+        <th:block th:if="${hasTopics}">
+            <a href="/entries" class="btn btn-secondary btn-sm"
+               style="color:white;">Entries</a>
+            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        </th:block>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                Logout
+            </button>
+        </form>
+    </div>
+    <!-- Yeni Entry Butonu -->
+    <div th:if="${topic == null}" style="margin-top:4px;">
+        <a th:href="@{/entries/new?returnPage=entries}" class="btn btn-secondary btn-sm" style="color:white;">Add New Entry</a>
+    </div>
+</div>
+
+
+<div class="container my-2" style="max-width: 1000px;">
+
+
+
+    <h1><span class="fonbg">Entries</span></h1>
+
+<div style="background-color:WhiteSmoke;">
+
+
+
+    <div th:if="${topic != null}" class="mb-3">
+        <p>
+
+
+            <span th:text="${topic.name}" style="font-size: 1.17em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    ">Topic Name</span>
+
+            <spam th:text="${': ' + topic.description}">Topic Description</spam>
+
+
+        </p>
+
+
+
+    </div>
+
+    <!-- pagination start -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+
+        <!--  pagination nav code -->
+        <!-- 1️⃣ << < önceki 5 … sonraki 5 … > >> -->
+        <nav th:with="startPage=${startPage}, endPage=${endPage}">
+            <ul class="pagination mb-0">
+                <!-- << -->
+                <li class="page-item" th:classappend="${entriesPage.first} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries/weekly-calendar(topicId=${topicId},page=0,size=${entriesPage.size})}">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+
+                <!-- < -->
+                <li class="page-item" th:classappend="${!entriesPage.hasPrevious()} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries/weekly-calendar(topicId=${topicId},page=${entriesPage.number-1},size=${entriesPage.size})}">
+                        &laquo;
+                    </a>
+                </li>
+
+                <!-- startPage…endPage -->
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                    th:classappend="${i == entriesPage.number} ? 'active'">
+
+                <span class="page-link"
+                      th:if="${i == entriesPage.number}"
+                      th:text="${i + 1}">1</span>
+
+                    <a class="page-link"
+                       th:if="${i != entriesPage.number}"
+                       th:href="@{/entries/weekly-calendar(topicId=${topicId},page=${i},size=${entriesPage.size})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+
+                <!-- > -->
+                <li class="page-item" th:classappend="${!entriesPage.hasNext()} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries/weekly-calendar(topicId=${topicId},page=${entriesPage.number+1},size=${entriesPage.size})}">
+                        &raquo;
+                    </a>
+                </li>
+
+                <!-- >> -->
+                <li class="page-item" th:classappend="${entriesPage.last} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/entries/weekly-calendar(topicId=${topicId},page=${entriesPage.totalPages-1},size=${entriesPage.size})}">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 2️⃣ Sayfa başına satır sayısı -->
+        <form th:action="@{/entries/weekly-calendar}" method="get" class="d-inline">
+            <input type="hidden" name="topicId" th:value="${topicId}" />
+            <input type="hidden" name="page"    th:value="${entriesPage.number}" />
+            <select name="size"
+                    class="form-select form-select-sm"
+                    th:onchange="this.form.submit()">
+                <option th:value="10"  th:selected="${entriesPage.size == 10}">10</option>
+                <option th:value="20"  th:selected="${entriesPage.size == 20}">20</option>
+                <option th:value="50"  th:selected="${entriesPage.size == 50}">50</option>
+                <option th:value="100" th:selected="${entriesPage.size == 100}">100</option>
+                <option th:value="200" th:selected="${entriesPage.size == 200}">200</option>
+            </select>
+        </form>
+
+        <!-- 3️⃣ “Go to” sayfa numarası (select) -->
+        <form th:action="@{/entries/weekly-calendar}" method="get" class="d-inline">
+            <input type="hidden" name="topicId" th:value="${topicId}" />
+            <input type="hidden" name="size"    th:value="${entriesPage.size}" />
+            <select name="page"
+                    class="form-select form-select-sm"
+                    th:onchange="this.form.submit()">
+                <option th:each="i : ${#numbers.sequence(0, entriesPage.totalPages-1)}"
+                        th:value="${i}"
+                        th:text="${i + 1}"
+                        th:selected="${i == entriesPage.number}">
+                </option>
+            </select>
+        </form>
+
+        <!-- 4️⃣ Sayfa etiketi: bulunduğumuz / toplam -->
+        <span class="align-self-center">
+        <span th:text="${entriesPage.number + 1}">1</span> /
+        <span th:text="${entriesPage.totalPages}">7</span>
+    </span>
+    </div>
+
+</div>
+
+    <!-- Entries Tablosu -->
+
+
+
+
+    <table id="weeklyCalendarView" class="table table-bordered text-center align-middle">
+        <thead>
+        <tr>
+            <th>Week</th>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+            <th>S</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="week, weekStat : ${weeklyRows}">
+            <td th:text="'W' + ${weekStat.index + 1}">W1</td>
+
+            <th:block th:each="entryItem : ${week}" >
+
+
+
+                <!-- 1) Var olan (status!=3) entry’leri link şeklinde göster -->
+                <th:block th:if="${entryItem != null}">
+                    <td
+                        th:if="${entryItem.status != 3}"
+                        th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
+
+                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
+                                               categoryId=${topic.category.id},
+                                               returnPage=pivottable)}">
+
+                            <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
+                        <span th:title="${entryItem.note.content}"
+                              class="entry-with-content">
+                            @
+                        </span>
+                            </th:block>
+                            <th:block th:if="${#strings.isEmpty(entryItem.note.content)}">
+                        <span th:title="${'Entry ' + entryItem.id}">
+                            @
+                        </span>
+                            </th:block>
+                        </a>
+                        <br/>
+                    </td>
+                </th:block>
+
+                <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
+                <th:block th:if="${entryItem == null }">
+                    <td class="pivot-table-entry-cell">
+                        <a th:href="@{/entries/new(topicId=${topic.id},
+                                           dateYmd=${day},
+                                           categoryId=${topic.category.id},
+                                           returnPage=pivottable)}"
+                           title="Add New Entry"
+                           class="add-new-entry">+</a>
+                    </td>
+                </th:block>
+
+
+
+
+
+
+            </th:block>
+
+
+
+
+        </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+<!-- sayfanın en altına yakın bir yere ekleyin -->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noteModalLabel">Not Detayı</h5>
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
+            </div>
+            <div class="modal-body">
+                <!-- HTMX ile buraya tam içerik gelecek -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+
+<script>
+    function confirmDelete() {
+        return confirm("Are you sure to delete this entry?");
+    }
+</script>
+
+<script>
+    // HTMX olayı: içerik yüklendikten hemen sonra
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      // Eğer swap hedefi modal-body içindeyse
+      if (evt.detail.target.closest('#noteModal .modal-body')) {
+        // Bootstrap modal’ı göster
+        var modalEl = document.getElementById('noteModal');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Copy butonunu bağla
+        document.getElementById('copyNoteBtn').onclick = function() {
+          var text = modalEl.querySelector('.modal-body').innerText;
+          navigator.clipboard.writeText(text)
+            .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
+        };
+      }
+    });
+</script>
+
+
+
+</body>
+</html>
