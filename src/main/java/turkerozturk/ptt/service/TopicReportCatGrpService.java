@@ -56,7 +56,6 @@ public class TopicReportCatGrpService {
 
         //List<Topic> result = topicRepository.findTop10FutureNeutralTopicsFromToday(todayEpochMillis);
         List<Topic> result = topicRepository.findFutureNeutralTopicsFromTodayForCategoryGroup(todayEpochMillis, categoryGroupId);
-        System.out.println("findFutureNeutralTopicsFromTodayForCategoryGroup: " + categoryGroupId);
 
 
         // elle LIMIT 10 uygula (ekstra güvenlik için)
