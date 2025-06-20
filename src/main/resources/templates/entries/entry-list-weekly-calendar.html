@@ -28,7 +28,7 @@
 
     <style>
 
-        .pivot-table-entry-cell {
+        .weekly-table-entry-cell {
                     text-align: center;      /* yatay ortalama */
                     vertical-align: middle;  /* dikey ortalama */
                     min-width: 20px;
@@ -143,26 +143,8 @@
 
 
 <div  id="navigation-panel">
-    <div class="align-center-horizontal">
-        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm"
-           th:text="#{category.groups}" style="color:white;">Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm"
-           th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
-        <a href="/topics" class="btn btn-secondary btn-sm"
-           th:if="${hasCategories}" style="color:white;">Topics</a>
-        <th:block th:if="${hasTopics}">
-            <a href="/entries" class="btn btn-secondary btn-sm"
-               style="color:white;">Entries</a>
-            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
-            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
-        </th:block>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
-                Logout
-            </button>
-        </form>
-    </div>
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+
     <!-- Yeni Entry Butonu -->
     <div th:if="${topic == null}" style="margin-top:4px;">
         <a th:href="@{/entries/new?returnPage=entries}" class="btn btn-secondary btn-sm" style="color:white;">Add New Entry</a>
@@ -300,17 +282,19 @@
 
 
 
-    <table id="weeklyCalendarView" class="table table-bordered text-center align-middle">
+    <table id="weeklyCalendarView"
+           class="table table-bordered text-center align-middle table-sm caption-top"
+    style="width:250px;">
         <thead>
         <tr>
             <th>Week</th>
-            <th>M</th>
-            <th>T</th>
-            <th>W</th>
-            <th>T</th>
-            <th>F</th>
-            <th>S</th>
-            <th>S</th>
+            <th title="Monday">M</th>
+            <th title="Tuesday">T</th>
+            <th title="Wednesday">W</th>
+            <th title="Thursday">T</th>
+            <th title="Friday">F</th>
+            <th title="Saturday">S</th>
+            <th title="Sunday">S</th>
         </tr>
         </thead>
         <tbody>
@@ -325,7 +309,7 @@
                 <th:block th:if="${entryItem != null}">
                     <td
                         th:if="${entryItem.status != 3}"
-                        th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
+                        th:class="'weekly-table-entry-cell status-' + ${entryItem.status}">
 
                         <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
                                                categoryId=${topic.category.id},
@@ -349,7 +333,7 @@
 
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
                 <th:block th:if="${entryItem == null }">
-                    <td class="pivot-table-entry-cell">
+                    <td class="weekly-table-entry-cell">
                         <a th:href="@{/entries/new(topicId=${topic.id},
                                            dateYmd=${day},
                                            categoryId=${topic.category.id},

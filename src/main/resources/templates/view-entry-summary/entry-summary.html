@@ -23,9 +23,53 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
 
+    <style>
+
+        /* https://css-pattern.com/rotated-squares/ */
+        body {
+          --s: 256px; /* control the size*/
+          --c1: #046d8b;
+          --c2: #2fb8ac;
+
+          --_g: #0000 90deg,var(--c1) 0;
+          background:
+            conic-gradient(from 116.56deg at calc(100%/3) 0   ,var(--_g)),
+            conic-gradient(from -63.44deg at calc(200%/3) 100%,var(--_g))
+            var(--c2);
+          background-size: var(--s) var(--s);
+        }
+
+         #navigation-panel button, a{
+           border-radius:10px !important;
+         }
+
+
+         #navigation-panel {
+            max-width: 640px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 3px;
+            border: 2px solid DarKGray;
+            border-radius: 7px 7px 7px 7px;
+
+            /* https://cssgradient.io/ */
+
+            background: #a7d6e8;
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+         }
+
+    </style>
+
 </head>
 <body>
-<form method="post" th:action="@{/entries/entry-summary-report}">
+    <div  id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+    </div>
+    <div style="margin-top:4px;"></div>
+
+<form method="post" th:action="@{/entries/entry-summary-report}" style="background-color:WhiteSmoke;">
     <label>Status:</label>
     <select name="status">
         <option value="0" th:selected="${selectedStatus == 0}">0</option>

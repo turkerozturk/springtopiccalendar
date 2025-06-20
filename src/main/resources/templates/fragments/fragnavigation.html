@@ -1,0 +1,37 @@
+<div th:fragment="fragnavigation" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+    <div>
+        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">Home</a>
+        <a href="/category-groups" class="btn btn-secondary btn-sm"
+           th:text="#{category.groups}" style="color:white;">Category Groups</a>
+        <a href="/categories" class="btn btn-secondary btn-sm"
+           th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
+        <!-- Eğer filterDto ve categoryId varsa -->
+        <a th:if="${filterDto != null and filterDto.categoryId != null}"
+           th:href="@{/topics(categoryId=${filterDto.categoryId})}"
+           class="btn btn-secondary btn-sm" style="color:white;">
+            Topics
+        </a>
+
+        <!-- Yoksa parametresiz versiyon -->
+        <a th:if="${filterDto == null or filterDto.categoryId == null}"
+           th:href="@{/topics}"
+           class="btn btn-secondary btn-sm" style="color:white;">
+            Topics
+        </a>
+
+        <th:block th:if="${hasTopics}">
+            <a href="/entries" class="btn btn-secondary btn-sm"
+               style="color:white;">Entries</a>
+            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;">Tracker</a>
+            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">Report</a>
+        </th:block>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                Logout
+            </button>
+        </form>
+    </div>
+
+
+</div>
