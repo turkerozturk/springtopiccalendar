@@ -246,7 +246,7 @@ body {
             </td>
             <!-- Category Name -->
             <td class="crop-text">
-                <a th:href="@{/categories/edit/{id}(id=${topic.category.id})}"
+                <a th:href="@{/categories/edit/{id}(id=${topic.category.id}, returnPage= 'topics')}"
                    th:text="${topic.category.name}">
                     Edit Category Name
                 </a>

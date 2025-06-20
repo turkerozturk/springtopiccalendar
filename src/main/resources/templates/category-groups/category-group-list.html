@@ -145,16 +145,15 @@
             <td th:text="${grp.name}">Group Name</td>
             <td>
                 <a th:if="${grp.categories.size == 0}"
-                   th:href="@{/categories/create(categoryGroupId=${grp.id})}"
-                   target="_blank" title="Add Category">Add Category</a>
+                   th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
+                   title="Add Category">Add Category</a>
                 <th:block th:each="cat, iStats : ${grp.categories}">
                     <span th:classappend="${cat.archived} ? ' css-archived' : ''"
                           style="display: inline-block; white-space: normal;">
                             [<a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
                                  th:text="${cat.name}"></a>
-                              <a th:href="@{/categories/edit/{id}(id=${cat.id})}"
+                              <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
                                  th:title="${cat.name} + ' [click to edit this category on a new page]' "
-                                 target="_blank"
                               >✎</a>]
                             </span>
                     <span th:if="${grp.categories.size != iStats.index + 1}">&nbsp;</span>
@@ -167,8 +166,8 @@
                    class=" btn-sm btn-outline-danger"
                    onclick="return confirm('Delete this group?');"
                    title="Delete Category Group">&nbsp;🗑</a>
-                <a th:href="@{/categories/create(categoryGroupId=${grp.id})}"
-                   target="_blank" title="Add Category">&nbsp;＋</a>
+                <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
+                   title="Add Category">&nbsp;＋</a>
                 <!-- intelligent report for only one category group -->
                 <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
                 >&nbsp;🧠</a>

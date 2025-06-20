@@ -567,6 +567,11 @@ public class EntryController {
                     }
                 case "reporttable":
                     return "redirect:/reports/all";
+                case "categories":
+                    return "redirect:/categories";
+                case "categorygroups":
+                    return "redirect:/category-groups";
+
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     return "redirect:/";

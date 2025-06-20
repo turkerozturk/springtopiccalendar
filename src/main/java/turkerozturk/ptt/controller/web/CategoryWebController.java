@@ -79,26 +79,28 @@ public class CategoryWebController {
         String returnPage = request.getParameter("returnPage");
 
         if (returnPage != null) {
-            switch (returnPage) {
-                case "home":
-                    return "redirect:/";
-                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
-                default:
-            }
+
+            return "redirect:/entries/redirect"
+                + "?returnPage=" + returnPage;
+               // + (categoryId != null ? "&categoryId=" + categoryId : "")
+               // + (topicId != null ? "&topicId=" + topicId : "");
         }
         return "redirect:/categories";
     }
 
     // Mevcut kategoriyi düzenleme formu
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id, Model model,
+                               @ModelAttribute("returnPage") String returnPage
+                               ) {
         Category category = categoryService
                 .getCategoryById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
 
-
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("categoryDTO", category);
+        model.addAttribute("returnPage", returnPage);
+
 
         return "categories/category-form"; // Aynı formu kullanacağız
     }
@@ -106,7 +108,8 @@ public class CategoryWebController {
     // Mevcut kategoriyi güncellemek için (form post)
     @PostMapping("/update/{id}")
     public String updateCategory(@PathVariable Long id,
-                                 @ModelAttribute("categoryDTO") Category dto) {
+                                 @ModelAttribute("categoryDTO") Category dto,
+                                 @ModelAttribute("returnPage") String returnPage) {
         Category category = categoryService
                 .getCategoryById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
@@ -120,6 +123,17 @@ public class CategoryWebController {
 
         // Topics liste gibi daha fazlası varsa burada set edebilirsiniz.
         categoryService.saveCategory(category);
+
+        Long categoryId = category.getId();
+
+        if (returnPage != null) {
+
+            return "redirect:/entries/redirect"
+                    + "?returnPage=" + returnPage
+             + (categoryId != null ? "&categoryId=" + categoryId : "");
+            // + (topicId != null ? "&topicId=" + topicId : "");
+        }
+
         return "redirect:/categories";
     }
 

@@ -81,7 +81,18 @@
 
     <!-- Geri Dön Linki -->
     <div class="mt-3">
-        <a th:href="@{/categories}" class="btn btn-secondary w-100">Back to List</a>
+
+
+        <form th:action="@{/entries/redirect}" id="cancelForm" method="post">
+            <input type="hidden" name="returnPage" th:value="${returnPage}">
+            <input type="hidden" name="categoryId" th:value="${categoryId}" th:if="${categoryId}">
+
+
+
+            <button type="submit" class="btn btn-sm btn-secondary col-sm-2">Cancel</button>
+
+        </form>
+
     </div>
 
 </div>
@@ -89,5 +100,20 @@
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+<noscript>
+    Please enable JavaScript.
+</noscript>
+<script>
+    // Webbrowser'in back dugmesine tiklandiginda bu sayfadaki cancelForm dugmesine
+    // tiklanmasini saglayan script. Cunku geldigi sayfa geri gidince calismaya uygun olmayabiliyor.
+    // Ama bu yolla istenildigi bicimde tracker sayfasina donmus oluyor.
+    if (performance.navigation.type === 2) { // 2 = Back/Forward
+        const form = document.getElementById('cancelForm');
+        if (form) form.submit();
+    }
+</script>
+
+
 </body>
 </html>

@@ -621,7 +621,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!-- your existing link -->
             <a th:text="${'-&nbsp;' + cat.name}"
                th:title="${'Click to rename'}"
-               th:href="@{/categories/edit/{id}(id=${cat.id})}">
+               th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">
             </a>
 
                         <!-- position / total -->

@@ -101,7 +101,8 @@
 <div  id="navigation-panel">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
     <div style="margin-top:4px;">
-        <a th:href="@{/categories/create}" class="btn btn-secondary btn-sm" style="color:white;">Create New Category</a>
+        <a th:href="@{/categories/create(returnPage='categories')}" class="btn btn-secondary btn-sm" style="color:white;">Create New Category</a>
+
     </div>
 </div>
 
@@ -167,7 +168,7 @@
 
 
             <td class="text-center">
-                <a th:href="@{/categories/edit/{id}(id=${cat.id})}">
+                <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}">
                     ✎
                 </a>
                 &nbsp;
