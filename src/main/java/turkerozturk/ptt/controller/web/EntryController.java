@@ -85,11 +85,29 @@ public class EntryController {
     @GetMapping
     public String listEntries(
             @RequestParam(name = "topicId", required = false) Long topicId,
-            @RequestParam(name = "page",    defaultValue = "0")  int page,
-            @RequestParam(name = "size",    defaultValue = "20") int size,
+            @RequestParam(name = "page", required = false) Integer page,  // Artık default yok
+            @RequestParam(name = "size", defaultValue = "20") int size,
             Model model) {
 
-        // sayfa isteğini oluşturuyoruz (tarih alanına göre azalan)
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        DateUtils dateUtils = new DateUtils();
+        dateUtils.setZoneId(zoneId);
+        long todayMillisYmd = dateUtils.getEpochMillisToday();
+
+        // Sayfa parametresi yoksa, bugüne en yakın entry'nin sırasına göre sayfa numarasını hesapla
+        if (page == null) {
+            int indexOfClosestEntry;
+
+            if (topicId != null) {
+                indexOfClosestEntry = entryRepository.countEntriesWithDateGreaterThanEqualAndTopicId(todayMillisYmd, topicId);
+            } else {
+                indexOfClosestEntry = entryRepository.countEntriesWithDateGreaterThanEqual(todayMillisYmd);
+            }
+
+            page = indexOfClosestEntry / size;
+        }
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
         Page<Entry> entriesPage;
 
@@ -101,24 +119,20 @@ public class EntryController {
         }
 
         model.addAttribute("entriesPage", entriesPage);
-        model.addAttribute("topicId",     topicId);
+        model.addAttribute("topicId", topicId);
 
         int current = entriesPage.getNumber();
-        int total   = entriesPage.getTotalPages();
-        int start   = Math.max(0, current - 5);
-        int end     = Math.min(total - 1, current + 5);
+        int total = entriesPage.getTotalPages();
+        int start = Math.max(0, current - 5);
+        int end = Math.min(total - 1, current + 5);
 
         model.addAttribute("startPage", start);
-        model.addAttribute("endPage",   end);
-
-        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
-
+        model.addAttribute("endPage", end);
         model.addAttribute("zoneId", zoneId);
-
-
 
         return "entries/entry-list";
     }
+
 
     @GetMapping("weekly-calendar")
     public String listEntriesWeekView(

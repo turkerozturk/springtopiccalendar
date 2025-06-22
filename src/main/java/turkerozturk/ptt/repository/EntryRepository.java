@@ -93,6 +93,12 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     );
 
 
+    @Query("SELECT COUNT(e) FROM Entry e WHERE e.dateMillisYmd >= :todayMillisYmd")
+    int countEntriesWithDateGreaterThanEqual(@Param("todayMillisYmd") long todayMillisYmd);
+
+    @Query("SELECT COUNT(e) FROM Entry e WHERE e.dateMillisYmd >= :todayMillisYmd AND e.topic.id = :topicId")
+    int countEntriesWithDateGreaterThanEqualAndTopicId(@Param("todayMillisYmd") long todayMillisYmd,
+                                                       @Param("topicId") Long topicId);
 
 
 
