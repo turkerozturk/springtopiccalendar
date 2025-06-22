@@ -6,19 +6,22 @@
            th:text="#{category.groups}" style="color:white;">Category Groups</a>
         <a href="/categories" class="btn btn-secondary btn-sm"
            th:if="${hasCategoryGroups}" style="color:white;">Categories</a>
-        <!-- Eğer filterDto ve categoryId varsa -->
-        <a th:if="${filterDto != null and filterDto.categoryId != null}"
-           th:href="@{/topics(categoryId=${filterDto.categoryId})}"
-           class="btn btn-secondary btn-sm" style="color:white;">
-            Topics
-        </a>
 
-        <!-- Yoksa parametresiz versiyon -->
-        <a th:if="${filterDto == null or filterDto.categoryId == null}"
-           th:href="@{/topics}"
-           class="btn btn-secondary btn-sm" style="color:white;">
-            Topics
-        </a>
+        <th:block th:if="${hasCategories}">
+            <!-- Eğer filterDto ve categoryId varsa -->
+            <a th:if="${filterDto != null and filterDto.categoryId != null}"
+               th:href="@{/topics(categoryId=${filterDto.categoryId})}"
+               class="btn btn-secondary btn-sm" style="color:white;">
+                Topics
+            </a>
+
+            <!-- Yoksa parametresiz versiyon -->
+            <a th:if="${filterDto == null or filterDto.categoryId == null}"
+               th:href="@{/topics}"
+               class="btn btn-secondary btn-sm" style="color:white;">
+                Topics
+            </a>
+        </th:block>
 
         <th:block th:if="${hasTopics}">
             <a href="/entries" class="btn btn-secondary btn-sm"
