@@ -282,7 +282,10 @@
 </div>
 
 <div class="align-center-horizontal" style="margin-top:4px;">
-    <h1><span class="fonbg">Intelligent Report</span></h1>
+    <h1><span class="fonbg">Intelligent Report</span>
+        <span th:if="${categoryGroupId == null}" style="font-size:14pt;">(Over all Category Groups)</span>
+        <span th:if="${categoryGroupId != null}" style="font-size:14pt;">(Over a Category Group)</span>
+    </h1>
 
     <!-- thymeleaf icin "templates/" dizini root dizindir. HTML relative pathleri oradan itibaren yazmak gerekir. -->
 

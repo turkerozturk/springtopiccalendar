@@ -41,6 +41,7 @@ import turkerozturk.ptt.helper.DateUtils;
 import turkerozturk.ptt.repository.CategoryRepository;
 import turkerozturk.ptt.repository.EntryRepository;
 import turkerozturk.ptt.repository.TopicRepository;
+import turkerozturk.ptt.service.EntryService;
 import turkerozturk.ptt.service.FilterService;
 import turkerozturk.ptt.service.TopicService;
 
@@ -58,7 +59,9 @@ public class EntryController {
     private final AppTimeZoneProvider timeZoneProvider;
     private final EntryRepository entryRepository;
 
-    private final FilterService entryService;
+    private final FilterService filterService;
+
+    private final EntryService entryService;
     private final TopicRepository topicRepository;
 
     private final TopicService topicService;
@@ -69,10 +72,11 @@ public class EntryController {
     private String startDayOfWeek;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
-        this.entryService = entryService;
+        this.filterService = entryService;
+        this.entryService = entryService1;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.categoryRepository = categoryRepository;
@@ -239,6 +243,7 @@ public class EntryController {
             @RequestParam(name="dateYmd", required=false) String dateString,
             @RequestParam(name="returnPage", required=false) String returnPage,
             @RequestParam(name="categoryId", required=false) Long categoryId,
+            @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
             Model model) {
 
         // System.out.println("dateYmd: " + dateString );
@@ -279,6 +284,13 @@ public class EntryController {
         //System.out.println("return page: " + returnPage);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
+
+        if(categoryId != null) {
+            categoryGroupId = categoryRepository.findById(categoryId).get().getCategoryGroup().getId();
+            model.addAttribute("categoryGroupId", categoryGroupId);
+        } else if(categoryGroupId != null) {
+            model.addAttribute("categoryGroupId", categoryGroupId);
+        }
 
         return "entries/entry-form";
     }
@@ -328,6 +340,7 @@ public class EntryController {
             categoryId = categoryIdFromForm;
         }
         // end   **** category id nin elde edilmesi (ugly code)
+        Long categoryGroupId = categoryRepository.findById(categoryId).get().getCategoryGroup().getId();
 
 
         // 1) Duplicate kayıt kontrolü için gerekli bilgileri alıyoruz
@@ -353,6 +366,8 @@ public class EntryController {
                 model.addAttribute("categories", categories);
                 model.addAttribute("returnPage", returnPage);
                 model.addAttribute("categoryId", categoryId);
+                model.addAttribute("categoryGroupId", categoryGroupId);
+
                 return "entries/entry-form";
             }
 
@@ -384,6 +399,8 @@ public class EntryController {
                 model.addAttribute("categories", categories);
                 model.addAttribute("returnPage", returnPage);
                 model.addAttribute("categoryId", categoryId);
+                model.addAttribute("categoryGroupId", categoryGroupId);
+
                 return "entries/entry-form";
             }
 
@@ -422,7 +439,8 @@ public class EntryController {
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
                 + (categoryId != null ? "&categoryId=" + categoryId : "")
-                + (topicId != null ? "&topicId=" + topicId : "");
+                + (topicId != null ? "&topicId=" + topicId : "")
+                + (categoryGroupId != null ? "&categoryGroupId=" + categoryGroupId : "");
 
 
 
@@ -487,6 +505,7 @@ public class EntryController {
         }
 
         Long categoryId = entry.getTopic().getCategory().getId();
+        Long categoryGroupId = entry.getTopic().getCategory().getCategoryGroup().getId();
 
         // to make topic selection easier from gui, we are sending categories to selection box:
         List<Category> categories = categoryRepository.findAll();
@@ -499,6 +518,7 @@ public class EntryController {
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("topicId", topicId);
+        model.addAttribute("categoryGroupId", categoryGroupId);
 
         return "entries/entry-form";
     }
@@ -508,12 +528,18 @@ public class EntryController {
     public String deleteEntry(@PathVariable Long id,
                               @RequestParam(name="returnPage", required=true) String returnPage) {
 
+
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
         Long topicId = entry.getTopic().getId();
         Long categoryId = entry.getTopic().getCategory().getId();
+        Long categoryGroupId = entry.getTopic().getCategory().getCategoryGroup().getId();
+        //System.out.println("cg: " + categoryGroupId + ",c: " + categoryId + ",t: " + topicId + ",e :" + id + ", note: " );
 
-        entryRepository.deleteById(id);
+        entryService.deleteEntryById(id);
+
+      //  entryRepository.deleteById(id);
+        //entryRepository.flush(); // delete hemen DB'ye gönderilir
 
         // predictionDate'i tekrar hesapla ve kaydet
         topicService.updateTopicStatus(topicId);
@@ -521,7 +547,9 @@ public class EntryController {
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
                 + (categoryId != null ? "&categoryId=" + categoryId : "")
-                + (topicId != null ? "&topicId=" + topicId : "");
+                + (topicId != null ? "&topicId=" + topicId : "")
+                + (categoryGroupId != null ? "&categoryGroupId=" + categoryGroupId : "");
+
     }
 
     // EntriesController veya uygun controller
@@ -546,7 +574,8 @@ public class EntryController {
     @RequestMapping(value = "/redirect", method = {RequestMethod.GET, RequestMethod.POST})
     public String redirect(@RequestParam(required = false) String returnPage,
                            @RequestParam(required = false) Long categoryId,
-                           @RequestParam(required = false) Long topicId) {
+                           @RequestParam(required = false) Long topicId,
+                           @RequestParam(required = false) Long categoryGroupId) {
 
         if (returnPage != null) {
             switch (returnPage) {
@@ -567,6 +596,8 @@ public class EntryController {
                     }
                 case "reporttable":
                     return "redirect:/reports/all";
+                case "cg":
+                    return "redirect:/reports/cg?categoryGroupId=" + categoryGroupId;
                 case "categories":
                     return "redirect:/categories";
                 case "categorygroups":
@@ -606,7 +637,7 @@ public class EntryController {
         long startingDate = startLocalDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
         long endingDate = endLocalDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
 
-        List<TopicEntrySummaryDTO> summaries = entryService.getFilteredEntries(status, weight, startingDate, endingDate);
+        List<TopicEntrySummaryDTO> summaries = filterService.getFilteredEntries(status, weight, startingDate, endingDate);
         model.addAttribute("entries", summaries);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedWeight", weight);

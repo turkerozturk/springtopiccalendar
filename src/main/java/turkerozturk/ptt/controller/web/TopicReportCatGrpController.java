@@ -249,7 +249,9 @@ public class TopicReportCatGrpController {
         model.addAttribute("archivedItems", archivedItems);
         model.addAttribute("negativeWeightArchivedItems", negativeWeightArchivedItems);
 
-
+        if(categoryGroupId != null) {
+            model.addAttribute("categoryGroupId", categoryGroupId);
+        }
         return "view-intelligent/report-all-statuses";
     }
 

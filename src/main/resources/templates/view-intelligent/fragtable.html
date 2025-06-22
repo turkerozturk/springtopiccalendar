@@ -205,36 +205,63 @@
                 <!-- eger gercek entry ise edit linki gosterilir -->
                 <th:block th:if="${item.status != 3}">
 
-                    <a th:href="@{/entries/editByDate
-                                        (
-                                        ymd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
-                                         topicId=${item.topic.id},
-                                         returnPage='reporttable'
-                                         )
-                                         }"
-                       th:title="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}"
-                       class="add-new-entry">&nbsp;✎&nbsp;</a>
-
+                    <th:block th:if="${categoryGroupId == null}">
+                        <a th:href="@{/entries/editByDate
+                                            (
+                                            ymd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                            topicId=${item.topic.id},
+                                            categoryGroupId=${item.topic.category.categoryGroup.id},
+                                            returnPage='reporttable'
+                                            )
+                                            }"
+                           th:title="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}"
+                           class="add-new-entry">&nbsp;✎&nbsp;</a>
+                    </th:block>
+                    <th:block th:if="${categoryGroupId != null}">
+                        <a th:href="@{/entries/editByDate
+                                            (
+                                            ymd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                            topicId=${item.topic.id},
+                                            categoryGroupId=${categoryGroupId},
+                                            returnPage='cg'
+                                            )
+                                            }"
+                           th:title="${#temporals.format(item.dateLocal, 'yyyy-MM-dd')}"
+                           class="add-new-entry">&nbsp;✎&nbsp;</a>
+                    </th:block>
 
 
                 </th:block>
 
                 <!-- predictionDate varsa -->
                 <th:block th:if="${item.status == 3}">
+                    <th:block th:if="${categoryGroupId == null}">
+                        <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+                            <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                            <a th:href="@{/entries/new(topicId=${item.topic.id},
+                                               dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                               categoryId=${item.topic.category.id},
+                                               categoryGroupId=${item.topic.category.categoryGroup.id},
+                                               returnPage=reporttable
+                                               )}"
+                               title="Add New Entry"
+                               class="add-new-entry">&nbsp;+&nbsp;</a>
 
-                    <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+                        </th:block>
+                    </th:block>
+                    <th:block th:if="${categoryGroupId != null}">
+                        <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
+                            <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                            <a th:href="@{/entries/new(topicId=${item.topic.id},
+                                               dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                               categoryId=${item.topic.category.id},
+                                               categoryGroupId=${categoryGroupId},
+                                               returnPage='cg'
+                                               )}"
+                               title="Add New Entry"
+                               class="add-new-entry">&nbsp;+&nbsp;</a>
 
-
-                        <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
-                        <a th:href="@{/entries/new(topicId=${item.topic.id},
-                                           dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
-                                           categoryId=${item.topic.category.id},
-                                           returnPage=reporttable)}"
-                           title="Add New Entry"
-                           class="add-new-entry">&nbsp;+&nbsp;</a>
-
-
-
+                        </th:block>
                     </th:block>
                 </th:block>
 
