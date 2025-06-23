@@ -40,13 +40,18 @@
            max-width:1280px;
        }
        #category-groups-table td
-    {
-        border: 1px solid gray;
-
-    }
+       {
+           border: 1px solid gray;
+       }
+       #category-groups-table .vertical
+       {
+           border: 1px solid gray;
+           font-family:sans-serif;
+           color:black;
+       }
 
        .css-archived {
-         background-color: gray;
+         background-color: lightgray;
        }
 
        a {
@@ -142,16 +147,34 @@
         <tr th:each="grp : ${groups}">
             <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
             th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
-            <td th:text="${grp.name}">Group Name</td>
+            <td class="vertical" th:text="${grp.name}">Group Name</td>
             <td>
                 <a th:if="${grp.categories.size == 0}"
                    th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
-                   title="Add Category">Add Category</a>
+                   title="Add Category" style="font-family:sans-serif;">Add Category</a>
                 <th:block th:each="cat, iStats : ${grp.categories}">
                     <span th:classappend="${cat.archived} ? ' css-archived' : ''"
                           style="display: inline-block; white-space: normal;">
                             [<a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
                                  th:text="${cat.name}"></a>
+
+
+                        <!-- Sayısal değerler (parantez + semboller) -->
+                        <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0}">
+                            (<span th:if="${cat.warningCount > 0}" style="color:red;font-weight:bold;">⚠ <span th:text="${cat.warningCount}"></span>
+                                <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0}">, </span>
+                            </span>
+                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character -->
+                            <!-- mesela 🔜 mor renkli. Ama &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  -->
+                            <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray;">&#128284;&#xfe0e; <span th:text="${cat.futureNotMarked}"></span>
+                                <span th:if="${cat.todayDone > 0}">, </span>
+                            </span>
+                            <span th:if="${cat.todayDone > 0}" style="color:darkgreen;">✅ <span th:text="${cat.todayDone}"></span></span>)
+                        </span>
+
+
+
+
                               <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
                                  th:title="${cat.name} + ' [click to edit this category on a new page]' "
                               >✎</a>]
@@ -177,43 +200,7 @@
     </table>
 </div>
 
-<ul>
-    <li th:each="cat : ${categoryStats}">
-        <span th:text="${cat.categoryName}"></span>
 
-        <!-- Parantez aç -->
-        <span th:if="${cat.warningCount > 0
-                or cat.futureNotMarked > 0
-                or cat.todayDone > 0}">(</span>
-
-        <!-- ⚠ Uyarılar -->
-        <span th:if="${cat.warningCount > 0}">
-    <span>⚠</span>
-    <span th:text="${cat.warningCount}"></span>
-    <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0}">, </span>
-  </span>
-
-        <!-- 🔜 Gelecek -->
-        <span th:if="${cat.futureNotMarked > 0}">
-    <span>🔜</span>
-    <span th:text="${cat.futureNotMarked}"></span>
-    <span th:if="${cat.todayDone > 0}">, </span>
-  </span>
-
-        <!-- ✅ Bugün Tamamlanan -->
-        <span th:if="${cat.todayDone > 0}">
-    <span>✅</span>
-    <span th:text="${cat.todayDone}"></span>
-  </span>
-
-        <!-- Parantez kapa -->
-        <span th:if="${cat.warningCount > 0
-                or cat.futureNotMarked > 0
-                or cat.todayDone > 0}">)</span>
-    </li>
-
-
-</ul>
 
 
 <script type="text/javascript"

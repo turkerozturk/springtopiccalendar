@@ -59,6 +59,15 @@ public class Category {
         this.name = name;
     }
 
+    // Counters over category
+    @Transient
+    private long warningCount; // total warnings, status = 2
+    @Transient
+    private long futureNotMarked; // total not markeds, status = 0, between today and future
+    @Transient
+    private long todayDone; // total dones, status = 1, only today
+
+
 }
 
 

@@ -39,6 +39,8 @@ import java.text.Collator;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -67,22 +69,31 @@ public class CategoryGroupController {
         Collator collator = Collator.getInstance(locale);
         collator.setStrength(Collator.PRIMARY);
 
+        // DTO: Kategori ID'ye göre Map'e çevir
+        List<CategoryEntryStatsDto> statsList = categoryService.getCategoryStats();
+        Map<Long, CategoryEntryStatsDto> statsMap = statsList.stream()
+                .collect(Collectors.toMap(CategoryEntryStatsDto::getCategoryId, Function.identity()));
+
+        // Gruplar ve kategoriler
         groups.forEach(g -> {
             List<Category> sorted = g.getCategories().stream()
+                    .peek(cat -> {
+                        CategoryEntryStatsDto dto = statsMap.get(cat.getId());
+                        if (dto != null) {
+                            cat.setWarningCount(dto.getWarningCount());
+                            cat.setFutureNotMarked(dto.getFutureNotMarked());
+                            cat.setTodayDone(dto.getTodayDone());
+                        }
+                    })
                     .sorted(Comparator.comparing(Category::getName, collator))
                     .collect(Collectors.toList());
             g.setCategories(sorted);
         });
 
         model.addAttribute("groups", groups);
-
-
-        List<CategoryEntryStatsDto> statsList = categoryService.getCategoryStats();
-        model.addAttribute("categoryStats", statsList);
-
-
         return "category-groups/category-group-list";
     }
+
 
     // SHOW CREATE FORM
     @GetMapping("/new")
