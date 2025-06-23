@@ -20,6 +20,9 @@
  */
 package turkerozturk.ptt.repository;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import turkerozturk.ptt.dto.CategoryEntryStatsDto;
 import turkerozturk.ptt.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
@@ -27,5 +30,22 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc();
+
+    @Query(value = """
+    SELECT new turkerozturk.ptt.dto.CategoryEntryStatsDto(
+        c.id,
+        c.name,
+        SUM(CASE WHEN e.status = 2 THEN 1 ELSE 0 END),
+        SUM(CASE WHEN e.status = 0 AND e.dateMillisYmd >= :today THEN 1 ELSE 0 END),
+        SUM(CASE WHEN e.status = 1 AND e.dateMillisYmd = :today THEN 1 ELSE 0 END)
+    )
+    FROM Category c
+    LEFT JOIN c.topics t
+    LEFT JOIN t.activities e
+    GROUP BY c.id, c.name
+    ORDER BY c.name
+""")
+    List<CategoryEntryStatsDto> getCategoryEntryStats(@Param("today") Long todayDateYmd);
+
 
 }

@@ -21,12 +21,16 @@
 package turkerozturk.ptt.service;
 
 import org.springframework.context.i18n.LocaleContextHolder;
+import turkerozturk.ptt.component.AppTimeZoneProvider;
+import turkerozturk.ptt.dto.CategoryEntryStatsDto;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.Collator;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -36,7 +40,11 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    private final AppTimeZoneProvider timeZoneProvider;
 
+    public CategoryService(AppTimeZoneProvider timeZoneProvider) {
+        this.timeZoneProvider = timeZoneProvider;
+    }
 
     public List<Category> getAllCategories() {
         // Veritabanından tüm kategorileri çekiyoruz.
@@ -72,5 +80,15 @@ public class CategoryService {
             categoryRepository.delete(category);
         }
     }
+
+    public List<CategoryEntryStatsDto> getCategoryStats() {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+        Long todayYmd = LocalDate.now(zoneId)
+                .atStartOfDay(zoneId)
+                .toInstant()
+                .toEpochMilli();
+        return categoryRepository.getCategoryEntryStats(todayYmd);
+    }
+
 
 }

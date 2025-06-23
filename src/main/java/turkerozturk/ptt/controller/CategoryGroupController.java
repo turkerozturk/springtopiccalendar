@@ -22,16 +22,18 @@ package turkerozturk.ptt.controller;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import turkerozturk.ptt.dto.CategoryEntryStatsDto;
 import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.entity.CategoryGroup;
 import turkerozturk.ptt.repository.CategoryGroupRepository;
+import turkerozturk.ptt.service.CategoryService;
 
 import java.text.Collator;
 import java.util.Comparator;
@@ -42,6 +44,9 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/category-groups")
 public class CategoryGroupController {
+
+    @Autowired
+    private CategoryService categoryService;
 
     private final CategoryGroupRepository repo;
 
@@ -70,6 +75,12 @@ public class CategoryGroupController {
         });
 
         model.addAttribute("groups", groups);
+
+
+        List<CategoryEntryStatsDto> statsList = categoryService.getCategoryStats();
+        model.addAttribute("categoryStats", statsList);
+
+
         return "category-groups/category-group-list";
     }
 
