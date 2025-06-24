@@ -142,7 +142,7 @@
     margin-right: 0;
     ">Topic Name</span>
 
-            <spam th:text="${': ' + topic.description}" style="white-space: pre-line;">Topic Description</spam>
+            <spam th:utext="${': ' + topicDescriptionAsHtml}" style="white-space: pre-line;">Topic Description</spam>
 
 
         </p>

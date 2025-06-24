@@ -113,7 +113,11 @@ public class EntryController {
 
         if (topicId != null) {
             entriesPage = entryRepository.findByTopicId(topicId, pageable);
-            model.addAttribute("topic", topicRepository.findById(topicId).orElseThrow());
+            Topic topic = topicRepository.findById(topicId).orElseThrow();
+            model.addAttribute("topic", topic);
+            String topicDescriptionAsHtml = convertUrlsToLinksSafe(topic.getDescription());
+            model.addAttribute("topicDescriptionAsHtml", topicDescriptionAsHtml);
+
         } else {
             entriesPage = entryRepository.findAll(pageable);
         }
@@ -571,9 +575,28 @@ public class EntryController {
     @ResponseBody
     public String getFullNote(@PathVariable Long id) {
         return entryRepository.findById(id)
-                .map(e -> e.getNote() != null ? e.getNote().getContent() : "")
+                .map(e -> e.getNote() != null ? convertUrlsToLinksSafe(e.getNote().getContent()) : "")
                 .orElse("");
     }
+
+
+    public String convertUrlsToLinksSafe(String text) {
+        if (text == null) return "";
+
+        // 1. HTML karakterlerini escape et (örneğin: <, >, &, ")
+        String escaped = text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;");
+
+        // 2. Kaçmış metin içindeki URL'leri <a> etiketi ile sarmala
+        String urlRegex = "(https?://\\S+)";
+        return escaped.replaceAll(urlRegex,
+                "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>");
+    }
+
+
 
 
     /**
