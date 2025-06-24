@@ -307,5 +307,51 @@
     <br/>
 
 </div>
+
+<!-- sayfanın en altına yakın bir yere ekleyin -->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
+                &nbsp;
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
+            </div>
+            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
+                <!-- HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+
+<script>
+    // HTMX olayı: içerik yüklendikten hemen sonra
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      // Eğer swap hedefi modal-body içindeyse
+      if (evt.detail.target.closest('#noteModal .modal-body')) {
+        // Bootstrap modal’ı göster
+        var modalEl = document.getElementById('noteModal');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Copy butonunu bağla
+        document.getElementById('copyNoteBtn').onclick = function() {
+          var text = modalEl.querySelector('.modal-body').innerText;
+          navigator.clipboard.writeText(text)
+            .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
+        };
+      }
+    });
+</script>
+
 </body>
 </html>

@@ -363,14 +363,15 @@
 
 
             <td>
-                <span
+                <!-- todo fragment yapilabilir cunku neredeyse aynisi intelligent report sayfasinda var. -->
+                <span   style="cursor: pointer;"
                         class="note-snippet"
                         th:attr="hx-get=@{/entries/{id}/note-full(id=${entry.id})}"
                         hx-trigger="click"
                         hx-target="#noteModal .modal-body"
                         hx-swap="innerHTML">
                   <span th:text="${entry.note != null ? #strings.abbreviate(entry.note.content, 30) : ''}">
-                    Note as Snippet
+                    Entry Note as Snippet
                   </span>
                 </span>
             </td>
@@ -400,7 +401,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="noteModalLabel">Not Detayı</h5>
+                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
+                &nbsp;
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
             </div>
             <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">

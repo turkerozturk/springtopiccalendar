@@ -276,9 +276,21 @@
 
             <!-- ENTRY NOTE -->
             <td>
-            <span th:if="${item.entry != null && item.entry.note != null}"
-                  th:title="${item.entry.note.content}"
-                  th:text="${#strings.abbreviate(item.entry.note.content, 37)}">Entry Note</span>
+
+                <th:block th:if="${item.entry != null && item.entry.note != null}">
+                    <!-- bu htmx in javascripti report-all-statuses.html sayfasinda. bu kodlar entries-list.html'de de var. -->
+                    <span   style="cursor: pointer;"
+                            class="note-snippet"
+                            th:attr="hx-get=@{/entries/{id}/note-full(id=${item.entry.id})}"
+                            hx-trigger="click"
+                            hx-target="#noteModal .modal-body"
+                            hx-swap="innerHTML">
+                      <span th:text="${item.entry.note != null ? #strings.abbreviate(item.entry.note.content, 37) : ''}">
+                        Entry Note as Snippet
+                      </span>
+                    </span>
+                </th:block>
+
 
             </td>
 
