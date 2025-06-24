@@ -142,7 +142,7 @@
     margin-right: 0;
     ">Topic Name</span>
 
-            <spam th:text="${': ' + topic.description}">Topic Description</spam>
+            <spam th:text="${': ' + topic.description}" style="white-space: pre-line;">Topic Description</spam>
 
 
         </p>
@@ -403,8 +403,8 @@
                 <h5 class="modal-title" id="noteModalLabel">Not Detayı</h5>
                 <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
             </div>
-            <div class="modal-body">
-                <!-- HTMX ile buraya tam içerik gelecek -->
+            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
+                <!-- HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor -->
             </div>
         </div>
     </div>
