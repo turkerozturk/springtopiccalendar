@@ -176,11 +176,20 @@
 
 
 
-                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character -->
-                            <!-- mesela 🔜 mor renkli. Ama &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  -->
-                            <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray;">&#128284;&#xfe0e; <span th:text="${cat.futureNotMarked}"></span>
+                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
+                            <!-- mesela 🔜 mor renkli. Ama renksiz veya farkli renkte kullanmak icin &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  -->
+                            <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray;; cursor:pointer;"
+                                  th:attr="hx-get=@{/entries/neutrals/category/{id}(id=${cat.id})}"
+                                  hx-target="#neutralModal .modal-body"
+                                  hx-trigger="click"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#neutralModal">
+                                &#128284;&#xfe0e;
+                                <span th:text="${cat.futureNotMarked}"></span>
                                 <span th:if="${cat.todayDone > 0}">, </span>
                             </span>
+
+
                             <span th:if="${cat.todayDone > 0}" style="color:darkgreen;">✅ <span th:text="${cat.todayDone}"></span></span>)
                         </span>
 
@@ -212,6 +221,7 @@
     </table>
 </div>
 
+<!-- htmx & bootstrap modal -->
 <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -220,7 +230,22 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- HTMX içeriği buraya gelecek -->
+                <!-- HTMX içerigi buraya gelecek -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- htmx & bootstrap modal -->
+<div class="modal fade" id="neutralModal" tabindex="-1" aria-labelledby="neutralModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="neutralModalLabel">Neutral Entries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- HTMX içerigi buraya gelecek -->
             </div>
         </div>
     </div>

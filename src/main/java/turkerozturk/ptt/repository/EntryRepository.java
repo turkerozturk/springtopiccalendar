@@ -101,13 +101,32 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
                                                        @Param("topicId") Long topicId);
 
 
+    /**
+     * total warning entries of a category (from all topics of the category)
+     * @param categoryId
+     * @param status
+     * @return
+     */
     @Query("""
     SELECT e FROM Entry e
     WHERE e.status = 2 AND e.topic.category.id = :categoryId
     ORDER BY e.dateMillisYmd DESC
     """)
-    List<Entry> findByCategoryIdAndStatus(@Param("categoryId") Long categoryId, @Param("status") int status);
+    List<Entry> findByCategoryIdAndStatusOfWarningEntries(@Param("categoryId") Long categoryId, @Param("status") int status);
 
-
+    /**
+     * total not marked entries of a category (from all topics of the category)
+     * from specified date(usually today's date) to future dates
+     * @param categoryId
+     * @param todayMillisYmd
+     * @return
+     */
+    @Query("""
+    SELECT e FROM Entry e
+    WHERE e.status = 0 AND e.topic.category.id = :categoryId
+    AND e.dateMillisYmd >= :todayMillisYmd
+    ORDER BY e.dateMillisYmd DESC
+    """)
+    List<Entry> findByCategoryIdAndStatusOfNeutralEntriesWithDateInterval(@Param("categoryId") Long categoryId, @Param("todayMillisYmd") Long todayMillisYmd);
 
 }

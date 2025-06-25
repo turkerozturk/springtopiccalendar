@@ -693,6 +693,17 @@ public class EntryController {
     }
 
 
+    @GetMapping("/neutrals/category/{id}")
+    public String getNeutralEntriesByCategory(@PathVariable("id") Long categoryId, Model model) {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<Entry> neutralEntries = entryService.findNeutralsByCategory(categoryId, dateMillisYmd);
+        model.addAttribute("neutralEntries", neutralEntries);
+        todo:  return "fragments/fragneutralentries :: fragneutralentries";
+    }
 
     /* these methods below are working, but we did it in SQLite query.
 

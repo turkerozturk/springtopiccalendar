@@ -30,7 +30,12 @@ public class EntryService {
 
     public List<Entry> findWarningsByCategory(Long categoryId) {
 
-        return entryRepository.findByCategoryIdAndStatus(categoryId, 2);
+        return entryRepository.findByCategoryIdAndStatusOfWarningEntries(categoryId, 2);
+    }
+
+    public List<Entry> findNeutralsByCategory(Long categoryId, Long dateMillisYmd) {
+
+        return entryRepository.findByCategoryIdAndStatusOfNeutralEntriesWithDateInterval(categoryId, dateMillisYmd);
     }
 
 
