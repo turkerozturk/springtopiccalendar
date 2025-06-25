@@ -101,5 +101,13 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
                                                        @Param("topicId") Long topicId);
 
 
+    @Query("""
+    SELECT e FROM Entry e
+    WHERE e.status = 2 AND e.topic.category.id = :categoryId
+    ORDER BY e.dateMillisYmd DESC
+    """)
+    List<Entry> findByCategoryIdAndStatus(@Param("categoryId") Long categoryId, @Param("status") int status);
+
+
 
 }

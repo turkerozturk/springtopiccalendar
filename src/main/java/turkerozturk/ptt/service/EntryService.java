@@ -6,6 +6,8 @@ import turkerozturk.ptt.entity.Entry;
 import turkerozturk.ptt.entity.Topic;
 import turkerozturk.ptt.repository.EntryRepository;
 
+import java.util.List;
+
 @Service
 public class EntryService {
 
@@ -25,5 +27,11 @@ public class EntryService {
 
         entryRepository.deleteById(id);
     }
+
+    public List<Entry> findWarningsByCategory(Long categoryId) {
+
+        return entryRepository.findByCategoryIdAndStatus(categoryId, 2);
+    }
+
 
 }

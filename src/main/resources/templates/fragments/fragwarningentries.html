@@ -1,0 +1,27 @@
+<div th:fragment="fragwarningentries" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Date</th>
+        <th>Topic</th>
+        <th>Note</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="entry : ${warningEntries}">
+
+        <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd EEE')
+                              .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                              .atZone(T(java.time.ZoneId).systemDefault())
+                              .toLocalDate())}"
+            th:title="${entry.dateMillisYmd}">
+        </td>
+
+        <td th:text="${entry.topic.name}"></td>
+        <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</div>

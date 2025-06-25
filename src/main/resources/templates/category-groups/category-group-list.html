@@ -161,9 +161,21 @@
 
                         <!-- Sayısal değerler (parantez + semboller) -->
                         <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0}">
-                            (<span th:if="${cat.warningCount > 0}" style="color:red;font-weight:bold;">⚠ <span th:text="${cat.warningCount}"></span>
+                            (
+
+                            <span
+                                  th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
+                                  th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
+                                  hx-target="#warningModal .modal-body"
+                                  hx-trigger="click"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#warningModal">
+                                ⚠ <span th:text="${cat.warningCount}"></span>
                                 <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0}">, </span>
                             </span>
+
+
+
                             <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character -->
                             <!-- mesela 🔜 mor renkli. Ama &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  -->
                             <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray;">&#128284;&#xfe0e; <span th:text="${cat.futureNotMarked}"></span>
@@ -200,8 +212,21 @@
     </table>
 </div>
 
+<div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="warningModalLabel">Warning Entries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- HTMX içeriği buraya gelecek -->
+            </div>
+        </div>
+    </div>
+</div>
 
-
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>

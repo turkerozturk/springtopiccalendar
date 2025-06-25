@@ -685,6 +685,14 @@ public class EntryController {
         return "view-entry-summary/entry-summary";
     }
 
+    @GetMapping("/warnings/category/{id}")
+    public String getWarningEntriesByCategory(@PathVariable("id") Long categoryId, Model model) {
+        List<Entry> warningEntries = entryService.findWarningsByCategory(categoryId);
+        model.addAttribute("warningEntries", warningEntries);
+      todo:  return "fragments/fragwarningentries :: fragwarningentries";
+    }
+
+
 
     /* these methods below are working, but we did it in SQLite query.
 
