@@ -38,5 +38,9 @@ public class EntryService {
         return entryRepository.findByCategoryIdAndStatusOfNeutralEntriesWithDateInterval(categoryId, dateMillisYmd);
     }
 
+    public List<Entry> findDonesByCategory(Long categoryId, Long dateMillisYmd) {
+
+        return entryRepository.findByCategoryIdAndStatusOfDoneEntriesWithDateInterval(categoryId, dateMillisYmd);
+    }
 
 }

@@ -705,6 +705,18 @@ public class EntryController {
         todo:  return "fragments/fragneutralentries :: fragneutralentries";
     }
 
+    @GetMapping("/dones/category/{id}")
+    public String getDoneEntriesByCategory(@PathVariable("id") Long categoryId, Model model) {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<Entry> doneEntries = entryService.findDonesByCategory(categoryId, dateMillisYmd);
+        model.addAttribute("doneEntries", doneEntries);
+        todo:  return "fragments/fragdoneentries :: fragdoneentries";
+    }
+
     /* these methods below are working, but we did it in SQLite query.
 
     public static long convertToMillis(String dateStr, ZoneId zoneId) {
