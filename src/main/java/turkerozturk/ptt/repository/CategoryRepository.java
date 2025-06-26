@@ -37,7 +37,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
         c.name,
         SUM(CASE WHEN e.status = 2 THEN 1 ELSE 0 END),
         SUM(CASE WHEN e.status = 0 AND e.dateMillisYmd >= :today THEN 1 ELSE 0 END),
-        SUM(CASE WHEN e.status = 1 AND e.dateMillisYmd = :today THEN 1 ELSE 0 END)
+        SUM(CASE WHEN e.status = 1 AND e.dateMillisYmd = :today THEN 1 ELSE 0 END),
+        SUM(CASE WHEN t.predictionDateMillisYmd <= :today THEN 1 ELSE 0 END)
     )
     FROM Category c
     LEFT JOIN c.topics t

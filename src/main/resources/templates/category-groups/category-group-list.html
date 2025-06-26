@@ -171,9 +171,9 @@
                                   data-bs-toggle="modal"
                                   data-bs-target="#warningModal">
                                 ⚠ <span th:text="${cat.warningCount}"></span>
-                                <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0}">, </span>
+                                  <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0 or cat.predictionCount > 0}"
+                                        style="color:black;">, </span>
                             </span>
-
 
 
                             <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
@@ -186,7 +186,7 @@
                                   data-bs-target="#neutralModal">
                                 &#128284;&#xfe0e;
                                 <span th:text="${cat.futureNotMarked}"></span>
-                                <span th:if="${cat.todayDone > 0}">, </span>
+                                <span th:if="${cat.todayDone > 0 or cat.predictionCount >0}" style="color:black;">, </span>
                             </span>
 
 
@@ -196,7 +196,24 @@
                                   hx-trigger="click"
                                   data-bs-toggle="modal"
                                   data-bs-target="#doneModal"
-                            >✅ <span th:text="${cat.todayDone}"></span></span>)
+                            >✅ <span th:text="${cat.todayDone}"></span>
+                            <span th:if="${cat.predictionCount > 0}" style="color:black;">, </span>
+                            </span>
+
+
+                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
+                            <!-- https://www.compart.com/en/unicode/U+2610 ☐ -->
+                            <span th:if="${cat.predictionCount > 0}" style="color:lightskyblue; cursor:pointer;"
+                                  th:attr="hx-get=@{/entries/predictions/category/{id}(id=${cat.id})}"
+                                  hx-target="#predictionModal .modal-body"
+                                  hx-trigger="click"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#predictionModal"
+                                  th:title="${cat.predictionCount}"
+                            >&#9744;&#xfe0e; <span></span>
+                            </span>
+
+                            )
 
 
                         </span>
@@ -266,6 +283,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="doneModalLabel">Done Entries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- HTMX içerigi buraya gelecek -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- htmx & bootstrap modal for status = 3 -->
+<div class="modal fade" id="predictionModal" tabindex="-1" aria-labelledby="predictionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="predictionModalLabel">Predictions</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

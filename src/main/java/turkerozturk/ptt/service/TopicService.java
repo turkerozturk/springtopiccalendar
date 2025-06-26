@@ -261,6 +261,9 @@ public class TopicService {
         return combined;
     }
 
+    public List<Topic> getTopicsWithPredictionDateBeforeOrEqualToday(Long categoryId, Long dateMillisYmd) {
+       return topicRepository.findByCategoryIdAndDateOfPredictionsWithDateInterval(categoryId, dateMillisYmd);
+    }
 
 
 }

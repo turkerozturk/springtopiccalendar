@@ -717,6 +717,21 @@ public class EntryController {
         todo:  return "fragments/fragdoneentries :: fragdoneentries";
     }
 
+    @GetMapping("/predictions/category/{id}")
+    public String getPredictionsByCategory(@PathVariable("id") Long categoryId, Model model) {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<Topic> predictionTopics = topicService.getTopicsWithPredictionDateBeforeOrEqualToday(categoryId, dateMillisYmd);
+
+
+        model.addAttribute("predictionTopics", predictionTopics);
+        todo:  return "fragments/fragpredictiontopics :: fragpredictiontopics";
+    }
+
+
     /* these methods below are working, but we did it in SQLite query.
 
     public static long convertToMillis(String dateStr, ZoneId zoneId) {

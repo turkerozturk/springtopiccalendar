@@ -66,6 +66,8 @@ public class Category {
     private long futureNotMarked; // total not markeds, status = 0, between today and future
     @Transient
     private long todayDone; // total dones, status = 1, only today
+    @Transient
+    private long predictionCount; // total predictions, between today and past
 
 
 }

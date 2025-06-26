@@ -80,9 +80,12 @@ public class CategoryGroupController {
                     .peek(cat -> {
                         CategoryEntryStatsDto dto = statsMap.get(cat.getId());
                         if (dto != null) {
+                            // sorgu sonucu dto ya yukledigimiz istatistik sayaclari
+                            // Category entity'sinde karsilik gelen transient degiskenlere yukluyoruz.
                             cat.setWarningCount(dto.getWarningCount());
                             cat.setFutureNotMarked(dto.getFutureNotMarked());
                             cat.setTodayDone(dto.getTodayDone());
+                            cat.setPredictionCount(dto.getPredictionCount());
                         }
                     })
                     .sorted(Comparator.comparing(Category::getName, collator))

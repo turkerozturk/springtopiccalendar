@@ -21,10 +21,10 @@
 package turkerozturk.ptt.repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import turkerozturk.ptt.entity.Topic;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
@@ -153,6 +153,17 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
     List<Topic> findTopNByLastPastEntryDateBeforeTodayForCategoryGroup(@Param("todayEpochMillis") Long todayEpochMillis, Pageable pageable,
                                                                        @Param("categoryGroupNumber") Long categoryGroupNumber);
+
+    @Query("""
+    SELECT t FROM Topic t
+    LEFT JOIN t.category c                
+    WHERE c.id = :categoryId
+    AND t.predictionDateMillisYmd <= :todayMillisYmd
+    AND t.weight >= -1
+    ORDER BY t.predictionDateMillisYmd DESC
+    """)
+    List<Topic> findByCategoryIdAndDateOfPredictionsWithDateInterval(@Param("categoryId") Long categoryId, @Param("todayMillisYmd") Long todayMillisYmd);
+
 
 
 }

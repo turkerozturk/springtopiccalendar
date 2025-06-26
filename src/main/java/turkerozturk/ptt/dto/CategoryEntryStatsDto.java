@@ -11,12 +11,8 @@ public class CategoryEntryStatsDto {
     private long warningCount;      // status = 2
     private long futureNotMarked;   // status = 0 and date >= today
     private long todayDone;         // status = 1 and date == today
+    private long predictionCount;
 
     // constructor, getters, setters
-
-
-
-
-
 }
 
