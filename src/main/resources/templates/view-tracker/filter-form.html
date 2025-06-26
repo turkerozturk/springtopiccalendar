@@ -29,6 +29,12 @@
     <style>
 
 
+
+
+
+
+
+
         /* https://stackoverflow.com/questions/3203252/unicode-character-as-bullet-for-list-item-in-css */
         ul li {
           list-style: none;
@@ -175,6 +181,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                   margin-right: auto;
                   }
 
+                .highlighted {
+                background-color: FloralWhite !important;
+                }
                 .pivot-table-entry-cell {
                     text-align: center;      /* yatay ortalama */
                     vertical-align: middle;  /* dikey ortalama */
@@ -188,7 +197,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     height: 20px;
                     padding: 0px;
 
-                    background-color: WhiteSmoke !important;
+                    background-color: WhiteSmoke;
 
                 }
 
@@ -1315,6 +1324,7 @@ function sortPivotTableByColumn(colIndex) {
 <!-- "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range. -->
 <!-- calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers -->
 <script>
+
     $(function() {
       $('#startDateContainer .startDateStyle.date').datepicker({
           format: "yyyy-mm-dd",
@@ -1336,7 +1346,43 @@ function sortPivotTableByColumn(colIndex) {
           todayHighlight: true
       });
   });
+
+
+$(document).ready(function () {
+    $('#pivot-table .pivot-table-entry-cell').hover(
+            function () {
+                const $cell = $(this);
+                const colIndex = $cell.index();
+                const $row = $cell.closest('tr');
+
+                // Aynı satırdaki diğer hücreler (aynı class'a sahip olanlar)
+                $row.find('.pivot-table-entry-cell').addClass('highlighted');
+
+                // Aynı sütundaki diğer hücreler
+                $('#pivot-table tr').each(function () {
+                    $(this).find('.pivot-table-entry-cell').each(function (i, cell) {
+                        if ($(cell).index() === colIndex) {
+                            $(cell).addClass('highlighted');
+                        }
+                    });
+                });
+
+            },
+            function () {
+                // Tüm hücrelerden class'ı kaldır
+                $('#pivot-table .pivot-table-entry-cell').removeClass('highlighted');
+            }
+        );
+    });
 </script>
+
+
+
+
+
+
+
+
 
 
 
