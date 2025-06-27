@@ -202,15 +202,14 @@
 
 
                             <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
-                            <!-- https://www.compart.com/en/unicode/U+2610 ☐ -->
+                            <!-- https://www.unicodepedia.com/unicode/geometric-shapes/25a0/black-square/ ■ -->
                             <span th:if="${cat.predictionCount > 0}" style="color:lightskyblue; cursor:pointer;"
                                   th:attr="hx-get=@{/entries/predictions/category/{id}(id=${cat.id})}"
                                   hx-target="#predictionModal .modal-body"
                                   hx-trigger="click"
                                   data-bs-toggle="modal"
                                   data-bs-target="#predictionModal"
-                                  th:title="${cat.predictionCount}"
-                            >&#9744;&#xfe0e; <span></span>
+                            >&#9632;&#xfe0e; <span th:text="${cat.predictionCount}"></span>
                             </span>
 
                             )

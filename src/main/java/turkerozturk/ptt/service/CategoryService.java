@@ -27,18 +27,24 @@ import turkerozturk.ptt.entity.Category;
 import turkerozturk.ptt.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import turkerozturk.ptt.repository.TopicRepository;
 
 import java.text.Collator;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private TopicRepository topicRepository;
 
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -87,7 +93,28 @@ public class CategoryService {
                 .atStartOfDay(zoneId)
                 .toInstant()
                 .toEpochMilli();
-        return categoryRepository.getCategoryEntryStats(todayYmd);
+
+
+        List<CategoryEntryStatsDto> statsDtos = categoryRepository.getCategoryEntryStats(todayYmd);
+
+        // basla --- statsDtos daki predictionCount sayisi yanlis geleceginden asagidaki kod ile duzeltiyoruz.
+        List<Object[]> predictionCounts = topicRepository.getPredictionCountsPerCategory(todayYmd);
+        Map<Long, Long> predictionMap = predictionCounts.stream()
+                .collect(Collectors.toMap(
+                        obj -> (Long) obj[0],
+                        obj -> (Long) obj[1]
+                ));
+
+        statsDtos.forEach(dto -> {
+            Long prediction = predictionMap.get(dto.getCategoryId());
+            if (prediction != null) {
+                dto.setPredictionCount(prediction);
+            }
+        });
+        // bitti
+
+
+        return statsDtos;
     }
 
 

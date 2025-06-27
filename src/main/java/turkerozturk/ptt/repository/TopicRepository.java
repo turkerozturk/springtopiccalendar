@@ -165,5 +165,13 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findByCategoryIdAndDateOfPredictionsWithDateInterval(@Param("categoryId") Long categoryId, @Param("todayMillisYmd") Long todayMillisYmd);
 
 
+    @Query("""
+    SELECT t.category.id, COUNT(t)
+    FROM Topic t
+    WHERE t.predictionDateMillisYmd <= :todayMillisYmd
+    GROUP BY t.category.id
+    """)
+    List<Object[]> getPredictionCountsPerCategory(@Param("todayMillisYmd") Long todayMillisYmd);
+
 
 }

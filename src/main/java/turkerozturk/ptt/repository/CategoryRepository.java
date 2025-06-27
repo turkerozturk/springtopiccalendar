@@ -31,6 +31,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc();
 
+    /* asagidaki sorguda son yani dorduncu SUM u kullanmiyoruz artik. Sorgudan gelen veri DTO listesini servis
+    katmanindaki baska bir sorgu ile elde ettigimiz dogru degerleri o SUM ile gelen yanlis degerlerin yerine yaziyoruz.
+    Peki niye burada silmedik cunku onu silersek DTO ya bir parametre eksik gittigi icin uygulama acilmadan hata verir.
+    Peki servis katmaninda duzeltme yapmasaydik bu haliyle sorgu ise yariyor mu? Yariyor ama predictionCount degerini
+    yanlis gosterir. Nasil yariyor o zaman, en azindan bir prediction olup olmadigini gosterir ki bu yeterli. Cunku
+    bu bilgiyi kategori gruplari sayfasinda tiklanabilir bir link gosterip gostermemeye karar vermek icin kullaniyoruz.
+    Ama artik servis katmaninda o parametreyi dogru sayisal predictionCount degeri ile duzelttikten sonra kullaniyoruz.
+     */
     @Query(value = """
     SELECT new turkerozturk.ptt.dto.CategoryEntryStatsDto(
         c.id,
@@ -45,7 +53,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     LEFT JOIN t.activities e
     GROUP BY c.id, c.name
     ORDER BY c.name
-""")
+    """)
     List<CategoryEntryStatsDto> getCategoryEntryStats(@Param("today") Long todayDateYmd);
 
 
