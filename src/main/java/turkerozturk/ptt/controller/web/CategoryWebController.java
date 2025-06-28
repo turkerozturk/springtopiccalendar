@@ -28,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import turkerozturk.ptt.entity.Category;
+import turkerozturk.ptt.entity.CategoryGroup;
 import turkerozturk.ptt.repository.CategoryGroupRepository;
 import turkerozturk.ptt.service.CategoryService;
 
@@ -59,8 +60,14 @@ public class CategoryWebController {
     // Yeni kategori oluşturma formunu getiren endpoint
     @GetMapping("/create")
     public String showCreateForm(Model model,
-                                 @RequestParam(name="returnPage", required=false) String returnPage) {
-        model.addAttribute("categoryDTO", new Category());
+                                 @RequestParam(name="returnPage", required=false) String returnPage,
+                                 @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId) {
+        Category category = new Category();
+        if(categoryGroupId != null) {
+            CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
+            category.setCategoryGroup(categoryGroup);
+        }
+        model.addAttribute("categoryDTO", category);
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("returnPage", returnPage);
 
