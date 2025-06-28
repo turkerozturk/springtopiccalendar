@@ -205,12 +205,16 @@ public class TopicWebController {
     // Topic silme
     @GetMapping("/delete/{id}")
     public String deleteTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+
+        Topic topic = topicService.getTopicById(id).get(); // for redirection after delete
+        var categoryId = topic.getCategory().getId(); // for redirection after delete
+
         try {
             topicService.deleteTopic(id);
         } catch (IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/topics";
+        return "redirect:/topics?categoryId=" + categoryId;
     }
 
 
