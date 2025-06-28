@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>daily-topic-tracker</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <name>Daily Topic Tracker</name>
   <description>Daily Topic Tracker, a Java Spring Boot application with SQLite database.</description>
   <url>https://github.com/turkerozturk/springtopiccalendar</url>

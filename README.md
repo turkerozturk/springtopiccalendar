@@ -3,14 +3,14 @@ Daily Topic Tracker, a Java Spring Boot application with SQLite database.
 
 ## HOW TO DOWNLOAD
 
-Current version is 1.0.2.
+Current version is 1.0.3.
 
 Download the daily-topic-tracker.zip archive file to your computer.
 Extract its contents to an empty folder.
 
 No installation required. It will work if Java is installed on your computer.
 
-https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.2/daily-topic-tracker.zip
+https://github.com/turkerozturk/springtopiccalendar/releases/download/1.0.3/daily-topic-tracker.zip
 
 ## HOW TO RUN:
 

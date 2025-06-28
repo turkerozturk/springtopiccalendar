@@ -63,7 +63,7 @@ public class LaunchDTT extends JFrame {
     private final JButton btnOpenApplicationFolder = new JButton("Open App Folder");
 
     private final JComboBox<String> cmbDatabaseList = new JComboBox<>();
-    private final JLabel lblAppVersion = new JLabel("DailyTopicTracker V1.0.2 - Turker Ozturk");
+    private final JLabel lblAppVersion = new JLabel("DailyTopicTracker V1.0.3 - Turker Ozturk");
     private final JTextArea textAreaLogs = new JTextArea();
 
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
