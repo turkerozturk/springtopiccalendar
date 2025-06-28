@@ -20,6 +20,7 @@
  */
 package turkerozturk.ptt.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.dto.CategoryEntryStatsDto;
@@ -75,13 +76,20 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
+
+    // can.delete.category.group.with.its.categories=false
+    @Value("${can.delete.category.with.its.topics:false}")
+    private boolean canDeleteCategoryWithItsTopics;
+
     public void deleteCategory(Long id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
         if (optionalCategory.isPresent()) {
             Category category = optionalCategory.get();
             if (category.getTopics() != null && !category.getTopics().isEmpty()) {
-                // Bağlı topic'ler varsa silme!
-                throw new IllegalStateException("Cannot delete category with associated topics.");
+                if(!canDeleteCategoryWithItsTopics) {
+                    // Bağlı topic'ler varsa silme!
+                    throw new IllegalStateException("Cannot delete category with associated topics.");
+                }
             }
             categoryRepository.delete(category);
         }

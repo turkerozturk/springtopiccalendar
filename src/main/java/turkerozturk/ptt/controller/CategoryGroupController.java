@@ -173,6 +173,11 @@ public class CategoryGroupController {
         return "redirect:/category-groups";
     }
 
+
+
+    @Value("${can.delete.category.group.with.its.categories:false}")
+    private boolean canDeleteCategoryGroupWithItsCategories;
+
     // DELETE
     @GetMapping("/delete/{id}")
     public String delete(
@@ -183,11 +188,13 @@ public class CategoryGroupController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CategoryGroup id: " + id));
 
         if (!group.getCategories().isEmpty()) {
-            redirectAttrs.addFlashAttribute(
-                    "error",
-                    "Delete operation cancelled: This category group has categories."
-            );
-            return "redirect:/category-groups";
+            if(!canDeleteCategoryGroupWithItsCategories) {
+                redirectAttrs.addFlashAttribute(
+                        "error",
+                        "Delete operation cancelled: This category group has categories."
+                );
+                return "redirect:/category-groups";
+            }
         }
 
         // no children → safe to delete

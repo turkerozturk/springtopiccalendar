@@ -22,6 +22,7 @@ package turkerozturk.ptt.service;
 
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import turkerozturk.ptt.component.AppTimeZoneProvider;
 import turkerozturk.ptt.entity.Entry;
@@ -67,12 +68,18 @@ public class TopicService {
         return topicRepository.save(topic);
     }
 
+
+    @Value("${can.delete.topic.with.its.entries:false}")
+    private boolean canDeleteTopicWithItsEntries;
+
     public void deleteTopic(Long id) {
         Optional<Topic> optionalTopic = topicRepository.findById(id);
         if (optionalTopic.isPresent()) {
             Topic topic = optionalTopic.get();
             if (topic.getActivities() != null && !topic.getActivities().isEmpty()) {
-                throw new IllegalStateException("Cannot delete topic with associated entries.");
+                if(!canDeleteTopicWithItsEntries) {
+                    throw new IllegalStateException("Cannot delete topic with associated entries.");
+                }
             }
             topicRepository.delete(topic);
         }
