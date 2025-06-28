@@ -87,10 +87,9 @@ For Windows operating system, you can make EXE from JAR file using an applicatio
 
 You need to fill the "Jar" text box with the full path of the jar file, and the "Output file" text box with the full path of exe file to be created.
 
-Then click on to "gear icon"(Build wrapper).
 
-image::screenshot-launcher-6.jpg[]
 
+image::screenshot-launcher-16.jpg[]
 
 Then give any filename to the XML file of Launch4j config. You can delete the config file after the operation, or store it for the next time to load.
 
@@ -99,6 +98,79 @@ Then give any filename to the XML file of Launch4j config. You can delete the co
 ====
 You need to put the LaunchDTT.exe file into the same folder, where the compiled project JAR file is located.
 ====
+
+==== Bonus - Embed JRE
+
+
+
+
+To ensure that the program works, also perform the following Launch4j operation.
+
+Create a folder named JRE in capital letters in the same folder as the application.
+
+In the JRE tab, paste the following text into the text box named "JRE paths":
+
+-----
+JRE;%JAVA_HOME%;%PATH%
+-----
+
+image::screenshot-launcher-10.jpg[]
+
+-----
+17
+-----
+
+image::screenshot-launcher-11.jpg[]
+
+Then click on to "gear icon"(Build wrapper).
+
+image::screenshot-launcher-6.jpg[]
+
+
+We do this to avoid encountering the following two consecutive error messages and informing the user that Java is missing.
+
+image::screenshot-launcher-12.jpg[]
+image::screenshot-launcher-13.jpg[]
+
+
+Download *zulu17.58.21-ca-jre17.0.15-win_x64.zip*
+or any *JRE*(Java Runtime Environment) or *JDK*(Java Development Kit) distribution that is at least *Java version 17* from the internet, extract it and place it in the JRE folder.
+
+
+https://www.azul.com/downloads/?package=jdk#zulu
+
+
+image::screenshot-launcher-14.jpg[]
+
+image::screenshot-launcher-15.jpg[]
+
+
+The file and folder structure should look like this:
+
+-----
+tmp/
+├─ JRE/         <-- Azul Zulu JRE (zulu17.58.21-ca-jre17.0.15-win_x64/)
+│  ├─ bin/
+│  ├─ conf/
+│  ├─ legal/
+│  ├─ lib/
+│  ├─ DISCLAIMER
+│  ├─ readme.txt
+│  ├─ release
+│  └─ Welcome.html
+├─ application.properties
+├─ daily-topic-tracker.jar
+├─ LaunchDTT.exe
+├─ LaunchDTT.jar
+├─ readme.txt
+└─ screenshot.jpg
+-----
+Optionally, you can put a demo database too:
+-----
+tmp/
+├─ mydatabase.db
+-----
+
 
 ==== How to create shortcut to LaunchDTT.exe file on the taskbar of Windows OS
 
