@@ -221,7 +221,7 @@
 
 
                               <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
-                                 th:title="${cat.name} + ' [click to edit this category on a new page]' "
+                                 th:title="${cat.name} + ' [click to edit this category]' "
                               >✎</a>]
                             </span>
                     <span th:if="${grp.categories.size != iStats.index + 1}">&nbsp;</span>
@@ -232,7 +232,7 @@
                    class=" btn-sm btn-outline-secondary" title="Edit Category Group">✎&nbsp;</a>
                 <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
                    class=" btn-sm btn-outline-danger"
-                   onclick="return confirm('Delete this group?');"
+                   th:onclick="return confirm('Delete this [[${grp.name}]] group?');"
                    title="Delete Category Group">&nbsp;🗑</a>
                 <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
                    title="Add Category">&nbsp;＋</a>
