@@ -34,6 +34,21 @@
 
 
     <style>
+
+        .status-0 {
+                    background-color: gainsboro !important;
+        }
+        .status-1 {
+            background-color: palegreen !important;
+        }
+        .status-2 {
+            background-color: tomato !important;
+        }
+        .status-3 {
+            background-color: LightBlue !important;
+        }
+
+
         #categorySelect {
           max-width: 250px; /* Genişliği sınırla */
           text-overflow: ellipsis;
@@ -274,10 +289,23 @@ body {
                    th:text="'☰'">
                     Entries List
                 </a>
+                <!--
                 <a th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
                    th:text="'📅'">
                     Entries Weekly Calendar View
                 </a>
+                -->
+                <a
+                        th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                        th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                        hx-target="#modal-content"
+                        hx-trigger="click"
+                        hx-swap="innerHTML"
+                        onclick="document.getElementById('modal').style.display='block'; return false;"
+                        th:text="'📅'">
+                    View Weekly Calendar
+                </a>
+
             </td>
 
             <td th:text="${topic.someTimeLater}">Prediction as Number</td>
@@ -295,6 +323,18 @@ body {
     </table>
 </div>
 
+
+<!-- Modal yapısı -->
+<div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
+    <div class="modal-content" id="modal-content">
+        <!-- İçerik buraya yüklenecek -->
+    </div>
+    <button onclick="document.getElementById('modal').style.display='none'"
+            style="background-color:WhiteSmoke;"
+    >Close</button>
+</div>
+
+
 <!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
 cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
 WebJars path'leri şu yapıyı izler:
@@ -311,6 +351,7 @@ WebJars path'leri şu yapıyı izler:
 
 
 <!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 
 
 <script>
