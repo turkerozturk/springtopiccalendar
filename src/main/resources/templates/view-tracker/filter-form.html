@@ -745,6 +745,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 id="header-upcoming-note"
                 style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note<br />(day)</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
 
         </tr>
         </thead>
@@ -1022,6 +1023,20 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </td>
             </th:block>
 
+            <td>
+
+                <a
+                        th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                        th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                        hx-target="#modal-content"
+                        hx-trigger="click"
+                        hx-swap="innerHTML"
+                        onclick="document.getElementById('modal').style.display='block'; return false;"
+                        th:text="'📅'">
+                    View Weekly Calendar
+                </a>
+            </td>
+
 
         </tr>
 
@@ -1043,6 +1058,16 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
     </div>
+</div>
+
+<!-- Modal yapısı -->
+<div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
+    <div class="modal-content" id="modal-content">
+        <!-- İçerik buraya yüklenecek -->
+    </div>
+    <button onclick="document.getElementById('modal').style.display='none'"
+            style="background-color:WhiteSmoke;"
+    >Close</button>
 </div>
 
 
