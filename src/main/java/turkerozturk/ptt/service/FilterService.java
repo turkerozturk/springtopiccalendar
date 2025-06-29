@@ -31,6 +31,7 @@ import turkerozturk.ptt.repository.EntryRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -96,6 +97,20 @@ public class FilterService {
 
     public List<TopicEntrySummaryDTO> getFilteredEntries(Integer status, Integer weight, Long startDate, Long endDate) {
         return entryRepository.findFilteredSummaries(status, weight, startDate, endDate);
+    }
+
+
+    /**
+     * startDate ile endDate arasındaki tüm günleri bir liste halinde döndürür.
+     */
+    public List<LocalDate> buildDateRangeList(LocalDate start, LocalDate end) {
+        List<LocalDate> result = new ArrayList<>();
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            result.add(current);
+            current = current.plusDays(1);
+        }
+        return result;
     }
 
 }

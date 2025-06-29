@@ -47,7 +47,10 @@ import turkerozturk.ptt.service.TopicService;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -138,7 +141,112 @@ public class EntryController {
     }
 
 
+
+    public LocalDate getEndOfWeek(LocalDate date, DayOfWeek startDayOfWeek) {
+        int startOrdinal = startDayOfWeek.getValue();
+        int endOrdinal = (startOrdinal + 6) % 7;
+        DayOfWeek endDayOfWeek = DayOfWeek.of(endOrdinal == 0 ? 7 : endOrdinal);
+        return date.with(TemporalAdjusters.nextOrSame(endDayOfWeek));
+    }
+
     @GetMapping("weekly-calendar")
+    public String listEntriesWeekView(
+            @RequestParam(name = "topicId", required = false) Long topicId,
+            @RequestParam(required = false) String startDateString,
+            @RequestParam(required = false) String endDateString,
+            Model model) {
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate endDate = (endDateString != null && !endDateString.isBlank())
+                ? LocalDate.parse(endDateString, formatter)
+                : LocalDate.now(zoneId);
+
+        LocalDate startDate = (startDateString != null && !startDateString.isBlank())
+                ? LocalDate.parse(startDateString, formatter)
+                : endDate.minusDays(365);
+
+        long startDateMillis = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        long endDateMillis = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+
+        // Repository'den verileri al
+        List<Entry> entries = entryService.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
+        //System.out.println(startDateMillis + " " + endDateMillis + " " + entries.size());
+
+        // Haftalık hizalanmış tarih aralığı oluştur
+        LocalDate today = LocalDate.now(zoneId);
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
+        LocalDate endDateAlignedToWeek = getEndOfWeek(today, startDay);
+        List<LocalDate> dateRange = filterService.buildDateRangeList(startDateAlignedToWeek, endDateAlignedToWeek);
+        //System.out.println(dateRange.size());
+
+
+        // Entry'leri tarihiyle eşle
+        Map<LocalDate, Entry> entryMap = entries.stream()
+                .collect(Collectors.toMap(
+                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
+                        Function.identity()
+                ));
+
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("MM");
+        DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yy");
+
+        // 7 adet gün Map'i oluştur
+        List<Map<LocalDate, Entry>> weeklyMaps = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            weeklyMaps.add(new LinkedHashMap<>());
+        }
+
+        List<String> topColumnDates = new LinkedList<>();
+        List<String> bottomColumnDates = new LinkedList<>();
+
+
+        int i = 0;
+        for(LocalDate d : dateRange) {
+            if(i == 0) {
+                topColumnDates.add(d.format(formatter2));
+            }
+
+            if(entryMap.containsKey(d)) {
+                weeklyMaps.get(i).put(d, entryMap.get(d));
+            } else {
+                weeklyMaps.get(i).put(d, null);
+            }
+
+            if(i == 0) {
+                bottomColumnDates.add(d.format(formatter3));
+            }
+
+            i = (i + 1) % 7;
+        }
+
+
+        model.addAttribute("topColumnDates", topColumnDates);
+        model.addAttribute("bottomColumnDates", bottomColumnDates);
+
+        // Thymeleaf model'e ekleyebilirsin:
+        model.addAttribute("weeklyMaps", weeklyMaps);
+
+        List<String> dayNames = new ArrayList<>();
+        for (int j = 0; j < 7; j++) {
+            DayOfWeek currentDay = startDay.plus(j);
+            // Gerekirse Türkçe'ye çevirmek için burada değiştirebilirsiniz
+            dayNames.add(currentDay.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        }
+
+        model.addAttribute("dayNames", dayNames);
+
+        Topic topic = topicRepository.findById(topicId).get();
+        model.addAttribute("topic", topic);
+
+        return "entries/entry-list-weekly-calendar";
+
+    }
+
+    @GetMapping("weekly-calendar-old")
     public String listEntriesWeekView(
             @RequestParam(name = "topicId", required = false) Long topicId,
             @RequestParam(name = "page",    defaultValue = "0")  int page,
@@ -252,7 +360,7 @@ public class EntryController {
 
 
 
-        return "entries/entry-list-weekly-calendar";
+        return "entries/entry-list-weekly-calendar-old";
     }
 
     @GetMapping("/new")

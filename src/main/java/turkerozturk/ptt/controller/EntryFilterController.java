@@ -143,7 +143,7 @@ public class EntryFilterController {
 
 
         // 2) dateRange listesi (örneğin startDate -> endDate arası)
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
 
 
@@ -256,7 +256,7 @@ public class EntryFilterController {
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
         // 3) Date range listesi oluştur
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
 
 
@@ -325,7 +325,7 @@ public class EntryFilterController {
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
         // 3) Date range listesi oluştur
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
 
 
@@ -393,7 +393,7 @@ public class EntryFilterController {
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
 
         // 3) Date range listesi oluştur
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
 
         // === (1) Session'a filtre bilgisini saklayalım ===
@@ -455,18 +455,7 @@ public class EntryFilterController {
 
 
 
-    /**
-     * startDate ile endDate arasındaki tüm günleri bir liste halinde döndürür.
-     */
-    private List<LocalDate> buildDateRangeList(LocalDate start, LocalDate end) {
-        List<LocalDate> result = new ArrayList<>();
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-            result.add(current);
-            current = current.plusDays(1);
-        }
-        return result;
-    }
+
 
 
     /**
@@ -616,7 +605,7 @@ public class EntryFilterController {
 
         // Tekrar filtre sonuçlarını oluşturup sayfaya bas
         List<Entry> filteredEntries = filterService.filterEntries(filterDto);
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
         if(reportType.equals("normal")) {
             model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
@@ -690,7 +679,7 @@ public class EntryFilterController {
         List<Entry> filtered = filterService.filterEntries(filterDto);
 
         // 3) dateRange
-        List<LocalDate> dateRange = buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
+        List<LocalDate> dateRange = filterService.buildDateRangeList(filterDto.getStartDate(), filterDto.getEndDate());
 
         // 4) model’e pivot ya da normal tablo
         if ("normal".equals(reportType)) {

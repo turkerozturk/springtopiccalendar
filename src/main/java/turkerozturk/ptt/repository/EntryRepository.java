@@ -137,5 +137,13 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     """)
     List<Entry> findByCategoryIdAndStatusOfDoneEntriesWithDateInterval(@Param("categoryId") Long categoryId, @Param("todayMillisYmd") Long todayMillisYmd);
 
+    @Query("SELECT e FROM Entry e WHERE " +
+            "(:topicId IS NULL OR e.topic.id = :topicId) AND " +
+            "e.dateMillisYmd BETWEEN :startDateMillis AND :endDateMillis")
+    List<Entry> findByTopicIdAndDateInterval(
+            @Param("topicId") Long topicId,
+            @Param("startDateMillis") long startDateMillis,
+            @Param("endDateMillis") long endDateMillis);
+
 
 }
