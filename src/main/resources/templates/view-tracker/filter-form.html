@@ -1060,7 +1060,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     </div>
 </div>
 
-<!-- Modal yapısı -->
+<!-- Modal yapısı weekly entry calendar icin -->
 <div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
     <div class="modal-content" id="modal-content">
         <!-- İçerik buraya yüklenecek -->
@@ -1401,8 +1401,16 @@ $(document).ready(function () {
     });
 </script>
 
-
-
+<!-- Modal yapısı weekly entry calendar icin -->
+<script>
+    // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
+    document.getElementById('modal').addEventListener('click', function (event) {
+        const modalContent = document.getElementById('modal-content');
+        if (!modalContent.contains(event.target)) {
+            this.style.display = 'none';
+        }
+    });
+</script>
 
 
 

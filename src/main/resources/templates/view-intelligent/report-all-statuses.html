@@ -324,6 +324,15 @@
     </div>
 </div>
 
+<!-- Modal yapısı weekly entry calendar icin -->
+<div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
+    <div class="modal-content" id="modal-content">
+        <!-- İçerik buraya yüklenecek -->
+    </div>
+    <button onclick="document.getElementById('modal').style.display='none'"
+            style="background-color:WhiteSmoke;"
+    >Close</button>
+</div>
 
 
 <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
@@ -332,6 +341,16 @@
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
 
+<!-- Modal yapısı weekly entry calendar icin -->
+<script>
+    // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
+    document.getElementById('modal').addEventListener('click', function (event) {
+        const modalContent = document.getElementById('modal-content');
+        if (!modalContent.contains(event.target)) {
+            this.style.display = 'none';
+        }
+    });
+</script>
 
 <script>
     // HTMX olayı: içerik yüklendikten hemen sonra

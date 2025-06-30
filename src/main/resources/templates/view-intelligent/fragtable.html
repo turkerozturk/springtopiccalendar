@@ -13,7 +13,8 @@
             <th style="min-width:115px; max-width:115px;">Date</th>
             <th style="min-width:200px; max-width:200px;">Topic</th>
             <th style="min-width:30px; max-width:30px;" title="Status">S</th>
-            <th style="min-width:300px; max-width:300px;">Entry Note</th>
+            <th style="min-width:280px; max-width:280px;">Entry Note</th>
+            <th style="min-width:20px; max-width:20px;">📅</th>
 
 
         </tr>
@@ -295,7 +296,18 @@
             </td>
 
 
-
+            <td>
+                <a
+                        th:href="@{/entries/weekly-calendar?topicId={id}(id=${item.topic.id})}"
+                        th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${item.topic.id})}"
+                        hx-target="#modal-content"
+                        hx-trigger="click"
+                        hx-swap="innerHTML"
+                        onclick="document.getElementById('modal').style.display='block'; return false;"
+                        th:text="'📅'">
+                    View Weekly Calendar
+                </a>
+            </td>
 
 
         </tr>
