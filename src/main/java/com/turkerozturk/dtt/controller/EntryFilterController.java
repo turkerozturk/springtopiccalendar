@@ -175,7 +175,16 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc());
-        model.addAttribute("topicsForSelectedCategory", List.of());
+        if(categoryId != null) {
+            model.addAttribute("topicsForSelectedCategory",
+                    topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+        } else {
+            model.addAttribute("topicsForSelectedCategory", List.of()); // bu satiri birakmamin sebebi,
+            // mevcut kodlarda hala tracker tablosu aslinda sadece bir kategori icin degil, topicIdler icin yapilmis
+            // olmasi ve eskiden ilk gelen gorunumde tabloda category sutunu da gorunurdu, bu durumda filter criteria
+            // kutusunda secili bir topic listesi olmamaliydi ve hata vermemeliydi.
+        }
+
 
         model.addAttribute("zoneId", zoneId);
 
