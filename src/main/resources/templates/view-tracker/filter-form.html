@@ -351,37 +351,43 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
             aria-controls="offcanvasTop">Toggle Filter</button>
 
-    <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
-    <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
-          method="post" style="display:inline;">
-        <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
-        <input type="hidden" th:field="*{topicIds}" />
-        <input type="hidden" th:field="*{startDate}" />
-        <input type="hidden" th:field="*{endDate}" />
-        <input type="hidden" th:field="*{statuses}" />
-        <input type="hidden" th:field="*{categoryId}" />
-        <input type="hidden" th:field="*{entriesThreshold}" />
+        <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
+            [Category navigation is disabled.]
+        </th:block>
+        <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
-        <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
-            ◀️category
-        </button>
-    </form>
+            <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
+            <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
+                  method="post" style="display:inline;">
+                <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
+                <input type="hidden" th:field="*{topicIds}" />
+                <input type="hidden" th:field="*{startDate}" />
+                <input type="hidden" th:field="*{endDate}" />
+                <input type="hidden" th:field="*{statuses}" />
+                <input type="hidden" th:field="*{categoryId}" />
+                <input type="hidden" th:field="*{entriesThreshold}" />
 
-    <form th:action="@{/entry-filter/nextCategory}" th:object="${filterDto}"
-          method="post" style="display:inline; margin-left:4px;">
-        <input type="hidden" th:field="*{topicIds}" />
-        <input type="hidden" th:field="*{startDate}" />
-        <input type="hidden" th:field="*{endDate}" />
-        <input type="hidden" th:field="*{statuses}" />
-        <input type="hidden" th:field="*{categoryId}" />
-        <input type="hidden" th:field="*{entriesThreshold}" />
-
-        <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
-            category▶️
-        </button>
-    </form>
+                <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
+                    ◀️category
+                </button>
+            </form>
 
 
+            <form th:action="@{/entry-filter/nextCategory}" th:object="${filterDto}"
+                  method="post" style="display:inline; margin-left:4px;">
+                <input type="hidden" th:field="*{topicIds}" />
+                <input type="hidden" th:field="*{startDate}" />
+                <input type="hidden" th:field="*{endDate}" />
+                <input type="hidden" th:field="*{statuses}" />
+                <input type="hidden" th:field="*{categoryId}" />
+                <input type="hidden" th:field="*{entriesThreshold}" />
+
+                <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
+                    category▶️
+                </button>
+            </form>
+
+        </th:block>
 </div>
 
 
@@ -623,22 +629,37 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     <table id="pivot-table" class="table-bordered table-sm caption-top">
         <caption>
             Pivot Table
-            <!-- iterate with status -->
-            <span th:each="cat, iStats : ${allCategories}"
-                  th:if="${cat.id} == ${filterDto.categoryId}">
 
-            <!-- your existing link -->
-            <a th:text="${'-&nbsp;' + cat.name}"
-               th:title="${'Click to rename'}"
-               th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">
-            </a>
+            <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
-                        <!-- position / total -->
-            <span class="ms-2"
-                  th:text=" '(' + ${iStats.count} + ' / ' + ${allCategories.size() + ')' }">
-              <!-- e.g. “3 / 10” -->
-            </span>
-          </span>
+                <!-- iterate with status -->
+                <span th:each="cat, iStats : ${allCategories}"
+                      th:if="${cat.id} == ${filterDto.categoryId}">
+
+                <!-- your existing link -->
+                <a th:text="${'-&nbsp;' + cat.name}"
+                   th:title="${'Click to rename'}"
+                   th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">
+                </a>
+
+                            <!-- position / total -->
+                <span class="ms-2"
+                      th:text=" '(' + ${iStats.count} + ' / ' + ${allCategories.size() + ')' }">
+                  <!-- e.g. “3 / 10” -->
+                </span>
+              </span>
+
+            </th:block>
+
+
+            <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
+                <a th:text="${'-&nbsp;' + selectedCategory.name}"
+                   th:title="${'Click to rename'}"
+                   th:href="@{/categories/edit/{id}(id=${selectedCategory.id}, returnPage= 'pivottable')}">
+                </a>
+                <span> &nbsp;[An archived category does not have previous and next category navigation buttons.]</span>
+            </th:block>
+
         </caption>
 
 
