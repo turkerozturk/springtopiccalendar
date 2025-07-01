@@ -178,6 +178,11 @@ public class EntryFilterController {
         model.addAttribute("topicsForSelectedCategory", List.of());
 
         model.addAttribute("zoneId", zoneId);
+
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
+
         return "view-tracker/filter-form";
 
 
@@ -302,6 +307,9 @@ public class EntryFilterController {
 
         model.addAttribute("zoneId", zoneId);
 
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
 
         return "view-tracker/filter-form";
     }
@@ -368,8 +376,13 @@ public class EntryFilterController {
 
         model.addAttribute("zoneId", zoneId);
 
-        // 6) Aynı form sayfasına dön
-        return "view-tracker/filter-form";
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
+
+        return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
+        // return "view-tracker/filter-form"; // gives Document Expired error Bu sorunun standart cozumu PRG (Post-Redirect-Get) desenidir.
+
     }
 
 
@@ -434,8 +447,13 @@ public class EntryFilterController {
 
         model.addAttribute("zoneId", zoneId);
 
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
 
-        return "view-tracker/filter-form";
+        return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
+        // return "view-tracker/filter-form"; // gives Document Expired error Bu sorunun standart cozumu PRG (Post-Redirect-Get) desenidir.
+
     }
 
     /**
@@ -641,6 +659,10 @@ public class EntryFilterController {
 
         model.addAttribute("zoneId", zoneId);
 
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
+
         return "view-tracker/filter-form";
     }
 
@@ -713,7 +735,12 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
 
-        return "view-tracker/filter-form";
+        // we need this to get the "archived" value
+        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        model.addAttribute("selectedCategory", selectedCategory);
+
+        return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
+        // return "view-tracker/filter-form"; // gives Document Expired error Bu sorunun standart cozumu PRG (Post-Redirect-Get) desenidir.
     }
 
     /**
