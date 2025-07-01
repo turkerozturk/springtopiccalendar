@@ -69,6 +69,89 @@ https://github.com/turkerozturk/springtopiccalendar
 
 </table>
 
+    <table id="statisticsContainer" class="table">
+        <tr>
+            <td class="col-7">
+
+            </td>
+
+
+            <td class="col-3">
+
+                <!-- some statistics -->
+                <table class="table table-sm table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Weekday</th>
+                        <th>Note</th>
+                        <th>Done</th>
+                        <th>Warn</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${#numbers.sequence(0, 6)}">
+                        <td th:text="${dayNames[i]}"></td>
+                        <td th:text="${status0[i]}"></td>
+                        <td th:text="${status1[i]}"></td>
+                        <td th:text="${status2[i]}"></td>
+                    </tr>
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+            </td>
+
+            <td class="col-2">
+
+                <!-- chart -->
+
+                <canvas id="status1Chart" ></canvas>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var status1Counts = [[${status1}]];
+        var labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        new Chart(document.getElementById('status1Chart'), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Status 1 Entries',
+                    data: status1Counts,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#66BB6A'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribution of entries marked as "Done" by day of the week'
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
 
 
 </div>

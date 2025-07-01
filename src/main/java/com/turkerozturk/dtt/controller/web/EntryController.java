@@ -242,6 +242,55 @@ public class EntryController {
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
 
+
+        // basla istatistik
+
+        List<Integer> status0 = new ArrayList<>();
+        List<Integer> status1 = new ArrayList<>();
+        List<Integer> status2 = new ArrayList<>();
+        int totalStatus0 = 0, totalStatus1 = 0, totalStatus2 = 0;
+
+        for (Map<LocalDate, Entry> map : weeklyMaps) {
+            int count0 = 0;
+            int count1 = 0;
+            int count2 = 0;
+
+            for (Entry entry : map.values()) {
+                if (entry != null) {
+                    switch (entry.getStatus()) {
+                        case 0:
+                            count0++;
+                            totalStatus0++;
+                            break;
+                        case 1:
+                            count1++;
+                            totalStatus1++;
+                            break;
+                        case 2:
+                            count2++;
+                            totalStatus2++;
+                            break;
+                    }
+                }
+            }
+
+            status0.add(count0);
+            status1.add(count1);
+            status2.add(count2);
+        }
+
+        model.addAttribute("status0", status0);
+        model.addAttribute("status1", status1);
+        model.addAttribute("status2", status2);
+        model.addAttribute("totalStatus0", totalStatus0);
+        model.addAttribute("totalStatus1", totalStatus1);
+        model.addAttribute("totalStatus2", totalStatus2);
+
+        // bitti istatistik
+
+
+
+
         return "entries/entry-list-weekly-calendar";
 
     }
