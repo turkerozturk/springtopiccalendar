@@ -354,7 +354,7 @@ public class EntryController {
         model.addAttribute("uniqueTopStreaks", uniqueTopStreaks);
 
 
-
+        model.addAttribute("zoneId", zoneId);
 
 
 

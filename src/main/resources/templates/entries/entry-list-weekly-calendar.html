@@ -75,7 +75,159 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 <div class="row">
-            <span class="col-4">
+
+            <span class="col-2">
+            </span>
+
+            <span class="col-2">
+
+            <!-- filter-form'da pivot tabledaki kodlar, prediction, warn, done, not marked tarihlerini gösterir. -->
+            <table class="table table-sm">
+                <caption style="color:DarkGray !important;text-align:center;">
+                    This table is not limited to 365 days<br/>
+                    <span th:text="${ ' Prediction is set to every ' + topic.someTimeLater + ' days'}"
+                        class="status-3" style="text-align: center">
+                    </span><br/>
+                </caption>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Days</th>
+                </tr>
+
+                </thead>
+                <tbody>
+
+
+                <!-- firstWarningEntryDate varsa -->
+                <tr th:if="${topic.firstWarningEntryDate != null or !#strings.isEmpty(topic.firstWarningEntryDate)}">
+
+
+
+                    <td th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))}"
+
+                        class="status-2" style="text-align: center">
+                    </td>
+
+                    <td>First Warn</td>
+
+                    <td th:title="${'First Warn: '
+                                            + T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))
+                                            + ' ('
+                                            +  T(java.time.temporal.ChronoUnit)
+                                .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate )
+                                            + ' days)' }"
+                        class="first-warn"
+                        style="text-align: center">
+
+                        <!-- how many days has past until today -->
+                        <span th:text="${T(java.time.temporal.ChronoUnit)
+                                .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate ) }">
+                        </span>
+                    </td>
+
+
+                </tr>
+
+
+                <!-- firsFutureNeutralEntryDate varsa -->
+                <tr th:if="${topic.firstFutureNeutralEntryDate != null or !#strings.isEmpty(topic.firstFutureNeutralEntryDate)}">
+
+
+
+                    <td th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))}"
+
+                        class="status-0" style="text-align: center">
+                    </td>
+
+                    <td>Upcoming Note</td>
+
+                    <td th:title="${'Upcoming in: '
+                                            + T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))
+                                            + ' ('
+                                            +  T(java.time.temporal.ChronoUnit)
+                                .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate )
+                                            + ' days)' }"
+                        class="upcoming-note"
+                        style="text-align: center">
+
+                        <!-- how many days has past until today -->
+                        <span th:text="${T(java.time.temporal.ChronoUnit)
+                                .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate ) }">
+                        </span>
+                    </td>
+
+
+                </tr>
+
+                <!-- predictionDate varsa -->
+                <tr th:if="${topic.predictionDate != null or !#strings.isEmpty(topic.predictionDate)}">
+
+                    <td th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.predictionDate.atStartOfDay(zoneId))}"
+
+                        class="status-3" style="text-align: center">
+                    </td>
+
+                    <td>Prediction</td>
+
+                    <td
+                        class="status-3" style="text-align: center">
+                        <!-- how many days has past until today -->
+                        <span th:text="${T(java.time.temporal.ChronoUnit)
+                                .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.predictionDate ) }">
+                        </span>
+                    </td>
+
+
+
+                </tr>
+
+                <!-- lastPastEntryDate varsa -->
+                <tr th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
+
+
+                    <td th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.lastPastEntryDate.atStartOfDay(zoneId))}"
+
+                        class="status-1" style="text-align: center">
+                    </td>
+
+                    <td>Last Done</td>
+
+                    <td th:title="${'Last done: '
+                                            + T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                            + ' ('
+                                            +  T(java.time.temporal.ChronoUnit)
+                                .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
+                                            + ' days before)' }"
+                        class="last-done"
+                        style="text-align: center">
+
+                        <!-- how many days has past until today -->
+                        <span th:text="${T(java.time.temporal.ChronoUnit)
+                                .DAYS.between(T(java.time.LocalDate).now(zoneId), topic.lastPastEntryDate)}">
+                        </span>
+                    </td>
+
+
+                </tr>
+                </tbody>
+
+            </table>
 
             </span>
             <span class="col-4">
@@ -118,7 +270,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <!-- newest streak chart -->
                     <table style="width: 100%">
                         <caption style="text-align:center;color:DarkGray !important;">
-                            Newest Streak
+                            Last Streak (closest to today)
                         </caption>
                         <tbody>
                         <tr style="height: 30px;">
