@@ -31,6 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+import com.turkerozturk.dtt.dto.Streak;
 import com.turkerozturk.dtt.dto.TopicDto;
 import com.turkerozturk.dtt.dto.TopicEntrySummaryDTO;
 import com.turkerozturk.dtt.entity.Category;
@@ -156,7 +157,9 @@ public class EntryController {
             @RequestParam(required = false) String endDateString,
             Model model) {
 
-        ZoneId zoneId = timeZoneProvider.getZoneId();
+        int totalDays = 365;
+
+                ZoneId zoneId = timeZoneProvider.getZoneId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         LocalDate endDate = (endDateString != null && !endDateString.isBlank())
@@ -165,7 +168,7 @@ public class EntryController {
 
         LocalDate startDate = (startDateString != null && !startDateString.isBlank())
                 ? LocalDate.parse(startDateString, formatter)
-                : endDate.minusDays(365);
+                : endDate.minusDays(totalDays);
 
         long startDateMillis = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
         long endDateMillis = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
@@ -289,7 +292,76 @@ public class EntryController {
         // bitti istatistik
 
 
+        // BASLA - istatistik - streak
 
+        List<Streak> streaks = new ArrayList<>();
+        Streak currentStreak = null;
+        for (LocalDate date : dateRange) {
+            Entry entry = entryMap.get(date);
+
+            if (entry != null && entry.getStatus() == 1) {
+                // Geçerli ve status=1 entry varsa streak başlat ya da devam et
+                if (currentStreak == null) {
+                    currentStreak = new Streak(date, date, totalDays);
+                } else {
+                    currentStreak = new Streak(currentStreak.getStartDate(), date, totalDays);
+                }
+            } else {
+                // Entry yok ya da status != 1 → streak biter
+                if (currentStreak != null) {
+                    streaks.add(currentStreak);
+                    currentStreak = null;
+                }
+                // ❌ break yok, döngü devam eder
+            }
+        }
+        // Loop sonunda aktif bir streak kaldıysa ekle
+        if (currentStreak != null) {
+            streaks.add(currentStreak);
+        }
+
+        // statistic: only last streak
+        if(!streaks.isEmpty()) {
+            Streak newestStreak = streaks.get(streaks.size()-1);
+            model.addAttribute("newestStreak", newestStreak);
+        }
+
+        // select top 10 streaks
+        List<Streak> topStreaks = streaks.stream()
+                .sorted(Comparator.comparingLong(Streak::getDayCount).reversed()
+                )
+                .limit(10)
+                .collect(Collectors.toList());
+
+        Collections.reverse(topStreaks); // en büyük en üstte görünür
+        topStreaks.sort(Comparator.comparing(Streak::getStartDate).reversed());
+
+        Map<Integer, Streak> uniqueByDayCount = new LinkedHashMap<>();
+
+        for (Streak streak : topStreaks) {
+            if (!uniqueByDayCount.containsKey(streak.getDayCount())) {
+                uniqueByDayCount.put(streak.getDayCount(), streak); // ilk karşılaşılan (yani en güncel) eklenecek
+            }
+        }
+
+        List<Streak> uniqueTopStreaks = new ArrayList<>(uniqueByDayCount.values());
+
+
+        // for(Streak streak : streaks) {
+          //  System.out.println(streak.getDayCount() + ": " + streak.getStartDate() + " --- " + streak.getEndDate());
+        // }
+
+        model.addAttribute("uniqueTopStreaks", uniqueTopStreaks);
+
+
+
+
+
+
+
+
+
+        // BITTI - istatistik - streak
 
         return "entries/entry-list-weekly-calendar";
 

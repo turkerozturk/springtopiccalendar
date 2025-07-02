@@ -69,17 +69,94 @@ https://github.com/turkerozturk/springtopiccalendar
 
 </table>
 
-    <table id="statisticsContainer" class="table">
-        <tr>
-            <td class="col-7">
-
-            </td>
 
 
-            <td class="col-3">
+
+
+
+<div class="row">
+            <span class="col-4">
+
+            </span>
+            <span class="col-4">
+
+                <!-- top streaks chart -->
+                <table style="width: 100%">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Top Streaks
+                    </caption>
+                    <tbody>
+
+                    <tr>
+                        <td colspan="3" style="text-align:center;">Stats between today and 365 days ago</td>
+                    </tr>
+
+                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
+                        <!-- Start Date -->
+                        <td style="width: 100px; text-align: right; padding-right: 10px;">
+                            <span th:text="${streak.startDate}"></span>
+                        </td>
+
+                        <!-- Bar with Count -->
+                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                            <div
+                                 th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                             text-align: center !important; font-weight: bold; margin:auto;
+                             width:' + (${streak.percentage} * 15) + 'px;'"
+                                 th:text="${streak.dayCount}"></div>
+                        </td>
+
+                        <!-- End Date -->
+                        <td style="width: 100px; text-align: left; padding-left: 10px;">
+                            <span th:text="${streak.endDate}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <th:block th:if="${newestStreak != null}">
+                    <!-- newest streak chart -->
+                    <table style="width: 100%">
+                        <caption style="text-align:center;color:DarkGray !important;">
+                            Newest Streak
+                        </caption>
+                        <tbody>
+                        <tr style="height: 30px;">
+                            <!-- Start Date -->
+                            <td style="width: 100px; text-align: right; padding-right: 10px;">
+                                <span th:text="${newestStreak.startDate}"></span>
+                            </td>
+
+                            <!-- Bar with Count -->
+                            <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                                <div
+                                        th:style="'background-color: #c33b73 !important; height: 20px; color: white !important;
+                                 text-align: center !important; font-weight: bold; margin:auto;
+                                 width:' + (${newestStreak.percentage} * 15) + 'px;'"
+                                        th:text="${newestStreak.dayCount}"></div>
+                            </td>
+
+                            <!-- End Date -->
+                            <td style="width: 100px; text-align: left; padding-left: 10px;">
+                                <span th:text="${newestStreak.endDate}"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </th:block>
+
+
+
+            </span>
+
+
+            <span class="col-2">
 
                 <!-- some statistics -->
                 <table class="table table-sm table-bordered">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Entry statuses between today and 365 days ago
+                    </caption>
                     <thead>
                     <tr>
                         <th>Weekday</th>
@@ -106,17 +183,64 @@ https://github.com/turkerozturk/springtopiccalendar
                     </tbody>
                 </table>
 
-            </td>
+            </span>
 
-            <td class="col-2">
+            <span class="col-2">
 
                 <!-- chart -->
 
                 <canvas id="status1Chart" ></canvas>
-            </td>
-        </tr>
+            </span>
+</div>
 
-    </table>
+    <script>
+        (() => {
+            const existingChart = Chart.getChart("streakChart");
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            const labels = /*[[${labelsJson}]]*/ [];
+            const dataValues = /*[[${dataJson}]]*/ [];
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Gün Sayısı',
+                    data: dataValues,
+                    backgroundColor: 'rgba(33, 99, 132, 0.6)',
+                    borderColor: 'rgba(33, 99, 132, 1)',
+                    borderWidth: 1,
+                    barThickness: 20
+                }]
+            };
+
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.raw} gün`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: false }
+                    }
+                }
+            };
+
+            new Chart(
+                document.getElementById('streakChart'),
+                config
+            );
+        })();
+    </script>
 
 
     <script th:inline="javascript">
