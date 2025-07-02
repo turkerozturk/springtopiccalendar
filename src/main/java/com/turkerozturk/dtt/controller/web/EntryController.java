@@ -330,7 +330,7 @@ public class EntryController {
         List<Streak> topStreaks = streaks.stream()
                 .sorted(Comparator.comparingLong(Streak::getDayCount).reversed()
                 )
-                .limit(10)
+                //.limit(10)
                 .collect(Collectors.toList());
 
         Collections.reverse(topStreaks); // en büyük en üstte görünür
