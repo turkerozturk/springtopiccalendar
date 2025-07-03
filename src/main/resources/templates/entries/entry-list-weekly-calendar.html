@@ -401,8 +401,11 @@ https://github.com/turkerozturk/springtopiccalendar
                 </table>
 
                 <br />
-                <!-- trend intervals chart -->
-                <canvas id="intervalChart" width="150" height="75"></canvas>
+
+                <!-- trend intervals chart ikinci varyasyon-->
+                <canvas id="intervalChart2" width="600" height="300"></canvas>
+
+
 
 
 
@@ -457,70 +460,80 @@ https://github.com/turkerozturk/springtopiccalendar
 </div>
 
 
-
-
-
-
-
-    <!-- trend intervals chart -->
-
-
+    <!-- trend intervals chart ikinci varyasyon -->
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var intervals = [[${intervals}]];
-        var labels2 = intervals.map((_, idx) => "T-" + (intervals.length - 1 - idx));
-        var target = 5;
+            var intervals3 = [[${intervals}]];
+            var labels3 = intervals3.map(function(_, idx) {
+                return "T-" + (intervals3.length - 1 - idx);
+            });
 
-        var ctx2 = document.getElementById('intervalChart').getContext('2d');
-        new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: labels2,
-                datasets: [
-                    {
-                        label: 'Aralık (Gün)',
-                        data: intervals,
-                        borderColor: 'blue',
-                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                        tension: 0.3,
-                        pointRadius: 4
-                    },
-                    {
-                        label: 'Hedef Gün (5)',
-                        data: Array(intervals.length).fill(target),
-                        borderColor: 'green',
-                        borderDash: [5, 5],
-                        pointRadius: 0
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Alışkanlık Günlük Aralık Grafiği'
-                    }
+            var target3 = 5;
+
+            // Her noktaya özel renk: 4–6 gün arası yeşil, diğerleri kırmızı
+            var pointColors3 = intervals3.map(function(val) {
+                return (val >= 4 && val <= 6) ? 'green' : 'red';
+            });
+
+            var ctx3 = document.getElementById('intervalChart2').getContext('2d');
+
+            var chart3 = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: labels3,
+                    datasets: [
+                        {
+                            label: 'Aralık (Gün)',
+                            data: intervals3,
+                            borderColor: 'blue',
+                            backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointBackgroundColor: pointColors3,
+                            pointBorderColor: pointColors3
+                        },
+                        {
+                            label: 'Hedef Gün (5)',
+                            data: Array(intervals3.length).fill(target3),
+                            borderColor: 'green',
+                            borderDash: [5, 5],
+                            borderWidth: 1,
+                            pointRadius: 0
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
+                options: {
+                    responsive: true,
+                    plugins: {
                         title: {
                             display: true,
-                            text: 'Gün Aralığı'
+                            text: 'Alışkanlık Günlük Aralık Grafiği (Renkli Noktalar)'
+                        },
+                        legend: {
+                            position: 'top'
                         }
                     },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Zaman (Geriye Doğru)'
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Gün Aralığı'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Zaman (Geriye Doğru)'
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
         /*]]>*/
     </script>
+
+
 
 
 
