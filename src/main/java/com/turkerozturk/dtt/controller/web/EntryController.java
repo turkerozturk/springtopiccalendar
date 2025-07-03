@@ -49,6 +49,7 @@ import com.turkerozturk.dtt.service.TopicService;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.function.Function;
@@ -381,8 +382,59 @@ public class EntryController {
 
         // simdi de baska streak istatistikleri olusturmaya çalışalım.
 
-        
+        Long firstDoneEntryDateMillisYmd = entries.stream()
+                .filter(e -> e.getStatus() == 1)
+                .map(Entry::getDateMillisYmd)
+                .min(Long::compareTo)
+                .orElse(null);
 
+        if(firstDoneEntryDateMillisYmd != null) {
+            LocalDate firstDoneEntryDate = Instant
+                    .ofEpochMilli(firstDoneEntryDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+
+            long daysSinceFirstDoneEntry = ChronoUnit.DAYS.between(firstDoneEntryDate, LocalDate.now());
+            model.addAttribute("daysSinceFirstDoneEntry", daysSinceFirstDoneEntry);
+
+            long numberOfDaysToBeConsidered = daysSinceFirstDoneEntry; // bizim icin bu sayac onemli, tahmin hesaplamalarinda.
+            if(topic.getPredictionDate() != null) {
+                long daysSinceFirstDoneEntryToPrediction = ChronoUnit.DAYS.between(firstDoneEntryDate, topic.getPredictionDate());
+                model.addAttribute("daysSinceFirstDoneEntryToPrediction", daysSinceFirstDoneEntryToPrediction);
+                // ust limit olarak bugunun veya gelecekteki predictionun tarihini aliyoruz, gecmiz predictionu almiyoruz cunku artik bugun gelmis.
+                numberOfDaysToBeConsidered = Math.max(daysSinceFirstDoneEntry, daysSinceFirstDoneEntryToPrediction);
+
+            }
+            model.addAttribute("numberOfDaysToBeConsidered", numberOfDaysToBeConsidered);
+
+            Set<Long> filledDates = entries.stream()
+                    .filter(e -> e.getStatus() == 1)
+                    .map(Entry::getDateMillisYmd)
+                    .collect(Collectors.toSet());
+
+           // long totalDays = ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now()) + 1;
+            long doneDayCount = filledDates.size();
+            long emptyDayCount = daysSinceFirstDoneEntry - doneDayCount;
+            model.addAttribute("doneDayCount", doneDayCount);
+            model.addAttribute("emptyDayCount", emptyDayCount);
+
+            double averageDoneInterval = (double) numberOfDaysToBeConsidered / doneDayCount;
+            model.addAttribute("averageDoneInterval", averageDoneInterval);
+
+
+
+
+            if(topic.getSomeTimeLater() != null || topic.getSomeTimeLater() > 0) {
+                double successRate = (topic.getSomeTimeLater() / averageDoneInterval) * 100;
+                model.addAttribute("successRate", successRate);
+            }
+
+
+
+
+
+
+        }
 
 
 

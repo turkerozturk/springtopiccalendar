@@ -111,6 +111,34 @@ https://github.com/turkerozturk/springtopiccalendar
 <div class="row">
 
             <span class="col-2">
+                <span th:if="${daysSinceFirstDoneEntry != null}"
+                      th:text="${'Days since first done: ' + daysSinceFirstDoneEntry}">
+                </span>
+                <br/>
+                <span th:if="${daysSinceFirstDoneEntryToPrediction != null}"
+                      th:text="${'Days since first done to prediction: ' + daysSinceFirstDoneEntryToPrediction}">
+                </span>
+                <br/>
+                <span th:if="${numberOfDaysToBeConsidered != null}"
+                      th:text="${'Number of days to be considered: ' + numberOfDaysToBeConsidered}">
+                </span>
+                <br/>
+                <span th:if="${doneDayCount != null}"
+                      th:text="${'Number of done days: ' + doneDayCount}">
+                </span>
+                <br/>
+                <span th:if="${emptyDayCount != null}"
+                      th:text="${'Number of empty days: ' + emptyDayCount}">
+                </span>
+                <br/>
+                <span th:if="${averageDoneInterval != null}"
+                      th:text="${'Average done interval: ' + #numbers.formatDecimal(averageDoneInterval, 1, 1)}">
+                </span>
+                <br/>
+                <h3 th:if="${successRate != null}"
+                      th:text="${'Success Rate: ' + #numbers.formatDecimal(successRate, 1, 1)}">
+                </h3>
+                <br/>
             </span>
 
             <span class="col-2">
