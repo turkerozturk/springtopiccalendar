@@ -180,6 +180,7 @@ public class EntryController {
 
         // Haftalık hizalanmış tarih aralığı oluştur
         LocalDate today = LocalDate.now(zoneId);
+        model.addAttribute("todayWeekIndex", today.getDayOfWeek().getValue());
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
         LocalDate endDateAlignedToWeek = getEndOfWeek(today, startDay);
@@ -194,8 +195,13 @@ public class EntryController {
                         Function.identity()
                 ));
 
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yy");
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("MM");
-        DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("yy");
+        DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("dd");
+        DateTimeFormatter formatter4 = DateTimeFormatter.ofPattern("dd");
+        DateTimeFormatter formatter5 = DateTimeFormatter.ofPattern("MM");
+        DateTimeFormatter formatter6 = DateTimeFormatter.ofPattern("yy");
+
 
         // 7 adet gün Map'i oluştur
         List<Map<LocalDate, Entry>> weeklyMaps = new ArrayList<>();
@@ -203,14 +209,25 @@ public class EntryController {
             weeklyMaps.add(new LinkedHashMap<>());
         }
 
-        List<String> topColumnDates = new LinkedList<>();
-        List<String> bottomColumnDates = new LinkedList<>();
+        List<String> top1ColumnDates = new LinkedList<>();
+        List<String> top2ColumnDates = new LinkedList<>();
+        List<String> top3ColumnDates = new LinkedList<>();
+        List<String> bottom1ColumnDates = new LinkedList<>();
+        List<String> bottom2ColumnDates = new LinkedList<>();
+        List<String> bottom3ColumnDates = new LinkedList<>();
 
 
         int i = 0;
         for(LocalDate d : dateRange) {
+
             if(i == 0) {
-                topColumnDates.add(d.format(formatter2));
+                top1ColumnDates.add(d.format(formatter1));
+            }
+            if(i == 0) {
+                top2ColumnDates.add(d.format(formatter2));
+            }
+            if(i == 0) {
+                top3ColumnDates.add(d.format(formatter3));
             }
 
             if(entryMap.containsKey(d)) {
@@ -219,16 +236,25 @@ public class EntryController {
                 weeklyMaps.get(i).put(d, null);
             }
 
-            if(i == 0) {
-                bottomColumnDates.add(d.format(formatter3));
+            if(i == 6) {
+                bottom1ColumnDates.add(d.format(formatter4));
+            }
+            if(i == 6) {
+                bottom2ColumnDates.add(d.format(formatter5));
+            }
+            if(i == 6) {
+                bottom3ColumnDates.add(d.format(formatter6));
             }
 
             i = (i + 1) % 7;
         }
 
-
-        model.addAttribute("topColumnDates", topColumnDates);
-        model.addAttribute("bottomColumnDates", bottomColumnDates);
+        model.addAttribute("top1ColumnDates", top1ColumnDates);
+        model.addAttribute("top2ColumnDates", top2ColumnDates);
+        model.addAttribute("top3ColumnDates", top3ColumnDates);
+        model.addAttribute("bottom1ColumnDates", bottom1ColumnDates);
+        model.addAttribute("bottom2ColumnDates", bottom2ColumnDates);
+        model.addAttribute("bottom3ColumnDates", bottom3ColumnDates);
 
         // Thymeleaf model'e ekleyebilirsin:
         model.addAttribute("weeklyMaps", weeklyMaps);
@@ -352,6 +378,12 @@ public class EntryController {
         // }
 
         model.addAttribute("uniqueTopStreaks", uniqueTopStreaks);
+
+        // simdi de baska streak istatistikleri olusturmaya çalışalım.
+
+        
+
+
 
 
         model.addAttribute("zoneId", zoneId);

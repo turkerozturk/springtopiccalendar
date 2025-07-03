@@ -14,11 +14,27 @@ https://github.com/turkerozturk/springtopiccalendar
     </caption>
 
     <thead>
-    <th></th>
-    <th:block th:each="columnDate : ${topColumnDates}">
-        <th th:text="${columnDate}"></th>
-    </th:block>
-    <th></th>
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th:block th:each="columnDate : ${top1ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+        </tr>
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th:block th:each="columnDate : ${top2ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+        </tr>
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th:block th:each="columnDate : ${top3ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+        </tr>
     </thead>
 
     <tbody>
@@ -47,8 +63,10 @@ https://github.com/turkerozturk/springtopiccalendar
 
         </th:block>
 
-        <td th:text="${dayNames[stat.index]}"> </td>
 
+        <td th:text="${dayNames[stat.index]}"
+            th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow' : ''">
+        </td>
 
 
 
@@ -59,11 +77,27 @@ https://github.com/turkerozturk/springtopiccalendar
     </tbody>
 
     <tfoot>
-    <th></th>
-    <th:block th:each="columnDate : ${bottomColumnDates}">
-        <th th:text="${columnDate}"></th>
-    </th:block>
-    <th></th>
+        <tr>
+        <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+        <th:block th:each="columnDate : ${bottom1ColumnDates}">
+            <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
+        </th:block>
+        <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+        </tr>
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th:block th:each="columnDate : ${bottom2ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+        </tr>
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th:block th:each="columnDate : ${bottom3ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+        </tr>
     </tfoot>
 
 
@@ -232,40 +266,11 @@ https://github.com/turkerozturk/springtopiccalendar
             </span>
             <span class="col-4">
 
-                <!-- top streaks chart -->
-                <table style="width: 100%">
-                    <caption style="text-align:center;color:DarkGray !important;">
-                        Top Streaks
-                    </caption>
-                    <tbody>
 
-                    <tr>
-                        <td colspan="3" style="text-align:center;">Stats between today and 365 days ago</td>
-                    </tr>
+                <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago</span>
 
-                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
-                        <!-- Start Date -->
-                        <td style="width: 100px; text-align: right; padding-right: 10px;">
-                            <span th:text="${streak.startDate}"></span>
-                        </td>
 
-                        <!-- Bar with Count -->
-                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                            <div
-                                 th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
-                             text-align: center !important; font-weight: bold; margin:auto;
-                             width:' + (${streak.percentage} * 15) + 'px;'"
-                                 th:text="${streak.dayCount}"></div>
-                        </td>
-
-                        <!-- End Date -->
-                        <td style="width: 100px; text-align: left; padding-left: 10px;">
-                            <span th:text="${streak.endDate}"></span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
+                <!-- newsest streak (closest to today) chart -->
                 <th:block th:if="${newestStreak != null}">
                     <!-- newest streak chart -->
                     <table style="width: 100%">
@@ -298,6 +303,41 @@ https://github.com/turkerozturk/springtopiccalendar
                 </th:block>
 
 
+                <!-- top streaks chart -->
+                <table style="width: 100%">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Top Streaks (closest unique one)
+                    </caption>
+                    <tbody>
+
+
+
+                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
+                        <!-- Start Date -->
+                        <td style="width: 100px; text-align: right; padding-right: 10px;">
+                            <span th:text="${streak.startDate}"></span>
+                        </td>
+
+                        <!-- Bar with Count -->
+                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                            <div
+                                 th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                             text-align: center !important; font-weight: bold; margin:auto;
+                             width:' + (${streak.percentage} * 15) + 'px;'"
+                                 th:text="${streak.dayCount}"></div>
+                        </td>
+
+                        <!-- End Date -->
+                        <td style="width: 100px; text-align: left; padding-left: 10px;">
+                            <span th:text="${streak.endDate}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+
+
 
             </span>
 
@@ -319,7 +359,11 @@ https://github.com/turkerozturk/springtopiccalendar
                     </thead>
                     <tbody>
                     <tr th:each="i : ${#numbers.sequence(0, 6)}">
-                        <td th:text="${dayNames[i]}"></td>
+
+                        <td th:text="${dayNames[i]}"
+                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow' : ''">
+                        </td>
+
                         <td th:text="${status0[i]}"></td>
                         <td th:text="${status1[i]}"></td>
                         <td th:text="${status2[i]}"></td>
