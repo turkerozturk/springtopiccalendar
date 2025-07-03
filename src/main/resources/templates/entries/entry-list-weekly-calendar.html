@@ -139,6 +139,43 @@ https://github.com/turkerozturk/springtopiccalendar
                       th:text="${'Success Rate: ' + #numbers.formatDecimal(successRate, 1, 1)}">
                 </h3>
                 <br/>
+
+                <span th:if="${realAverage != null}"
+                      th:text="${'Real Average done interval: ' + #numbers.formatDecimal(realAverage, 1, 1)}">
+                </span>
+                <br/>
+                <h3 th:if="${realSuccessRate != null}"
+                    th:text="${'Real Success Rate: ' + #numbers.formatDecimal(realSuccessRate, 1, 1)}">
+                </h3>
+                <br/>
+
+                <!-- TREND related variables -->
+                <!--
+                <span th:if="${intervals != null}"
+                      th:text="${'intervals: ' + intervals}">
+                </span>
+                -->
+                <br/>
+                <span th:if="${mean != null}"
+                      th:text="${'mean: ' + #numbers.formatDecimal(mean, 1, 1)}">
+                </span>
+                <br/>
+                <span th:if="${std != null}"
+                      th:text="${'std: ' + #numbers.formatDecimal(std, 1, 1)}">
+                </span>
+                <br/>
+                <span th:if="${successRate2 != null}"
+                      th:text="${'successRate2: ' + #numbers.formatDecimal(successRate2, 1, 1)}">
+                </span>
+                <br/>
+                <span th:if="${trendSlope != null}"
+                      th:text="${'trendSlope: ' + #numbers.formatDecimal(trendSlope, 1, 1)}">
+                </span>
+                <br/>
+                <span th:if="${trendStatus != null}"
+                      th:text="${'trendStatus: ' + trendStatus}">
+                </span>
+                <br/>
             </span>
 
             <span class="col-2">

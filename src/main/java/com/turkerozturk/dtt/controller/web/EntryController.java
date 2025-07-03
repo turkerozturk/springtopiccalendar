@@ -424,10 +424,101 @@ public class EntryController {
 
 
 
-            if(topic.getSomeTimeLater() != null || topic.getSomeTimeLater() > 0) {
+            if(topic.getSomeTimeLater() != null && topic.getSomeTimeLater() > 0) {
                 double successRate = (topic.getSomeTimeLater() / averageDoneInterval) * 100;
                 model.addAttribute("successRate", successRate);
             }
+
+
+          //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+
+            List<LocalDate> filledDatesSorted = entries.stream()
+                    .filter(e -> e.getStatus() == 1)
+                    .map(e -> Instant.ofEpochMilli(e.getDateMillisYmd())
+                            .atZone(zoneId)
+                            .toLocalDate())
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            List<Long> intervals = new ArrayList<>();
+            for (int k = 1; k < filledDatesSorted.size(); k++) {
+                long diff = ChronoUnit.DAYS.between(filledDatesSorted.get(k - 1), filledDatesSorted.get(k));
+                intervals.add(diff);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (Long l : intervals) {
+                sb.append(l + ", ");
+            }
+            System.out.println(sb.toString() + "\n\n");
+
+            double realAverage = intervals.stream()
+                    .mapToLong(Long::longValue)
+                    .average()
+                    .orElse(0);
+
+
+            model.addAttribute("realAverage", realAverage);
+
+            if(topic.getSomeTimeLater() != null && topic.getSomeTimeLater() > 0) {
+                double realSuccessRate = (topic.getSomeTimeLater() / realAverage) * 100;
+                model.addAttribute("realSuccessRate", realSuccessRate);
+            }
+
+
+
+            // basla -------------------------------------
+
+            double target = 5.0;
+
+            // Ortalama
+            double mean = intervals.stream()
+                    .mapToDouble(Long::doubleValue)
+                    .average()
+                    .orElse(0.0);
+
+            // Standart sapma
+            double std = Math.sqrt(intervals.stream()
+                    .mapToDouble(iiii -> Math.pow(iiii - mean, 2))
+                    .average()
+                    .orElse(0.0));
+
+            // Başarı oranı: 4 <= i <= 6
+            long successCount = intervals.stream()
+                    .filter(jjjj -> jjjj >= 4 && jjjj <= 6)
+                    .count();
+            double successRate2 = (double) successCount / intervals.size() * 100;
+
+            // Trend eğimi (basit doğrusal regresyon)
+            int n = intervals.size();
+            double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+            for (int inte = 0; inte < n; inte++) {
+                double x = inte;
+                double y = intervals.get(inte);
+                sumX += x;
+                sumY += y;
+                sumXY += x * y;
+                sumX2 += x * x;
+            }
+
+            double trendSlope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            String trendStatus = (trendSlope < -0.1) ? "OLUMLU"
+                    : (trendSlope > 0.1) ? "OLUMSUZ"
+                    : "DURAĞAN";
+
+            // Thymeleaf'e aktar
+            model.addAttribute("intervals", intervals);
+            model.addAttribute("mean", mean);
+            model.addAttribute("std", std);
+            model.addAttribute("successRate2", successRate2);
+            model.addAttribute("trendSlope", trendSlope);
+            model.addAttribute("trendStatus", trendStatus);
+
+
+
+            // bitti --------------------------------------------
 
 
 
