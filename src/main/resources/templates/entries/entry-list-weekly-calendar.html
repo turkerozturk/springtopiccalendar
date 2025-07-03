@@ -400,7 +400,9 @@ https://github.com/turkerozturk/springtopiccalendar
                     </tbody>
                 </table>
 
-
+                <br />
+                <!-- trend intervals chart -->
+                <canvas id="intervalChart" width="150" height="75"></canvas>
 
 
 
@@ -454,6 +456,78 @@ https://github.com/turkerozturk/springtopiccalendar
             </span>
 </div>
 
+
+
+
+
+
+
+    <!-- trend intervals chart -->
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var intervals = [[${intervals}]];
+        var labels2 = intervals.map((_, idx) => "T-" + (intervals.length - 1 - idx));
+        var target = 5;
+
+        var ctx2 = document.getElementById('intervalChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: labels2,
+                datasets: [
+                    {
+                        label: 'Aralık (Gün)',
+                        data: intervals,
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                        tension: 0.3,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Hedef Gün (5)',
+                        data: Array(intervals.length).fill(target),
+                        borderColor: 'green',
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Alışkanlık Günlük Aralık Grafiği'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Gün Aralığı'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Zaman (Geriye Doğru)'
+                        }
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+
+
+
+
+
+
+    <!-- streak chart -->
     <script>
         (() => {
             const existingChart = Chart.getChart("streakChart");
