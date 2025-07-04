@@ -973,7 +973,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                     <!-- how many days has past until today -->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
-                            .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))}">
+                            .DAYS.between(T(java.time.LocalDate).now(zoneId), topic.lastPastEntryDate)}">
                     </span>
                 </td>
             </th:block>
@@ -990,7 +990,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <!-- firstWarningEntryDate varsa -->
             <th:block th:if="${topic.firstWarningEntryDate != null or !#strings.isEmpty(topic.firstWarningEntryDate)}">
-                <td th:title="${'Last done: '
+                <td th:title="${'First warn: '
                                         + T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))
