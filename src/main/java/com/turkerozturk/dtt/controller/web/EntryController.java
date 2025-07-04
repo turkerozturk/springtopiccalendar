@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.controller.web;
 
 
+import com.turkerozturk.dtt.helper.SuccessAnalyzer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -217,6 +218,33 @@ public class EntryController {
         List<String> bottom2ColumnDates = new LinkedList<>();
         List<String> bottom3ColumnDates = new LinkedList<>();
 
+        // basla bu kisim patternSuccessRate ile ilgili
+        Topic topic = topicRepository.findById(topicId).get();
+        model.addAttribute("topic", topic);
+
+        List<LocalDate> dateRange2 = filterService.buildDateRangeList(startDateAlignedToWeek, today);
+        List<Integer> rawArray = new ArrayList<>();
+        for(LocalDate d : dateRange2) {
+            if(entryMap.containsKey(d)) {
+                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0);
+            } else {
+                rawArray.add(0);
+            }
+        }
+
+        Integer offset = SuccessAnalyzer.findOffset(rawArray);
+        System.out.println("offset: " + offset);
+        int divider = topic.getSomeTimeLater() == null ? 1 : topic.getSomeTimeLater().intValue();
+        System.out.println("divider: " + divider);
+        if(offset != null) {
+            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, divider, 1, null);
+            System.out.println("reduced size: " + reducedArray.size());
+
+            System.out.println("reduced: " + reducedArray);
+            double patternSuccessRate = SuccessAnalyzer.getSuccessRate(reducedArray);
+            model.addAttribute("patternSuccessRate", patternSuccessRate);
+        }
+        // bitti bu kisim patternSuccessRate ile ilgili
 
         int i = 0;
         for(LocalDate d : dateRange) {
@@ -269,8 +297,7 @@ public class EntryController {
 
         model.addAttribute("dayNames", dayNames);
 
-        Topic topic = topicRepository.findById(topicId).get();
-        model.addAttribute("topic", topic);
+
 
 
         // basla istatistik
@@ -315,6 +342,7 @@ public class EntryController {
         model.addAttribute("totalStatus0", totalStatus0);
         model.addAttribute("totalStatus1", totalStatus1);
         model.addAttribute("totalStatus2", totalStatus2);
+
 
         // bitti istatistik
 
@@ -470,7 +498,7 @@ public class EntryController {
 
             // basla -------------------------------------
 
-            double target = 5.0;
+       //     double target = topic.getSomeTimeLater();
 
             // Ortalama
             double mean = intervals.stream()
