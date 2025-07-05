@@ -99,6 +99,11 @@ Then give any filename to the XML file of Launch4j config. You can delete the co
 You need to put the LaunchDTT.exe file into the same folder, where the compiled project JAR file is located.
 ====
 
+Browse favicon.ico file;
+
+image::screenshot-launcher-17.jpg[]
+
+
 ==== Bonus - Embed JRE
 
 
