@@ -281,6 +281,22 @@ public class EntryController {
             patternSuccessText.append("(from first 'done' day to today)");
             model.addAttribute("patternSuccessText", patternSuccessText);
 
+
+            // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
+            // divideri 1 kabul ediyoruz o zaman doluluk orani veriyor. // TODO sonradan burasini kaldirip kafa karisikligi ve hsap hatasina mahal vermeyecek bicimde guncelle.
+            List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, 1, 1, null);
+            long patternFillCount = SuccessAnalyzer.getSuccessCount(notReducedArray);
+            StringBuilder patternFillText = new StringBuilder();
+            patternFillText.append("(" + patternFillCount + " / " + notReducedArray.size() + " days are filled with 'done')");
+            patternFillText.append("<br/>");
+            patternFillText.append("<br/>");
+            patternFillText.append(firstDoneEntryDate1 + " to " + today);
+            patternFillText.append("<br/>");
+            patternFillText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
+            patternFillText.append("<br/>");
+            patternFillText.append("(from first 'done' day to today)");
+            model.addAttribute("patternFillText", patternFillText);
+
         }
         // bitti bu kisim patternSuccessRate ile ilgili
 
