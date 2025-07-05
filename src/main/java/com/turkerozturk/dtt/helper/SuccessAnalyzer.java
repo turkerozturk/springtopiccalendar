@@ -12,10 +12,19 @@ public class SuccessAnalyzer {
             int successDivider,
             Integer occuranceCount,
             List<Integer> occuranceOrder) {
-        System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
+        // System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
         List<Integer> reduced = new ArrayList<>();
 
         for (int i = offset; i < rawArray.size(); i += successDivider) {
+
+            if (successDivider <= 0) {
+                throw new IllegalArgumentException("successDivider must be > 0");
+            }
+            if (occuranceCount == null && (occuranceOrder == null || occuranceOrder.isEmpty())) {
+                throw new IllegalArgumentException("Either occuranceCount or occuranceOrder must be provided.");
+            }
+
+
             List<Integer> chunk = new ArrayList<>();
 
             for (int j = 0; j < successDivider; j++) {
@@ -48,8 +57,14 @@ public class SuccessAnalyzer {
 
     public static double getSuccessRate(List<Integer> reducedArray) {
         if (reducedArray.isEmpty()) return 0.0;
-        long successCount = reducedArray.stream().filter(x -> x == 1).count();
+        long successCount = getSuccessCount(reducedArray);
         return (double) successCount / reducedArray.size();
+    }
+
+    public static long getSuccessCount(List<Integer> reducedArray) {
+        if (reducedArray.isEmpty()) return 0;
+        long successCount = reducedArray.stream().filter(x -> x == 1).count();
+        return successCount;
     }
 
     public static String getNextStatus(List<Integer> reducedArray) {

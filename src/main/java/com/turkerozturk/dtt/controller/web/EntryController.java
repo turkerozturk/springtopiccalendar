@@ -182,8 +182,15 @@ public class EntryController {
 
         // Haftalık hizalanmış tarih aralığı oluştur
         LocalDate today = LocalDate.now(zoneId);
-        model.addAttribute("todayWeekIndex", today.getDayOfWeek().getValue());
+        model.addAttribute("todayWeekIndex", today.getDayOfWeek().getValue()); // haftanin hangi gunundeyiz frontendde gostermek icin
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        List<String> dayNames = new ArrayList<>();
+        for (int j = 0; j < 7; j++) {
+            DayOfWeek currentDay = startDay.plus(j);
+            // Gerekirse Türkçe'ye çevirmek için burada değiştirebilirsiniz
+            dayNames.add(currentDay.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        }
+        model.addAttribute("dayNames", dayNames);
         LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
         LocalDate endDateAlignedToWeek = getEndOfWeek(today, startDay);
         List<LocalDate> dateRange = filterService.buildDateRangeList(startDateAlignedToWeek, endDateAlignedToWeek);
@@ -222,27 +229,58 @@ public class EntryController {
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
 
-        List<LocalDate> dateRange2 = filterService.buildDateRangeList(startDateAlignedToWeek, today);
-        List<Integer> rawArray = new ArrayList<>();
-        for(LocalDate d : dateRange2) {
+        List<LocalDate> dateRangeBetweenAlignedStartDateAndToday = filterService.buildDateRangeList(startDateAlignedToWeek, today);
+        List<Integer> rawArray = new ArrayList<>(); // tarih araligi boyunca 1 ve 0 lardan olusan doluluk bosluk dizisi.
+
+        for(LocalDate d : dateRangeBetweenAlignedStartDateAndToday) {
             if(entryMap.containsKey(d)) {
-                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0);
+                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0); // entry.status 1 olanlar dolu yani 1, digerleri 0 yani bos.
             } else {
-                rawArray.add(0);
+                rawArray.add(0); // entry zaten yok ve bos yani 0.
             }
         }
 
-        Integer offset = SuccessAnalyzer.findOffset(rawArray);
-        System.out.println("offset: " + offset);
-        int divider = topic.getSomeTimeLater() == null ? 1 : topic.getSomeTimeLater().intValue();
-        System.out.println("divider: " + divider);
+        Integer offset = SuccessAnalyzer.findOffset(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
+        //System.out.println("offset: " + offset);
+        int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
+        //System.out.println("divider: " + divider);
         if(offset != null) {
             List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, divider, 1, null);
-            System.out.println("reduced size: " + reducedArray.size());
+            //System.out.println("reduced size: " + reducedArray.size());
 
-            System.out.println("reduced: " + reducedArray);
+            //System.out.println("reduced: " + reducedArray);
             double patternSuccessRate = SuccessAnalyzer.getSuccessRate(reducedArray);
             model.addAttribute("patternSuccessRate", patternSuccessRate);
+
+
+
+            Long firstDoneEntryDateMillisYmd1 = entries.stream()
+                    .filter(e -> e.getStatus() == 1)
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .orElse(null);
+            // yukarida offset null degilse dedigimiz icin bu da null olmaz, o yuzden kontrol eklemedik.
+            LocalDate firstDoneEntryDate1 = Instant
+                    .ofEpochMilli(firstDoneEntryDateMillisYmd1)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+
+            long daysSinceFirstDoneEntryPlusToday = ChronoUnit.DAYS.between(firstDoneEntryDate1, today) + 1;
+
+
+
+            long patternSuccessCount = SuccessAnalyzer.getSuccessCount(reducedArray);
+            StringBuilder patternSuccessText = new StringBuilder();
+            patternSuccessText.append("(" + patternSuccessCount + " / " + reducedArray.size() + " intervals are 'done')");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append(firstDoneEntryDate1 + " to " + today);
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("(from first 'done' day to today)");
+            model.addAttribute("patternSuccessText", patternSuccessText);
+
         }
         // bitti bu kisim patternSuccessRate ile ilgili
 
@@ -288,14 +326,7 @@ public class EntryController {
         // Thymeleaf model'e ekleyebilirsin:
         model.addAttribute("weeklyMaps", weeklyMaps);
 
-        List<String> dayNames = new ArrayList<>();
-        for (int j = 0; j < 7; j++) {
-            DayOfWeek currentDay = startDay.plus(j);
-            // Gerekirse Türkçe'ye çevirmek için burada değiştirebilirsiniz
-            dayNames.add(currentDay.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
-        }
 
-        model.addAttribute("dayNames", dayNames);
 
 
 
@@ -479,7 +510,7 @@ public class EntryController {
             for (Long l : intervals) {
                 sb.append(l + ", ");
             }
-            System.out.println(sb.toString() + "\n\n");
+            //System.out.println(sb.toString() + "\n\n");
 
             double realAverage = intervals.stream()
                     .mapToLong(Long::longValue)

@@ -344,13 +344,16 @@ https://github.com/turkerozturk/springtopiccalendar
                 </table>
 
 
-                <br/>
+
                 <h3 th:if="${patternSuccessRate != null}"
                     th:text="${'Success Rate: ' + T(java.lang.Math).round(patternSuccessRate * 100) + ' %'}"
                     title="It is the percentage ratio of those with and without at least one 'done entry' in each
                     section, after dividing the days between the first 'done entry' date and 'todays date' by the
                     'prediction date'.">
                 </h3>
+                <span th:if="${patternSuccessRate != null}"
+                      th:utext="${patternSuccessText}"
+                ></span>
 
 
 
