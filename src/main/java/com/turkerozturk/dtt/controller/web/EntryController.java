@@ -182,7 +182,9 @@ public class EntryController {
 
         // Haftalık hizalanmış tarih aralığı oluştur
         LocalDate today = LocalDate.now(zoneId);
-        model.addAttribute("todayWeekIndex", today.getDayOfWeek().getValue()); // haftanin hangi gunundeyiz frontendde gostermek icin
+        // System.out.println("today weekday index " + today.getDayOfWeek().getValue() % 7);
+        int todayWeekIndex = today.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
+        model.addAttribute("todayWeekIndex", todayWeekIndex); // haftanin hangi gunundeyiz frontendde gostermek icin
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         List<String> dayNames = new ArrayList<>();
         for (int j = 0; j < 7; j++) {

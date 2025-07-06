@@ -65,7 +65,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
         <td th:text="${dayNames[stat.index]}"
-            th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow' : ''">
+            th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : ''">
         </td>
 
 
@@ -482,7 +482,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <tr th:each="i : ${#numbers.sequence(0, 6)}">
 
                         <td th:text="${dayNames[i]}"
-                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow' : ''">
+                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
                         </td>
 
                         <td th:text="${status0[i]}"></td>
