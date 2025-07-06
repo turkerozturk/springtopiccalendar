@@ -67,6 +67,11 @@ Developer: Turker Ozturk
 
 ## Screenshots
 
+2025-07-07:
+
+![Screenshot](screenshots/dttweb20250707.jpg)
+
+
 2025-06-05:
 
 ![Screenshot](screenshots/dttweb20250605.jpg)
