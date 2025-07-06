@@ -258,14 +258,25 @@ public class TopicService {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
         LocalDate today = LocalDate.now(zoneId);
         long todayEpochMillis = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<Topic> combined = new ArrayList<>();
 
         List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(todayEpochMillis);
-        List<Topic> previousList = topicRepository.findTopNByLastPastEntryDateBeforeToday(todayEpochMillis, PageRequest.of(0, limit));
-
-        List<Topic> combined = new ArrayList<>();
         combined.addAll(todayList);
-        combined.addAll(previousList);
+
+        if(limit > 0) {
+            List<Topic> previousList = topicRepository.findTopNByLastPastEntryDateBeforeToday(todayEpochMillis, PageRequest.of(0, limit));
+            combined.addAll(previousList);
+        }
+
         return combined;
+    }
+
+    public List<Topic> getLastPastEntryDateIsToday() {
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+        LocalDate today = LocalDate.now(zoneId);
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(dateMillisYmd);
+        return todayList;
     }
 
     public List<Topic> getTopicsWithPredictionDateBeforeOrEqualToday(Long categoryId, Long dateMillisYmd) {
