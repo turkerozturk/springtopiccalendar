@@ -211,6 +211,7 @@
                 </td>
             </tr>
 
+            <!-- TODO
             <tr>
                 <td colspan="2" class="text-center">
                     <a href="/entries/entry-summary-report" class="list-group-item list-group-item-action link-primary">
@@ -218,6 +219,7 @@
                     </a>
                 </td>
             </tr>
+            -->
 
         </th:block>
         <th:block th:if="${!hasTopics}">
@@ -273,6 +275,213 @@
 
 
     </table>
+
+</div>
+
+
+
+    <!-- chart -->
+    <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+
+
+<div class="row my-2" >
+
+    <!-- https://rgbacolorpicker.com/ -->
+
+
+    <!-- chartjs radar two days ago -->
+    <div th:if="${not #lists.isEmpty(twoDaysAgoCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+        <p th:text="${'Two Days Ago, ' + twoDaysAgoCategoryTotalCount + ' entries in ' + twoDaysAgoCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
+        <div style="background-color:white; width: 450px; height: 450px; margin-left:auto; margin-right:auto;">
+
+            <canvas id="radarChartTwoDaysAgo"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${twoDaysAgoCategoryLabels}]];
+                var radarData = [[${twoDaysAgoCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartTwoDaysAgo').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            label: 'Completed Entries by Category',
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(twoDaysAgoCategoryLabels)}" style="background-color:white;">
+        <p>No data available for two days ago.</p>
+    </div>
+
+
+    <br/>
+
+    <!-- chartjs radar today -->
+    <div th:if="${not #lists.isEmpty(todayCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+        <p th:text="${'Today, ' + todayCategoryTotalCount + ' entries in ' + todayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
+        <div style="background-color:white; width: 500px; height: 500px; margin-left:auto; margin-right:auto;">
+            <canvas id="radarChartToday"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${todayCategoryLabels}]];
+                var radarData = [[${todayCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartToday').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            /* label: 'Completed Entries by Category', */
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(todayCategoryLabels)}" style="background-color:white;">
+        <p>No data available for today.</p>
+    </div>
+
+
+    <br/>
+
+
+    <!-- chartjs radar yesterday -->
+    <div th:if="${not #lists.isEmpty(yesterdayCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+        <p th:text="${'Yesterday, ' + yesterdayCategoryTotalCount + ' entries in ' + yesterdayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
+        <div style="background-color:white; width: 450px; height: 450px; margin-left:auto; margin-right:auto;">
+
+            <canvas id="radarChartYesterday"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${yesterdayCategoryLabels}]];
+                var radarData = [[${yesterdayCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartYesterday').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            label: 'Completed Entries by Category',
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(yesterdayCategoryLabels)}" style="background-color:white;">
+        <p>No data available for yesterday.</p>
+    </div>
+
+    <br/>
+
+
+
+
+
 </div>
 
 <script type="text/javascript"
