@@ -236,19 +236,21 @@
         </th:block>
 
         <tr>
+            <!--
             <td colspan="2" class="text-center">
                 <a href="/languages" class="list-group-item list-group-item-action link-success"
                    th:text="#{change.language}">
                     Change Language
                 </a>
             </td>
+            -->
 
         </tr>
         <tr>
             <td colspan="2" class="text-center">
                 <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
                    class="list-group-item list-group-item-action link-secondary"
-                   th:text="'DailyTopicTracker V1.0.3 - Türker Öztürk'">Website</a>.
+                   th:text="'DailyTopicTracker V1.0.3 - Türker Öztürk'">Website</a>
             </td>
 
         </tr>
@@ -292,12 +294,9 @@
     <!-- chartjs radar two days ago -->
     <div th:if="${not #lists.isEmpty(twoDaysAgoCategoryLabels)}"
          class="col-4"
-         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
-        </div>
-        <p th:text="${'Two Days Ago, ' + twoDaysAgoCategoryTotalCount + ' entries in ' + twoDaysAgoCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
-        <div style="background-color:white; width: 450px; height: 450px; margin-left:auto; margin-right:auto;">
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Two Days Ago, ' + twoDaysAgoCategoryTotalCount + ' entries in ' + twoDaysAgoCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
 
             <canvas id="radarChartTwoDaysAgo"></canvas>
 
@@ -344,22 +343,18 @@
                 /*]]>*/
             </script>
         </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
     </div>
 
-
-
-
-    <br/>
 
     <!-- chartjs radar today -->
     <div th:if="${not #lists.isEmpty(todayCategoryLabels)}"
          class="col-4"
-         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
-        </div>
-        <p th:text="${'Today, ' + todayCategoryTotalCount + ' entries in ' + todayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
-        <div style="background-color:white; width: 500px; height: 500px; margin-left:auto; margin-right:auto;">
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Today, ' + todayCategoryTotalCount + ' entries in ' + todayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 300px; height: 300px; margin-left:auto; margin-right:auto;">
             <canvas id="radarChartToday"></canvas>
 
             <script th:inline="javascript">
@@ -405,24 +400,20 @@
                 /*]]>*/
             </script>
         </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
     </div>
 
 
 
 
-
-    <br/>
-
-
     <!-- chartjs radar yesterday -->
     <div th:if="${not #lists.isEmpty(yesterdayCategoryLabels)}"
          class="col-4"
-         style="background-color:white; width: 550px; margin-left:auto; margin-right:auto;">
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
-        </div>
-        <p th:text="${'Yesterday, ' + yesterdayCategoryTotalCount + ' entries in ' + yesterdayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></p>
-        <div style="background-color:white; width: 450px; height: 450px; margin-left:auto; margin-right:auto;">
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Yesterday, ' + yesterdayCategoryTotalCount + ' entries in ' + yesterdayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
 
             <canvas id="radarChartYesterday"></canvas>
 
@@ -469,11 +460,14 @@
                 /*]]>*/
             </script>
         </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
     </div>
 
 
 
-    <br/>
+
 
 
 
