@@ -9,7 +9,11 @@
     <description>Daily Topic Tracker Launcher.</description>
     <url>https://github.com/turkerozturk/springtopiccalendar</url>
 
-
+    <organization>
+        <name>Turker Ozturk</name>
+        <url>https://github.com/turkerozturk</url>
+    </organization>
+    <inceptionYear>2025</inceptionYear>
 
 
     <properties>
@@ -46,6 +50,64 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.turkerozturk.dttlauncher.LaunchDTT</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+
+
+
+            <!-- Launch4j Plugin -->
+            <!-- https://launch4j.sourceforge.net/
+                https://github.com/orphan-oss/launch4j-maven-plugin -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.6.0</version>
+                <executions>
+                    <execution>
+                        <id>create-exe</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dontWrapJar>false</dontWrapJar>
+                    <headerType>gui</headerType>
+
+                    <!-- target klasöründeki jar'ı kullan -->
+                    <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
+                    <outfile>${project.build.directory}/LaunchDTT.exe</outfile>
+
+                    <errTitle></errTitle>
+                    <chdir>.</chdir>
+                    <priority>normal</priority>
+
+                    <!-- src/main/resources içindeki ikonu kullan -->
+                    <icon>${project.basedir}/src/main/resources/favicon.ico</icon>
+
+                    <jre>
+                        <path>JRE;%JAVA_HOME%;%PATH% </path>
+                        <requiresJdk>false</requiresJdk>
+                        <requires64Bit>false</requires64Bit>
+                        <minVersion>17</minVersion>
+                    </jre>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>
