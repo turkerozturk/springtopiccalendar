@@ -266,6 +266,31 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+            <!-- Plugin derlendikten sonra release klasörüne kopyala -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="target/${project.build.finalName}.jar"
+                                      todir="../release/" />
+                                <copy file="src/main/resources/application.properties"
+                                      todir="../release/" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
