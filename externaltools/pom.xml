@@ -9,6 +9,7 @@
     <description>Daily Topic Tracker Launcher.</description>
     <url>https://github.com/turkerozturk/springtopiccalendar</url>
 
+    <!-- for launch4j -->
     <organization>
         <name>Turker Ozturk</name>
         <url>https://github.com/turkerozturk</url>
@@ -70,7 +71,8 @@
 
             <!-- Launch4j Plugin -->
             <!-- https://launch4j.sourceforge.net/
-                https://github.com/orphan-oss/launch4j-maven-plugin -->
+                https://github.com/orphan-oss/launch4j-maven-plugin
+                https://launch4j.sourceforge.net/docs.html#Configuration_file -->
             <plugin>
                 <groupId>com.akathist.maven.plugins.launch4j</groupId>
                 <artifactId>launch4j-maven-plugin</artifactId>
@@ -105,6 +107,21 @@
                         <requires64Bit>false</requires64Bit>
                         <minVersion>17</minVersion>
                     </jre>
+
+                    <!-- https://learn.microsoft.com/en-us/windows/win32/menurc/versioninfo-resource?redirectedfrom=MSDN -->
+                    <!-- https://launch4j.sourceforge.net/docs.html#Configuration_file -->
+                    <versionInfo>
+                        <fileVersion>1.0.3.0</fileVersion>
+                        <txtFileVersion>1.0.3</txtFileVersion>
+                        <fileDescription>Daily Topic Tracker Launcher</fileDescription>
+                        <copyright>Turker Ozturk</copyright>
+                        <productVersion>1.0.3.0</productVersion>
+                        <txtProductVersion>1.0.3</txtProductVersion>
+                        <productName>Daily Topic Tracker Launcher</productName>
+                        <companyName>Turker Ozturk</companyName>
+                        <internalName>LaunchDTT</internalName>
+                        <originalFilename>LaunchDTT.exe</originalFilename>
+                    </versionInfo>
                 </configuration>
             </plugin>
 
