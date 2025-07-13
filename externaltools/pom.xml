@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.turkerozturk</groupId>
+    <artifactId>LaunchDTT</artifactId>
+    <version>1.0.3</version>
+    <name>Daily Topic Tracker Launcher</name>
+    <description>Daily Topic Tracker Launcher.</description>
+    <url>https://github.com/turkerozturk/springtopiccalendar</url>
+
+
+
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <!-- bunlar maven.compiler.release belirtildigi icin gereksiz oluyormus:
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
+
+    <build>
+
+        <!-- this setting makes the compiled filename independent of version information. -->
+        <finalName>${project.artifactId}</finalName>
+
+        <plugins>
+
+
+
+            <plugin>
+                <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>12.1.3</version> <!-- En güncel sürüm olabilir, kontrol edebiliriz -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

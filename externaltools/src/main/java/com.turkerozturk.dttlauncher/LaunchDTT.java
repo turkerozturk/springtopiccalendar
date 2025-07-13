@@ -1,4 +1,4 @@
-/*
+package com.turkerozturk.dttlauncher;/*
  * This file is part of the DailyTopicTracker project.
  * Please refer to the project's README.md file for additional details.
  * https://github.com/turkerozturk/springtopiccalendar

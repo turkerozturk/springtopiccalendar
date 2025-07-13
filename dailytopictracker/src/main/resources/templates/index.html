@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8">
+    <title>Daily Topic Tracker</title>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style>
+
+    .blink {
+          animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+          50% {
+            opacity: 0;
+          }
+        }
+
+        /* https://css-pattern.com/quatrefoils/ */
+        body {
+       --s: 250px; /* control the size*/
+       --c1: #b09f79;
+       --c2: #476074;
+
+       --_g: #0000 83%,var(--c1) 85% 99%,#0000 101%;
+       background:
+         radial-gradient(27% 29% at right ,var(--_g)) calc(var(--s)/ 2) var(--s),
+         radial-gradient(27% 29% at left  ,var(--_g)) calc(var(--s)/-2) var(--s),
+         radial-gradient(29% 27% at top   ,var(--_g)) 0 calc(var(--s)/ 2),
+         radial-gradient(29% 27% at bottom,var(--_g)) 0 calc(var(--s)/-2)
+         var(--c2);
+       background-size: calc(2*var(--s)) calc(2*var(--s));
+     }
+
+               .fonbg {
+                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+
+               #navigation-panel button, a{
+                 border-radius:10px !important;
+               }
+
+
+               #navigation-panel {
+                  max-width: 640px;
+                  margin-top: 10px;
+                  margin-bottom: 5px;
+                  margin-left: auto;
+                  margin-right: auto;
+                  padding: 3px;
+                  border: 2px solid DarKGray;
+                  border-radius: 7px 7px 7px 7px;
+
+                  /* https://cssgradient.io/ */
+
+                  background: #a7d6e8;
+                  background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+    </style>
+
+
+</head>
+<body>
+
+
+<div id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+</div>
+
+<div class="container my-2" style="max-width: 600px;">
+
+
+    <h1><span class="fonbg" th:text="#{software.name}">Daily Topic Tracker</span></h1>
+
+
+    <!-- Bağlantılar (List Group) -->
+    <table class="table" style="border: solid 3px; background-color:WhiteSmoke;">
+        <tr>
+            <th colspan="2">
+
+        <span th:text="#{welcome.message}">
+            This is the main page. For more info, visit the website.
+        </span>
+
+
+            </th>
+
+        </tr>
+
+        <tr>
+            <td>
+                <a th:if="${hasCategoryGroups}" href="/category-groups" class="list-group-item list-group-item-action"
+                   th:text="#{category.groups}">
+                    Category Groups
+                </a>
+                <a th:if="${!hasCategoryGroups}" href="/category-groups/new?returnPage=home"
+                   class="list-group-item list-group-item-action blink"
+                   th:text="' Category Groups - Create a Category Group'">
+
+                </a>
+            </td>
+            <td th:text="${categoryGroupsCount}">#</td>
+        </tr>
+        <tr>
+            <td>
+                <th:block th:if="${hasCategoryGroups}">
+
+
+                    <a th:if="${categoriesCount > 0}" href="/categories"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{categories}">
+                    </a>
+
+                    <a th:if="${categoriesCount == 0}" href="/categories/create?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Categories - Create a Category'">
+                    </a>
+
+                </th:block>
+
+
+                <span th:if="${!hasCategoryGroups}" class="list-group-item list-group-item-action"
+                      style="color:gray;" th:text="'Categories [Create at least one category group]'">
+
+            </span>
+            </td>
+            <td th:text="${categoriesCount}">#</td>
+
+        </tr>
+        <tr>
+            <td>
+
+
+                <th:block th:if="${hasCategories}">
+
+
+                    <a th:if="${topicsCount > 0}" href="/topics"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{topics}">
+                    </a>
+
+                    <a th:if="${topicsCount == 0}" href="/topics/create?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Topics - Create a Topic'">
+                    </a>
+
+                </th:block>
+
+
+                <span th:if="${!hasCategories}" class="list-group-item list-group-item-action"
+                      style="color: gray;" th:text="'Topics [Create at least one category]'">
+
+            </span>
+            </td>
+            <td th:text="${topicsCount}">#</td>
+
+        </tr>
+        <th:block th:if="${hasTopics}">
+            <tr>
+                <td>
+                    <a th:if="${entriesCount > 0}" href="/entries"
+                       class="list-group-item list-group-item-action"
+                       th:text="#{entries}">
+                    </a>
+
+                    <a th:if="${entriesCount == 0}" href="/entries/new?returnPage=home"
+                       class="list-group-item list-group-item-action blink"
+                       th:text="'Entries - Create an Entry'">
+                    </a>
+
+                </td>
+                <td th:text="${entriesCount}">#</td>
+
+            </tr>
+            <tr th:if="${entriesCount == 0}">
+               <td colspan="2">It is better to create one entry, before clicking to tracker or intelligent report</td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <a href="/entry-filter/form"
+                       class="list-group-item list-group-item-action link-primary"
+                       th:classappend="${categoryGroupsCount > 0 and categoriesCount > 0 and topicsCount > 0 and entriesCount == 1} ? ' blink' : ''"
+                       title="Categorised Pivot Tables">
+                        <span th:text="#{tracker}">Tracker</span>
+                        <br />
+                        <img src="/favicon-60x60.png" />
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="text-center">
+                    <a href="/reports/all" class="list-group-item list-group-item-action link-primary">
+                        Intelligent Report View
+                    </a>
+                </td>
+            </tr>
+
+            <!-- TODO
+            <tr>
+                <td colspan="2" class="text-center">
+                    <a href="/entries/entry-summary-report" class="list-group-item list-group-item-action link-primary">
+                        Entry Summary Report
+                    </a>
+                </td>
+            </tr>
+            -->
+
+        </th:block>
+        <th:block th:if="${!hasTopics}">
+            <tr>
+                <td colspan="2">
+                     <span th:if="${!hasEntries}" class="list-group-item list-group-item-action"
+                           style="color: gray;" th:text="'Entries [Create at least one Entry]'"></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">Perform the necessary operations to view the entries, tracker and report pages.</td>
+            </tr>
+        </th:block>
+
+        <tr>
+            <!--
+            <td colspan="2" class="text-center">
+                <a href="/languages" class="list-group-item list-group-item-action link-success"
+                   th:text="#{change.language}">
+                    Change Language
+                </a>
+            </td>
+            -->
+
+        </tr>
+        <tr>
+            <td colspan="2" class="text-center">
+                <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
+                   class="list-group-item list-group-item-action link-secondary"
+                   th:text="'DailyTopicTracker V1.0.3 - Türker Öztürk'">Website</a>
+            </td>
+
+        </tr>
+        <!--
+        <a href="/reports/neutral" class="list-group-item list-group-item-action" >
+            Reports - Neutral
+        </a>
+
+
+        <a href="/reports/warn" class="list-group-item list-group-item-action" >
+            Reports - Warn
+        </a>
+
+
+        <a href="/reports/done" class="list-group-item list-group-item-action" >
+            Reports - Done
+        </a>
+
+
+        <a href="/reports/prediction" class="list-group-item list-group-item-action" >
+            Reports - Prediction
+        </a>
+-->
+
+
+    </table>
+
+</div>
+
+
+
+    <!-- chart -->
+    <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+
+
+<div class="row my-2" >
+
+    <!-- https://rgbacolorpicker.com/ -->
+
+
+    <!-- chartjs radar two days ago -->
+    <div th:if="${not #lists.isEmpty(twoDaysAgoCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Two Days Ago, ' + twoDaysAgoCategoryTotalCount + ' entries in ' + twoDaysAgoCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
+
+            <canvas id="radarChartTwoDaysAgo"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${twoDaysAgoCategoryLabels}]];
+                var radarData = [[${twoDaysAgoCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartTwoDaysAgo').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            label: 'Completed Entries by Category',
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+    </div>
+
+
+    <!-- chartjs radar today -->
+    <div th:if="${not #lists.isEmpty(todayCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Today, ' + todayCategoryTotalCount + ' entries in ' + todayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 300px; height: 300px; margin-left:auto; margin-right:auto;">
+            <canvas id="radarChartToday"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${todayCategoryLabels}]];
+                var radarData = [[${todayCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartToday').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            /* label: 'Completed Entries by Category', */
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+    </div>
+
+
+
+
+    <!-- chartjs radar yesterday -->
+    <div th:if="${not #lists.isEmpty(yesterdayCategoryLabels)}"
+         class="col-4"
+         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
+        <span th:text="${'Yesterday, ' + yesterdayCategoryTotalCount + ' entries in ' + yesterdayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
+        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
+
+            <canvas id="radarChartYesterday"></canvas>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                var radarLabels = [[${yesterdayCategoryLabels}]];
+                var radarData = [[${yesterdayCategoryCounts}]];
+
+                var ctx = document.getElementById('radarChartYesterday').getContext('2d');
+                var radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels,
+                        datasets: [{
+                            label: 'Completed Entries by Category',
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                            borderColor: 'rgba(0, 0, 0, 1)',
+                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                pointLabels: {
+                                    display: false
+                                },
+                                ticks: {
+                                    stepSize: 1,
+                                    precision: 0
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                /*]]>*/
+            </script>
+        </div>
+        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+</div>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.5/js/bootstrap.min.js}"></script>
+
+</body>
+</html>

@@ -2,266 +2,52 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>daily-topic-tracker</artifactId>
+  <groupId>com.turkerozturk</groupId>
+  <artifactId>DailyTopicTrackerProject</artifactId>
   <version>1.0.3</version>
-  <name>Daily Topic Tracker</name>
+  <name>DailyTopicTrackerProject</name>
   <description>Daily Topic Tracker, a Java Spring Boot application with SQLite database.</description>
   <url>https://github.com/turkerozturk/springtopiccalendar</url>
+  <packaging>pom</packaging>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.3</version>
-    <relativePath/>
-  </parent>
+  <modules>
+    <module>dailytopictracker</module>
+    <module>externaltools</module>
+  </modules>
+
 
   <properties>
     <java.version>17</java.version>
-
+    <maven.compiler.release>${java.version}</maven.compiler.release>
+    <!-- bunlar maven.compiler.release belirtildigi icin gereksiz oluyormus:
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <dependencies>
-
-    <!-- Spring Web -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <!-- Spring Data JPA -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-community-dialects</artifactId>
-      <version>6.6.15.Final</version>
-    </dependency>
-
-    <!-- SQLite JDBC -->
-    <dependency>
-      <groupId>org.xerial</groupId>
-      <artifactId>sqlite-jdbc</artifactId>
-      <version>3.49.1.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
-    <dependency>
-      <groupId>org.flywaydb</groupId>
-      <artifactId>flyway-core</artifactId>
-      <version>11.8.2</version>
-    </dependency>
-
-
-    <!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
-    <!--
-    <dependency>
-      <groupId>org.modelmapper</groupId>
-      <artifactId>modelmapper</artifactId>
-      <version>3.2.2</version>
-    </dependency>
--->
-
-    <!-- Spring Security -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-
-
-    <!-- Spring Boot Test (isteğe bağlı) -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <!-- https://www.baeldung.com/spring-rest-openapi-documentation
-			http://localhost:8080/v3/api-docs
-			http://localhost:8080/swagger-ui/index.html -->
-    <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.8.8</version>
-    </dependency>
 
 
 
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
 
-    <!-- https://mvnrepository.com/artifact/nz.net.ultraq.thymeleaf/thymeleaf-layout-dialect -->
-    <dependency>
-      <groupId>nz.net.ultraq.thymeleaf</groupId>
-      <artifactId>thymeleaf-layout-dialect</artifactId>
-      <version>3.4.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars.npm/htmx.org -->
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>htmx.org</artifactId>
-      <version>2.0.5</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars.npm/hyperscript -->
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>hyperscript</artifactId>
-      <version>2.0.2</version>
-    </dependency>
-
-    <!--
-    TailwindCSS webjar pakages have dependency issues.
-    If you want to use it in quick way, continue to use this line below:
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    If you want to use it locally, follow the directions below:
-
-    Spring Boot with Thymeleaf and Tailwind CSS - Complete Guide
-    https://maciejwalkowiak.com/blog/spring-boot-thymeleaf-tailwindcss/
-
-    Spring Boot Thymeleaf Setup with Tailwind CSS | Step-by-Step Tutorial
-    https://www.youtube.com/watch?v=rW-fTIVBYt4
-    -->
-
-
-    <!-- https://www.webjars.org/ -->
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/webjars-locator -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>webjars-locator</artifactId>
-      <version>0.52</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap</artifactId>
-      <version>5.3.7</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/bootstrap-select -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>bootstrap-select</artifactId>
-      <version>1.13.18</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars.npm/bootstrap-datepicker -->
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>bootstrap-datepicker</artifactId>
-      <version>1.10.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/popper.js -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>popper.js</artifactId>
-      <version>2.11.7</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/font-awesome -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>font-awesome</artifactId>
-      <version>6.7.2</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars/jquery -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-      <version>3.7.1</version>
-    </dependency>
-
-    <!-- https://datatables.net/ , https://github.com/DataTables/DataTables -->
-    <!-- https://mvnrepository.com/artifact/org.webjars/datatables -->
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>datatables</artifactId>
-      <version>2.3.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.webjars.npm/chart.js -->
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>chart.js</artifactId>
-      <version>4.5.0</version>
-    </dependency>
-
-    <!-- bu tus kombinasyonu Windows'da degisiklikligi aninda guncelliyor, css denerken cok isime yaradi: -->
-    <!-- CTRL + S ile kaydet, CTRL + SHIFT + F9 ile guncelle, F5 ile browseri refresh et. -->
-    <!-- https://docs.spring.io/spring-boot/how-to/hotswapping.html devtools sayesinde cache'yi development modda.
-    disable etmek icin Thymeleaf vs. icin ayrica properties degiskenleri yazmaya gerek kalmaz. Intellij ayari da lazim
-    " How to make auto reload with Spring-boot on IDEA Intellij SpringBoot DevTools Auto Restart " -->
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <scope>runtime</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <!-- https://www.datafaker.net This library is an improved fork of JavaFaker -->
-    <!-- https://mvnrepository.com/artifact/net.datafaker/datafaker -->
-    <dependency>
-      <groupId>net.datafaker</groupId>
-      <artifactId>datafaker</artifactId>
-      <version>2.4.3</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-
-
-  </dependencies>
 
   <build>
-
-    <!-- this setting makes the compiled filename independent of version information. -->
-    <finalName>${project.artifactId}</finalName>
-
     <plugins>
-      <!-- Spring Boot Maven Plugin -->
+      <!-- Tüm modulleri sirasiyla build eder -->
       <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>12.1.3</version> <!-- En güncel sürüm olabilir, kontrol edebiliriz -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.2.0</version>
         <executions>
           <execution>
+            <phase>clean</phase>
             <goals>
-              <goal>check</goal>
+              <goal>clean</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>
