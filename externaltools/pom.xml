@@ -214,6 +214,10 @@
                                       todir="../release/" />
                                 <copy file="target/generated-docs/how-to-compile.pdf"
                                       todir="../release/" />
+                                <copy file="../README.md"
+                                      todir="../release/" />
+                                <copy file="../LICENSE"
+                                      tofile="../release/license.txt" />
                             </target>
                         </configuration>
                     </execution>
