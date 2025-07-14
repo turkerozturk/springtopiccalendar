@@ -24,6 +24,13 @@
     <maven.compiler.target>17</maven.compiler.target>
     -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Intellij antrun'da kullanacagimiz bu iki degiskeni tanimsiz olarak algilamasin diye,
+		property olarak tanimliyoruz. Tanimlamazsak maven hatasiz calisir ama IDE'de error
+		olarak gorunmesi can sikar.
+	 -->
+    <jre.path>unset</jre.path>
+    <jre.dir.exists>false</jre.dir.exists>
   </properties>
 
 
@@ -65,6 +72,46 @@
                       todir="release/" />
                 <copy file="LICENSE"
                       tofile="release/license.txt" />
+              </target>
+            </configuration>
+          </execution>
+
+          <!-- Bu gorevin amaci eger ignoredfolder/jrepath.txt dosyasi varsa, icindeki ilk satirdaki
+		klasor yolunu jre.path degiskenine yuklemesi ve o degiskeni kullanarak klasor yolu icindeki
+		tum dosya ve klasorleri release/JRE klasorune kopyalamasi. -->
+          <execution>
+            <id>copy-jre</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target name="copy-jre-if-defined">
+
+
+
+                <!-- jrepath.txt dosyasindaki ilk satiri jre.path ozelligine oku -->
+                <loadfile property="jre.path"
+                          srcFile="ignoredfolder/jrepath.txt"
+                          failonerror="false">
+                  <filterchain>
+                    <headfilter lines="1"/>
+                    <striplinebreaks/>
+                  </filterchain>
+                </loadfile>
+
+                <available file="${jre.path}" type="dir" property="jre.dir.exists" />
+
+                <echo message="JRE path read: ${jre.path}" />
+
+                <!-- klasor varsa kopyala -->
+
+                <copy todir="release/JRE" failonerror="false">
+                  <fileset dir="${jre.path}" erroronmissingdir="false"/>
+                </copy>
+
+                <echo message="JRE copy attempted from ${jre.path} (exists? ${jre.dir.exists})" />
+
               </target>
             </configuration>
           </execution>
