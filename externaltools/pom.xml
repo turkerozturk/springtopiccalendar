@@ -195,7 +195,7 @@
                 </executions>
             </plugin>
 
-            <!-- Plugin derlendikten sonra release klasörüne kopyala -->
+            <!-- derlenen dosyalari "release" klasorune kopyala -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -214,10 +214,6 @@
                                       todir="../release/" />
                                 <copy file="target/generated-docs/how-to-compile.pdf"
                                       todir="../release/" />
-                                <copy file="../README.md"
-                                      todir="../release/" />
-                                <copy file="../LICENSE"
-                                      tofile="../release/license.txt" />
                             </target>
                         </configuration>
                     </execution>
