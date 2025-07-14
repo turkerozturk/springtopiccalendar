@@ -116,6 +116,28 @@
             </configuration>
           </execution>
 
+          <!-- tum islemler bittikten sonra release klasorunun icindekilerin zip yapilmasi -->
+          <execution>
+            <id>package-zip</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target name="create-zip">
+                <!-- release-zip klasorunu olustur -->
+                <mkdir dir="release/release-zip" />
+
+                <!-- release klasorunun icerigini ziple, zip dosyasini release/release-zip altina koy -->
+                <zip destfile="release/release-zip/daily-topic-tracker.zip" basedir="release">
+                  <!-- release klasorunun kendisi degil, sadece icerigi eklensin -->
+                  <exclude name="release-zip/**" />
+                </zip>
+              </target>
+            </configuration>
+          </execution>
+
+
         </executions>
       </plugin>
 
