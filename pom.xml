@@ -29,8 +29,8 @@
 		property olarak tanimliyoruz. Tanimlamazsak maven hatasiz calisir ama IDE'de error
 		olarak gorunmesi can sikar.
 	 -->
-    <jre.path>unset</jre.path>
-    <jre.dir.exists>false</jre.dir.exists>
+
+
   </properties>
 
 
