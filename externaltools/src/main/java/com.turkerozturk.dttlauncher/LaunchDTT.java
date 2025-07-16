@@ -139,10 +139,12 @@ public class LaunchDTT extends JFrame {
         logPane.setFont(font);
         ((DefaultCaret) logPane.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
+
         styledDocument = logPane.getStyledDocument();
 
         JScrollPane scrollPane = new JScrollPane(logPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        addContextMenu(logPane); // adds right click context menu.
 
         // Start/Stop butonu
         btnStartStop.setBackground(COLOR_STOPPED);
@@ -576,6 +578,45 @@ public class LaunchDTT extends JFrame {
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
     }
+
+    /**
+     * secili log satirlarini panoya kopyalamak icin sag tus context menu
+     * @param textPane
+     */
+    private void addContextMenu(JTextPane textPane) {
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem copyItem = new JMenuItem("Copy");
+        popupMenu.add(copyItem);
+
+        copyItem.addActionListener(e -> {
+            String selectedText = textPane.getSelectedText();
+            if (selectedText != null && !selectedText.isEmpty()) {
+                StringSelection selection = new StringSelection(selectedText);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, null);
+            }
+        });
+
+        // Mouse listener to trigger popup on right click
+        textPane.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                showPopupIfTriggered(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopupIfTriggered(e);
+            }
+
+            private void showPopupIfTriggered(MouseEvent e) {
+                if (e.isPopupTrigger() && textPane.getSelectedText() != null) {
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
 
 
     // code below is for multi colored logs
