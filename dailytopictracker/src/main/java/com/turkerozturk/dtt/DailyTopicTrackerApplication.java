@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt;
 
+import com.turkerozturk.dtt.configuration.banner.CustomBanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -33,6 +34,9 @@ public class DailyTopicTrackerApplication {
         if (args.length > 0 && !args[0].isBlank()) {
             System.setProperty("spring.datasource.url", "jdbc:sqlite:" + args[0]);
         }
-        SpringApplication.run(DailyTopicTrackerApplication.class, args);
+        //SpringApplication.run(DailyTopicTrackerApplication.class, args);
+        SpringApplication app = new SpringApplication(DailyTopicTrackerApplication.class);
+        app.setBanner(new CustomBanner()); // DailyTopicTracker asciiart on console
+        app.run(args);
     }
 }
