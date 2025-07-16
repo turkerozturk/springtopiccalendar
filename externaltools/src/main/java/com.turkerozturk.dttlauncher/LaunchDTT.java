@@ -19,7 +19,7 @@ package com.turkerozturk.dttlauncher;/*
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
 import javax.swing.*;
-import javax.swing.text.DefaultCaret;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -39,6 +39,8 @@ import java.util.Properties;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Commands to compile to jar and run:
@@ -66,7 +68,7 @@ public class LaunchDTT extends JFrame {
 
     private final JComboBox<String> cmbDatabaseList = new JComboBox<>();
     //private final JLabel lblAppVersion = new JLabel();
-    private final JTextArea textAreaLogs = new JTextArea();
+    //private final JTextArea textAreaLogs = new JTextArea();
 
     private final JButton btnOpenApplicationWebPage = new JButton("\uD83C\uDF10"); // unicode globe symbol
     private final JButton btnCopy = new JButton("📋"); // Unicode clipboard symbol
@@ -127,16 +129,19 @@ public class LaunchDTT extends JFrame {
             }
         });
 
-        Font font = new Font(Font.MONOSPACED, Font.BOLD, 12);
-        textAreaLogs.setBackground(Color.BLACK);
-        textAreaLogs.setForeground(Color.GREEN);
-        textAreaLogs.setFont(font);
-        // Log metin alanı ayarları
-        textAreaLogs.setEditable(false);
-        // Otomatik en alta kayması için:
-        ((DefaultCaret) textAreaLogs.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        JScrollPane scrollPane = new JScrollPane(textAreaLogs);
+
+        logPane = new JTextPane();
+        logPane.setEditable(false);
+        logPane.setBackground(Color.BLACK);
+        logPane.setForeground(Color.WHITE);
+        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        logPane.setFont(font);
+        ((DefaultCaret) logPane.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+        styledDocument = logPane.getStyledDocument();
+
+        JScrollPane scrollPane = new JScrollPane(logPane);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         // Start/Stop butonu
@@ -177,7 +182,7 @@ public class LaunchDTT extends JFrame {
 
         btnCopy.setToolTipText("Copy logs to clipboard");
         btnCopy.addActionListener(e -> {
-            StringSelection selection = new StringSelection(textAreaLogs.getText());
+            StringSelection selection = new StringSelection(logPane.getText());
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(selection, null);
 
@@ -190,7 +195,7 @@ public class LaunchDTT extends JFrame {
         });
 
         btnClear.setToolTipText("Clear logs");
-        btnClear.addActionListener(e -> textAreaLogs.setText(""));
+        btnClear.addActionListener(e -> logPane.setText(""));
 
 
 
@@ -445,7 +450,8 @@ public class LaunchDTT extends JFrame {
 
     // Metin alanına log ekleme (Swing thread'i üzerinden)
     private void appendLog(String text) {
-        SwingUtilities.invokeLater(() -> textAreaLogs.append(text));
+        //SwingUtilities.invokeLater(() -> textAreaLogs.append(text));
+        SwingUtilities.invokeLater(() -> addStringLineToLog(text));
     }
 
     // Varsayılan tarayıcıda URL açma (Windows ortamında)
@@ -570,5 +576,89 @@ public class LaunchDTT extends JFrame {
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
     }
+
+
+    // code below is for multi colored logs
+    private final JTextPane logPane;
+    private final StyledDocument styledDocument;
+
+    private void addStringLineToLog(String line) {
+        if (line.trim().isEmpty()) {
+            appendToStyledDocument(line + "\n", Color.WHITE);
+            return;
+        }
+
+        // Tarihle başlayan satır
+        Pattern datePattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+([+-]\\d{2}:?\\d{2})?)\\s+(INFO|WARN|DEBUG|ERROR|TRACE)");
+        Matcher matcher = datePattern.matcher(line);
+
+        if (matcher.find()) {
+            String datePart = matcher.group(1);
+            String level = matcher.group(3);
+
+            int levelStart = line.indexOf(level, datePart.length());
+            int messageStart = levelStart + level.length();
+
+            appendToStyledDocument(datePart, Color.GRAY);
+            appendToStyledDocument(" " + level, getLevelColor(level));
+            appendToStyledDocument(line.substring(messageStart) + "\n", Color.WHITE);
+            return;
+        }
+
+        // [LEVEL] formatı
+        Pattern tagPattern = Pattern.compile("^\\[(INFO|WARN|ERROR|DEBUG|TRACE)]");
+        matcher = tagPattern.matcher(line);
+        if (matcher.find()) {
+            String level = matcher.group(1);
+            int levelEnd = matcher.end();
+            appendToStyledDocument(line.substring(0, levelEnd), getLevelColor(level));
+            appendToStyledDocument(line.substring(levelEnd) + "\n", Color.WHITE);
+            return;
+        }
+
+        // WARNING: ... veya ERROR: ... gibi
+        Pattern colonPattern = Pattern.compile("^(INFO|WARN|ERROR|DEBUG|TRACE):");
+        matcher = colonPattern.matcher(line);
+        if (matcher.find()) {
+            String level = matcher.group(1);
+            int levelEnd = matcher.end();
+            appendToStyledDocument(line.substring(0, levelEnd), getLevelColor(level));
+            appendToStyledDocument(line.substring(levelEnd) + "\n", Color.WHITE);
+            return;
+        }
+
+        // Diğerleri beyaz ve \n olmadan daha iyi:
+        appendToStyledDocument(line, Color.WHITE);
+    }
+
+    private void appendToStyledDocument(String text, Color color) {
+        Style style = logPane.addStyle("Style", null);
+        StyleConstants.setForeground(style, color);
+        try {
+            styledDocument.insertString(styledDocument.getLength(), text, style);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private Color getLevelColor(String level) {
+        return switch (level.toUpperCase()) {
+            case "INFO" -> new Color(0x00FF00);     // Yeşil
+            case "WARN", "WARNING" -> new Color(0xFFA500); // Turuncu
+            case "ERROR" -> Color.RED;
+            case "DEBUG" -> Color.CYAN;
+            case "TRACE" -> Color.LIGHT_GRAY;
+            default -> Color.WHITE;
+        };
+    }
+
+
+
+
+
+
+
+
+
 
 }
