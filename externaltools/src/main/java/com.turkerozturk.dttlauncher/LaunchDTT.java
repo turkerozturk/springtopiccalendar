@@ -21,6 +21,8 @@ package com.turkerozturk.dttlauncher;/*
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -63,11 +65,15 @@ public class LaunchDTT extends JFrame {
     private final JButton btnOpenApplicationFolder = new JButton("Open App Folder");
 
     private final JComboBox<String> cmbDatabaseList = new JComboBox<>();
-    private final JLabel lblAppVersion = new JLabel("DailyTopicTracker V1.0.3 - Turker Ozturk");
+    //private final JLabel lblAppVersion = new JLabel();
     private final JTextArea textAreaLogs = new JTextArea();
 
+    private final JButton btnOpenApplicationWebPage = new JButton("\uD83C\uDF10"); // unicode globe symbol
+    private final JButton btnCopy = new JButton("📋"); // Unicode clipboard symbol
+    private final JButton btnClear = new JButton("🗑"); // Unicode trash can
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
     private int serverPort;
+    private String serverUrl = "http://localhost:";
 
     // Process
     private Process process;
@@ -86,7 +92,7 @@ public class LaunchDTT extends JFrame {
     }
 
     public LaunchDTT() {
-        super("Daily Topic Tracker Launcher");
+        super("Daily Topic Tracker Launcher" + " - " + "DailyTopicTracker V1.0.3 - Turker Ozturk");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -121,6 +127,10 @@ public class LaunchDTT extends JFrame {
             }
         });
 
+        Font font = new Font(Font.MONOSPACED, Font.BOLD, 12);
+        textAreaLogs.setBackground(Color.BLACK);
+        textAreaLogs.setForeground(Color.GREEN);
+        textAreaLogs.setFont(font);
         // Log metin alanı ayarları
         textAreaLogs.setEditable(false);
         // Otomatik en alta kayması için:
@@ -142,6 +152,13 @@ public class LaunchDTT extends JFrame {
             }
         });
 
+        btnOpenApplicationWebPage.setToolTipText("Open " + serverUrl + serverPort);
+        btnOpenApplicationWebPage.addActionListener( e -> {
+
+            openBrowser(serverUrl + serverPort);
+
+        });
+
 
         JLabel linkLabel = new JLabel("<html><a href=''>Open Website</a></html>");
         linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -157,6 +174,29 @@ public class LaunchDTT extends JFrame {
         });
 
 
+
+        btnCopy.setToolTipText("Copy logs to clipboard");
+        btnCopy.addActionListener(e -> {
+            StringSelection selection = new StringSelection(textAreaLogs.getText());
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(selection, null);
+
+            // Temporary "Copied" message
+            String oldText = btnCopy.getText();
+            btnCopy.setText("✔ Copied!");
+            Timer timer = new Timer(1500, ev -> btnCopy.setText(oldText));
+            timer.setRepeats(false);
+            timer.start();
+        });
+
+        btnClear.setToolTipText("Clear logs");
+        btnClear.addActionListener(e -> textAreaLogs.setText(""));
+
+
+
+
+
+
         // Basit layout
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(btnStartStop);
@@ -167,7 +207,7 @@ public class LaunchDTT extends JFrame {
         topPanel.add(btnOpenApplicationFolder);
 
         topPanel.add(cmbDatabaseList);
-        topPanel.add(lblAppVersion);
+        //topPanel.add(lblAppVersion);
         topPanel.add(linkLabel);
 
         JButton licenseButton = new JButton("License");
@@ -193,6 +233,9 @@ public class LaunchDTT extends JFrame {
         });
         topPanel.add(licenseButton);
 
+        topPanel.add(btnOpenApplicationWebPage);
+        topPanel.add(btnCopy);
+        topPanel.add(btnClear);
 
         // Ana panel
         setLayout(new BorderLayout());
@@ -318,12 +361,12 @@ public class LaunchDTT extends JFrame {
             }
             // Eğer STARTING moddaysak actuator'a bak
             if (currentStatus == AppStatus.STARTING) {
-                boolean up = isApplicationUp("http://localhost:" + serverPort + "/actuator/health");
+                boolean up = isApplicationUp(serverUrl + serverPort + "/actuator/health");
                 if (up) {
                     appendLog("[INFO] Application is UP. Opening browser...\n");
                     setStatus(AppStatus.RUNNING);
                     // Tarayıcı aç (isteğe bağlı; Windows)
-                    openBrowser("http://localhost:" + serverPort);
+                    openBrowser(serverUrl + serverPort);
                 }
             }
         }, 1, 1, TimeUnit.SECONDS);
