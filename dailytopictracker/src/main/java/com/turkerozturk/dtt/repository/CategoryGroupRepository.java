@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.entity.Entry;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Map;
@@ -42,5 +43,8 @@ public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Lo
 
 
     Optional<CategoryGroup> findByName(String name);
+
+    @Query("SELECT MAX(c.priority) FROM CategoryGroup c")
+    Optional<Integer> findMaxPriority();
 
 }

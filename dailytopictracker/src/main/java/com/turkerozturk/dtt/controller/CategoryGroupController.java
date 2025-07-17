@@ -120,6 +120,14 @@ public class CategoryGroupController {
             redirectAttrs.addFlashAttribute("error", "Cannot create duplicate category group.");
             return "redirect:/category-groups/new";
         }
+
+        // Yeni CategoryGroup olusturulurken priority degeri otomatik ayarlanmali.
+        // id daha oluşmadığı için onu doğrudan kullanamazsın.
+        // Ama örneğin en yüksek mevcut priority + 1 olarak belirleyebilirsin.
+        // Otomatik priority ataması
+        Integer maxPriority = repo.findMaxPriority().orElse(0);
+        formGroup.setPriority(maxPriority + 1);
+
         repo.save(formGroup);
         redirectAttrs.addFlashAttribute("success", "Category group created successfully.");
 
