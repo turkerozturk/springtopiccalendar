@@ -9,6 +9,10 @@
     -->
     <meta charset="UTF-8">
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
     <!-- favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -21,6 +25,11 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.css}">
+
+
+
 
     <style>
 
@@ -128,13 +137,15 @@
 
     <table id="category-groups-table">
         <colgroup>
+            <col style="width: 22px;">
             <col style="width: 22px;background-color: white;">
             <col style="width: 200px;">
-            <col style="width: 948px;background-color: white;">
+            <col style="width: 926px;background-color: white;">
             <col style="width: 110px;">
         </colgroup>
         <thead>
         <tr>
+            <th></th> <!-- Tutamak sütunu -->
             <th class="text-center" style="background-color: lightgray;"
                 title="Categories in the category group with a high ID number appear first in the tracker view.">ID</th>
             <th class="text-center" style="background-color: lightgray;">Group Name</th>
@@ -142,9 +153,11 @@
             <th class="text-center" style="background-color: lightgray;">Actions</th>
         </tr>
         </thead>
-        <tbody>
-
-        <tr th:each="grp : ${groups}">
+        <tbody id="sortable">
+        <tr th:each="grp : ${groups}" th:attr="data-id=${grp.id}">
+            <td class="handle" style="cursor: move;">
+                <i>&#x2630;</i>
+            </td>
             <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
             th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
             <td class="vertical" th:text="${grp.name}">Group Name</td>
@@ -310,5 +323,63 @@
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.js}"></script>
+
+<script>
+    $(function () {
+      $("#sortable").sortable({
+        handle: ".handle",
+        update: function (event, ui) {
+          const draggedId = ui.item.data("id");
+    const nextRow = ui.item.next("tr");
+    const prevRow = ui.item.prev("tr");
+
+    let targetId;
+    if (nextRow.length > 0) {
+        targetId = nextRow.data("id");
+    } else if (prevRow.length > 0) {
+        targetId = prevRow.data("id");
+    } else {
+        // tek elemanlı liste?
+        return;
+    }
+
+    const payload = {
+        draggedId: draggedId,
+        targetId: targetId
+    };
+          // POST isteği gönder
+
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+             $.ajax({
+        url: "/api/category-groups/swap-priority",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(payload),
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+        },
+        success: function () {
+            console.log("Priority swapped");
+        },
+        error: function (xhr) {
+            alert("Failed to update priority. Status: " + xhr.status);
+        }
+    });
+
+        }
+      });
+    });
+</script>
+
 </body>
 </html>
