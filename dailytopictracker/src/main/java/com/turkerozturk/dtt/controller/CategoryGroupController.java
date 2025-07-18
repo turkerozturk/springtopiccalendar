@@ -63,7 +63,7 @@ public class CategoryGroupController {
     // LIST
     @GetMapping
     public String list(Model model) {
-        List<CategoryGroup> groups = repo.findAllByOrderByIdDesc();
+        List<CategoryGroup> groups = repo.findAllByOrderByPriorityDesc();
 
         Locale locale = Locale.forLanguageTag(appLocale);
         Collator collator = Collator.getInstance(locale);

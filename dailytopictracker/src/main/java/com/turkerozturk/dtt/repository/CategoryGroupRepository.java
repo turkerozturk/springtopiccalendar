@@ -40,6 +40,7 @@ public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Lo
 
     List<CategoryGroup> findAllByOrderByIdDesc();
 
+    List<CategoryGroup> findAllByOrderByPriorityDesc();
 
 
     Optional<CategoryGroup> findByName(String name);
