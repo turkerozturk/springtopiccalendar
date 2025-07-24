@@ -30,6 +30,8 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc();
+    List<Category> findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+
 
     /* asagidaki sorguda son yani dorduncu SUM u kullanmiyoruz artik. Sorgudan gelen veri DTO listesini servis
     katmanindaki baska bir sorgu ile elde ettigimiz dogru degerleri o SUM ile gelen yanlis degerlerin yerine yaziyoruz.

@@ -93,7 +93,7 @@ public class IndexController {
     ) {
         long dateMillisYmd = aDay.atStartOfDay(zoneId).toInstant().toEpochMilli();
 
-        List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroupIdDescNameAsc();
+        List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
         List<String> labels = new ArrayList<>();
         List<Integer> counts = new ArrayList<>();
         List<Long> ids = new ArrayList<>();
