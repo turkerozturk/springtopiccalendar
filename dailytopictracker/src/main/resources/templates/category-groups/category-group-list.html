@@ -172,10 +172,10 @@
 
     <table id="category-groups-table">
         <colgroup>
-            <col style="width: 22px;">
+            <col style="width: 32px;">
             <col style="width: 22px;background-color: white;">
             <col style="width: 200px;">
-            <col style="width: 926px;background-color: white;">
+            <col style="width: 916px;background-color: white;">
             <col style="width: 110px;">
         </colgroup>
         <thead>
@@ -197,7 +197,12 @@
 
             <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
             th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
-            <td class="vertical" th:text="${grp.name}">Group Name</td>
+            <td class="vertical" th:style="${ 'background-color:' + grp.backgroundColor + '; text-align:center;' }">
+                <span th:text="${grp.name}"
+                      style="background-color: azure;
+                        padding: 3px;
+                        border: 2px solid DarKGray;
+                        border-radius: 7px 7px 7px 7px;">Group Name</span></td>
             <td>
                 <a th:if="${grp.categories.size == 0}"
                    th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
