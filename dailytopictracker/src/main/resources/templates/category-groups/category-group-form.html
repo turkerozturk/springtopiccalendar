@@ -45,6 +45,24 @@
                    placeholder="Enter unique group name"
                    required autofocus/>
         </div>
+
+
+
+
+        <div class="mb-3">
+            <label for="backgroundColor" class="form-label">Color picker</label>
+            <input type="color"
+                   class="form-control form-control-color"
+                   id="backgroundColor"
+                   th:field="*{backgroundColor}"
+                   title="Choose a color"
+            />
+        </div>
+
+        <div class="mb-3">
+            <p style="color:darkgray;">Note: Priority ordering between category groups is done on the category groups page.</p>
+        </div>
+
         <button type="submit" class="btn btn-success">Save</button>
         <a href="/category-groups" class="btn btn-secondary ms-2">Cancel</a>
     </form>

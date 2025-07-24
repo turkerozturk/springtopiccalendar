@@ -102,7 +102,10 @@ public class CategoryGroupController {
     @GetMapping("/new")
     public String createForm(Model model,
                              @RequestParam(name="returnPage", required=false) String returnPage) {
-        model.addAttribute("group", new CategoryGroup());
+        CategoryGroup categoryGroup = new CategoryGroup();
+        String defaultBgColor = "#f5f5f5"; // WhiteSmoke
+        categoryGroup.setBackgroundColor(defaultBgColor);
+        model.addAttribute("group", categoryGroup);
         model.addAttribute("returnPage", returnPage);
 
         return "category-groups/category-group-form";
@@ -176,6 +179,8 @@ public class CategoryGroupController {
         CategoryGroup managed = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CategoryGroup id: " + id));
         managed.setName(formGroup.getName());
+        managed.setBackgroundColor(formGroup.getBackgroundColor());
+        System.out.println("color: " + formGroup.getBackgroundColor());
         repo.save(managed);
         redirectAttrs.addFlashAttribute("success", "Category group updated successfully.");
         return "redirect:/category-groups";
