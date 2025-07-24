@@ -335,49 +335,53 @@ WebJars path'leri şu yapıyı izler:
 <script>
     $(function () {
       $("#sortable").sortable({
-        handle: ".handle",
-        update: function (event, ui) {
-          const draggedId = ui.item.data("id");
-    const nextRow = ui.item.next("tr");
-    const prevRow = ui.item.prev("tr");
+  handle: ".handle",
+  update: function (event, ui) {
+    const fromIndex = ui.item.data("original-index");
+    const toIndex = ui.item.index();
 
-    let targetId;
-    if (nextRow.length > 0) {
-        targetId = nextRow.data("id");
-    } else if (prevRow.length > 0) {
-        targetId = prevRow.data("id");
-    } else {
-        // tek elemanlı liste?
-        return;
+    // En fazla bir birimlik hareket izni
+    if (Math.abs(toIndex - fromIndex) > 1) {
+      ui.item.css("background-color", "#ffcccc"); // kırmızı
+      setTimeout(() => ui.item.css("background-color", ""), 1000);
+      $(this).sortable("cancel");
+      return;
     }
 
+    const draggedId = ui.item.data("id");
+    const adjacentRow = (toIndex > fromIndex) ? ui.item.prev() : ui.item.next();
+    const targetId = adjacentRow.data("id");
+
     const payload = {
-        draggedId: draggedId,
-        targetId: targetId
+      draggedId: draggedId,
+      targetId: targetId
     };
-          // POST isteği gönder
 
-            const csrfToken = $('meta[name="_csrf"]').attr('content');
-            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+    const csrfToken = $('meta[name="_csrf"]').attr('content');
+    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-             $.ajax({
-        url: "/api/category-groups/swap-priority",
-        method: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(payload),
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader(csrfHeader, csrfToken);
-        },
-        success: function () {
-            console.log("Priority swapped");
-        },
-        error: function (xhr) {
-            alert("Failed to update priority. Status: " + xhr.status);
-        }
+    $.ajax({
+      url: "/api/category-groups/swap-priority",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(payload),
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader(csrfHeader, csrfToken);
+      },
+      success: function () {
+        ui.item.css("background-color", "#ccffcc"); // yeşil
+        setTimeout(() => ui.item.css("background-color", ""), 1000);
+      },
+      error: function () {
+        alert("Failed to update priority.");
+      }
     });
+  },
+  start: function (event, ui) {
+    ui.item.data("original-index", ui.item.index());
+  }
+});
 
-        }
-      });
     });
 </script>
 
