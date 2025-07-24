@@ -114,6 +114,41 @@
  }
     </style>
 
+
+    <!-- these styles below are for moving category group rows -->
+    <style>
+
+        .move-controls {
+            width: 40px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1; /* Satır yüksekliğini sabit tutar */
+        }
+
+        .move-controls a {
+            text-decoration: none;
+            color: #444;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        #sortable tr:hover .move-controls a {
+            display: inline-block;
+        }
+
+        tr.swapped-success {
+            background-color: #ccffcc !important; /* yeşil */
+            transition: background-color 1s ease;
+        }
+
+        tr.swapped-fail {
+            background-color: #ffcccc !important; /* kırmızı */
+            transition: background-color 1s ease;
+        }
+
+
+    </style>
+
 </head>
 <body>
 
@@ -155,10 +190,11 @@
         </thead>
         <tbody id="sortable">
         <tr th:each="grp : ${groups}" th:attr="data-id=${grp.id}">
-            <td>
-                <button class="btn-up" style="display:none;">↑</button>
-                <button class="btn-down" style="display:none;">↓</button>
+            <td class="move-controls">
+                <a href="#" class="move-up" title="Yukarı Taşı" style="display:none;">&#x25B2;</a> <!-- ▲ -->
+                <a href="#" class="move-down" title="Aşağı Taşı" style="display:none;">&#x25BC;</a> <!-- ▼ -->
             </td>
+
             <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
             th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
             <td class="vertical" th:text="${grp.name}">Group Name</td>
@@ -333,67 +369,68 @@ WebJars path'leri şu yapıyı izler:
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 <script type="text/javascript" th:src="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.js}"></script>
 
+<!-- these scripts below are for moving category group rows -->
 <script>
-
     $(function () {
-  $("#sortable tr").hover(
-    function () {
-      $(this).find(".btn-up, .btn-down").show();
-    },
-    function () {
-      $(this).find(".btn-up, .btn-down").hide();
-    }
-  );
+      $("#sortable tr").hover(
+        function () {
+          $(this).find(".move-up, .move-down").show();
+        },
+        function () {
+          $(this).find(".move-up, .move-down").hide();
+        }
+      );
 
-  $(".btn-up").click(function () {
-    const row = $(this).closest("tr");
-    const prev = row.prev("tr");
-    if (prev.length === 0) return;
+      $(".move-up").click(function (e) {
+        e.preventDefault();
+        const row = $(this).closest("tr");
+        const prev = row.prev("tr");
+        if (prev.length === 0) return;
 
-    const draggedId = row.data("id");
-    const targetId = prev.data("id");
+        const draggedId = row.data("id");
+        const targetId = prev.data("id");
 
-    swapRows(row, prev);
-    sendSwapRequest(draggedId, targetId);
-  });
+        row.insertBefore(prev);
+        sendSwapRequest(draggedId, targetId, row);
+      });
 
-  $(".btn-down").click(function () {
-    const row = $(this).closest("tr");
-    const next = row.next("tr");
-    if (next.length === 0) return;
+      $(".move-down").click(function (e) {
+        e.preventDefault();
+        const row = $(this).closest("tr");
+        const next = row.next("tr");
+        if (next.length === 0) return;
 
-    const draggedId = row.data("id");
-    const targetId = next.data("id");
+        const draggedId = row.data("id");
+        const targetId = next.data("id");
 
-    swapRows(next, row);
-    sendSwapRequest(draggedId, targetId);
-  });
+        next.insertBefore(row); // sırayı değiştir
+        sendSwapRequest(draggedId, targetId, row);
+      });
 
-  function swapRows(row1, row2) {
-    row1.insertBefore(row2);
-  }
+      function sendSwapRequest(draggedId, targetId, row) {
+        const csrfToken = $('meta[name="_csrf"]').attr('content');
+        const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-  function sendSwapRequest(draggedId, targetId) {
-    const csrfToken = $('meta[name="_csrf"]').attr('content');
-    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
-
-    $.ajax({
-      url: "/api/category-groups/swap-priority",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({ draggedId, targetId }),
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader(csrfHeader, csrfToken);
-      },
-      success: function () {
-        console.log("Priority updated.");
-      },
-      error: function () {
-        alert("Failed to update priority.");
+        $.ajax({
+          url: "/api/category-groups/swap-priority",
+          method: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({ draggedId, targetId }),
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader(csrfHeader, csrfToken);
+          },
+          success: function () {
+            row.addClass("swapped-success");
+            setTimeout(() => row.removeClass("swapped-success"), 1000);
+          },
+          error: function () {
+            row.addClass("swapped-fail");
+            setTimeout(() => row.removeClass("swapped-fail"), 1000);
+          }
+        });
       }
-    });
-  }
 });
+
 
 </script>
 
