@@ -41,6 +41,9 @@ public class CategoryGroup {
     @Column(nullable = false, unique = true)
     private Integer priority;
 
+    @Column(name="background_color", nullable = false)
+    private String backgroundColor;
+
     @OneToMany(mappedBy = "categoryGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories = new ArrayList<>();
 
