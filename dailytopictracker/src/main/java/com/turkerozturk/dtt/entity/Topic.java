@@ -177,6 +177,41 @@ public class Topic {
         return firstFutureNeutralEntryDate;
     }
 
+    // start base_date_millis_ymd
+    // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Getter
+    @Column(name = "base_date_millis_ymd")
+    private Long baseDateMillisYmd;
+
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate baseDate;
+
+    public void setBaseDateMillisYmd(Long baseDateMillisYmd) {
+        this.baseDateMillisYmd = baseDateMillisYmd;
+        // isteğe bağlı: burada da güncelleyebilirsiniz
+        this.baseDate = null;
+    }
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getBaseDate() {
+        if (baseDate == null && baseDateMillisYmd != null) {
+            baseDate = Instant
+                    .ofEpochMilli(baseDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return baseDate;
+    }
+
+    // end base_date_millis_ymd
+
+
+
+
     /**
      *  indicates the importance of a topic. user can use it manually for severity or something else.
     **/
