@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.controller.web;
 
+import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,7 @@ import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.CategoryService;
 import com.turkerozturk.dtt.service.TopicService;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,13 @@ public class TopicWebController {
 
     @Autowired
     private CategoryService categoryService;
+
+    private final AppTimeZoneProvider timeZoneProvider;
+
+    public TopicWebController(AppTimeZoneProvider timeZoneProvider) {
+        this.timeZoneProvider = timeZoneProvider;
+    }
+
 
     // Tüm topic'leri veya belli kategoriye ait topic'leri listeleyen sayfa
     @GetMapping
@@ -168,6 +177,10 @@ public class TopicWebController {
         model.addAttribute("categories", categoryDTOList);
 
         model.addAttribute("topic", topic);
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        model.addAttribute("zoneId", zoneId);
+
         return "topics/topic-form"; // Aynı formu kullanacağız
     }
 
@@ -195,6 +208,10 @@ public class TopicWebController {
         existingTopic.setSomeTimeLater(topic.getSomeTimeLater());
         existingTopic.setPinned(topic.isPinned());
         existingTopic.setWeight(topic.getWeight());
+
+        existingTopic.setBaseDateMillisYmd(topic.getBaseDateMillisYmd());
+        //System.out.println(topic.getBaseDateMillisYmd());
+        //System.out.println(topic.getBaseDate());
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());

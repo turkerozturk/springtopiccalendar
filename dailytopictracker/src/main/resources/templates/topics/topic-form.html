@@ -19,6 +19,15 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+    <style>
+        form {
+            background-color: WhiteSmoke;
+            border-radius: 15px;
+        }
+    </style>
     <title>Topic Form</title>
 
 
@@ -91,6 +100,53 @@
                    title="The numerical importance of the topic" />
         </div>
 
+        <input type="hidden" id="lastPastEntryDateMillis" th:value="${topic.lastPastEntryDateMillisYmd}" />
+
+        <!-- baseDateMillisYmd (artık gizli) -->
+        <input type="hidden" id="baseDateMillisYmd" th:field="*{baseDateMillisYmd}"  name="baseDateMillisYmd" />
+
+        <!-- Checkbox: aktif değilse tarih seçici disable olur -->
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="enableBaseDate"
+                   onclick="toggleBaseDatePicker()" />
+            <label class="form-check-label" for="enableBaseDate">Enable Base Date</label>
+        </div>
+
+
+        <!-- Date picker input alanı -->
+        <div class="mb-3" id="baseDateContainer">
+            <div class="input-group baseDateStyle date">
+                <label for="baseDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
+                <input type="text" id="baseDatePicker"
+                       class="form-control form-control-sm"
+                       onchange="convertDateToEpoch()"
+                       th:value="${
+                   topic.baseDateMillisYmd != null
+                     ? T(java.time.Instant).ofEpochMilli(topic.baseDateMillisYmd)
+                        .atZone(T(java.time.ZoneId).systemDefault())
+                        .toLocalDate()
+                     : ''
+               }"
+                />
+                <span class="input-group-append">
+             <button class="btn btn-outline-secondary" type="button">
+                 <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                 <i class="far fa-calendar" aria-hidden="true"></i>
+             </button>
+        </span>
+            </div>
+        </div>
+
+        <!-- Temizle ve Son Giriş Tarihini Kullan butonları -->
+        <div class="mb-3 d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearBaseDate()">Clear Date</button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="useLastPastEntryDate()"
+                    th:if="${topic.lastPastEntryDateMillisYmd != null}">
+                Use Last Entry Date
+            </button>
+        </div>
+
+
         <button type="submit" class="btn btn-primary w-100">Save</button>
 
         <!-- if user hits “cancel,” send them back -->
@@ -101,13 +157,133 @@
     </form>
 
     <div class="mt-3">
+        <!-- lastPastEntryDate varsa -->
+        <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
+            <td
+                class="last-done"
+                style="text-align: center">
+
+                <!-- how many days has past until today -->
+                <span th:text="${topic.lastPastEntryDate}">
+                    </span>
+                <br />
+                <span th:text="${topic.lastPastEntryDateMillisYmd}">
+                    </span>
+                <br />
+                <span  th:text="${'Last done: '
+                                        + T(java.time.format.DateTimeFormatter)
+                                        .ofPattern('yyyy-MM-dd')
+                                        .format(topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                         }">
+
+                </span>
+            </td>
+        </th:block>
+    </div>
+
+    <div class="mt-3">
         <a th:href="@{/topics(categoryId=${topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
     </div>
 </div>
 
 
+
+
+
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+
+<noscript>
+    Please enable JavaScript.
+</noscript>
+
+<script>
+    /**
+     * Date Picker’da tarih seçilince,
+     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
+     * dateMillisYmd input’una yazan basit fonksiyon.
+     */
+    function convertDateToEpoch() {
+        const selectedDate = document.getElementById('baseDatePicker').value; // yyyy-MM-dd
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            const dateObj = new Date(year, month - 1, day);
+            const epochMillis = dateObj.getTime();
+            document.getElementById('baseDateMillisYmd').value = epochMillis;
+        }
+    }
+
+
+
+    function clearBaseDate() {
+        document.getElementById('baseDateMillisYmd').value = '';
+        document.getElementById('baseDatePicker').value = '';
+        document.getElementById('enableBaseDate').checked = false;
+        toggleBaseDatePicker();
+    }
+
+    function useLastPastEntryDate() {
+
+
+        const lastMillis = [[${topic.lastPastEntryDateMillisYmd}]];
+        //const lastMillis = /*[[${topic.lastPastEntryDateMillisYmd}]]*/ 0;
+
+        if (lastMillis) {
+            const dateObj = new Date(Number(lastMillis));
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('baseDatePicker').value = formattedDate;
+            document.getElementById('baseDateMillisYmd').value = lastMillis;
+            document.getElementById('enableBaseDate').checked = true;
+            toggleBaseDatePicker();
+        }
+    }
+
+    function toggleBaseDatePicker() {
+        const isEnabled = document.getElementById('enableBaseDate').checked;
+        document.getElementById('baseDatePicker').disabled = !isEnabled;
+    }
+
+    // Sayfa açıldığında baseDate varsa checkbox işaretli gelsin
+    window.addEventListener('DOMContentLoaded', () => {
+        const hasValue = document.getElementById('baseDateMillisYmd').value !== '';
+        document.getElementById('enableBaseDate').checked = hasValue;
+        toggleBaseDatePicker();
+    });
+
+
+    /** https://uxsolutions.github.io/bootstrap-datepicker/
+    * "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range.
+    * calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers
+    */
+
+        $(function() {
+          $('#baseDateContainer .baseDateStyle.date').datepicker({
+              format: "yyyy-mm-dd",
+              todayBtn: "linked",
+              daysOfWeekHighlighted: "0,6",
+              calendarWeeks: false,
+              autoclose: true,
+              todayHighlight: true
+          });
+      });
+</script>
+
+
+
 
 </body>
 </html>
