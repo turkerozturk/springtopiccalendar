@@ -7,13 +7,13 @@ https://github.com/turkerozturk/springtopiccalendar
 <div xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
 
-<table class="table-bordered">
+    <table class="table-bordered">
 
-    <caption style="background-color:black;">
-        <h4 th:text="${topic.name}" style="font-weight:bold;color:white;text-align:right;margin-right:130px;"></h4>
-    </caption>
+        <caption style="background-color:black;">
+            <h4 th:text="${topic.name}" style="font-weight:bold;color:white;text-align:right;margin-right:130px;"></h4>
+        </caption>
 
-    <thead>
+        <thead>
         <tr>
             <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
             <th:block th:each="columnDate : ${top1ColumnDates}">
@@ -35,54 +35,54 @@ https://github.com/turkerozturk/springtopiccalendar
             </th:block>
             <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
         </tr>
-    </thead>
+        </thead>
 
-    <tbody>
-    <tr th:each="dayMap, stat : ${weeklyMaps}">
-        <td th:text="${dayNames[stat.index]}"> </td>
-
-
-        <th:block th:each="entry : ${dayMap}">
+        <tbody>
+        <tr th:each="dayMap, stat : ${weeklyMaps}">
+            <td th:text="${dayNames[stat.index]}"> </td>
 
 
-            <th:block th:if="${entry.value != null }">
-                <td th:title="${entry.key} + ' ' + ${entry.value.id}" th:class="'weekly-table-entry-cell status-' + ${entry.value.status}" >
-                </td>
+            <th:block th:each="entry : ${dayMap}">
+
+
+                <th:block th:if="${entry.value != null }">
+                    <td th:title="${entry.key} + ' ' + ${entry.value.id}" th:class="'weekly-table-entry-cell status-' + ${entry.value.status}" >
+                    </td>
+                </th:block>
+
+                <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
+                <th:block th:if="${entry.value == null }">
+                    <td class="weekly-table-entry-cell"  th:title="${entry.key}">
+                        &nbsp;
+                    </td>
+                </th:block>
+
+
+
+
+
             </th:block>
 
-            <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
-            <th:block th:if="${entry.value == null }">
-                <td class="weekly-table-entry-cell"  th:title="${entry.key}">
-                    &nbsp;
-                </td>
-            </th:block>
 
-
-
-
-
-        </th:block>
-
-
-        <td th:text="${dayNames[stat.index]}"
-            th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : ''">
-        </td>
+            <td th:text="${dayNames[stat.index]}"
+                th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : ''">
+            </td>
 
 
 
 
 
 
-    </tr>
-    </tbody>
+        </tr>
+        </tbody>
 
-    <tfoot>
+        <tfoot>
         <tr>
-        <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
-        <th:block th:each="columnDate : ${bottom1ColumnDates}">
-            <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
-        </th:block>
-        <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th:block th:each="columnDate : ${bottom1ColumnDates}">
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
         </tr>
         <tr>
             <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
@@ -98,17 +98,17 @@ https://github.com/turkerozturk/springtopiccalendar
             </th:block>
             <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
         </tr>
-    </tfoot>
+        </tfoot>
 
 
-</table>
-
-
-
+    </table>
 
 
 
-<div class="row">
+
+
+
+    <div class="row">
 
             <span class="col-2">
                 <!--
@@ -193,7 +193,144 @@ https://github.com/turkerozturk/springtopiccalendar
 
             </span>
 
-            <span class="col-2">
+        <span class="col-2">
+
+                <!-- chart -->
+
+                <canvas id="status1Chart" ></canvas>
+            </span>
+
+        <span class="col-2">
+
+
+
+                <!-- some statistics -->
+                <table class="table table-sm table-bordered">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Entry statuses between today and 365 days ago
+                    </caption>
+                    <thead>
+                    <tr>
+                        <th>Weekday</th>
+                        <th>Note</th>
+                        <th>Done</th>
+                        <th>Warn</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${#numbers.sequence(0, 6)}">
+
+                        <td th:text="${dayNames[i]}"
+                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
+                        </td>
+
+                        <td th:text="${status0[i]}"></td>
+                        <td th:text="${status1[i]}"></td>
+                        <td th:text="${status2[i]}"></td>
+                    </tr>
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+            </span>
+
+        <!-- Streaks Bolumu -->
+        <span class="col-4">
+
+
+                <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
+                Streaks are calculated for consecutive days only.</span>
+
+
+            <!-- newsest streak (closest to today) chart -->
+                <th:block th:if="${newestStreak != null}">
+                    <!-- newest streak chart -->
+                    <table style="width: 100%">
+                        <caption style="text-align:center;color:DarkGray !important;">
+                            Last Streak (closest to today)
+                        </caption>
+                        <tbody>
+                        <tr style="height: 30px;">
+                            <!-- Start Date -->
+                            <td style="width: 100px; text-align: right; padding-right: 10px;">
+                                <span th:text="${newestStreak.startDate}"></span>
+                            </td>
+
+                            <!-- Bar with Count -->
+                            <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                                <div
+                                        th:style="'background-color: #c33b73 !important; height: 20px; color: white !important;
+                                 text-align: center !important; font-weight: bold; margin:auto;
+                                 width:' + (${newestStreak.percentage} * 15) + 'px;'"
+                                        th:text="${newestStreak.dayCount}"></div>
+                            </td>
+
+                            <!-- End Date -->
+                            <td style="width: 100px; text-align: left; padding-left: 10px;">
+                                <span th:text="${newestStreak.endDate}"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </th:block>
+
+
+            <!-- top streaks chart -->
+                <table style="width: 100%">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Top Streaks (closest unique one)
+                    </caption>
+                    <tbody>
+
+
+
+                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
+                        <!-- Start Date -->
+                        <td style="width: 100px; text-align: right; padding-right: 10px;">
+                            <span th:text="${streak.startDate}"></span>
+                        </td>
+
+                        <!-- Bar with Count -->
+                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                            <div
+                                    th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                             text-align: center !important; font-weight: bold; margin:auto;
+                             width:' + (${streak.percentage} * 15) + 'px;'"
+                                    th:text="${streak.dayCount}"></div>
+                        </td>
+
+                        <!-- End Date -->
+                        <td style="width: 100px; text-align: left; padding-left: 10px;">
+                            <span th:text="${streak.endDate}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <br />
+
+            <!-- trend intervals chart ikinci varyasyon-->
+            <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"
+                     id="intervalChart2" width="150" height="75"></canvas>
+            -->
+
+
+
+
+
+            </span>
+
+
+
+        <!-- Success Rate bolumu -->
+        <span class="col-2">
 
                 <!-- filter-form'da pivot tabledaki kodlar, prediction, warn, done, not marked tarihlerini gösterir. -->
                 <table class="table table-sm">
@@ -202,7 +339,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
                         <th:block th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}">
                             Prediction is set to every <span th:text="${topic.someTimeLater}"
-                                class="status-3" style="text-align: center; font-size:2em;">
+                                                             class="status-3" style="text-align: center; font-size:2em;">
                             </span> days<br/>
                         </th:block>
 
@@ -305,7 +442,7 @@ https://github.com/turkerozturk/springtopiccalendar
                         <td>Prediction</td>
 
                         <td
-                            class="status-3" style="text-align: center">
+                                class="status-3" style="text-align: center">
                             <!-- how many days has past until today -->
                             <span th:text="${T(java.time.temporal.ChronoUnit)
                                     .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.predictionDate ) }">
@@ -377,138 +514,10 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
             </span>
-            <span class="col-4">
-
-
-                <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
-                Streaks are calculated for consecutive days only.</span>
-
-
-                <!-- newsest streak (closest to today) chart -->
-                <th:block th:if="${newestStreak != null}">
-                    <!-- newest streak chart -->
-                    <table style="width: 100%">
-                        <caption style="text-align:center;color:DarkGray !important;">
-                            Last Streak (closest to today)
-                        </caption>
-                        <tbody>
-                        <tr style="height: 30px;">
-                            <!-- Start Date -->
-                            <td style="width: 100px; text-align: right; padding-right: 10px;">
-                                <span th:text="${newestStreak.startDate}"></span>
-                            </td>
-
-                            <!-- Bar with Count -->
-                            <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                                <div
-                                        th:style="'background-color: #c33b73 !important; height: 20px; color: white !important;
-                                 text-align: center !important; font-weight: bold; margin:auto;
-                                 width:' + (${newestStreak.percentage} * 15) + 'px;'"
-                                        th:text="${newestStreak.dayCount}"></div>
-                            </td>
-
-                            <!-- End Date -->
-                            <td style="width: 100px; text-align: left; padding-left: 10px;">
-                                <span th:text="${newestStreak.endDate}"></span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </th:block>
-
-
-                <!-- top streaks chart -->
-                <table style="width: 100%">
-                    <caption style="text-align:center;color:DarkGray !important;">
-                        Top Streaks (closest unique one)
-                    </caption>
-                    <tbody>
 
 
 
-                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
-                        <!-- Start Date -->
-                        <td style="width: 100px; text-align: right; padding-right: 10px;">
-                            <span th:text="${streak.startDate}"></span>
-                        </td>
-
-                        <!-- Bar with Count -->
-                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                            <div
-                                 th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
-                             text-align: center !important; font-weight: bold; margin:auto;
-                             width:' + (${streak.percentage} * 15) + 'px;'"
-                                 th:text="${streak.dayCount}"></div>
-                        </td>
-
-                        <!-- End Date -->
-                        <td style="width: 100px; text-align: left; padding-left: 10px;">
-                            <span th:text="${streak.endDate}"></span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <br />
-
-                <!-- trend intervals chart ikinci varyasyon-->
-                <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"
-                         id="intervalChart2" width="150" height="75"></canvas>
-                -->
-
-
-
-
-
-            </span>
-
-
-            <span class="col-2">
-
-                <!-- some statistics -->
-                <table class="table table-sm table-bordered">
-                    <caption style="text-align:center;color:DarkGray !important;">
-                        Entry statuses between today and 365 days ago
-                    </caption>
-                    <thead>
-                    <tr>
-                        <th>Weekday</th>
-                        <th>Note</th>
-                        <th>Done</th>
-                        <th>Warn</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="i : ${#numbers.sequence(0, 6)}">
-
-                        <td th:text="${dayNames[i]}"
-                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
-                        </td>
-
-                        <td th:text="${status0[i]}"></td>
-                        <td th:text="${status1[i]}"></td>
-                        <td th:text="${status2[i]}"></td>
-                    </tr>
-                    <tr>
-                        <td><b>Total</b></td>
-                        <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
-                        <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
-                        <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
-
-
-                    </tr>
-                    </tbody>
-                </table>
-
-            </span>
-
-            <span class="col-2">
-
-                <!-- chart -->
-
-                <canvas id="status1Chart" ></canvas>
-            </span>
-</div>
+    </div>
 
 
     <!-- trend intervals chart ikinci varyasyon -->
