@@ -190,8 +190,46 @@ https://github.com/turkerozturk/springtopiccalendar
                 <br/>
                 -->
 
+                <div class="mt-3">
+                    <!-- lastPastEntryDate varsa -->
+                    <th:block th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}">
+                        <td
+
+
+                                style="text-align: center">
+
+                            <!-- how many days has past until today -->
+                            <span th:text="${topic.baseDate}">
+                                </span>
+                            <br />
+                            <span th:text="${topic.baseDateMillisYmd}">
+                                </span>
+                            <br />
+                            <span  th:text="${'Base date: '
+                                                    + T(java.time.format.DateTimeFormatter)
+                                                    .ofPattern('yyyy-MM-dd')
+                                                    .format(topic.baseDate.atStartOfDay(zoneId))
+                                                     }">
+
+                            </span>
+                            <br/>
+                            <p>
+                                The base date is optionally determined by the user.
+                                <br/>
+                                If a base date is specified, statistical calculations are made starting from that date, not from the last data date.
+                            </p>
+                        </td>
+                    </th:block>
+                </div>
+
 
             </span>
+
+
+
+
+
+
 
         <span class="col-2">
 

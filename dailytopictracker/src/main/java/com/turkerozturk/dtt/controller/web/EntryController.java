@@ -21,6 +21,10 @@
 package com.turkerozturk.dtt.controller.web;
 
 
+import com.turkerozturk.dtt.dto.statistics.OverallStatisticsDTO;
+import com.turkerozturk.dtt.dto.statistics.StreaksDTO;
+import com.turkerozturk.dtt.dto.statistics.SuccessStatisticsDTO;
+import com.turkerozturk.dtt.dto.statistics.WeeklyViewDTO;
 import com.turkerozturk.dtt.helper.SuccessAnalyzer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -206,146 +210,32 @@ public class EntryController {
                         Function.identity()
                 ));
 
-        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yy");
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("MM");
-        DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("dd");
-        DateTimeFormatter formatter4 = DateTimeFormatter.ofPattern("dd");
-        DateTimeFormatter formatter5 = DateTimeFormatter.ofPattern("MM");
-        DateTimeFormatter formatter6 = DateTimeFormatter.ofPattern("yy");
+        WeeklyViewDTO weeklyViewDTO = calculateCalendarRows(entryMap, dateRange);
 
+        model.addAttribute("top1ColumnDates", weeklyViewDTO.getTop1ColumnDates());
+        model.addAttribute("top2ColumnDates", weeklyViewDTO.getTop2ColumnDates());
+        model.addAttribute("top3ColumnDates", weeklyViewDTO.getTop3ColumnDates());
+        model.addAttribute("bottom1ColumnDates", weeklyViewDTO.getBottom1ColumnDates());
+        model.addAttribute("bottom2ColumnDates", weeklyViewDTO.getBottom2ColumnDates());
+        model.addAttribute("bottom3ColumnDates", weeklyViewDTO.getBottom3ColumnDates());
+        model.addAttribute("weeklyMaps", weeklyViewDTO.getWeeklyMaps());
 
-        // 7 adet gün Map'i oluştur
-        List<Map<LocalDate, Entry>> weeklyMaps = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            weeklyMaps.add(new LinkedHashMap<>());
-        }
+        List<Map<LocalDate, Entry>> weeklyMaps = weeklyViewDTO.getWeeklyMaps();
 
-        List<String> top1ColumnDates = new LinkedList<>();
-        List<String> top2ColumnDates = new LinkedList<>();
-        List<String> top3ColumnDates = new LinkedList<>();
-        List<String> bottom1ColumnDates = new LinkedList<>();
-        List<String> bottom2ColumnDates = new LinkedList<>();
-        List<String> bottom3ColumnDates = new LinkedList<>();
-
-        // basla bu kisim patternSuccessRate ile ilgili
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
 
-        List<LocalDate> dateRangeBetweenAlignedStartDateAndToday = filterService.buildDateRangeList(startDateAlignedToWeek, today);
-        List<Integer> rawArray = new ArrayList<>(); // tarih araligi boyunca 1 ve 0 lardan olusan doluluk bosluk dizisi.
 
-        for(LocalDate d : dateRangeBetweenAlignedStartDateAndToday) {
-            if(entryMap.containsKey(d)) {
-                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0); // entry.status 1 olanlar dolu yani 1, digerleri 0 yani bos.
-            } else {
-                rawArray.add(0); // entry zaten yok ve bos yani 0.
-            }
-        }
+        // basla bu kisim patternSuccessRate ile ilgili
 
-        Integer offset = SuccessAnalyzer.findOffset(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
-        //System.out.println("offset: " + offset);
-        int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
-        //System.out.println("divider: " + divider);
-        if(offset != null) {
-            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, divider, 1, null);
-            //System.out.println("reduced size: " + reducedArray.size());
-
-            //System.out.println("reduced: " + reducedArray);
-            double patternSuccessRate = SuccessAnalyzer.getSuccessRate(reducedArray);
-            model.addAttribute("patternSuccessRate", patternSuccessRate);
-
-
-
-            Long firstDoneEntryDateMillisYmd1 = entries.stream()
-                    .filter(e -> e.getStatus() == 1)
-                    .map(Entry::getDateMillisYmd)
-                    .min(Long::compareTo)
-                    .orElse(null);
-            // yukarida offset null degilse dedigimiz icin bu da null olmaz, o yuzden kontrol eklemedik.
-            LocalDate firstDoneEntryDate1 = Instant
-                    .ofEpochMilli(firstDoneEntryDateMillisYmd1)
-                    .atZone(AppTimeZoneProvider.getZone())
-                    .toLocalDate();
-
-            long daysSinceFirstDoneEntryPlusToday = ChronoUnit.DAYS.between(firstDoneEntryDate1, today) + 1;
-
-
-
-            long patternSuccessCount = SuccessAnalyzer.getSuccessCount(reducedArray);
-            StringBuilder patternSuccessText = new StringBuilder();
-            patternSuccessText.append("(" + patternSuccessCount + " / " + reducedArray.size() + " intervals are 'done')");
-            patternSuccessText.append("<br/>");
-            patternSuccessText.append("<br/>");
-            patternSuccessText.append(firstDoneEntryDate1 + " to " + today);
-            patternSuccessText.append("<br/>");
-            patternSuccessText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
-            patternSuccessText.append("<br/>");
-            patternSuccessText.append("(from first 'done' day to today)");
-            model.addAttribute("patternSuccessText", patternSuccessText);
-
-
-            // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
-            // divideri 1 kabul ediyoruz o zaman doluluk orani veriyor. // TODO sonradan burasini kaldirip kafa karisikligi ve hsap hatasina mahal vermeyecek bicimde guncelle.
-            List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, 1, 1, null);
-            long patternFillCount = SuccessAnalyzer.getSuccessCount(notReducedArray);
-            StringBuilder patternFillText = new StringBuilder();
-            patternFillText.append("(" + patternFillCount + " / " + notReducedArray.size() + " days are filled with 'done')");
-            patternFillText.append("<br/>");
-            patternFillText.append("<br/>");
-            patternFillText.append(firstDoneEntryDate1 + " to " + today);
-            patternFillText.append("<br/>");
-            patternFillText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
-            patternFillText.append("<br/>");
-            patternFillText.append("(from first 'done' day to today)");
-            model.addAttribute("patternFillText", patternFillText);
-
-        }
-        // bitti bu kisim patternSuccessRate ile ilgili
-
-        int i = 0;
-        for(LocalDate d : dateRange) {
-
-            if(i == 0) {
-                top1ColumnDates.add(d.format(formatter1));
-            }
-            if(i == 0) {
-                top2ColumnDates.add(d.format(formatter2));
-            }
-            if(i == 0) {
-                top3ColumnDates.add(d.format(formatter3));
-            }
-
-            if(entryMap.containsKey(d)) {
-                weeklyMaps.get(i).put(d, entryMap.get(d));
-            } else {
-                weeklyMaps.get(i).put(d, null);
-            }
-
-            if(i == 6) {
-                bottom1ColumnDates.add(d.format(formatter4));
-            }
-            if(i == 6) {
-                bottom2ColumnDates.add(d.format(formatter5));
-            }
-            if(i == 6) {
-                bottom3ColumnDates.add(d.format(formatter6));
-            }
-
-            i = (i + 1) % 7;
-        }
-
-        model.addAttribute("top1ColumnDates", top1ColumnDates);
-        model.addAttribute("top2ColumnDates", top2ColumnDates);
-        model.addAttribute("top3ColumnDates", top3ColumnDates);
-        model.addAttribute("bottom1ColumnDates", bottom1ColumnDates);
-        model.addAttribute("bottom2ColumnDates", bottom2ColumnDates);
-        model.addAttribute("bottom3ColumnDates", bottom3ColumnDates);
-
-        // Thymeleaf model'e ekleyebilirsin:
-        model.addAttribute("weeklyMaps", weeklyMaps);
-
-
-
+        SuccessStatisticsDTO successStatisticsDTO = calculateSuccessStatistics( topic,
+                entryMap,
+                entries,
+                today,
+                startDateAlignedToWeek);
+        model.addAttribute("patternSuccessRate", successStatisticsDTO.getPatternSuccessRate());
+        model.addAttribute("patternSuccessText", successStatisticsDTO.getPatternSuccessText());
+        model.addAttribute("patternFillText", successStatisticsDTO.getPatternFillText());
 
 
 
@@ -398,66 +288,48 @@ public class EntryController {
 
         // BASLA - istatistik - streak
 
-        List<Streak> streaks = new ArrayList<>();
-        Streak currentStreak = null;
-        for (LocalDate date : dateRange) {
-            Entry entry = entryMap.get(date);
+        StreaksDTO streaksDTO = calculateStreaks ( entryMap,  dateRange, totalDays);
+        model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
+        model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
 
-            if (entry != null && entry.getStatus() == 1) {
-                // Geçerli ve status=1 entry varsa streak başlat ya da devam et
-                if (currentStreak == null) {
-                    currentStreak = new Streak(date, date, totalDays);
-                } else {
-                    currentStreak = new Streak(currentStreak.getStartDate(), date, totalDays);
-                }
-            } else {
-                // Entry yok ya da status != 1 → streak biter
-                if (currentStreak != null) {
-                    streaks.add(currentStreak);
-                    currentStreak = null;
-                }
-                // ❌ break yok, döngü devam eder
-            }
-        }
-        // Loop sonunda aktif bir streak kaldıysa ekle
-        if (currentStreak != null) {
-            streaks.add(currentStreak);
-        }
-
-        // statistic: only last streak
-        if(!streaks.isEmpty()) {
-            Streak newestStreak = streaks.get(streaks.size()-1);
-            model.addAttribute("newestStreak", newestStreak);
-        }
-
-        // select top 10 streaks
-        List<Streak> topStreaks = streaks.stream()
-                .sorted(Comparator.comparingLong(Streak::getDayCount).reversed()
-                )
-                //.limit(10)
-                .collect(Collectors.toList());
-
-        Collections.reverse(topStreaks); // en büyük en üstte görünür
-        topStreaks.sort(Comparator.comparing(Streak::getStartDate).reversed());
-
-        Map<Integer, Streak> uniqueByDayCount = new LinkedHashMap<>();
-
-        for (Streak streak : topStreaks) {
-            if (!uniqueByDayCount.containsKey(streak.getDayCount())) {
-                uniqueByDayCount.put(streak.getDayCount(), streak); // ilk karşılaşılan (yani en güncel) eklenecek
-            }
-        }
-
-        List<Streak> uniqueTopStreaks = new ArrayList<>(uniqueByDayCount.values());
+        // BITTI - istatistik - streak
 
 
-        // for(Streak streak : streaks) {
-          //  System.out.println(streak.getDayCount() + ": " + streak.getStartDate() + " --- " + streak.getEndDate());
-        // }
+        // BASLA simdi de baska istatistikler olusturmaya çalışalım.
 
-        model.addAttribute("uniqueTopStreaks", uniqueTopStreaks);
+        OverallStatisticsDTO overallStatisticsDTO = calculateOverallStatistics(entries, topic, zoneId);
 
-        // simdi de baska streak istatistikleri olusturmaya çalışalım.
+        model.addAttribute("daysSinceFirstDoneEntry", overallStatisticsDTO.getDaysSinceFirstDoneEntry());
+        model.addAttribute("daysSinceFirstDoneEntryToPrediction", overallStatisticsDTO.getDaysSinceFirstDoneEntryToPrediction());
+        model.addAttribute("numberOfDaysToBeConsidered", overallStatisticsDTO.getNumberOfDaysToBeConsidered());
+        model.addAttribute("doneDayCount", overallStatisticsDTO.getDoneDayCount());
+        model.addAttribute("emptyDayCount", overallStatisticsDTO.getEmptyDayCount());
+        model.addAttribute("averageDoneInterval", overallStatisticsDTO.getAverageDoneInterval());
+        model.addAttribute("successRate", overallStatisticsDTO.getSuccessRate());
+        model.addAttribute("realAverage", overallStatisticsDTO.getRealAverage());
+        model.addAttribute("realSuccessRate", overallStatisticsDTO.getRealSuccessRate());
+
+
+        model.addAttribute("intervals", overallStatisticsDTO.getIntervals());
+        model.addAttribute("mean", overallStatisticsDTO.getMean());
+        model.addAttribute("std", overallStatisticsDTO.getStd());
+        model.addAttribute("successRate2", overallStatisticsDTO.getSuccessRate2());
+        model.addAttribute("trendSlope", overallStatisticsDTO.getTrendSlope());
+        model.addAttribute("trendStatus", overallStatisticsDTO.getTrendStatus());
+
+        // BITTI simdi de baska istatistikler olusturmaya çalışalım.
+
+
+        model.addAttribute("zoneId", zoneId);
+
+        return "entries/entry-list-weekly-calendar";
+
+    }
+
+
+    private OverallStatisticsDTO calculateOverallStatistics(List<Entry> entries, Topic topic, ZoneId zoneId) {
+
+        OverallStatisticsDTO overallStatisticsDTO = new OverallStatisticsDTO();
 
         Long firstDoneEntryDateMillisYmd = entries.stream()
                 .filter(e -> e.getStatus() == 1)
@@ -472,42 +344,48 @@ public class EntryController {
                     .toLocalDate();
 
             long daysSinceFirstDoneEntry = ChronoUnit.DAYS.between(firstDoneEntryDate, LocalDate.now());
-            model.addAttribute("daysSinceFirstDoneEntry", daysSinceFirstDoneEntry);
+            //model.addAttribute("daysSinceFirstDoneEntry", daysSinceFirstDoneEntry);
+            overallStatisticsDTO.setDaysSinceFirstDoneEntry(daysSinceFirstDoneEntry);
 
             long numberOfDaysToBeConsidered = daysSinceFirstDoneEntry; // bizim icin bu sayac onemli, tahmin hesaplamalarinda.
             if(topic.getPredictionDate() != null) {
                 long daysSinceFirstDoneEntryToPrediction = ChronoUnit.DAYS.between(firstDoneEntryDate, topic.getPredictionDate());
-                model.addAttribute("daysSinceFirstDoneEntryToPrediction", daysSinceFirstDoneEntryToPrediction);
+                //model.addAttribute("daysSinceFirstDoneEntryToPrediction", daysSinceFirstDoneEntryToPrediction);
+                overallStatisticsDTO.setDaysSinceFirstDoneEntryToPrediction(daysSinceFirstDoneEntryToPrediction);
                 // ust limit olarak bugunun veya gelecekteki predictionun tarihini aliyoruz, gecmiz predictionu almiyoruz cunku artik bugun gelmis.
                 numberOfDaysToBeConsidered = Math.max(daysSinceFirstDoneEntry, daysSinceFirstDoneEntryToPrediction);
 
             }
-            model.addAttribute("numberOfDaysToBeConsidered", numberOfDaysToBeConsidered);
+            //model.addAttribute("numberOfDaysToBeConsidered", numberOfDaysToBeConsidered);
+            overallStatisticsDTO.setNumberOfDaysToBeConsidered(numberOfDaysToBeConsidered);
 
             Set<Long> filledDates = entries.stream()
                     .filter(e -> e.getStatus() == 1)
                     .map(Entry::getDateMillisYmd)
                     .collect(Collectors.toSet());
 
-           // long totalDays = ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now()) + 1;
+            // long totalDays = ChronoUnit.DAYS.between(firstEntryDate, LocalDate.now()) + 1;
             long doneDayCount = filledDates.size();
             long emptyDayCount = daysSinceFirstDoneEntry - doneDayCount;
-            model.addAttribute("doneDayCount", doneDayCount);
-            model.addAttribute("emptyDayCount", emptyDayCount);
+            //model.addAttribute("doneDayCount", doneDayCount);
+            overallStatisticsDTO.setDoneDayCount(doneDayCount);
+            //model.addAttribute("emptyDayCount", emptyDayCount);
+            overallStatisticsDTO.setEmptyDayCount(emptyDayCount);
 
             double averageDoneInterval = (double) numberOfDaysToBeConsidered / doneDayCount;
-            model.addAttribute("averageDoneInterval", averageDoneInterval);
-
+            //model.addAttribute("averageDoneInterval", averageDoneInterval);
+            overallStatisticsDTO.setAverageDoneInterval(averageDoneInterval);
 
 
 
             if(topic.getSomeTimeLater() != null && topic.getSomeTimeLater() > 0) {
                 double successRate = (topic.getSomeTimeLater() / averageDoneInterval) * 100;
-                model.addAttribute("successRate", successRate);
+                //model.addAttribute("successRate", successRate);
+                overallStatisticsDTO.setSuccessRate(successRate);
             }
 
 
-          //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 
             List<LocalDate> filledDatesSorted = entries.stream()
@@ -536,18 +414,20 @@ public class EntryController {
                     .orElse(0);
 
 
-            model.addAttribute("realAverage", realAverage);
+            //model.addAttribute("realAverage", realAverage);
+            overallStatisticsDTO.setRealAverage(realAverage);
 
             if(topic.getSomeTimeLater() != null && topic.getSomeTimeLater() > 0) {
                 double realSuccessRate = (topic.getSomeTimeLater() / realAverage) * 100;
-                model.addAttribute("realSuccessRate", realSuccessRate);
+                //model.addAttribute("realSuccessRate", realSuccessRate);
+                overallStatisticsDTO.setRealSuccessRate(realSuccessRate);
             }
 
 
 
             // basla -------------------------------------
 
-       //     double target = topic.getSomeTimeLater();
+            //     double target = topic.getSomeTimeLater();
 
             // Ortalama
             double mean = intervals.stream()
@@ -586,15 +466,18 @@ public class EntryController {
                     : "DURAĞAN";
 
             // Thymeleaf'e aktar
-            model.addAttribute("intervals", intervals);
-            model.addAttribute("mean", mean);
-            model.addAttribute("std", std);
-            model.addAttribute("successRate2", successRate2);
-            model.addAttribute("trendSlope", trendSlope);
-            model.addAttribute("trendStatus", trendStatus);
-
-
-
+            //model.addAttribute("intervals", intervals);
+            //model.addAttribute("mean", mean);
+            //model.addAttribute("std", std);
+            //model.addAttribute("successRate2", successRate2);
+            //model.addAttribute("trendSlope", trendSlope);
+            //model.addAttribute("trendStatus", trendStatus);
+            overallStatisticsDTO.setIntervals(intervals);
+            overallStatisticsDTO.setMean(mean);
+            overallStatisticsDTO.setStd(std);
+            overallStatisticsDTO.setSuccessRate2(successRate2);
+            overallStatisticsDTO.setTrendSlope(trendSlope);
+            overallStatisticsDTO.setTrendStatus(trendStatus);
             // bitti --------------------------------------------
 
 
@@ -604,19 +487,239 @@ public class EntryController {
 
         }
 
+        return overallStatisticsDTO;
 
-
-        model.addAttribute("zoneId", zoneId);
-
-
-
+    }
 
 
 
-        // BITTI - istatistik - streak
+    private StreaksDTO calculateStreaks (Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange, int totalDays) {
 
-        return "entries/entry-list-weekly-calendar";
+        StreaksDTO streaksDTO = new StreaksDTO();
 
+        List<Streak> streaks = new ArrayList<>();
+        Streak currentStreak = null;
+        for (LocalDate date : dateRange) {
+            Entry entry = entryMap.get(date);
+
+            if (entry != null && entry.getStatus() == 1) {
+                // Geçerli ve status=1 entry varsa streak başlat ya da devam et
+                if (currentStreak == null) {
+                    currentStreak = new Streak(date, date, totalDays);
+                } else {
+                    currentStreak = new Streak(currentStreak.getStartDate(), date, totalDays);
+                }
+            } else {
+                // Entry yok ya da status != 1 → streak biter
+                if (currentStreak != null) {
+                    streaks.add(currentStreak);
+                    currentStreak = null;
+                }
+                // ❌ break yok, döngü devam eder
+            }
+        }
+        // Loop sonunda aktif bir streak kaldıysa ekle
+        if (currentStreak != null) {
+            streaks.add(currentStreak);
+        }
+
+        // statistic: only last streak
+        if(!streaks.isEmpty()) {
+            Streak newestStreak = streaks.get(streaks.size()-1);
+            streaksDTO.setNewestStreak(newestStreak);
+        }
+
+        // select top 10 streaks
+        List<Streak> topStreaks = streaks.stream()
+                .sorted(Comparator.comparingLong(Streak::getDayCount).reversed()
+                )
+                //.limit(10)
+                .collect(Collectors.toList());
+
+        Collections.reverse(topStreaks); // en büyük en üstte görünür
+        topStreaks.sort(Comparator.comparing(Streak::getStartDate).reversed());
+
+        Map<Integer, Streak> uniqueByDayCount = new LinkedHashMap<>();
+
+        for (Streak streak : topStreaks) {
+            if (!uniqueByDayCount.containsKey(streak.getDayCount())) {
+                uniqueByDayCount.put(streak.getDayCount(), streak); // ilk karşılaşılan (yani en güncel) eklenecek
+            }
+        }
+
+        List<Streak> uniqueTopStreaks = new ArrayList<>(uniqueByDayCount.values());
+
+
+        // for(Streak streak : streaks) {
+        //  System.out.println(streak.getDayCount() + ": " + streak.getStartDate() + " --- " + streak.getEndDate());
+        // }
+
+        streaksDTO.setUniqueTopStreaks(uniqueTopStreaks);
+
+
+        return streaksDTO;
+    }
+
+
+
+    private WeeklyViewDTO calculateCalendarRows(Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange) {
+
+        WeeklyViewDTO weeklyViewDTO = new WeeklyViewDTO();
+
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yy");
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("MM");
+        DateTimeFormatter formatter3 = DateTimeFormatter.ofPattern("dd");
+        DateTimeFormatter formatter4 = DateTimeFormatter.ofPattern("dd");
+        DateTimeFormatter formatter5 = DateTimeFormatter.ofPattern("MM");
+        DateTimeFormatter formatter6 = DateTimeFormatter.ofPattern("yy");
+
+
+        // 7 adet gün Map'i oluştur
+        List<Map<LocalDate, Entry>> weeklyMaps = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            weeklyMaps.add(new LinkedHashMap<>());
+        }
+
+        List<String> top1ColumnDates = new LinkedList<>();
+        List<String> top2ColumnDates = new LinkedList<>();
+        List<String> top3ColumnDates = new LinkedList<>();
+        List<String> bottom1ColumnDates = new LinkedList<>();
+        List<String> bottom2ColumnDates = new LinkedList<>();
+        List<String> bottom3ColumnDates = new LinkedList<>();
+
+
+        // bitti bu kisim patternSuccessRate ile ilgili
+
+        int i = 0;
+        for(LocalDate d : dateRange) {
+
+            if(i == 0) {
+                top1ColumnDates.add(d.format(formatter1));
+            }
+            if(i == 0) {
+                top2ColumnDates.add(d.format(formatter2));
+            }
+            if(i == 0) {
+                top3ColumnDates.add(d.format(formatter3));
+            }
+
+            if(entryMap.containsKey(d)) {
+                weeklyMaps.get(i).put(d, entryMap.get(d));
+            } else {
+                weeklyMaps.get(i).put(d, null);
+            }
+
+            if(i == 6) {
+                bottom1ColumnDates.add(d.format(formatter4));
+            }
+            if(i == 6) {
+                bottom2ColumnDates.add(d.format(formatter5));
+            }
+            if(i == 6) {
+                bottom3ColumnDates.add(d.format(formatter6));
+            }
+
+            i = (i + 1) % 7;
+        }
+
+        weeklyViewDTO.setBottom1ColumnDates(bottom1ColumnDates);
+        weeklyViewDTO.setBottom2ColumnDates(bottom2ColumnDates);
+        weeklyViewDTO.setBottom3ColumnDates(bottom3ColumnDates);
+        weeklyViewDTO.setTop1ColumnDates(top1ColumnDates);
+        weeklyViewDTO.setTop2ColumnDates(top2ColumnDates);
+        weeklyViewDTO.setTop3ColumnDates(top3ColumnDates);
+        weeklyViewDTO.setWeeklyMaps(weeklyMaps);
+
+        return weeklyViewDTO;
+
+    }
+
+
+
+
+    private SuccessStatisticsDTO calculateSuccessStatistics(Topic topic,
+                                                           Map<LocalDate, Entry> entryMap,
+                                                           List<Entry> entries,
+                                                           LocalDate today,
+                                                           LocalDate startDateAlignedToWeek) {
+
+        SuccessStatisticsDTO successStatisticsDTO = new SuccessStatisticsDTO();
+
+        // basla bu kisim patternSuccessRate ile ilgili
+
+
+        List<LocalDate> dateRangeBetweenAlignedStartDateAndToday =
+                filterService.buildDateRangeList(startDateAlignedToWeek, today);
+        List<Integer> rawArray = new ArrayList<>(); // tarih araligi boyunca 1 ve 0 lardan olusan doluluk bosluk dizisi.
+
+        for(LocalDate d : dateRangeBetweenAlignedStartDateAndToday) {
+            if(entryMap.containsKey(d)) {
+                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0); // entry.status 1 olanlar dolu yani 1, digerleri 0 yani bos.
+            } else {
+                rawArray.add(0); // entry zaten yok ve bos yani 0.
+            }
+        }
+
+        Integer offset = SuccessAnalyzer.findOffset(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
+        //System.out.println("offset: " + offset);
+        int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
+        //System.out.println("divider: " + divider);
+        if(offset != null) {
+            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, divider, 1, null);
+            //System.out.println("reduced size: " + reducedArray.size());
+
+            //System.out.println("reduced: " + reducedArray);
+            double patternSuccessRate = SuccessAnalyzer.getSuccessRate(reducedArray);
+            successStatisticsDTO.setPatternSuccessRate(patternSuccessRate);
+
+
+            Long firstDoneEntryDateMillisYmd1 = entries.stream()
+                    .filter(e -> e.getStatus() == 1)
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .orElse(null);
+            // yukarida offset null degilse dedigimiz icin bu da null olmaz, o yuzden kontrol eklemedik.
+            LocalDate firstDoneEntryDate1 = Instant
+                    .ofEpochMilli(firstDoneEntryDateMillisYmd1)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+
+            long daysSinceFirstDoneEntryPlusToday = ChronoUnit.DAYS.between(firstDoneEntryDate1, today) + 1;
+
+
+
+            long patternSuccessCount = SuccessAnalyzer.getSuccessCount(reducedArray);
+            StringBuilder patternSuccessText = new StringBuilder();
+            patternSuccessText.append("(" + patternSuccessCount + " / " + reducedArray.size() + " intervals are 'done')");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append(firstDoneEntryDate1 + " to " + today);
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
+            patternSuccessText.append("<br/>");
+            patternSuccessText.append("(from first 'done' day to today)");
+            successStatisticsDTO.setPatternSuccessText(patternSuccessText.toString());
+
+
+            // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
+            // divideri 1 kabul ediyoruz o zaman doluluk orani veriyor. // TODO sonradan burasini kaldirip kafa karisikligi ve hsap hatasina mahal vermeyecek bicimde guncelle.
+            List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, 1, 1, null);
+            long patternFillCount = SuccessAnalyzer.getSuccessCount(notReducedArray);
+            StringBuilder patternFillText = new StringBuilder();
+            patternFillText.append("(" + patternFillCount + " / " + notReducedArray.size() + " days are filled with 'done')");
+            patternFillText.append("<br/>");
+            patternFillText.append("<br/>");
+            patternFillText.append(firstDoneEntryDate1 + " to " + today);
+            patternFillText.append("<br/>");
+            patternFillText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
+            patternFillText.append("<br/>");
+            patternFillText.append("(from first 'done' day to today)");
+            successStatisticsDTO.setPatternFillText(patternFillText.toString());
+
+        }
+        // bitti bu kisim patternSuccessRate ile ilgili
+
+        return successStatisticsDTO;
     }
 
     @GetMapping("weekly-calendar-old")
