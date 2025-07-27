@@ -15,39 +15,53 @@ https://github.com/turkerozturk/springtopiccalendar
 
         <thead>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
             <th:block th:each="columnDate : ${top1ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
             <th:block th:each="columnDate : ${top2ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
             <th:block th:each="columnDate : ${top3ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
         </tr>
         </thead>
 
         <tbody>
         <tr th:each="dayMap, stat : ${weeklyMaps}">
-            <td th:text="${dayNames[stat.index]}"> </td>
+            <td th:text="${dayNames[stat.index]}" style="background-color:WhiteSmoke;"> </td>
 
 
             <th:block th:each="entry : ${dayMap}">
 
 
                 <th:block th:if="${entry.value != null }">
-                    <td th:title="${entry.key} + ' ' + ${entry.value.id}" th:class="'weekly-table-entry-cell status-' + ${entry.value.status}" >
-                    </td>
+                    <th:block th:if="${entry.value.status != -1 }">
+                        <td th:text="${entry.value.status}" th:title="${entry.key} + ' ' + ${entry.value.id}" th:class="'weekly-table-entry-cell status-' + ${entry.value.status}" >
+                            @
+                        </td>
+                    </th:block>
+
+
+                    <!-- visualising disabled cells, no data, outside of date range -->
+                    <th:block th:if="${entry.value.status == -1 }">
+                        <td th:text="''" th:title="${entry.value.dateMillisYmd}"
+                            style="background-color:WhiteSmoke;"
+                            >
+                            X
+                        </td>
+                    </th:block>
+
                 </th:block>
 
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
@@ -65,7 +79,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
             <td th:text="${dayNames[stat.index]}"
-                th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : ''">
+                th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : 'background-color:WhiteSmoke;'">
             </td>
 
 
@@ -78,25 +92,25 @@ https://github.com/turkerozturk/springtopiccalendar
 
         <tfoot>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
             <th:block th:each="columnDate : ${bottom1ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
             <th:block th:each="columnDate : ${bottom2ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
             <th:block th:each="columnDate : ${bottom3ColumnDates}">
-                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;"></th>
+                <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
         </tr>
         </tfoot>
 

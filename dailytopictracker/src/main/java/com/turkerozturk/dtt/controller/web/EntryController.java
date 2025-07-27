@@ -218,9 +218,19 @@ public class EntryController {
         model.addAttribute("bottom1ColumnDates", weeklyViewDTO.getBottom1ColumnDates());
         model.addAttribute("bottom2ColumnDates", weeklyViewDTO.getBottom2ColumnDates());
         model.addAttribute("bottom3ColumnDates", weeklyViewDTO.getBottom3ColumnDates());
-        model.addAttribute("weeklyMaps", weeklyViewDTO.getWeeklyMaps());
 
         List<Map<LocalDate, Entry>> weeklyMaps = weeklyViewDTO.getWeeklyMaps();
+
+        // frontenddeki takvimde hesaplama disinda kalan takvim gunlerini farkli renkte gostermek icin yaptigimiz islem:
+        // BASLA calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
+        long npcStartDayCount = ChronoUnit.DAYS.between(startDateAlignedToWeek, startDate);
+        long npcEndDayCount = ChronoUnit.DAYS.between(today, endDateAlignedToWeek);
+        //System.out.println(npcStartDayCount + " " + npcEndDayCount);
+        List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
+        // BITTI calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
+
+        model.addAttribute("weeklyMaps", weeklyMapsWithFakeEntries);
+
 
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
@@ -323,6 +333,48 @@ public class EntryController {
         model.addAttribute("zoneId", zoneId);
 
         return "entries/entry-list-weekly-calendar";
+
+    }
+
+    private List<Map<LocalDate, Entry>> addNpcFakeEntriesToWeeklyMaps(List<Map<LocalDate, Entry>> weeklyMaps, long npcStartDayCount, long npcEndDayCount, ZoneId zoneId) {
+
+
+        final int npcStatusCode = -1;
+        // BASA sahte Entry ekle
+        for (int weekdayRowIndex = 0; weekdayRowIndex < npcStartDayCount; weekdayRowIndex++) {
+            List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get(weekdayRowIndex).keySet());
+            //  System.out.println(columnDates);
+            LocalDate date = columnDates.get(0);
+            //  System.out.println(date);
+            Entry fakeEntry = new Entry();
+            fakeEntry.setStatus(npcStatusCode);
+            long epochMilli = date
+                    .atStartOfDay(zoneId) // Günün başlangıç zamanı ile ZonedDateTime oluştur
+                    .toInstant()
+                    .toEpochMilli();
+            fakeEntry.setDateMillisYmd(epochMilli);
+            weeklyMaps.get(weekdayRowIndex).put(date, fakeEntry);
+
+        }
+        // SONA sahte Entry ekle
+        for (int i = 0; i < npcEndDayCount; i++) {
+            int weekdayRowIndex = (int) npcEndDayCount - i;
+            List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get((weekdayRowIndex)).keySet());
+            //System.out.println(columnDates);
+            int lastColumnIndex = columnDates.size()-1;
+            LocalDate date = columnDates.get(lastColumnIndex);
+            //System.out.println(date);
+            Entry fakeEntry = new Entry();
+            fakeEntry.setStatus(npcStatusCode);
+            long epochMilli = date
+                    .atStartOfDay(zoneId) //
+                    .toInstant()
+                    .toEpochMilli();
+            fakeEntry.setDateMillisYmd(epochMilli);
+            weeklyMaps.get((int) (weekdayRowIndex)).put(date, fakeEntry);
+        }
+
+        return weeklyMaps;
 
     }
 
