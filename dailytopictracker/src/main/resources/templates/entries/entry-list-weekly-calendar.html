@@ -125,6 +125,10 @@ https://github.com/turkerozturk/springtopiccalendar
     <div class="row">
 
             <span class="col-2">
+                <!-- colon sayisini 12 ye tamamlamak icin bu span-->
+            </span>
+
+            <span class="col-2">
                 <!--
                 <span th:if="${daysSinceFirstDoneEntry != null}"
                       th:text="${'Days since first done: ' + daysSinceFirstDoneEntry}">
@@ -294,7 +298,7 @@ https://github.com/turkerozturk/springtopiccalendar
             </span>
 
         <!-- Streaks Bolumu -->
-        <span class="col-4">
+        <span class="col-2" style="background-color:WhiteSmoke;">
 
 
                 <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
@@ -309,26 +313,35 @@ https://github.com/turkerozturk/springtopiccalendar
                             Last Streak (closest to today)
                         </caption>
                         <tbody>
-                        <tr style="height: 30px;">
-                            <!-- Start Date -->
-                            <td style="width: 100px; text-align: right; padding-right: 10px;">
-                                <span th:text="${newestStreak.startDate}"></span>
-                            </td>
 
-                            <!-- Bar with Count -->
-                            <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                                <div
-                                        th:style="'background-color: #c33b73 !important; height: 20px; color: white !important;
-                                 text-align: center !important; font-weight: bold; margin:auto;
-                                 width:' + (${newestStreak.percentage} * 15) + 'px;'"
-                                        th:text="${newestStreak.dayCount}"></div>
-                            </td>
 
-                            <!-- End Date -->
-                            <td style="width: 100px; text-align: left; padding-left: 10px;">
-                                <span th:text="${newestStreak.endDate}"></span>
-                            </td>
-                        </tr>
+
+                          <tr style="height: 30px;">
+                                <!-- Start Date -->
+                               <td style="width: 100px; text-align: right; padding-right: 2px;">
+                                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('yy-MM-dd')
+                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"></small>
+                                </td>
+
+                                      <!-- Bar with Count -->
+                                <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                                    <div
+                                            th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                                     text-align: center !important; font-weight: bold; margin:auto;
+                                     width:' + ${newestStreak.width} + 'px;'"
+                                            th:text="${newestStreak.dayCount}"
+                                            th:title="${newestStreak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
+                                </td>
+
+                                      <!-- End Date -->
+                               <td style="width: 100px; text-align: left; padding-left: 2px;">
+                                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('MM-dd')
+                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"></small>
+
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </th:block>
@@ -345,8 +358,10 @@ https://github.com/turkerozturk/springtopiccalendar
 
                     <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
                         <!-- Start Date -->
-                        <td style="width: 100px; text-align: right; padding-right: 10px;">
-                            <span th:text="${streak.startDate}"></span>
+                        <td style="width: 100px; text-align: right; padding-right: 2px;">
+                            <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yy-MM-dd')
+                                                .format(streak.startDate.atStartOfDay(zoneId))}"></small>
                         </td>
 
                         <!-- Bar with Count -->
@@ -354,13 +369,17 @@ https://github.com/turkerozturk/springtopiccalendar
                             <div
                                     th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
                              text-align: center !important; font-weight: bold; margin:auto;
-                             width:' + (${streak.percentage} * 15) + 'px;'"
-                                    th:text="${streak.dayCount}"></div>
+                             width:' + ${streak.width} + 'px;'"
+                                    th:text="${streak.dayCount}"
+                                    th:title="${streak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
                         </td>
 
                         <!-- End Date -->
-                        <td style="width: 100px; text-align: left; padding-left: 10px;">
-                            <span th:text="${streak.endDate}"></span>
+                        <td style="width: 100px; text-align: left; padding-left: 2px;">
+                            <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('MM-dd')
+                                                .format(streak.endDate.atStartOfDay(zoneId))}"></small>
+
                         </td>
                     </tr>
                     </tbody>
@@ -570,6 +589,9 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
     </div>
+
+
+
 
 
     <!-- trend intervals chart ikinci varyasyon -->

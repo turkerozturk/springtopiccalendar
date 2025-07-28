@@ -164,6 +164,7 @@ public class EntryController {
             Model model) {
 
         int totalDays = 365;
+        model.addAttribute("totalDays", totalDays);
 
                 ZoneId zoneId = timeZoneProvider.getZoneId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
