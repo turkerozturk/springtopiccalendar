@@ -210,6 +210,38 @@ public class Topic {
     // end base_date_millis_ymd
 
 
+    // start end_date_millis_ymd
+    // 13 haneli epoch time (sadece tarih, saat bilgileri 0)
+    @Getter
+    @Column(name = "end_date_millis_ymd")
+    private Long endDateMillisYmd;
+
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate endDate;
+
+    public void setEndDateMillisYmd(Long endDateMillisYmd) {
+        this.endDateMillisYmd = endDateMillisYmd;
+        // isteğe bağlı: burada da güncelleyebilirsiniz
+        this.endDate = null;
+    }
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getEndDate() {
+        if (endDate == null && endDateMillisYmd != null) {
+            endDate = Instant
+                    .ofEpochMilli(endDateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return endDate;
+    }
+    // end end_date_millis_ymd
+
+
 
 
     /**
