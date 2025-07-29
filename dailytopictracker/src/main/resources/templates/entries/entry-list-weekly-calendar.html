@@ -134,8 +134,9 @@ https://github.com/turkerozturk/springtopiccalendar
 
     <div class="row">
 
-            <span class="col-2">
-                <!-- colon sayisini 12 ye tamamlamak icin bu span-->
+            <!-- colon sayisini 12 ye tamamlamak icin bu span-->
+
+            <span class="col-1" style="background-color:WhiteSmoke;">
             </span>
 
             <span class="col-2">
@@ -244,7 +245,7 @@ https://github.com/turkerozturk/springtopiccalendar
                             <p>
                                 The base date is optionally determined by the user.
                                 <br/>
-                                If a base date is specified, statistical calculations are made starting from that date, not from the last data date.
+                                If a base date is specified, statistical calculations are made starting from that date, not from the oldest data date.
                             </p>
                         </td>
                     </th:block>
@@ -259,11 +260,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-        <span class="col-2">
 
-                <!-- colon sayisini 12 ye tamamlamak icin bu span-->
-
-        </span>
 
         <span class="col-2" style="background-color:FloralWhite;">
 
@@ -272,7 +269,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <canvas id="status1Chart" ></canvas>
                 </div>
 
-                <!-- some statistics -->
+            <!-- some statistics -->
                 <table style="border:1px;border-collapse: collapse;margin-left:auto;margin-right:auto;">
                     <caption style="text-align:center;color:DarkGray !important;">
                         Entry statuses between today and 365 days ago
@@ -308,6 +305,22 @@ https://github.com/turkerozturk/springtopiccalendar
                 </table>
 
             </span>
+
+        <!-- Parser bolumu -->
+        <span class="col-3" style="background-color:WhiteSmoke;">
+
+                <!-- colon sayisini 12 ye tamamlamak icin bu span-->
+            <code th:if="${parserReport != null}" th:text="${parserReport}">
+
+            </code>
+
+
+            <div style="width: 90%; max-width: 400px; margin: 0 auto;"
+                 th:if="${topic.dataClassName == 'MeasurementParser'}">
+              <canvas id="measurementChart"></canvas>
+            </div>
+
+        </span>
 
         <!-- Streaks Bolumu -->
         <span class="col-2" style="background-color:WhiteSmoke;">
@@ -772,6 +785,86 @@ https://github.com/turkerozturk/springtopiccalendar
         });
         /*]]>*/
     </script>
+
+
+
+
+    <script th:inline="javascript" th:if="${topic.dataClassName == 'MeasurementParser'}">
+        /*<![CDATA[*/
+
+        var parsed = JSON.parse(/*[[${parsedDataAsJSON}]]*/ "null");
+
+
+       // console.log("Parsed JSON:", parsed);
+
+
+
+            var parserLabels = parsed.data.map(item => item.date);
+            var parserDataValues = parsed.data.map(item => item.value);
+
+            var minValue = Math.min(...parserDataValues);
+            var maxValue = Math.max(...parserDataValues);
+
+            // Küçük bir buffer payı ekleyelim ki çizgi grafik taşmasın:
+            var yMin = Math.floor(minValue - (maxValue - minValue) * 0.2);
+            var yMax = Math.ceil(maxValue + (maxValue - minValue) * 0.2);
+
+
+            var parserCtx = document.getElementById('measurementChart').getContext('2d');
+            var myChart = new Chart(parserCtx, {
+                type: 'line',
+                data: {
+                    labels: parserLabels,
+                    datasets: [{
+                        label: parsed.parser + ' (' + parsed.unit + ')',
+                        data: parserDataValues,
+                        fill: false,
+                        borderColor: 'rgb(35, 92, 92)',
+                        backgroundColor: 'rgba(35, 92, 92, 0.2)',
+                        tension: 0.3,
+                        borderWidth: 1,
+                        pointRadius: 0.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            min: yMin,
+                            max: yMax,
+                            title: {
+                                display: true,
+                                text: parsed.unit
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Measurement Over Time'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' ' + parsed.unit;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+/*]]>*/
+
+    </script>
+
 
 
 </div>
