@@ -39,7 +39,14 @@ https://github.com/turkerozturk/springtopiccalendar
 
         <tbody>
         <tr th:each="dayMap, stat : ${weeklyMaps}">
-            <td th:text="${dayNames[stat.index]}" style="background-color:WhiteSmoke;"> </td>
+
+
+            <td th:style="${oldestDayWeekIndex == stat.index} ? 'background-color: lightgray;' : 'background-color: WhiteSmoke;'">
+                <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <span style="margin: 0 auto;" th:text="${dayNames[stat.index]}"></span>
+                    <span th:if="${oldestDayWeekIndex == stat.index}" style="position: absolute; right: 5px;">→</span>
+                </div>
+            </td>
 
 
             <th:block th:each="entry : ${dayMap}">
@@ -78,11 +85,14 @@ https://github.com/turkerozturk/springtopiccalendar
             </th:block>
 
 
-            <td th:text="${dayNames[stat.index]}"
-                th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : 'background-color:WhiteSmoke;'">
+
+            <!-- http://xahlee.info/comp/unicode_arrows.html -->
+            <td th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : 'background-color: WhiteSmoke;'">
+                <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <span th:if="${todayWeekIndex == stat.index}" style="position: absolute; left: 5px;">←</span>
+                    <span style="margin: 0 auto;" th:text="${dayNames[stat.index]}"></span>
+                </div>
             </td>
-
-
 
 
 

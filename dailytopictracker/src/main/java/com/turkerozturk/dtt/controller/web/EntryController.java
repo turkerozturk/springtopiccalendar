@@ -171,11 +171,12 @@ public class EntryController {
 
         LocalDate endDate = (endDateString != null && !endDateString.isBlank())
                 ? LocalDate.parse(endDateString, formatter)
-                : LocalDate.now(zoneId);
+                : LocalDate.now(zoneId); // Since no end date is specified, it is determined as today's date.
 
         LocalDate startDate = (startDateString != null && !startDateString.isBlank())
                 ? LocalDate.parse(startDateString, formatter)
-                : endDate.minusDays(totalDays);
+                : endDate.minusDays(totalDays); // Since the start date is not specified, it is determined by
+                                                // subtracting a fixed number of days from the end date.
 
         long startDateMillis = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
         long endDateMillis = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
@@ -186,10 +187,15 @@ public class EntryController {
         //System.out.println(startDateMillis + " " + endDateMillis + " " + entries.size());
 
         // Haftalık hizalanmış tarih aralığı oluştur
-        LocalDate today = LocalDate.now(zoneId);
+        //LocalDate today = LocalDate.now(zoneId);
         // System.out.println("today weekday index " + today.getDayOfWeek().getValue() % 7);
-        int todayWeekIndex = today.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
-        model.addAttribute("todayWeekIndex", todayWeekIndex); // haftanin hangi gunundeyiz frontendde gostermek icin
+        int oldestDayWeekIndex = startDate.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
+        model.addAttribute("oldestDayWeekIndex", oldestDayWeekIndex); // haftanin hangi gunuydu frontendde gostermek icin.
+
+        int todayWeekIndex = endDate.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
+        model.addAttribute("todayWeekIndex", todayWeekIndex); // haftanin hangi gunuydu frontendde gostermek icin TODAY olmak zorunda degil, end date aslinda.
+
+
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         List<String> dayNames = new ArrayList<>();
         for (int j = 0; j < 7; j++) {
@@ -199,7 +205,7 @@ public class EntryController {
         }
         model.addAttribute("dayNames", dayNames);
         LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
-        LocalDate endDateAlignedToWeek = getEndOfWeek(today, startDay);
+        LocalDate endDateAlignedToWeek = getEndOfWeek(endDate, startDay);
         List<LocalDate> dateRange = filterService.buildDateRangeList(startDateAlignedToWeek, endDateAlignedToWeek);
         //System.out.println(dateRange.size());
 
@@ -225,8 +231,8 @@ public class EntryController {
         // frontenddeki takvimde hesaplama disinda kalan takvim gunlerini farkli renkte gostermek icin yaptigimiz islem:
         // BASLA calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
         long npcStartDayCount = ChronoUnit.DAYS.between(startDateAlignedToWeek, startDate);
-        long npcEndDayCount = ChronoUnit.DAYS.between(today, endDateAlignedToWeek);
-        //System.out.println(npcStartDayCount + " " + npcEndDayCount);
+        long npcEndDayCount = ChronoUnit.DAYS.between(endDate, endDateAlignedToWeek);
+        System.out.println(npcStartDayCount + " " + npcEndDayCount);
         List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
         // BITTI calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
 
@@ -242,7 +248,7 @@ public class EntryController {
         SuccessStatisticsDTO successStatisticsDTO = calculateSuccessStatistics( topic,
                 entryMap,
                 entries,
-                today,
+                endDate,
                 startDateAlignedToWeek);
         model.addAttribute("patternSuccessRate", successStatisticsDTO.getPatternSuccessRate());
         model.addAttribute("patternSuccessText", successStatisticsDTO.getPatternSuccessText());
@@ -340,9 +346,11 @@ public class EntryController {
     private List<Map<LocalDate, Entry>> addNpcFakeEntriesToWeeklyMaps(List<Map<LocalDate, Entry>> weeklyMaps, long npcStartDayCount, long npcEndDayCount, ZoneId zoneId) {
 
 
+
         final int npcStatusCode = -1;
         // BASA sahte Entry ekle
-        for (int weekdayRowIndex = 0; weekdayRowIndex < npcStartDayCount; weekdayRowIndex++) {
+        for (int i = 0; i < npcStartDayCount; i++) {
+            int weekdayRowIndex = (int) i;
             List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get(weekdayRowIndex).keySet());
             //  System.out.println(columnDates);
             LocalDate date = columnDates.get(0);
@@ -358,8 +366,9 @@ public class EntryController {
 
         }
         // SONA sahte Entry ekle
+        final int seventhRowIndex = 6;
         for (int i = 0; i < npcEndDayCount; i++) {
-            int weekdayRowIndex = (int) npcEndDayCount - i;
+            int weekdayRowIndex = (int) seventhRowIndex - i;
             List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get((weekdayRowIndex)).keySet());
             //System.out.println(columnDates);
             int lastColumnIndex = columnDates.size()-1;
