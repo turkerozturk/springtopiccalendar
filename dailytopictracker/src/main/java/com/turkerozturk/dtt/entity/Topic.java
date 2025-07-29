@@ -56,6 +56,9 @@ public class Topic {
     @Column(name = "is_pinned", nullable = false)
     private boolean pinned;
 
+    @Column(name = "data_class_name")
+    private String dataClassName;
+
     /**
      * -- GETTER --
      * Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için
