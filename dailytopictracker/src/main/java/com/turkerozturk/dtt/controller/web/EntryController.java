@@ -21,6 +21,8 @@
 package com.turkerozturk.dtt.controller.web;
 
 
+import com.turkerozturk.dtt.dto.notefieldstructures.NoteFieldStructure;
+import com.turkerozturk.dtt.dto.notefieldstructures.ParserFactory;
 import com.turkerozturk.dtt.dto.statistics.OverallStatisticsDTO;
 import com.turkerozturk.dtt.dto.statistics.StreaksDTO;
 import com.turkerozturk.dtt.dto.statistics.SuccessStatisticsDTO;
@@ -241,6 +243,20 @@ public class EntryController {
 
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
+
+        // basla bu kisim entry.note lerin topic.dataClassName'da yazan sinif adina gore parse edilmesi
+
+        if(topic.getDataClassName() != null) {
+            NoteFieldStructure parser = ParserFactory.create(topic.getDataClassName());
+            parser.parseRawData(entries);
+
+            model.addAttribute("parserReport", parser.getReport());
+            model.addAttribute("parsedDataAsJSON", parser.getParsedDataAsJSON());
+
+            //System.out.println(parser.getParsedDataAsJSON());
+        }
+
+        // bitti bu kisim entry.note lerin topic.dataClassName'da yazan sinif adina gore parse edilmesi
 
 
         // basla bu kisim patternSuccessRate ile ilgili
