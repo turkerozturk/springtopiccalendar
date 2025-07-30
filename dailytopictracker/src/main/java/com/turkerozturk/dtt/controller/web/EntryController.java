@@ -234,7 +234,7 @@ public class EntryController {
         // BASLA calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
         long npcStartDayCount = ChronoUnit.DAYS.between(startDateAlignedToWeek, startDate);
         long npcEndDayCount = ChronoUnit.DAYS.between(endDate, endDateAlignedToWeek);
-        System.out.println(npcStartDayCount + " " + npcEndDayCount);
+        //System.out.println(npcStartDayCount + " " + npcEndDayCount); TODO
         List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
         // BITTI calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
 
@@ -246,7 +246,9 @@ public class EntryController {
 
         // basla bu kisim entry.note lerin topic.dataClassName'da yazan sinif adina gore parse edilmesi
 
-        if(topic.getDataClassName() != null) {
+        // The critical difference is that isBlank() returns true for whitespace characters, like some escape sequences.
+        // On the other hand, isEmpty() only returns true when the String doesn’t contain any character.
+        if(topic.getDataClassName() != null && !topic.getDataClassName().isBlank()) {
             NoteFieldStructure parser = ParserFactory.create(topic.getDataClassName());
             parser.parseRawData(entries);
 
