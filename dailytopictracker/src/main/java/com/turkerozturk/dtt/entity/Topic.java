@@ -59,6 +59,9 @@ public class Topic {
     @Column(name = "data_class_name")
     private String dataClassName;
 
+    @Column(name = "image_file_name")
+    private String imageFileName;
+
     /**
      * -- GETTER --
      * Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için
