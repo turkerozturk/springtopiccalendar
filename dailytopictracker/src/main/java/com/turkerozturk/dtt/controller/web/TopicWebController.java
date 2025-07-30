@@ -210,8 +210,11 @@ public class TopicWebController {
         existingTopic.setWeight(topic.getWeight());
 
         existingTopic.setBaseDateMillisYmd(topic.getBaseDateMillisYmd());
+        existingTopic.setEndDateMillisYmd(topic.getEndDateMillisYmd());
         //System.out.println(topic.getBaseDateMillisYmd());
         //System.out.println(topic.getBaseDate());
+        existingTopic.setImageFileName(topic.getImageFileName());
+        existingTopic.setDataClassName(topic.getDataClassName());
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());

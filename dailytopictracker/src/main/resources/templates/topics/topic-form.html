@@ -147,6 +147,19 @@
         </div>
 
 
+
+
+        <div class="mb-3">
+            <label for="imageFileName" class="form-label">Image File Name:</label>
+            <input type="text" id="imageFileName" th:field="*{imageFileName}" class="form-control"  required autofocus/>
+        </div>
+
+        <div class="mb-3">
+            <label for="dataClassName" class="form-label">Data Class Name:</label>
+            <input type="text" id="dataClassName" th:field="*{dataClassName}" class="form-control"  required autofocus/>
+        </div>
+
+
         <button type="submit" class="btn btn-primary w-100">Save</button>
 
         <!-- if user hits “cancel,” send them back -->
