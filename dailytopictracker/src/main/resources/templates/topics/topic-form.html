@@ -170,10 +170,17 @@
         </div>
 
         <div class="mb-3">
-            <label for="dataClassName" class="form-label">Data Class Name:</label>
-            <input type="text" id="dataClassName" th:field="*{dataClassName}" class="form-control" />
+            <label for="dataClassName" class="form-label">Parser:</label>
+            <select id="dataClassName" th:field="*{dataClassName}" class="form-select">
+                <option value="">-- Without Parser --</option>
+                <option th:each="parserName : ${availableParsers}"
+                        th:value="${parserName}"
+                        th:text="${parserName}">Parser</option>
+            </select>
         </div>
 
+        <br>
+        <br>
 
         <button type="submit" class="btn btn-primary w-100">Save</button>
 

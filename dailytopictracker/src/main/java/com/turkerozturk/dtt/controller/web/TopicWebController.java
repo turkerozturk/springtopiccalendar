@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.controller.web;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+import com.turkerozturk.dtt.component.ParserRegistryLoader;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +49,9 @@ public class TopicWebController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ParserRegistryLoader parserRegistryLoader;
 
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -119,6 +123,8 @@ public class TopicWebController {
         List<String> imageFilePaths = collectImagePaths();
         model.addAttribute("imageFilePaths", imageFilePaths);
 
+        model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
+
         return "topics/topic-form"; // templates/topic-form.html
     }
 
@@ -189,6 +195,8 @@ public class TopicWebController {
 
         List<String> imageFilePaths = collectImagePaths();
         model.addAttribute("imageFilePaths", imageFilePaths);
+
+        model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
 
         return "topics/topic-form"; // Aynı formu kullanacağız
     }
