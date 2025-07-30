@@ -136,8 +136,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
             <!-- colon sayisini 12 ye tamamlamak icin bu span-->
 
-            <span class="col-1" style="background-color:WhiteSmoke;">
-            </span>
+
 
             <span class="col-2">
                 <!--
@@ -257,7 +256,15 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-
+            <span class="col-1" style="background-color:WhiteSmoke;">
+                <div style="text-align:center;">
+                <img th:src="@{${topic.imageFileName != null} ? '/topicimages/' + ${topic.imageFileName} : '/images/default.png'}"
+                     alt="Topic Image"
+                     style="max-width:135px;max-height:135px;margin-top:10px;" />
+                </div>
+                <p th:text="${#strings.abbreviate(topic.description,200)}">Topic description
+                    </p>
+            </span>
 
 
 
