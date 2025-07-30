@@ -258,7 +258,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
             <span class="col-1" style="background-color:WhiteSmoke;">
                 <div style="text-align:center;">
-                <img th:src="@{${topic.imageFileName != null} ? '/topicimages/' + ${topic.imageFileName} : '/images/default.png'}"
+                <img th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
                      alt="Topic Image"
                      style="max-width:135px;max-height:135px;margin-top:10px;" />
                 </div>
