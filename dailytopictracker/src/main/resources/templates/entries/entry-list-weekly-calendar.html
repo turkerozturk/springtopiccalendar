@@ -54,17 +54,22 @@ https://github.com/turkerozturk/springtopiccalendar
 
                 <th:block th:if="${entry.value != null }">
                     <th:block th:if="${entry.value.status != -1 }">
-                        <td th:text="${entry.value.status}" th:title="${entry.key} + ' ' + ${entry.value.id}" th:class="'weekly-table-entry-cell status-' + ${entry.value.status}" >
+                        <td th:text="${entry.value.status}"
+                            th:attr="title=${entry.key} + ' ' + ${entry.value.id}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                            th:class="'weekly-table-entry-cell status-' + ${entry.value.status}">
                             @
                         </td>
+
+
                     </th:block>
 
 
                     <!-- visualising disabled cells, no data, outside of date range -->
                     <th:block th:if="${entry.value.status == -1 }">
-                        <td th:text="''" th:title="${entry.value.dateMillisYmd}"
+                        <td th:text="''"
                             style="background-color:WhiteSmoke;"
-                            >
+                            th:attr="title=${entry.value.dateMillisYmd}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                        >
                             X
                         </td>
                     </th:block>
@@ -73,7 +78,10 @@ https://github.com/turkerozturk/springtopiccalendar
 
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
                 <th:block th:if="${entry.value == null }">
-                    <td class="weekly-table-entry-cell"  th:title="${entry.key}">
+                    <td class="weekly-table-entry-cell"
+                        th:title="${entry.key}"
+                        th:attr="onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                    >
                         &nbsp;
                     </td>
                 </th:block>
@@ -691,6 +699,14 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
+    <div id="custom-tooltip-popup" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+    background-color: white; border: 2px solid gray; padding: 20px 30px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-radius: 10px;">
+        <h2 id="custom-tooltip-text" style="margin: 0; font-size: 1.5rem;"></h2>
+    </div>
+
+
+
+
     <!-- trend intervals chart ikinci varyasyon -->
     <!--
     <script th:inline="javascript" th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}">
@@ -936,6 +952,36 @@ https://github.com/turkerozturk/springtopiccalendar
 /*]]>*/
 
     </script>
+
+
+
+    <script>
+        var tooltipTimeout;
+
+        function showCustomTooltip(element) {
+          const popup = document.getElementById('custom-tooltip-popup');
+          const popupText = document.getElementById('custom-tooltip-text');
+          const titleText = element.getAttribute('title');
+
+          if (!titleText) return;
+
+          popupText.textContent = titleText;
+          popup.style.display = 'block';
+
+          tooltipTimeout = setTimeout(() => {
+            popup.style.display = 'none';
+          }, 5000);
+        }
+
+        function hideCustomTooltip() {
+          const popup = document.getElementById('custom-tooltip-popup');
+          popup.style.display = 'none';
+          clearTimeout(tooltipTimeout);
+        }
+    </script>
+
+
+
 
 
 
