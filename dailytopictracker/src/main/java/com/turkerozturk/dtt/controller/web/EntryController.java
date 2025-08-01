@@ -165,20 +165,29 @@ public class EntryController {
             @RequestParam(required = false) String endDateString,
             Model model) {
 
-        int totalDays = 365;
+        int totalDays = 364;
         model.addAttribute("totalDays", totalDays);
 
-                ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate today = LocalDate.now(zoneId);
+        model.addAttribute("today", today);
+
 
         LocalDate endDate = (endDateString != null && !endDateString.isBlank())
                 ? LocalDate.parse(endDateString, formatter)
                 : LocalDate.now(zoneId); // Since no end date is specified, it is determined as today's date.
+        model.addAttribute("finishDate", endDate);
+
 
         LocalDate startDate = (startDateString != null && !startDateString.isBlank())
                 ? LocalDate.parse(startDateString, formatter)
                 : endDate.minusDays(totalDays); // Since the start date is not specified, it is determined by
                                                 // subtracting a fixed number of days from the end date.
+        model.addAttribute("beginDate", startDate);
+
 
         long startDateMillis = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
         long endDateMillis = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
@@ -187,6 +196,12 @@ public class EntryController {
         // Repository'den verileri al
         List<Entry> entries = entryService.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
         //System.out.println(startDateMillis + " " + endDateMillis + " " + entries.size());
+        for(Entry ent : entries) {
+            if(ent.getStatus() == 1) {
+                model.addAttribute("oldestDoneDate", Instant.ofEpochMilli(ent.getDateMillisYmd()).atZone(zoneId).toLocalDate());
+                break;
+            }
+        }
 
         // Haftalık hizalanmış tarih aralığı oluştur
         //LocalDate today = LocalDate.now(zoneId);
@@ -740,12 +755,31 @@ public class EntryController {
             }
         }
 
-        Integer offset = SuccessAnalyzer.findOffset(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
+        Integer offsetA = null; // bu offseti belirleyen iki kural var, ya baseDate'in offseti(hicbir entry olmasa da olur), veya ilk done entry nin offseti.
+        if (topic.getBaseDateMillisYmd() != null) { // TODO ve basedate arrayde yoksa, cok eskiyse veya todayden veya enddatedan yeniyse olmayacak sekilde kural koy.
+            if(dateRangeBetweenAlignedStartDateAndToday.contains(topic.getBaseDate())){
+                offsetA = dateRangeBetweenAlignedStartDateAndToday.indexOf(topic.getBaseDate());
+                System.out.println("offsetA: " + offsetA);
+            }
+        } else {
+            offsetA = SuccessAnalyzer.findFirstDoneOffsetOfArray(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
+        }
+
+        Integer offsetB = null; // bu offseti belirleyen
+        if (topic.getEndDateMillisYmd() != null) { // TODO ve enddate arrayde yoksa, cok eskiyse veya basedateten eskiyse veya bugunden yeniyse olmayacak sekilde kural koy.
+            if(dateRangeBetweenAlignedStartDateAndToday.contains(topic.getEndDate())){
+                offsetB = dateRangeBetweenAlignedStartDateAndToday.indexOf(topic.getEndDate());
+                System.out.println("offsetB: " + offsetB);
+            }
+        }
+
         //System.out.println("offset: " + offset);
         int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
         //System.out.println("divider: " + divider);
-        if(offset != null) {
-            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, divider, 1, null);
+
+        //
+        if(offsetA != null) {
+            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offsetA, offsetB, divider, 1, null);
             //System.out.println("reduced size: " + reducedArray.size());
 
             //System.out.println("reduced: " + reducedArray);
@@ -783,7 +817,7 @@ public class EntryController {
 
             // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
             // divideri 1 kabul ediyoruz o zaman doluluk orani veriyor. // TODO sonradan burasini kaldirip kafa karisikligi ve hsap hatasina mahal vermeyecek bicimde guncelle.
-            List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offset, 1, 1, null);
+            List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offsetA, offsetB,1, 1, null);
             long patternFillCount = SuccessAnalyzer.getSuccessCount(notReducedArray);
             StringBuilder patternFillText = new StringBuilder();
             patternFillText.append("(" + patternFillCount + " / " + notReducedArray.size() + " days are filled with 'done')");

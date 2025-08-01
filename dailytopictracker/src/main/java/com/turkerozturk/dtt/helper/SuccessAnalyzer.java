@@ -1,7 +1,5 @@
 package com.turkerozturk.dtt.helper;
 
-import com.turkerozturk.dtt.entity.Entry;
-
 import java.util.*;
 
 public class SuccessAnalyzer {
@@ -9,13 +7,21 @@ public class SuccessAnalyzer {
     public static List<Integer> getSuccessArray(
             List<Integer> rawArray,
             int offset,
+            Integer offsetB,
             int successDivider,
             Integer occuranceCount,
             List<Integer> occuranceOrder) {
         // System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
         List<Integer> reduced = new ArrayList<>();
+        int limit = 0;
+        if (offsetB == null) {
 
-        for (int i = offset; i < rawArray.size(); i += successDivider) {
+            limit = rawArray.size();
+        } else {
+            limit = offsetB + 1;
+        }
+
+        for (int i = offset; i < limit; i += successDivider) {
 
             if (successDivider <= 0) {
                 throw new IllegalArgumentException("successDivider must be > 0");
@@ -29,7 +35,7 @@ public class SuccessAnalyzer {
 
             for (int j = 0; j < successDivider; j++) {
                 int idx = i + j;
-                chunk.add(idx < rawArray.size() ? rawArray.get(idx) : 0); // pad with 0
+                chunk.add(idx < limit ? rawArray.get(idx) : 0); // pad with 0
             }
 
             // Mode 1: occuranceCount ile karar ver
@@ -105,7 +111,7 @@ public class SuccessAnalyzer {
 
     */
 
-    public static Integer findOffset(List<Integer> array) {
+    public static Integer findFirstDoneOffsetOfArray(List<Integer> array) {
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i) == 1) {
                 return i;
