@@ -313,24 +313,22 @@ https://github.com/turkerozturk/springtopiccalendar
 
             </span>
 
-        <!-- Parser bolumu -->
+        <!-- Parser class bolumu -->
         <span class="col-3" style="background-color:WhiteSmoke;">
+                <br/>
+                <div style="width: 90%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
+                     th:if="${topic.dataClassName == 'MeasurementParser'}">
+                  <canvas id="measurementChart"></canvas>
+                </div>
+                <br/>
+                <p th:if="${parserReport != null}" th:utext="${parserReport}">
 
-                <!-- colon sayisini 12 ye tamamlamak icin bu span-->
-            <code th:if="${parserReport != null}" th:text="${parserReport}">
-
-            </code>
-
-
-            <div style="width: 90%; max-width: 400px; margin: 0 auto;"
-                 th:if="${topic.dataClassName == 'MeasurementParser'}">
-              <canvas id="measurementChart"></canvas>
-            </div>
+                </p>
 
         </span>
 
         <!-- Streaks Bolumu -->
-        <span class="col-2" style="background-color:WhiteSmoke;">
+        <span class="col-2" style="background-color:FloralWhite;">
 
 
                 <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
@@ -604,7 +602,7 @@ https://github.com/turkerozturk/springtopiccalendar
                       th:utext="${patternSuccessText}"
                 ></span>
                 </th:block>
-                <th:block th:if="${topic.someTimeLater == null || topic.someTimeLater <= 0}">
+                <!-- <th:block th:if="${topic.someTimeLater == null || topic.someTimeLater <= 0}"> -->
                 <h3 th:if="${patternSuccessRate != null}"
                     th:text="${'Fill Rate: ' + T(java.lang.Math).round(patternSuccessRate * 100) + ' %'}"
                     title="It is the occupancy rate of the days in the date range from the first 'done' entry to today.">
@@ -612,7 +610,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 <span th:if="${patternSuccessRate != null}"
                       th:utext="${patternFillText}"
                 ></span>
-                </th:block>
+                <!-- </th:block> -->
 
 
 
