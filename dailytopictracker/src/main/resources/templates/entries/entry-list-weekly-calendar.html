@@ -56,7 +56,9 @@ https://github.com/turkerozturk/springtopiccalendar
                     <th:block th:if="${entry.value.status != -1 }">
                         <td th:text="${entry.value.status}"
                             th:attr="title=${entry.key} + ' ' + ${entry.value.id}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
-                            th:class="'weekly-table-entry-cell status-' + ${entry.value.status}">
+                            th:class="'weekly-table-entry-cell status-' + ${entry.value.status}"
+                            th:data-ymd="${entry.key}"
+                        >
                             @
                         </td>
 
@@ -69,6 +71,7 @@ https://github.com/turkerozturk/springtopiccalendar
                         <td th:text="''"
                             style="background-color:WhiteSmoke;"
                             th:attr="title=${entry.value.dateMillisYmd}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                            th:data-ymd="${entry.key}"
                         >
                             X
                         </td>
@@ -81,6 +84,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <td class="weekly-table-entry-cell"
                         th:title="${entry.key}"
                         th:attr="onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                        th:data-ymd="${entry.key}"
                     >
                         &nbsp;
                     </td>
@@ -272,8 +276,11 @@ https://github.com/turkerozturk/springtopiccalendar
                         <td title="The date the time period begins. Calculations begin on this date.">
                             Begin date
                         </td>
-                        <td th:text="${beginDate}">
 
+                        <td th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(beginDate.atStartOfDay(zoneId))}"
+                            >
                         </td>
                     </tr>
                     <tr>
@@ -288,16 +295,27 @@ https://github.com/turkerozturk/springtopiccalendar
                         <td title="If set, some calculations start from the 'base date' instead of the 'oldest done date'.">
                             Base date
                         </td>
-                        <td th:text="${topic.baseDate}">
 
+                        <td>
+                            <span th:id="'baseDate-span-' + ${topic.id}"
+                                  th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}"
+                                  th:text="${T(java.time.format.DateTimeFormatter)
+                                                  .ofPattern('yyyy-MM-dd')
+                                                  .format(topic.baseDate.atStartOfDay(zoneId))}">
+                            </span>
                         </td>
                     </tr>
                     <tr>
                         <td title="If set, some calculations will end on the 'end date' instead of the 'finish date'.">
                             End date
                         </td>
-                        <td th:text="${topic.endDate}">
-
+                        <td>
+                            <span th:id="'endDate-span-' + ${topic.id}"
+                                  th:if="${topic.endDate != null or !#strings.isEmpty(topic.endDate)}"
+                                  th:text="${T(java.time.format.DateTimeFormatter)
+                                                  .ofPattern('yyyy-MM-dd')
+                                                  .format(topic.endDate.atStartOfDay(zoneId))}">
+                            </span>
                         </td>
                     </tr>
                     <tr>
@@ -785,6 +803,59 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function () {
+            if (window.blinkIntervalStarted) return;
+            window.blinkIntervalStarted = true;
+
+            setInterval(function () {
+                document.querySelectorAll("span[id^='baseDate-span-']").forEach(function (span) {
+                    const baseDate = span.textContent.trim();
+                    if (!baseDate) return;
+
+                    const tdBase = document.querySelector(`td[data-ymd='${baseDate}']`);
+                    if (!tdBase) return;
+
+                    toggleBlinkMarker(tdBase, '⯆');
+                });
+
+
+
+
+
+                document.querySelectorAll("span[id^='endDate-span-']").forEach(function (span) {
+                    const endDate = span.textContent.trim();
+                    if (!endDate) return;
+
+                    const tdEnd = document.querySelector(`td[data-ymd='${endDate}']`);
+                    if (!tdEnd) return;
+
+                    toggleBlinkMarker(tdEnd, '⯅');
+                });
+
+            }, 1500);
+
+
+        });
+
+        function toggleBlinkMarker(td, markerChar) {
+            if (td.dataset.originalHtml === undefined) {
+                td.dataset.originalHtml = td.innerHTML.trim();
+                td.dataset.blinkState = 'off';
+            }
+
+            if (td.dataset.blinkState === 'off') {
+                td.innerHTML = `<span style="font-size: 0.9em;padding:0px;margin:0px;color:red;">${markerChar}</span>`;
+                td.dataset.blinkState = 'on';
+            } else {
+                td.innerHTML = td.dataset.originalHtml;
+                td.dataset.blinkState = 'off';
+            }
+        }
+
+    </script>
+
+
 
 
 
@@ -979,8 +1050,6 @@ https://github.com/turkerozturk/springtopiccalendar
           clearTimeout(tooltipTimeout);
         }
     </script>
-
-
 
 
 
