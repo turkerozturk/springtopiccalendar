@@ -251,6 +251,73 @@ https://github.com/turkerozturk/springtopiccalendar
                 -->
 
 
+                <table class="table table-sm table-border">
+                    <tr>
+                        <td title="Since today is included in the number of days before today, it is stated separately as + 1.">
+                            Total Days
+                        </td>
+                        <td th:text="${totalDays} + ' + 1' ">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="The date the time period begins. Calculations begin on this date.">
+                            Begin date
+                        </td>
+                        <td th:text="${beginDate}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="If there is, the date of the first, i.e. the oldest, 'done' entry here, after the calculation start date.">
+                            Oldest done date
+                        </td>
+                        <td th:text="${oldestDoneDate}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="If set, some calculations start from the 'base date' instead of the 'oldest done date'.">
+                            Base date
+                        </td>
+                        <td th:text="${topic.baseDate}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="If set, some calculations will end on the 'end date' instead of the 'finish date'.">
+                            End date
+                        </td>
+                        <td th:text="${topic.endDate}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="Today's date">
+                            Today's date
+                        </td>
+                        <td th:text="${today}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="The date of the last 'done' entry, if available.">
+                            Newest done date
+                        </td>
+                        <td th:text="${topic.lastPastEntryDate}">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td title="The date on which the time period ends. Calculations end on this date.">
+                            Finish date
+                        </td>
+                        <td th:text="${finishDate}">
+
+                        </td>
+                    </tr>
+                </table>
+
             </span>
 
 
