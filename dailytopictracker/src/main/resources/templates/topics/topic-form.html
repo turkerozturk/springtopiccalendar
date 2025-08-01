@@ -104,6 +104,7 @@
 
         <!-- baseDateMillisYmd (artık gizli) -->
         <input type="hidden" id="baseDateMillisYmd" th:field="*{baseDateMillisYmd}"  name="baseDateMillisYmd" />
+        <input type="hidden" id="endDateMillisYmd" th:field="*{endDateMillisYmd}"  name="endDateMillisYmd" />
 
         <!-- Checkbox: aktif değilse tarih seçici disable olur -->
         <div class="form-check mb-2">
@@ -119,7 +120,7 @@
                 <label for="baseDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
                 <input type="text" id="baseDatePicker"
                        class="form-control form-control-sm"
-                       onchange="convertDateToEpoch()"
+                       onchange="convertBaseDateToEpoch()"
                        th:value="${
                    topic.baseDateMillisYmd != null
                      ? T(java.time.Instant).ofEpochMilli(topic.baseDateMillisYmd)
@@ -168,6 +169,41 @@
             <img id="imagePreview" th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
                  width="135" height="135" alt="Selected Image" style="object-fit: contain; border: 1px solid #ccc;" />
         </div>
+
+
+        <!-- Date picker input alanı -->
+        <div class="mb-3" id="endDateContainer">
+            <div class="input-group endDateStyle date">
+                <label for="endDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select End Date:</label>
+                <input type="text" id="endDatePicker"
+                       class="form-control form-control-sm"
+                       onchange="convertEndDateToEpoch()"
+                       th:value="${
+                   topic.endDateMillisYmd != null
+                     ? T(java.time.Instant).ofEpochMilli(topic.endDateMillisYmd)
+                        .atZone(T(java.time.ZoneId).systemDefault())
+                        .toLocalDate()
+                     : ''
+               }"
+                />
+                <span class="input-group-append">
+             <button class="btn btn-outline-secondary" type="button">
+                 <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                 <i class="far fa-calendar" aria-hidden="true"></i>
+             </button>
+        </span>
+            </div>
+        </div>
+
+        <!-- Temizle ve Bugunu Kullan butonlari -->
+        <div class="mb-3 d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearEndDate()">Clear Date</button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="useTodaysDate()">
+                Use Today's Date
+            </button>
+        </div>
+
+
 
         <div class="mb-3">
             <label for="dataClassName" class="form-label">Parser:</label>
@@ -251,7 +287,7 @@ WebJars path'leri şu yapıyı izler:
      * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
      * dateMillisYmd input’una yazan basit fonksiyon.
      */
-    function convertDateToEpoch() {
+    function convertBaseDateToEpoch() {
         const selectedDate = document.getElementById('baseDatePicker').value; // yyyy-MM-dd
         if (selectedDate) {
             const [year, month, day] = selectedDate.split('-');
@@ -321,6 +357,80 @@ WebJars path'leri şu yapıyı izler:
 </script>
 
 
+<script>
+    /**
+     * Date Picker’da tarih seçilince,
+     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
+     * dateMillisYmd input’una yazan basit fonksiyon.
+     */
+    function convertEndDateToEpoch() {
+        const selectedDate = document.getElementById('endDatePicker').value; // yyyy-MM-dd
+        if (selectedDate) {
+            const [year, month, day] = selectedDate.split('-');
+            const dateObj = new Date(year, month - 1, day);
+            const epochMillis = dateObj.getTime();
+            document.getElementById('endDateMillisYmd').value = epochMillis;
+        }
+    }
+
+
+
+    function clearEndDate() {
+        document.getElementById('endDateMillisYmd').value = '';
+        document.getElementById('endDatePicker').value = '';
+        document.getElementById('enableEndDate').checked = false;
+        toggleEndDatePicker();
+    }
+
+    function useTodaysDate() {
+
+
+        const lastMillis = [[${topic.lastPastEntryDateMillisYmd}]];
+        //const lastMillis = /*[[${topic.lastPastEntryDateMillisYmd}]]*/ 0;
+
+        if (lastMillis) {
+            const dateObj = new Date(Number(lastMillis));
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('endDatePicker').value = formattedDate;
+            document.getElementById('endDateMillisYmd').value = lastMillis;
+            document.getElementById('enableEndDate').checked = true;
+            toggleEndDatePicker();
+        }
+    }
+
+    function toggleEndDatePicker() {
+        const isEnabled = document.getElementById('enableEndDate').checked;
+        document.getElementById('endDatePicker').disabled = !isEnabled;
+    }
+
+    // Sayfa açıldığında endDate varsa checkbox işaretli gelsin
+    window.addEventListener('DOMContentLoaded', () => {
+        const hasValue = document.getElementById('endDateMillisYmd').value !== '';
+        document.getElementById('enableEndDate').checked = hasValue;
+        toggleEndDatePicker();
+    });
+
+
+    /** https://uxsolutions.github.io/bootstrap-datepicker/
+    * "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range.
+    * calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers
+    */
+
+        $(function() {
+          $('#endDateContainer .endDateStyle.date').datepicker({
+              format: "yyyy-mm-dd",
+              todayBtn: "linked",
+              daysOfWeekHighlighted: "0,6",
+              calendarWeeks: false,
+              autoclose: true,
+              todayHighlight: true
+          });
+      });
+</script>
 
 <script>
     function updatePreview(selectElement) {
