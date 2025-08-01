@@ -22,6 +22,7 @@ package com.turkerozturk.dtt.controller.web;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.component.ParserRegistryLoader;
+import com.turkerozturk.dtt.entity.Entry;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,8 @@ import com.turkerozturk.dtt.service.CategoryService;
 import com.turkerozturk.dtt.service.TopicService;
 
 import java.io.File;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -110,6 +113,32 @@ public class TopicWebController {
 
         // Boş bir DTO
         model.addAttribute("topic", topic);
+
+        // basla
+        List<Entry> entries = topic.getActivities();
+        if(!entries.isEmpty()) {
+            Long firstDoneEntryDateMillisYmd = entries.stream()
+                    .filter(e -> e.getStatus() == 1) // 1 = done
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .orElse(null);
+
+            if (firstDoneEntryDateMillisYmd != null) {
+                LocalDate firstDoneEntryDate = Instant
+                        .ofEpochMilli(firstDoneEntryDateMillisYmd)
+                        .atZone(AppTimeZoneProvider.getZone())
+                        .toLocalDate();
+                model.addAttribute("firstDoneEntryDateMillisYmd",firstDoneEntryDateMillisYmd);
+                model.addAttribute("firstDoneEntryDate",firstDoneEntryDate);
+            }
+        }
+        // bitti
+
+
+        ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
+        model.addAttribute("zoneId", zoneId);
+        long todayMillisYmd = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli();
+        model.addAttribute("todayMillisYmd", todayMillisYmd);
 
         // Kategori seçimi için tüm kategorileri DTO olarak modele ekleyelim
         var categoryDTOList = categoryService.getAllCategories()
@@ -190,13 +219,36 @@ public class TopicWebController {
 
         model.addAttribute("topic", topic);
 
+        // basla
+        List<Entry> entries = topic.getActivities();
+        if(!entries.isEmpty()) {
+            Long firstDoneEntryDateMillisYmd = entries.stream()
+                    .filter(e -> e.getStatus() == 1) // 1 = done
+                    .map(Entry::getDateMillisYmd)
+                    .min(Long::compareTo)
+                    .orElse(null);
+
+            if (firstDoneEntryDateMillisYmd != null) {
+                LocalDate firstDoneEntryDate = Instant
+                        .ofEpochMilli(firstDoneEntryDateMillisYmd)
+                        .atZone(AppTimeZoneProvider.getZone())
+                        .toLocalDate();
+                model.addAttribute("firstDoneEntryDateMillisYmd",firstDoneEntryDateMillisYmd);
+                model.addAttribute("firstDoneEntryDate",firstDoneEntryDate);
+            }
+        }
+        // bitti
+
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
         model.addAttribute("zoneId", zoneId);
+        long todayMillisYmd = LocalDate.now(zoneId).atStartOfDay(zoneId).toInstant().toEpochMilli();
+        model.addAttribute("todayMillisYmd", todayMillisYmd);
 
         List<String> imageFilePaths = collectImagePaths();
         model.addAttribute("imageFilePaths", imageFilePaths);
 
         model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
+
 
         return "topics/topic-form"; // Aynı formu kullanacağız
     }

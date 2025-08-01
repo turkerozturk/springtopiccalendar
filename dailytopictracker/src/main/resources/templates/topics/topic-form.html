@@ -8,6 +8,10 @@
     -->
     <meta charset="UTF-8"/>
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
     <!-- favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -100,7 +104,7 @@
                    title="The numerical importance of the topic" />
         </div>
 
-        <input type="hidden" id="lastPastEntryDateMillis" th:value="${topic.lastPastEntryDateMillisYmd}" />
+
 
         <!-- baseDateMillisYmd (artık gizli) -->
         <input type="hidden" id="baseDateMillisYmd" th:field="*{baseDateMillisYmd}"  name="baseDateMillisYmd" />
@@ -141,9 +145,9 @@
         <!-- Temizle ve Son Giriş Tarihini Kullan butonları -->
         <div class="mb-3 d-flex gap-2">
             <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearBaseDate()">Clear Date</button>
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="useLastPastEntryDate()"
-                    th:if="${topic.lastPastEntryDateMillisYmd != null}">
-                Use Last Entry Date
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="useFirstDoneEntryDate()"
+                    th:if="${firstDoneEntryDateMillisYmd != null}">
+                Use First Done Entry Date
             </button>
         </div>
 
@@ -170,6 +174,12 @@
                  width="135" height="135" alt="Selected Image" style="object-fit: contain; border: 1px solid #ccc;" />
         </div>
 
+        <!-- Checkbox: aktif değilse tarih seçici disable olur -->
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="enableEndDate"
+                   onclick="toggleEndDatePicker()" />
+            <label class="form-check-label" for="enableEndDate">Enable End Date</label>
+        </div>
 
         <!-- Date picker input alanı -->
         <div class="mb-3" id="endDateContainer">
@@ -227,33 +237,8 @@
         </a>
     </form>
 
-    <!-- lastPastEntryDate varsa -->
-
-    <!--
-    <div class="mt-3">
-        <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
-            <td
-                class="last-done"
-                style="text-align: center">
-
-
-                <span th:text="${topic.lastPastEntryDate}">
-                    </span>
-                <br />
-                <span th:text="${topic.lastPastEntryDateMillisYmd}">
-                    </span>
-                <br />
-                <span  th:text="${'Last done: '
-                                        + T(java.time.format.DateTimeFormatter)
-                                        .ofPattern('yyyy-MM-dd')
-                                        .format(topic.lastPastEntryDate.atStartOfDay(zoneId))
-                                         }">
-
-                </span>
-            </td>
-        </th:block>
-    </div>
-    -->
+   
+    
 
     <div class="mt-3">
         <a th:href="@{/topics(categoryId=${topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
@@ -306,11 +291,11 @@ WebJars path'leri şu yapıyı izler:
         toggleBaseDatePicker();
     }
 
-    function useLastPastEntryDate() {
+    function useFirstDoneEntryDate() {
 
 
-        const lastMillis = [[${topic.lastPastEntryDateMillisYmd}]];
-        //const lastMillis = /*[[${topic.lastPastEntryDateMillisYmd}]]*/ 0;
+        const lastMillis = [[${firstDoneEntryDateMillisYmd}]];
+        //const lastMillis = /*[[${firstDoneEntryDateMillisYmd}]]*/ 0;
 
         if (lastMillis) {
             const dateObj = new Date(Number(lastMillis));
@@ -385,18 +370,18 @@ WebJars path'leri şu yapıyı izler:
     function useTodaysDate() {
 
 
-        const lastMillis = [[${topic.lastPastEntryDateMillisYmd}]];
-        //const lastMillis = /*[[${topic.lastPastEntryDateMillisYmd}]]*/ 0;
+        const todayMillis = [[${todayMillisYmd}]];
+        //const todayMillis = /*[[${todayMillisYmd}]]*/ 0;
 
-        if (lastMillis) {
-            const dateObj = new Date(Number(lastMillis));
+        if (todayMillis) {
+            const dateObj = new Date(Number(todayMillis));
             const yyyy = dateObj.getFullYear();
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
             const dd = String(dateObj.getDate()).padStart(2, '0');
             const formattedDate = `${yyyy}-${mm}-${dd}`;
 
             document.getElementById('endDatePicker').value = formattedDate;
-            document.getElementById('endDateMillisYmd').value = lastMillis;
+            document.getElementById('endDateMillisYmd').value = todayMillis;
             document.getElementById('enableEndDate').checked = true;
             toggleEndDatePicker();
         }
@@ -434,6 +419,8 @@ WebJars path'leri şu yapıyı izler:
 
 <script>
     function updatePreview(selectElement) {
+        const csrfToken = $('meta[name="_csrf"]').attr('content');
+        const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
         const selectedValue = selectElement.value;
         const imagePreview = document.getElementById("imagePreview");
         if (selectedValue && selectedValue.trim() !== "") {
