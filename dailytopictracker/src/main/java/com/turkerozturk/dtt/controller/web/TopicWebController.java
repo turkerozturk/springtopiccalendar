@@ -285,6 +285,8 @@ public class TopicWebController {
         existingTopic.setImageFileName(topic.getImageFileName());
         existingTopic.setDataClassName(topic.getDataClassName());
 
+        existingTopic.setIntervalRule(topic.getIntervalRule());
+
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());
 
