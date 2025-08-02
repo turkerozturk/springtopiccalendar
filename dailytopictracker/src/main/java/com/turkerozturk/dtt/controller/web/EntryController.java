@@ -203,28 +203,26 @@ public class EntryController {
             }
         }
 
-        // Haftalık hizalanmış tarih aralığı oluştur
-        //LocalDate today = LocalDate.now(zoneId);
-        // System.out.println("today weekday index " + today.getDayOfWeek().getValue() % 7);
-        int oldestDayWeekIndex = startDate.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
-        model.addAttribute("oldestDayWeekIndex", oldestDayWeekIndex); // haftanin hangi gunuydu frontendde gostermek icin.
-
-        int todayWeekIndex = endDate.getDayOfWeek().getValue() % 7; // I guaranteed it using modulus 7 operator. Because on Sunday I saw its value was not 0, its value was 7. Now it is highlighting correctly on frontend.
-        model.addAttribute("todayWeekIndex", todayWeekIndex); // haftanin hangi gunuydu frontendde gostermek icin TODAY olmak zorunda degil, end date aslinda.
-
 
         DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
         List<String> dayNames = new ArrayList<>();
         for (int j = 0; j < 7; j++) {
-            DayOfWeek currentDay = startDay.plus(j);
-            // Gerekirse Türkçe'ye çevirmek için burada değiştirebilirsiniz
-            dayNames.add(currentDay.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+            dayNames.add(startDay.plus(j).getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         }
         model.addAttribute("dayNames", dayNames);
+        String startDateDayName = startDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        model.addAttribute("startDateDayName", startDateDayName);
+        String todayDateDayName = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        model.addAttribute("todayDateDayName", todayDateDayName);
+        String endDateDayName = endDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        //model.addAttribute("endDateDayName", endDateDayName);
+
         LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
         LocalDate endDateAlignedToWeek = getEndOfWeek(endDate, startDay);
         List<LocalDate> dateRange = filterService.buildDateRangeList(startDateAlignedToWeek, endDateAlignedToWeek);
-        //System.out.println(dateRange.size());
+
+
+
 
 
         // Entry'leri tarihiyle eşle
@@ -234,7 +232,16 @@ public class EntryController {
                         Function.identity()
                 ));
 
-        WeeklyViewDTO weeklyViewDTO = calculateCalendarRows(entryMap, dateRange);
+        WeeklyViewDTO weeklyViewDTO = calculateCalendarRows(entryMap, dateRange, startDate, endDate, zoneId);
+
+        // basla counter
+        int countt = weeklyViewDTO.getTop1ColumnDates().size();
+        List<Integer> weekNumbers = new ArrayList<>();
+        for(int i = 0; i < countt; i++) {
+            weekNumbers.add(countt-i);
+        }
+        model.addAttribute("weekNumbers", weekNumbers);
+        // bitti counter
 
         model.addAttribute("top1ColumnDates", weeklyViewDTO.getTop1ColumnDates());
         model.addAttribute("top2ColumnDates", weeklyViewDTO.getTop2ColumnDates());
@@ -250,10 +257,10 @@ public class EntryController {
         long npcStartDayCount = ChronoUnit.DAYS.between(startDateAlignedToWeek, startDate);
         long npcEndDayCount = ChronoUnit.DAYS.between(endDate, endDateAlignedToWeek);
         //System.out.println(npcStartDayCount + " " + npcEndDayCount); TODO
-        List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
+        //List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
         // BITTI calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
 
-        model.addAttribute("weeklyMaps", weeklyMapsWithFakeEntries);
+        model.addAttribute("weeklyMaps", weeklyMaps);
 
 
         Topic topic = topicRepository.findById(topicId).get();
@@ -376,50 +383,7 @@ public class EntryController {
 
     }
 
-    private List<Map<LocalDate, Entry>> addNpcFakeEntriesToWeeklyMaps(List<Map<LocalDate, Entry>> weeklyMaps, long npcStartDayCount, long npcEndDayCount, ZoneId zoneId) {
 
-
-
-        final int npcStatusCode = -1;
-        // BASA sahte Entry ekle
-        for (int i = 0; i < npcStartDayCount; i++) {
-            int weekdayRowIndex = (int) i;
-            List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get(weekdayRowIndex).keySet());
-            //  System.out.println(columnDates);
-            LocalDate date = columnDates.get(0);
-            //  System.out.println(date);
-            Entry fakeEntry = new Entry();
-            fakeEntry.setStatus(npcStatusCode);
-            long epochMilli = date
-                    .atStartOfDay(zoneId) // Günün başlangıç zamanı ile ZonedDateTime oluştur
-                    .toInstant()
-                    .toEpochMilli();
-            fakeEntry.setDateMillisYmd(epochMilli);
-            weeklyMaps.get(weekdayRowIndex).put(date, fakeEntry);
-
-        }
-        // SONA sahte Entry ekle
-        final int seventhRowIndex = 6;
-        for (int i = 0; i < npcEndDayCount; i++) {
-            int weekdayRowIndex = (int) seventhRowIndex - i;
-            List<LocalDate> columnDates = new ArrayList<>(weeklyMaps.get((weekdayRowIndex)).keySet());
-            //System.out.println(columnDates);
-            int lastColumnIndex = columnDates.size()-1;
-            LocalDate date = columnDates.get(lastColumnIndex);
-            //System.out.println(date);
-            Entry fakeEntry = new Entry();
-            fakeEntry.setStatus(npcStatusCode);
-            long epochMilli = date
-                    .atStartOfDay(zoneId) //
-                    .toInstant()
-                    .toEpochMilli();
-            fakeEntry.setDateMillisYmd(epochMilli);
-            weeklyMaps.get((int) (weekdayRowIndex)).put(date, fakeEntry);
-        }
-
-        return weeklyMaps;
-
-    }
 
 
     private OverallStatisticsDTO calculateOverallStatistics(List<Entry> entries, Topic topic, ZoneId zoneId) {
@@ -657,7 +621,8 @@ public class EntryController {
 
 
 
-    private WeeklyViewDTO calculateCalendarRows(Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange) {
+    private WeeklyViewDTO calculateCalendarRows(Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange,
+                                                LocalDate startDate, LocalDate endDate, ZoneId zoneId) {
 
         WeeklyViewDTO weeklyViewDTO = new WeeklyViewDTO();
 
@@ -701,7 +666,27 @@ public class EntryController {
             if(entryMap.containsKey(d)) {
                 weeklyMaps.get(i).put(d, entryMap.get(d));
             } else {
-                weeklyMaps.get(i).put(d, null);
+
+                if (d.isBefore(startDate) || d.isAfter(endDate)) {
+                    // d, startDate'ten küçük VEYA endDate'ten büyükse burası çalışır
+                    //System.out.println("Dahil değil: " + d);
+
+                    //  sahte Entry ekle
+                    int npcEntryStatusCode = -1;
+                    Entry fakeEntry = new Entry();
+                    fakeEntry.setStatus(npcEntryStatusCode);
+                    long epochMilli = d
+                            .atStartOfDay(zoneId) // Günün başlangıç zamanı ile ZonedDateTime oluştur
+                            .toInstant()
+                            .toEpochMilli();
+                    fakeEntry.setDateMillisYmd(epochMilli);
+                    weeklyMaps.get(i).put(d, fakeEntry);
+
+                } else {
+                    weeklyMaps.get(i).put(d, null);
+                }
+
+
             }
 
             if(i == 6) {

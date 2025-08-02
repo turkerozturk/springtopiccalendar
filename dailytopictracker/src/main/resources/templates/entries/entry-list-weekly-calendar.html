@@ -14,26 +14,35 @@ https://github.com/turkerozturk/springtopiccalendar
         </caption>
 
         <thead>
+
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Week Counter</th>
+            <th:block th:each="weekNumber : ${weekNumbers}">
+                <th th:text="${weekNumber}" style="font-size:0.7em;font-weight:normal;color:black;background-color:WhiteSmoke;"></th>
+            </th:block>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Week Counter</th>
+        </tr>
+
+        <tr>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Year</th>
             <th:block th:each="columnDate : ${top1ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Year</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Month</th>
             <th:block th:each="columnDate : ${top2ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Month</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Day</th>
             <th:block th:each="columnDate : ${top3ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Day</th>
         </tr>
         </thead>
 
@@ -41,10 +50,12 @@ https://github.com/turkerozturk/springtopiccalendar
         <tr th:each="dayMap, stat : ${weeklyMaps}">
 
 
-            <td th:style="${oldestDayWeekIndex == stat.index} ? 'background-color: lightgray;' : 'background-color: WhiteSmoke;'">
+
+            <!-- http://xahlee.info/comp/unicode_arrows.html -->
+            <td th:style="${dayNames[stat.index]} == ${startDateDayName} ? 'background-color: lightgray;' : 'background-color: WhiteSmoke;'">
                 <div style="display: flex; justify-content: center; align-items: center; position: relative;">
+                    <span th:if="${dayNames[stat.index]} == ${startDateDayName}" style="position: absolute; right: 5px;">→</span>
                     <span style="margin: 0 auto;" th:text="${dayNames[stat.index]}"></span>
-                    <span th:if="${oldestDayWeekIndex == stat.index}" style="position: absolute; right: 5px;">→</span>
                 </div>
             </td>
 
@@ -71,7 +82,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <th:block th:if="${entry.value.status == -1 }">
                         <td th:text="''"
                             style="background-color:WhiteSmoke;padding:0;"
-                            th:attr="title=${entry.value.dateMillisYmd}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                            th:attr="title=${entry.key} + ' [Outside of the date range]', onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                             th:data-ymd="${entry.key}"
                         >
                             X
@@ -102,13 +113,12 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
             <!-- http://xahlee.info/comp/unicode_arrows.html -->
-            <td th:style="${todayWeekIndex == stat.index} ? 'background-color: lightyellow;' : 'background-color: WhiteSmoke;'">
+            <td th:style="${dayNames[stat.index]} == ${todayDateDayName} ? 'background-color: lightyellow;' : 'background-color: WhiteSmoke;'">
                 <div style="display: flex; justify-content: center; align-items: center; position: relative;">
-                    <span th:if="${todayWeekIndex == stat.index}" style="position: absolute; left: 5px;">←</span>
+                    <span th:if="${dayNames[stat.index]} == ${todayDateDayName}" style="position: absolute; left: 5px;">←</span>
                     <span style="margin: 0 auto;" th:text="${dayNames[stat.index]}"></span>
                 </div>
             </td>
-
 
 
 
@@ -117,25 +127,25 @@ https://github.com/turkerozturk/springtopiccalendar
 
         <tfoot>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Day</th>
             <th:block th:each="columnDate : ${bottom1ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:gray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">D</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Day</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Month</th>
             <th:block th:each="columnDate : ${bottom2ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">M</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Month</th>
         </tr>
         <tr>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Year</th>
             <th:block th:each="columnDate : ${bottom3ColumnDates}">
                 <th th:text="${columnDate}" style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;"></th>
             </th:block>
-            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Y</th>
+            <th style="font-size:0.7em;font-weight:normal;color:darkgray;background-color:WhiteSmoke;">Year</th>
         </tr>
         </tfoot>
 
@@ -462,8 +472,13 @@ https://github.com/turkerozturk/springtopiccalendar
                     <tbody>
                     <tr th:each="i : ${#numbers.sequence(0, 6)}">
 
-                        <td th:text="${dayNames[i]}"
-                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
+
+
+
+                        <td th:style="${dayNames[i]} == ${todayDateDayName} ? 'background-color: lightyellow;' : ''">
+
+                            <span style="margin: 0 auto;" th:text="${dayNames[i]}"></span>
+
                         </td>
 
                         <td th:text="${status0[i]}"></td>
