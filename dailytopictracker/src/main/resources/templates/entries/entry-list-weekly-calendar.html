@@ -304,9 +304,6 @@ https://github.com/turkerozturk/springtopiccalendar
                         <td>
                             <span id="baseDatePlaceHolder"
                                   th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}"
-                                  th:data-ymd="${T(java.time.format.DateTimeFormatter)
-                                                  .ofPattern('yyyy-MM-dd')
-                                                  .format(topic.baseDate.atStartOfDay(zoneId))}"
                                   th:text="${T(java.time.format.DateTimeFormatter)
                                                   .ofPattern('yyyy-MM-dd')
                                                   .format(topic.baseDate.atStartOfDay(zoneId))}"
