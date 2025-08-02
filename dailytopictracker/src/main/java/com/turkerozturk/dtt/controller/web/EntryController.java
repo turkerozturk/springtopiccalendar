@@ -744,7 +744,7 @@ public class EntryController {
         if (topic.getBaseDateMillisYmd() != null) { // TODO ve basedate arrayde yoksa, cok eskiyse veya todayden veya enddatedan yeniyse olmayacak sekilde kural koy.
             if(dateRangeBetweenAlignedStartDateAndToday.contains(topic.getBaseDate())){
                 offsetA = dateRangeBetweenAlignedStartDateAndToday.indexOf(topic.getBaseDate());
-                System.out.println("offsetA: " + offsetA);
+                //System.out.println("offsetA: " + offsetA);
             }
         } else {
             offsetA = SuccessAnalyzer.findFirstDoneOffsetOfArray(rawArray); // sifirlari gecerek dizinin ilk 1 olan elemaninin indeksini bulur.
@@ -754,7 +754,7 @@ public class EntryController {
         if (topic.getEndDateMillisYmd() != null) { // TODO ve enddate arrayde yoksa, cok eskiyse veya basedateten eskiyse veya bugunden yeniyse olmayacak sekilde kural koy.
             if(dateRangeBetweenAlignedStartDateAndToday.contains(topic.getEndDate())){
                 offsetB = dateRangeBetweenAlignedStartDateAndToday.indexOf(topic.getEndDate());
-                System.out.println("offsetB: " + offsetB);
+                //System.out.println("offsetB: " + offsetB);
             }
         }
 
