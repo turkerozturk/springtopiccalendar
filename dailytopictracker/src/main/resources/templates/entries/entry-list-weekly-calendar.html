@@ -152,123 +152,39 @@ https://github.com/turkerozturk/springtopiccalendar
             <!-- colon sayisini 12 ye tamamlamak icin bu span-->
 
 
-
-            <span class="col-1">
-                <!--
-                <span th:if="${daysSinceFirstDoneEntry != null}"
-                      th:text="${'Days since first done: ' + daysSinceFirstDoneEntry}">
-                </span>
-                <br/>
-                <span th:if="${daysSinceFirstDoneEntryToPrediction != null}"
-                      th:text="${'Days since first done to prediction: ' + daysSinceFirstDoneEntryToPrediction}">
-                </span>
-                <br/>
-                -->
-
-                <!--
-                <span th:if="${numberOfDaysToBeConsidered != null}"
-                      th:text="${'Number of days to be considered: ' + numberOfDaysToBeConsidered}">
-                </span>
-                -->
-
-                <br/>
-
-                <!--
-                <br/>
-                <span th:if="${doneDayCount != null}"
-                      th:text="${'Number of done days: ' + doneDayCount}">
-                </span>
-                <br/>
-                <span th:if="${emptyDayCount != null}"
-                      th:text="${'Number of empty days: ' + emptyDayCount}">
-                </span>
-                <br/>
-                <span th:if="${averageDoneInterval != null}"
-                      th:text="${'Average done interval: ' + #numbers.formatDecimal(averageDoneInterval, 1, 1)}">
-                </span>
-                <br/>
-                <h3 th:if="${successRate != null}"
-                      th:text="${'Success Rate: ' + #numbers.formatDecimal(successRate, 1, 1)}">
-                </h3>
-                <br/>
-
-                <span th:if="${realAverage != null}"
-                      th:text="${'Real Average done interval: ' + #numbers.formatDecimal(realAverage, 1, 1)}">
-                </span>
-                <br/>
-                <h3 th:if="${realSuccessRate != null}"
-                    th:text="${'Real Success Rate: ' + #numbers.formatDecimal(realSuccessRate, 1, 1)}">
-                </h3>
-                <br/>
-                -->
-                <br/>
-                <!-- TREND related variables -->
-                <!--
-                <span th:if="${intervals != null}"
-                      th:text="${'intervals: ' + intervals}">
-                </span>
-                -->
-                <br/>
-
-                <!--
-                <span th:if="${mean != null}"
-                      th:text="${'mean: ' + #numbers.formatDecimal(mean, 1, 1)}">
-                </span>
-                <br/>
-                <span th:if="${std != null}"
-                      th:text="${'std: ' + #numbers.formatDecimal(std, 1, 1)}">
-                </span>
-                <br/>
-                <span th:if="${successRate2 != null}"
-                      th:text="${'successRate2: ' + #numbers.formatDecimal(successRate2, 1, 1)}">
-                </span>
-                <br/>
-                <span th:if="${trendSlope != null}"
-                      th:text="${'trendSlope: ' + #numbers.formatDecimal(trendSlope, 1, 1)}">
-                </span>
-                <br/>
-                <span th:if="${trendStatus != null}"
-                      th:text="${'trendStatus: ' + trendStatus}">
-                </span>
-                <br/>
-                -->
-
-                <!--
-                <div class="mt-3">
-                    <th:block th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}">
-                        <td
-
-
-                                style="text-align: center">
-
-                            <span th:text="${topic.baseDate}">
-                                </span>
-                            <br />
-                            <span th:text="${topic.baseDateMillisYmd}">
-                                </span>
-                            <br />
-                            <span  th:text="${'Base date: '
-                                                    + T(java.time.format.DateTimeFormatter)
-                                                    .ofPattern('yyyy-MM-dd')
-                                                    .format(topic.baseDate.atStartOfDay(zoneId))
-                                                     }">
-
-                            </span>
-                            <br/>
-                            <p>
-                                The base date is optionally determined by the user.
-                                <br/>
-                                If a base date is specified, statistical calculations are made starting from that date, not from the oldest data date.
-                            </p>
-                        </td>
-                    </th:block>
+        <!--
+        <span class="col-2" style="background-color:White;">
+                <div style="text-align:center;">
+                <img th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
+                     alt="Topic Image"
+                     style="max-width:135px;max-height:135px;margin-top:10px;" />
                 </div>
-                -->
-            </span>
+                <p th:text="${#strings.abbreviate(topic.description,200)}">Topic description
+                    </p>
+        </span>
+        -->
 
-        <span class="col-1" style="background-color:WhiteSmoke;">
+        <span class="col-2 p-2" style="display:inline-block;">
+            <div class="card h-100 shadow-sm border-0" style="overflow:hidden;">
+                <div class="text-center p-2 bg-light">
+                    <img th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
+                         alt="Topic Image"
+                         class="img-fluid rounded"
+                         style="max-height:135px; object-fit:cover;" />
+                </div>
+                <div class="card-body p-2" style="font-size:0.9rem;">
+                    <p class="card-text text-secondary mb-0" th:text="${#strings.abbreviate(topic.description,200)}">Topic description</p>
+                </div>
+            </div>
+        </span>
 
-                <table class="table table-sm table-border">
+
+
+
+
+        <span class="col-2" style="background-color:MintCream;">
+
+                <table class="table table-sm table-border" style="margin:auto;">
                     <tr>
                         <td title="Since today is included in the number of days before today, it is stated separately as + 1.">
                             Total Days
@@ -350,20 +266,10 @@ https://github.com/turkerozturk/springtopiccalendar
                     </tr>
                 </table>
 
-            </span>
+        </span>
 
 
 
-
-            <span class="col-1" style="background-color:WhiteSmoke;">
-                <div style="text-align:center;">
-                <img th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
-                     alt="Topic Image"
-                     style="max-width:135px;max-height:135px;margin-top:10px;" />
-                </div>
-                <p th:text="${#strings.abbreviate(topic.description,200)}">Topic description
-                    </p>
-            </span>
 
 
 
@@ -412,10 +318,12 @@ https://github.com/turkerozturk/springtopiccalendar
 
             </span>
 
+
+
         <!-- Parser class bolumu -->
-        <span class="col-3" style="background-color:WhiteSmoke;">
+        <span class="col-2" style="background-color:WhiteSmoke;padding:1px;">
                 <br/>
-                <div style="width: 90%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
+                <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
                      th:if="${topic.dataClassName == 'MeasurementParser'}">
                   <canvas id="measurementChart"></canvas>
                 </div>
@@ -834,9 +742,25 @@ https://github.com/turkerozturk/springtopiccalendar
                     const tdEnd = document.querySelector(`td[data-ymd='${endDate}']`);
                     if (!tdEnd) return;
 
-                    const highlightGradient = 'radial-gradient(circle, RoyalBlue 30%, rgba(255, 255, 255, 1) 100%)';
+                    const highlightGradient = 'radial-gradient(circle, purple 30%, rgba(255, 255, 255, 1) 100%)';
                     toggleBlinkMarker(tdEnd, highlightGradient);
                 });
+
+
+                // EXTRA: span#baseDatePlaceHolder
+                const baseSpan = document.getElementById("baseDatePlaceHolder");
+                if (baseSpan) {
+                    const highlightGradient = 'radial-gradient(circle, ForestGreen 30%, rgba(255, 255, 255, 1) 100%)';
+                    toggleBlinkMarker(baseSpan, highlightGradient);
+                }
+
+                // EXTRA: span#endDatePlaceHolder
+                const endSpan = document.getElementById("endDatePlaceHolder");
+                if (endSpan) {
+                    const highlightGradient = 'radial-gradient(circle, purple 30%, rgba(255, 255, 255, 1) 100%)';
+                    toggleBlinkMarker(endSpan, highlightGradient);
+                }
+
 
             }, 750);
 
@@ -996,8 +920,12 @@ https://github.com/turkerozturk/springtopiccalendar
                     scales: {
                         x: {
                             title: {
-                                display: true,
+                                display: false,
                                 text: 'Date'
+                            },
+                            ticks: {
+                                maxRotation: 90, // maksimum döndürme derecesi
+                                minRotation: 90, // minimum döndürme derecesi
                             }
                         },
                         y: {
@@ -1012,7 +940,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     },
                     plugins: {
                         title: {
-                            display: true,
+                            display: false,
                             text: 'Measurement Over Time'
                         },
                         tooltip: {
@@ -1021,7 +949,10 @@ https://github.com/turkerozturk/springtopiccalendar
                                     return context.parsed.y + ' ' + parsed.unit;
                                 }
                             }
-                        }
+                        },
+                        legend: {
+                            display: false
+                        },
                     }
                 }
             });
