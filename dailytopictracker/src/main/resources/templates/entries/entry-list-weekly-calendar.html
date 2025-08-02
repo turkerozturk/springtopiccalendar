@@ -266,182 +266,9 @@ https://github.com/turkerozturk/springtopiccalendar
                     </tr>
                 </table>
 
-        </span>
 
-
-
-
-
-
-
-        <span class="col-2" style="background-color:FloralWhite;">
-
-                <!-- chart -->
-                <div style="max-width:200px;max-height:200px;margin-left:auto;margin-right:auto;">
-                    <canvas id="status1Chart" ></canvas>
-                </div>
-
-            <!-- some statistics -->
-                <table style="border:1px;border-collapse: collapse;margin-left:auto;margin-right:auto;">
-                    <caption style="text-align:center;color:DarkGray !important;">
-                        Entry statuses between today and 365 days ago
-                    </caption>
-                    <thead>
-                    <tr>
-                        <th>Weekday</th>
-                        <th>Note</th>
-                        <th>Done</th>
-                        <th>Warn</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="i : ${#numbers.sequence(0, 6)}">
-
-                        <td th:text="${dayNames[i]}"
-                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
-                        </td>
-
-                        <td th:text="${status0[i]}"></td>
-                        <td th:text="${status1[i]}"></td>
-                        <td th:text="${status2[i]}"></td>
-                    </tr>
-                    <tr>
-                        <td><b>Total</b></td>
-                        <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
-                        <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
-                        <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
-
-
-                    </tr>
-                    </tbody>
-                </table>
-
-            </span>
-
-
-
-        <!-- Parser class bolumu -->
-        <span class="col-2" style="background-color:WhiteSmoke;padding:1px;">
-                <br/>
-                <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
-                     th:if="${topic.dataClassName == 'MeasurementParser'}">
-                  <canvas id="measurementChart"></canvas>
-                </div>
-                <br/>
-                <p th:if="${parserReport != null}" th:utext="${parserReport}">
-
-                </p>
-
-        </span>
-
-        <!-- Streaks Bolumu -->
-        <span class="col-2" style="background-color:FloralWhite;">
-
-
-                <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
-                Streaks are calculated for consecutive days only.</span>
-
-
-            <!-- newsest streak (closest to today) chart -->
-                <th:block th:if="${newestStreak != null}">
-                    <!-- newest streak chart -->
-                    <table style="width: 100%">
-                        <caption style="text-align:center;color:DarkGray !important;">
-                            Last Streak (closest to today)
-                        </caption>
-                        <tbody>
-
-
-
-                          <tr style="height: 30px;">
-                                <!-- Start Date -->
-                               <td style="width: 100px; text-align: right; padding-right: 2px;">
-                                    <small th:text="${T(java.time.format.DateTimeFormatter)
-                                                        .ofPattern('yy-MM-dd')
-                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"></small>
-                                </td>
-
-                                      <!-- Bar with Count -->
-                                <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                                    <div
-                                            th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
-                                     text-align: center !important; font-weight: bold; margin:auto;
-                                     width:' + ${newestStreak.width} + 'px;'"
-                                            th:text="${newestStreak.dayCount}"
-                                            th:title="${newestStreak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
-                                </td>
-
-                                      <!-- End Date -->
-                               <td style="width: 100px; text-align: left; padding-left: 2px;">
-                                    <small th:text="${T(java.time.format.DateTimeFormatter)
-                                                        .ofPattern('MM-dd')
-                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"></small>
-
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </th:block>
-
-
-            <!-- top streaks chart -->
-                <table style="width: 100%">
-                    <caption style="text-align:center;color:DarkGray !important;">
-                        Top Streaks (closest unique one)
-                    </caption>
-                    <tbody>
-
-
-
-                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
-                        <!-- Start Date -->
-                        <td style="width: 100px; text-align: right; padding-right: 2px;">
-                            <small th:text="${T(java.time.format.DateTimeFormatter)
-                                                .ofPattern('yy-MM-dd')
-                                                .format(streak.startDate.atStartOfDay(zoneId))}"></small>
-                        </td>
-
-                        <!-- Bar with Count -->
-                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
-                            <div
-                                    th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
-                             text-align: center !important; font-weight: bold; margin:auto;
-                             width:' + ${streak.width} + 'px;'"
-                                    th:text="${streak.dayCount}"
-                                    th:title="${streak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
-                        </td>
-
-                        <!-- End Date -->
-                        <td style="width: 100px; text-align: left; padding-left: 2px;">
-                            <small th:text="${T(java.time.format.DateTimeFormatter)
-                                                .ofPattern('MM-dd')
-                                                .format(streak.endDate.atStartOfDay(zoneId))}"></small>
-
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
-                <br />
-
-            <!-- trend intervals chart ikinci varyasyon-->
-            <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"
-                     id="intervalChart2" width="150" height="75"></canvas>
-            -->
-
-
-
-
-
-            </span>
-
-
-
-        <!-- Success Rate bolumu -->
-        <span class="col-2">
-
-                <!-- filter-form'da pivot tabledaki kodlar, prediction, warn, done, not marked tarihlerini gösterir. -->
-                <table class="table table-sm">
+            <!-- filter-form'da pivot tabledaki kodlar, prediction, warn, done, not marked tarihlerini gösterir. -->
+                <table class="table table-sm" style="margin-top:10px;">
                     <caption style="color:DarkGray !important;text-align:center;">
                         (This table is not limited to 365 days).<br/>
 
@@ -597,6 +424,191 @@ https://github.com/turkerozturk/springtopiccalendar
                     </tbody>
 
                 </table>
+
+
+
+
+
+        </span>
+
+
+
+
+
+
+
+
+
+        <span class="col-2" style="background-color:FloralWhite;">
+
+                <!-- chart -->
+                <div style="max-width:200px;max-height:200px;margin-left:auto;margin-right:auto;">
+                    <canvas id="status1Chart" ></canvas>
+                </div>
+
+            <!-- some statistics -->
+                <table style="border:1px;border-collapse: collapse;margin-left:auto;margin-right:auto;">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Entry statuses between today and 365 days ago
+                    </caption>
+                    <thead>
+                    <tr>
+                        <th>Weekday</th>
+                        <th>Note</th>
+                        <th>Done</th>
+                        <th>Warn</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="i : ${#numbers.sequence(0, 6)}">
+
+                        <td th:text="${dayNames[i]}"
+                            th:style="${todayWeekIndex == i} ? 'background-color: lightyellow;' : ''">
+                        </td>
+
+                        <td th:text="${status0[i]}"></td>
+                        <td th:text="${status1[i]}"></td>
+                        <td th:text="${status2[i]}"></td>
+                    </tr>
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
+                        <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+
+            </span>
+
+
+
+        <!-- Parser class bolumu -->
+        <span class="col-2" style="background-color:WhiteSmoke;padding:1px;">
+                <br/>
+                <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
+                     th:if="${topic.dataClassName == 'MeasurementParser'}">
+                  <canvas id="measurementChart"></canvas>
+                </div>
+                <br/>
+                <p th:if="${parserReport != null}" th:utext="${parserReport}">
+
+                </p>
+                <p th:if="${parserReport == null}" style="color:gray;">
+                    This field will appear blank if a parser is not selected in the topic settings.
+                </p>
+
+        </span>
+
+        <!-- Streaks Bolumu -->
+        <span class="col-2" style="background-color:FloralWhite;">
+
+
+                <span style="text-align:center;color:DarkGray !important;">Streak stats between today and 365 days ago<br/>
+                Streaks are calculated for consecutive days only.</span>
+
+
+            <!-- newsest streak (closest to today) chart -->
+                <th:block th:if="${newestStreak != null}">
+                    <!-- newest streak chart -->
+                    <table style="width: 100%">
+                        <caption style="text-align:center;color:DarkGray !important;">
+                            Last Streak (closest to today)
+                        </caption>
+                        <tbody>
+
+
+
+                          <tr style="height: 30px;">
+                                <!-- Start Date -->
+                               <td style="width: 100px; text-align: right; padding-right: 2px;">
+                                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('yy-MM-dd')
+                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"></small>
+                                </td>
+
+                                      <!-- Bar with Count -->
+                                <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                                    <div
+                                            th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                                     text-align: center !important; font-weight: bold; margin:auto;
+                                     width:' + ${newestStreak.width} + 'px;'"
+                                            th:text="${newestStreak.dayCount}"
+                                            th:title="${newestStreak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
+                                </td>
+
+                                      <!-- End Date -->
+                               <td style="width: 100px; text-align: left; padding-left: 2px;">
+                                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('MM-dd')
+                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"></small>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </th:block>
+
+
+            <!-- top streaks chart -->
+                <table style="width: 100%">
+                    <caption style="text-align:center;color:DarkGray !important;">
+                        Top Streaks (closest unique one)
+                    </caption>
+                    <tbody>
+
+
+
+                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
+                        <!-- Start Date -->
+                        <td style="width: 100px; text-align: right; padding-right: 2px;">
+                            <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yy-MM-dd')
+                                                .format(streak.startDate.atStartOfDay(zoneId))}"></small>
+                        </td>
+
+                        <!-- Bar with Count -->
+                        <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                            <div
+                                    th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                             text-align: center !important; font-weight: bold; margin:auto;
+                             width:' + ${streak.width} + 'px;'"
+                                    th:text="${streak.dayCount}"
+                                    th:title="${streak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
+                        </td>
+
+                        <!-- End Date -->
+                        <td style="width: 100px; text-align: left; padding-left: 2px;">
+                            <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('MM-dd')
+                                                .format(streak.endDate.atStartOfDay(zoneId))}"></small>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <br />
+
+            <!-- trend intervals chart ikinci varyasyon-->
+            <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"
+                     id="intervalChart2" width="150" height="75"></canvas>
+            -->
+
+
+
+
+
+            </span>
+
+
+
+        <!-- Success Rate bolumu -->
+        <span class="col-2">
+
+
 
 
                 <th:block th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}">
