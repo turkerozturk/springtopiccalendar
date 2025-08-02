@@ -540,9 +540,10 @@ https://github.com/turkerozturk/springtopiccalendar
                     <!-- predictionDate varsa -->
                     <tr th:if="${topic.predictionDate != null or !#strings.isEmpty(topic.predictionDate)}">
 
-                        <td th:text="${T(java.time.format.DateTimeFormatter)
-                                                .ofPattern('yyyy-MM-dd')
-                                                .format(topic.predictionDate.atStartOfDay(zoneId))}"
+                        <td id="predictionDatePlaceHolder"
+                            th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.predictionDate.atStartOfDay(zoneId))}"
 
                             class="status-3" style="text-align: center">
                         </td>
@@ -763,6 +764,24 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
             }, 750);
+
+
+            setInterval(function () {
+
+                // PREDICTION DATE BLINK
+                document.querySelectorAll("td[id^='predictionDatePlaceHolder']").forEach(function (td) {
+                    const predictionDate = td.textContent.trim();
+                    if (!predictionDate) return;
+
+                    const tdPrediction = document.querySelector(`td[data-ymd='${predictionDate}']`);
+                    if (!tdPrediction) return;
+
+                    const highlightGradient = 'radial-gradient(circle, LightBlue 30%, rgba(255, 255, 255, 1) 100%)';
+                    toggleBlinkMarker(tdPrediction, highlightGradient);
+                });
+
+            }, 1500);
+
 
         });
 
