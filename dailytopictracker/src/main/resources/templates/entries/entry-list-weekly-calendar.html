@@ -58,6 +58,7 @@ https://github.com/turkerozturk/springtopiccalendar
                             th:attr="title=${entry.key} + ' ' + ${entry.value.id}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                             th:class="'weekly-table-entry-cell status-' + ${entry.value.status}"
                             th:data-ymd="${entry.key}"
+                            style="padding:0;"
                         >
                             @
                         </td>
@@ -69,7 +70,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     <!-- visualising disabled cells, no data, outside of date range -->
                     <th:block th:if="${entry.value.status == -1 }">
                         <td th:text="''"
-                            style="background-color:WhiteSmoke;"
+                            style="background-color:WhiteSmoke;padding:0;"
                             th:attr="title=${entry.value.dateMillisYmd}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                             th:data-ymd="${entry.key}"
                         >
@@ -85,6 +86,8 @@ https://github.com/turkerozturk/springtopiccalendar
                         th:title="${entry.key}"
                         th:attr="onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                         th:data-ymd="${entry.key}"
+                        style="padding:0;"
+
                     >
                         &nbsp;
                     </td>
@@ -150,7 +153,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <span class="col-2">
+            <span class="col-1">
                 <!--
                 <span th:if="${daysSinceFirstDoneEntry != null}"
                       th:text="${'Days since first done: ' + daysSinceFirstDoneEntry}">
@@ -261,7 +264,9 @@ https://github.com/turkerozturk/springtopiccalendar
                     </th:block>
                 </div>
                 -->
+            </span>
 
+        <span class="col-1" style="background-color:WhiteSmoke;">
 
                 <table class="table table-sm table-border">
                     <tr>
@@ -297,11 +302,15 @@ https://github.com/turkerozturk/springtopiccalendar
                         </td>
 
                         <td>
-                            <span th:id="'baseDate-span-' + ${topic.id}"
+                            <span id="baseDatePlaceHolder"
                                   th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}"
+                                  th:data-ymd="${T(java.time.format.DateTimeFormatter)
+                                                  .ofPattern('yyyy-MM-dd')
+                                                  .format(topic.baseDate.atStartOfDay(zoneId))}"
                                   th:text="${T(java.time.format.DateTimeFormatter)
                                                   .ofPattern('yyyy-MM-dd')
-                                                  .format(topic.baseDate.atStartOfDay(zoneId))}">
+                                                  .format(topic.baseDate.atStartOfDay(zoneId))}"
+                            >
                             </span>
                         </td>
                     </tr>
@@ -310,7 +319,7 @@ https://github.com/turkerozturk/springtopiccalendar
                             End date
                         </td>
                         <td>
-                            <span th:id="'endDate-span-' + ${topic.id}"
+                            <span id="endDatePlaceHolder"
                                   th:if="${topic.endDate != null or !#strings.isEmpty(topic.endDate)}"
                                   th:text="${T(java.time.format.DateTimeFormatter)
                                                   .ofPattern('yyyy-MM-dd')
@@ -809,47 +818,47 @@ https://github.com/turkerozturk/springtopiccalendar
             window.blinkIntervalStarted = true;
 
             setInterval(function () {
-                document.querySelectorAll("span[id^='baseDate-span-']").forEach(function (span) {
+                document.querySelectorAll("span[id^='baseDatePlaceHolder']").forEach(function (span) {
                     const baseDate = span.textContent.trim();
                     if (!baseDate) return;
 
                     const tdBase = document.querySelector(`td[data-ymd='${baseDate}']`);
                     if (!tdBase) return;
 
-                    toggleBlinkMarker(tdBase, '⯆');
+
+                    const highlightGradient = 'radial-gradient(circle, ForestGreen 30%, rgba(255, 255, 255, 1) 100%)';
+                    toggleBlinkMarker(tdBase, highlightGradient);
                 });
 
-
-
-
-
-                document.querySelectorAll("span[id^='endDate-span-']").forEach(function (span) {
+                document.querySelectorAll("span[id^='endDatePlaceHolder']").forEach(function (span) {
                     const endDate = span.textContent.trim();
                     if (!endDate) return;
 
                     const tdEnd = document.querySelector(`td[data-ymd='${endDate}']`);
                     if (!tdEnd) return;
 
-                    toggleBlinkMarker(tdEnd, '⯅');
+                    const highlightGradient = 'radial-gradient(circle, RoyalBlue 30%, rgba(255, 255, 255, 1) 100%)';
+                    toggleBlinkMarker(tdEnd, highlightGradient);
                 });
 
-            }, 1500);
-
+            }, 750);
 
         });
 
-        function toggleBlinkMarker(td, markerChar) {
-            if (td.dataset.originalHtml === undefined) {
-                td.dataset.originalHtml = td.innerHTML.trim();
+        function toggleBlinkMarker(td, highlightGradient) {
+            if (td.dataset.originalGradient === undefined) {
+                td.dataset.originalGradient = td.style.background || '';
                 td.dataset.blinkState = 'off';
             }
 
             if (td.dataset.blinkState === 'off') {
-                td.innerHTML = `<span style="font-size: 0.9em;padding:0px;margin:0px;color:red;">${markerChar}</span>`;
                 td.dataset.blinkState = 'on';
+                td.style.background = highlightGradient;
+                td.style.color = 'white';
             } else {
-                td.innerHTML = td.dataset.originalHtml;
                 td.dataset.blinkState = 'off';
+                td.style.background = td.dataset.originalGradient;
+                td.style.color = 'black';
             }
         }
 
