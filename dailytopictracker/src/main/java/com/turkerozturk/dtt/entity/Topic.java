@@ -62,6 +62,9 @@ public class Topic {
     @Column(name = "image_file_name")
     private String imageFileName;
 
+    @Column(name = "interval_rule")
+    private String intervalRule;
+
     /**
      * -- GETTER --
      * Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için
