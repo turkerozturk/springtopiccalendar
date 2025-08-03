@@ -14,13 +14,63 @@ public class OccurrenceParser {
     private List<Integer> occurancesListInOrder;
     private OccuranceType occuranceType;
 
-    public void parse(String input) {
+    public void parse(String inputExtended) {
 
+        if (inputExtended == null || inputExtended.isBlank()) {
+            getDefaultResult();
+            return;
+        }
+
+        String temporaryString = inputExtended;
+        boolean isDisabled = false;
+        boolean isStrict = false;
+        boolean isOpposite = false;
+        String input = null;
+
+        // 1. Başta ' varsa disable et ve baştaki ' karakterini sil
+        if (temporaryString.startsWith("'")) {
+            isDisabled = true;
+            temporaryString = temporaryString.substring(1);
+            getDefaultResult();
+            return;
+            // OccuranceType.DISABLED
+        }
+
+        // 2. İlk rakam karakterinin indeksini bul
+        int firstDigitIndex = -1;
+        for (int i = 0; i < temporaryString.length(); i++) {
+            if (Character.isDigit(temporaryString.charAt(i))) {
+                firstDigitIndex = i;
+                break;
+            }
+        }
+
+        // 3. Eğer rakamdan önce '!' varsa isStrict = true ve sil
+        if (firstDigitIndex > 0) {
+            int strictIndex = temporaryString.indexOf('!');
+            if (strictIndex != -1 && strictIndex < firstDigitIndex) {
+                isStrict = true;
+                temporaryString = temporaryString.substring(0, strictIndex)
+                        + temporaryString.substring(strictIndex + 1);
+            }
+        }
+
+        // 4. Eğer rakamdan önce '-' varsa isOpposite = true ve sil
+        if (firstDigitIndex > 0) {
+            int oppositeIndex = temporaryString.indexOf('-');
+            if (oppositeIndex != -1 && oppositeIndex < firstDigitIndex) {
+                isOpposite = true;
+                temporaryString = temporaryString.substring(0, oppositeIndex)
+                        + temporaryString.substring(oppositeIndex + 1);
+            }
+        }
+
+        // 5. Geriye kalan input string
+        input = temporaryString.trim();
 
         if (input == null || input.isBlank()) {
             getDefaultResult();
         } else {
-
 
             input = input.trim();
 
@@ -38,7 +88,15 @@ public class OccurrenceParser {
                 setPartitionLength(orderList.size());
                 setRandomOccuranceCount(null);
                 setOccurancesListInOrder(orderList);
-                setOccuranceType(OccuranceType.PATTERNED_FILLED_LOOSE);
+                if(isStrict) {
+                    setOccuranceType(OccuranceType.PATTERNED_BOTH_STRICT);
+                } else{
+                    if(isOpposite) {
+                        setOccuranceType(OccuranceType.PATTERNED_EMPTY_LOOSE);
+                    } else {
+                        setOccuranceType(OccuranceType.PATTERNED_FILLED_LOOSE);
+                    }
+                }
             } else if (input.contains("/")) { // Format 2: a/b
                 String[] parts = input.split("/");
                 if (parts.length == 2) {
@@ -46,7 +104,19 @@ public class OccurrenceParser {
                         setPartitionLength(Integer.parseInt(parts[1].trim()));
                         setRandomOccuranceCount(Integer.parseInt(parts[0].trim()));
                         setOccurancesListInOrder(null);
-                        setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
+                        if(isStrict) {
+                            if(isOpposite) {
+                                setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
+                            } else {
+                                setOccuranceType(OccuranceType.RANDOM_EMPTY_STRICT);
+                            }
+                        } else {
+                            if(isOpposite) {
+                                setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
+                            } else {
+                                setOccuranceType(OccuranceType.RANDOM_EMPTY_LOOSE);
+                            }
+                        }
                     } catch (NumberFormatException e) {
                         getDefaultResult();
                     }
@@ -60,7 +130,20 @@ public class OccurrenceParser {
                     setPartitionLength(Integer.parseInt(input));
                     setRandomOccuranceCount(1);
                     setOccurancesListInOrder(null);
-                    setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
+
+                    if(isStrict) {
+                        if(isOpposite) {
+                            setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
+                        } else {
+                            setOccuranceType(OccuranceType.RANDOM_EMPTY_STRICT);
+                        }
+                    } else {
+                        if(isOpposite) {
+                            setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
+                        } else {
+                            setOccuranceType(OccuranceType.RANDOM_EMPTY_LOOSE);
+                        }
+                    }
                 } catch (NumberFormatException e) {
                     getDefaultResult();
                 }

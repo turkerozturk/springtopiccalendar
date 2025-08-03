@@ -12,7 +12,7 @@ public class SuccessAnalyzer {
             OccurrenceParser occurrenceParser) {
 
         // System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
-        List<Integer> reduced = new ArrayList<>();
+
 
         int limit = 0;
         if (offsetB == null) {
@@ -21,8 +21,9 @@ public class SuccessAnalyzer {
             limit = offsetB + 1;
         }
 
-        for (int i = offsetA; i < limit; i += occurrenceParser.getPartitionLength()) {
+        List<Integer> reduced = new ArrayList<>();
 
+        for (int i = offsetA; i < limit; i += occurrenceParser.getPartitionLength()) {
             List<Integer> chunk = new ArrayList<>();
 
             for (int j = 0; j < occurrenceParser.getPartitionLength(); j++) {
@@ -30,57 +31,94 @@ public class SuccessAnalyzer {
                 chunk.add(idx < limit ? rawArray.get(idx) : 0); // pad with 0
             }
 
-            //
             switch (occurrenceParser.getOccuranceType()) {
 
                 case PATTERNED_FILLED_LOOSE:
-                    // match olması için pattern'deki 1'lerin yeri aynı olmalı, diğerleri 0 veya 1 olsa da farketmez.
-                    boolean match = true;
+                    // Pattern'deki 1'lerin olduğu yerlerde chunk da 1 olmalı, diğer yerlere bakılmaz.
+                    boolean matchFilledLoose = true;
                     for (int j = 0; j < occurrenceParser.getOccurancesListInOrder().size(); j++) {
                         if (occurrenceParser.getOccurancesListInOrder().get(j) == 1 && chunk.get(j) != 1) {
-                            match = false;
+                            matchFilledLoose = false;
                             break;
                         }
                     }
-                    reduced.add(match ? 1 : 0);
+                    reduced.add(matchFilledLoose ? 1 : 0);
                     break;
+
                 case PATTERNED_EMPTY_LOOSE:
-                    // TODO match olması için pattern'deki sıfırların yeri aynı olmalı, diğerleri 0 veya 1 olsa da farketmez.
+                    // Pattern'deki 0'ların olduğu yerlerde chunk da 0 olmalı, diğer yerlere bakılmaz.
+                    boolean matchEmptyLoose = true;
+                    for (int j = 0; j < occurrenceParser.getOccurancesListInOrder().size(); j++) {
+                        if (occurrenceParser.getOccurancesListInOrder().get(j) == 0 && chunk.get(j) != 0) {
+                            matchEmptyLoose = false;
+                            break;
+                        }
+                    }
+                    reduced.add(matchEmptyLoose ? 1 : 0);
                     break;
+
                 case PATTERNED_BOTH_STRICT:
-                    // TODO match olması için pattern'deki 1'lerin ve sıfırların yeri birebir aynı olmalı.
+                    // Birebir tüm pattern elemanları chunk ile aynı olmalı.
+                    boolean matchBothStrict = true;
+                    for (int j = 0; j < occurrenceParser.getOccurancesListInOrder().size(); j++) {
+                        if (!chunk.get(j).equals(occurrenceParser.getOccurancesListInOrder().get(j))) {
+                            matchBothStrict = false;
+                            break;
+                        }
+                    }
+                    reduced.add(matchBothStrict ? 1 : 0);
+                    System.out.println("match: " + matchBothStrict);
                     break;
 
                 case ONE_FILLED_IN_ONE:
-                    // 1 tane bir var, pattern length de 1
-                case RANDOM_FILLED_LOOSE:
-                    // 1'lerin sayısı belirtilen kadar veya daha fazla olabilir.
-                    long countOnes = chunk.stream().filter(x -> x == 1).count();
-                    reduced.add(countOnes >= occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
+                    // Pattern length zaten 1, chunk da sadece 1 varsa match
+                    reduced.add((chunk.size() == 1 && chunk.get(0) == 1) ? 1 : 0);
                     break;
+
+                case RANDOM_FILLED_LOOSE:
+                    // Chunk içindeki 1 sayısı istenen sayıdan fazla veya eşitse match
+                    long countOnesLoose = chunk.stream().filter(x -> x == 1).count();
+                    reduced.add(countOnesLoose >= occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
+                    break;
+
                 case RANDOM_FILLED_STRICT:
-                    // TODO 1'lerin sayısı aynı olmalı
+                    // 1 sayısı tam olarak belirtilen sayıya eşitse match
+                    long countOnesStrict = chunk.stream().filter(x -> x == 1).count();
+                    reduced.add(countOnesStrict == occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
                     break;
 
                 case ONE_EMPTY_IN_ONE:
-                    // 1 tane sıfır var, pattern length de 1
-                case RANDOM_EMPTY_LOOSE:
-                    // TODO 0'lerin sayısı belirtilen kadar veya daha fazla olabilir.
+                    // Pattern length zaten 1, chunk da sadece 0 varsa match
+                    reduced.add((chunk.size() == 1 && chunk.get(0) == 0) ? 1 : 0);
                     break;
+
+                case RANDOM_EMPTY_LOOSE:
+                    // 0 sayısı istenen sayıdan fazla veya eşitse match
+                    long countZerosLoose = chunk.stream().filter(x -> x == 0).count();
+                    reduced.add(countZerosLoose >= occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
+                    break;
+
                 case RANDOM_EMPTY_STRICT:
-                    // TODO 0'ların sayısı aynı olmalı
+                    // 0 sayısı tam olarak belirtilen sayıya eşitse match
+                    long countZerosStrict = chunk.stream().filter(x -> x == 0).count();
+                    reduced.add(countZerosStrict == occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
                     break;
 
                 case ALL_FILLED:
-                    // TODO hepsi 1 olmalı
+                    // Tüm elemanlar 1 ise match
+                    boolean allOnes = chunk.stream().allMatch(x -> x == 1);
+                    reduced.add(allOnes ? 1 : 0);
                     break;
+
                 case ALL_EMPTY:
-                    // TODO hepsi 0 olmalı
+                    // Tüm elemanlar 0 ise match
+                    boolean allZeros = chunk.stream().allMatch(x -> x == 0);
+                    reduced.add(allZeros ? 1 : 0);
                     break;
+
                 default:
                     throw new IllegalArgumentException("Either randomOccuranceCount or occurancesListInOrder must be provided.");
             }
-
         }
 
         return reduced;
