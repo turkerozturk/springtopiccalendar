@@ -4,62 +4,89 @@ import java.util.*;
 
 public class SuccessAnalyzer {
 
-    public static List<Integer> getSuccessArray(
+
+    public List<Integer> getSuccessArrayNew(
             List<Integer> rawArray,
-            int offset,
+            int offsetA,
             Integer offsetB,
-            int successDivider,
-            Integer occuranceCount,
-            List<Integer> occuranceOrder) {
+            OccurrenceParser occurrenceParser) {
+
         // System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
         List<Integer> reduced = new ArrayList<>();
+
         int limit = 0;
         if (offsetB == null) {
-
             limit = rawArray.size();
         } else {
             limit = offsetB + 1;
         }
 
-        for (int i = offset; i < limit; i += successDivider) {
-
-            if (successDivider <= 0) {
-                throw new IllegalArgumentException("successDivider must be > 0");
-            }
-            if (occuranceCount == null && (occuranceOrder == null || occuranceOrder.isEmpty())) {
-                throw new IllegalArgumentException("Either occuranceCount or occuranceOrder must be provided.");
-            }
-
+        for (int i = offsetA; i < limit; i += occurrenceParser.getPartitionLength()) {
 
             List<Integer> chunk = new ArrayList<>();
 
-            for (int j = 0; j < successDivider; j++) {
+            for (int j = 0; j < occurrenceParser.getPartitionLength(); j++) {
                 int idx = i + j;
                 chunk.add(idx < limit ? rawArray.get(idx) : 0); // pad with 0
             }
 
-            // Mode 1: occuranceCount ile karar ver
-            if (occuranceCount != null) {
-                long countOnes = chunk.stream().filter(x -> x == 1).count();
-                reduced.add(countOnes >= occuranceCount ? 1 : 0);
-            }
-            // Mode 2: occuranceOrder ile karar ver
-            else if (occuranceOrder != null && !occuranceOrder.isEmpty()) {
-                boolean match = true;
-                for (int j = 0; j < Math.min(successDivider, occuranceOrder.size()); j++) {
-                    if (occuranceOrder.get(j) == 1 && chunk.get(j) != 1) {
-                        match = false;
-                        break;
+            //
+            switch (occurrenceParser.getOccuranceType()) {
+
+                case PATTERNED_FILLED_LOOSE:
+                    // match olması için pattern'deki 1'lerin yeri aynı olmalı, diğerleri 0 veya 1 olsa da farketmez.
+                    boolean match = true;
+                    for (int j = 0; j < occurrenceParser.getOccurancesListInOrder().size(); j++) {
+                        if (occurrenceParser.getOccurancesListInOrder().get(j) == 1 && chunk.get(j) != 1) {
+                            match = false;
+                            break;
+                        }
                     }
-                }
-                reduced.add(match ? 1 : 0);
-            } else {
-                throw new IllegalArgumentException("Either occuranceCount or occuranceOrder must be provided.");
+                    reduced.add(match ? 1 : 0);
+                    break;
+                case PATTERNED_EMPTY_LOOSE:
+                    // TODO match olması için pattern'deki sıfırların yeri aynı olmalı, diğerleri 0 veya 1 olsa da farketmez.
+                    break;
+                case PATTERNED_BOTH_STRICT:
+                    // TODO match olması için pattern'deki 1'lerin ve sıfırların yeri birebir aynı olmalı.
+                    break;
+
+                case ONE_FILLED_IN_ONE:
+                    // 1 tane bir var, pattern length de 1
+                case RANDOM_FILLED_LOOSE:
+                    // 1'lerin sayısı belirtilen kadar veya daha fazla olabilir.
+                    long countOnes = chunk.stream().filter(x -> x == 1).count();
+                    reduced.add(countOnes >= occurrenceParser.getRandomOccuranceCount() ? 1 : 0);
+                    break;
+                case RANDOM_FILLED_STRICT:
+                    // TODO 1'lerin sayısı aynı olmalı
+                    break;
+
+                case ONE_EMPTY_IN_ONE:
+                    // 1 tane sıfır var, pattern length de 1
+                case RANDOM_EMPTY_LOOSE:
+                    // TODO 0'lerin sayısı belirtilen kadar veya daha fazla olabilir.
+                    break;
+                case RANDOM_EMPTY_STRICT:
+                    // TODO 0'ların sayısı aynı olmalı
+                    break;
+
+                case ALL_FILLED:
+                    // TODO hepsi 1 olmalı
+                    break;
+                case ALL_EMPTY:
+                    // TODO hepsi 0 olmalı
+                    break;
+                default:
+                    throw new IllegalArgumentException("Either randomOccuranceCount or occurancesListInOrder must be provided.");
             }
+
         }
 
         return reduced;
     }
+
+
 
     public static double getSuccessRate(List<Integer> reducedArray) {
         if (reducedArray.isEmpty()) return 0.0;

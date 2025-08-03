@@ -292,6 +292,13 @@ https://github.com/turkerozturk/springtopiccalendar
                             Prediction is not set.
 
                         </th:block>
+                        <br/>
+                        <th:block th:if="${topic.intervalRule != null && !#strings.isEmpty(topic.intervalRule)}">
+                            <span th:text="${'Interval Rule: ' + topic.intervalRule}"></span>
+                        </th:block>
+                        <th:block th:if="${topic.intervalRule == null || #strings.isEmpty(topic.intervalRule)}">
+                            <span>Interval rule is not set. The default rule is daily.</span>
+                        </th:block>
 
                     </caption>
                     <thead>

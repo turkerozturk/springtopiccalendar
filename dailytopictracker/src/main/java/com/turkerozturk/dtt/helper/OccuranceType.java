@@ -1,0 +1,15 @@
+package com.turkerozturk.dtt.helper;
+
+public enum OccuranceType {
+    RANDOM_FILLED_LOOSE,
+    RANDOM_FILLED_STRICT,
+    RANDOM_EMPTY_STRICT,
+    RANDOM_EMPTY_LOOSE,
+    PATTERNED_FILLED_LOOSE,
+    PATTERNED_BOTH_STRICT,
+    PATTERNED_EMPTY_LOOSE,
+    ALL_FILLED,
+    ALL_EMPTY,
+    ONE_FILLED_IN_ONE,
+    ONE_EMPTY_IN_ONE
+    }

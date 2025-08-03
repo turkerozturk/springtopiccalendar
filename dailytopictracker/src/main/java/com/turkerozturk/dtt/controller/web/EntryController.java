@@ -27,6 +27,7 @@ import com.turkerozturk.dtt.dto.statistics.OverallStatisticsDTO;
 import com.turkerozturk.dtt.dto.statistics.StreaksDTO;
 import com.turkerozturk.dtt.dto.statistics.SuccessStatisticsDTO;
 import com.turkerozturk.dtt.dto.statistics.WeeklyViewDTO;
+import com.turkerozturk.dtt.helper.OccurrenceParser;
 import com.turkerozturk.dtt.helper.SuccessAnalyzer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -759,12 +760,26 @@ public class EntryController {
         }
 
         //System.out.println("offset: " + offset);
-        int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
+        //int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
         //System.out.println("divider: " + divider);
+
+        OccurrenceParser occurrenceParser = new OccurrenceParser();
+        occurrenceParser.parse(topic.getIntervalRule());
+        System.out.println(topic.getIntervalRule());
 
         //
         if(offsetA != null) {
-            List<Integer> reducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offsetA, offsetB, divider, 1, null);
+            SuccessAnalyzer successAnalyzer = new SuccessAnalyzer();
+            List<Integer> reducedArray = successAnalyzer.getSuccessArrayNew(
+                    rawArray,
+                    offsetA,
+                    offsetB,
+                    occurrenceParser);
+            /*.getPartitionLength(),
+
+                    occurrenceParser.getRandomOccuranceCount(),
+                    occurrenceParser.getOccurancesListInOrder());
+                    */
             //System.out.println("reduced size: " + reducedArray.size());
 
             //System.out.println("reduced: " + reducedArray);
@@ -802,7 +817,9 @@ public class EntryController {
 
             // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
             // divideri 1 kabul ediyoruz o zaman doluluk orani veriyor. // TODO sonradan burasini kaldirip kafa karisikligi ve hsap hatasina mahal vermeyecek bicimde guncelle.
+            /*
             List<Integer> notReducedArray = SuccessAnalyzer.getSuccessArray(rawArray, offsetA, offsetB,1, 1, null);
+
             long patternFillCount = SuccessAnalyzer.getSuccessCount(notReducedArray);
             StringBuilder patternFillText = new StringBuilder();
             patternFillText.append("(" + patternFillCount + " / " + notReducedArray.size() + " days are filled with 'done')");
@@ -814,6 +831,7 @@ public class EntryController {
             patternFillText.append("<br/>");
             patternFillText.append("(from first 'done' day to today)");
             successStatisticsDTO.setPatternFillText(patternFillText.toString());
+            */
 
         }
         // bitti bu kisim patternSuccessRate ile ilgili
