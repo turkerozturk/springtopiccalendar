@@ -37,6 +37,8 @@ public class CustomBanner implements Banner {
         out.println(" |____/ \\__,_|_|_|\\__, ||_|\\___/| .__/|_|\\___||_||_|  \\__,_|\\___|_|\\_\\___|_|   ");
         out.println("                  |___/         |_|                                            ");
         out.println();
+        out.println("Turker Ozturk");
+        out.println();
         out.println(":: Spring Boot :: (v" + SpringBootVersion.getVersion() + ")");
         out.println();
 
