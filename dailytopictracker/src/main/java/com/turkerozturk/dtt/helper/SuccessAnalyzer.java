@@ -1,8 +1,14 @@
 package com.turkerozturk.dtt.helper;
 
+import com.turkerozturk.dtt.configuration.environment.AppConfigReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
 import java.util.*;
 
 public class SuccessAnalyzer {
+
+
 
 
     public List<Integer> getSuccessArrayNew(
@@ -23,8 +29,10 @@ public class SuccessAnalyzer {
 
         List<Integer> reduced = new ArrayList<>();
 
+        int chunkCounterForDebug = 0;
         for (int i = offsetA; i < limit; i += occurrenceParser.getPartitionLength()) {
             List<Integer> chunk = new ArrayList<>();
+            chunkCounterForDebug++;
 
             for (int j = 0; j < occurrenceParser.getPartitionLength(); j++) {
                 int idx = i + j;
@@ -118,6 +126,14 @@ public class SuccessAnalyzer {
                 default:
                     throw new IllegalArgumentException("Either randomOccuranceCount or occurancesListInOrder must be provided.");
             }
+
+            if (AppConfigReader.isDebugIntervalRuleEnabled()) {
+                System.out.println(String.format("%03d", chunkCounterForDebug) + "\t" +
+                        (reduced.get(reduced.size() - 1) == 1 ? "match" : "-----") + "\t" +
+                        String.format("%03d", i + 1) + "\t" +
+                        chunk);
+            }
+
         }
 
         return reduced;
