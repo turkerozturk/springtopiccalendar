@@ -804,7 +804,8 @@ public class EntryController {
 
             long patternSuccessCount = SuccessAnalyzer.getSuccessCount(reducedArray);
             StringBuilder patternSuccessText = new StringBuilder();
-            patternSuccessText.append("(" + patternSuccessCount + " / " + reducedArray.size() + " intervals are 'done')");
+            patternSuccessText.append("(" + patternSuccessCount + " / " + reducedArray.size() + " intervals)");
+            /*
             patternSuccessText.append("<br/>");
             patternSuccessText.append("<br/>");
             patternSuccessText.append(firstDoneEntryDate1 + " to " + today);
@@ -812,6 +813,7 @@ public class EntryController {
             patternSuccessText.append("within " + daysSinceFirstDoneEntryPlusToday + " days");
             patternSuccessText.append("<br/>");
             patternSuccessText.append("(from first 'done' day to today)");
+            */
             successStatisticsDTO.setPatternSuccessText(patternSuccessText.toString());
 
 
