@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.entity;
 
 
+import com.turkerozturk.dtt.helper.OccurrenceParser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -64,6 +65,15 @@ public class Topic {
 
     @Column(name = "interval_rule")
     private String intervalRule;
+
+    @Transient
+    private String intervalRuleInfo;
+
+    public String getIntervalRuleInfo() {
+        OccurrenceParser occurrenceParser = new OccurrenceParser();
+        occurrenceParser.parse(getIntervalRule());
+        return occurrenceParser.toHTML();
+    }
 
     /**
      * -- GETTER --

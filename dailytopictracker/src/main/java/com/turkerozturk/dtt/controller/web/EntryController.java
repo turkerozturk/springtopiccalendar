@@ -765,7 +765,7 @@ public class EntryController {
 
         OccurrenceParser occurrenceParser = new OccurrenceParser();
         occurrenceParser.parse(topic.getIntervalRule());
-        System.out.println(topic.getIntervalRule());
+        //System.out.println(topic.getIntervalRule());
 
         //
         if(offsetA != null) {

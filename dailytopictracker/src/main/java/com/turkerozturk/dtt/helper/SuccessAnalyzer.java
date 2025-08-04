@@ -67,7 +67,6 @@ public class SuccessAnalyzer {
                         }
                     }
                     reduced.add(matchBothStrict ? 1 : 0);
-                    System.out.println("match: " + matchBothStrict);
                     break;
 
                 case ONE_FILLED_IN_ONE:

@@ -14,17 +14,22 @@ public class OccurrenceParser {
     private List<Integer> occurancesListInOrder;
     private OccuranceType occuranceType;
 
-    public void parse(String inputExtended) {
+    private boolean isDisabled; // sinif degiskeni olmasinin sebebi frontend'de bilgi amacli gostermek icin.
+    private boolean isStrict; // sinif degiskeni olmasinin sebebi frontend'de bilgi amacli gostermek icin.
+    private boolean isOpposite; // sinif degiskeni olmasinin sebebi frontend'de bilgi amacli gostermek icin.
+    private String inputExtended; // sinif degiskeni olmasinin sebebi frontend'de bilgi amacli gostermek icin.
 
+    public void parse(String inputExtended) {
+        this.inputExtended = inputExtended;
         if (inputExtended == null || inputExtended.isBlank()) {
             getDefaultResult();
             return;
         }
 
         String temporaryString = inputExtended;
-        boolean isDisabled = false;
-        boolean isStrict = false;
-        boolean isOpposite = false;
+        isDisabled = false;
+        isStrict = false;
+        isOpposite = false;
         String input = null;
 
         // 1. Başta ' varsa disable et ve baştaki ' karakterini sil
@@ -32,8 +37,7 @@ public class OccurrenceParser {
             isDisabled = true;
             temporaryString = temporaryString.substring(1);
             getDefaultResult();
-            return;
-            // OccuranceType.DISABLED
+            return; // varsayilan degerlerleri yani gunde bir kez' atayip geri donuyoruz cunku intervalRule disabled durumda.
         }
 
         // 2. İlk rakam karakterinin indeksini bul
@@ -74,6 +78,7 @@ public class OccurrenceParser {
 
             input = input.trim();
 
+
             // Format 3: Comma-separated list
             if (input.contains(",")) {
                 List<Integer> orderList = new ArrayList<>();
@@ -88,10 +93,10 @@ public class OccurrenceParser {
                 setPartitionLength(orderList.size());
                 setRandomOccuranceCount(null);
                 setOccurancesListInOrder(orderList);
-                if(isStrict) {
+                if (isStrict) {
                     setOccuranceType(OccuranceType.PATTERNED_BOTH_STRICT);
-                } else{
-                    if(isOpposite) {
+                } else {
+                    if (isOpposite) {
                         setOccuranceType(OccuranceType.PATTERNED_EMPTY_LOOSE);
                     } else {
                         setOccuranceType(OccuranceType.PATTERNED_FILLED_LOOSE);
@@ -104,17 +109,17 @@ public class OccurrenceParser {
                         setPartitionLength(Integer.parseInt(parts[1].trim()));
                         setRandomOccuranceCount(Integer.parseInt(parts[0].trim()));
                         setOccurancesListInOrder(null);
-                        if(isStrict) {
-                            if(isOpposite) {
-                                setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
-                            } else {
+                        if (isStrict) {
+                            if (isOpposite) {
                                 setOccuranceType(OccuranceType.RANDOM_EMPTY_STRICT);
+                            } else {
+                                setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
                             }
                         } else {
-                            if(isOpposite) {
-                                setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
-                            } else {
+                            if (isOpposite) {
                                 setOccuranceType(OccuranceType.RANDOM_EMPTY_LOOSE);
+                            } else {
+                                setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
                             }
                         }
                     } catch (NumberFormatException e) {
@@ -130,18 +135,17 @@ public class OccurrenceParser {
                     setPartitionLength(Integer.parseInt(input));
                     setRandomOccuranceCount(1);
                     setOccurancesListInOrder(null);
-
-                    if(isStrict) {
-                        if(isOpposite) {
-                            setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
-                        } else {
+                    if (isStrict) {
+                        if (isOpposite) {
                             setOccuranceType(OccuranceType.RANDOM_EMPTY_STRICT);
+                        } else {
+                            setOccuranceType(OccuranceType.RANDOM_FILLED_STRICT);
                         }
                     } else {
-                        if(isOpposite) {
-                            setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
-                        } else {
+                        if (isOpposite) {
                             setOccuranceType(OccuranceType.RANDOM_EMPTY_LOOSE);
+                        } else {
+                            setOccuranceType(OccuranceType.RANDOM_FILLED_LOOSE);
                         }
                     }
                 } catch (NumberFormatException e) {
@@ -151,6 +155,7 @@ public class OccurrenceParser {
         }
     }
 
+    // varsayilan degerler, eger bir kural yoksa veya hata varsa veya hicbir kurala uymuyorsa veya disabled ise bu degerler atanir.
     private void getDefaultResult() {
         setPartitionLength(1);
         setRandomOccuranceCount(1);
@@ -158,14 +163,131 @@ public class OccurrenceParser {
         setOccuranceType(OccuranceType.ONE_FILLED_IN_ONE);
     }
 
+    private static final String YES = "Yes";
+    private static final String NO = "No";
 
-    @Override
-    public String toString() {
-        return "Type: " + occuranceType + " ( partitionCount=" + partitionLength +
-                ", randomOccuranceCount=" + randomOccuranceCount +
-                ") OR ( occurancesListInOrder=" + occurancesListInOrder + " )";
+    public String toHTML() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<table style=\"border: solid 1px; text-align:left;width:100%;\">\n");
+
+
+        sb.append("<tr><td colspan=\"2\" ")
+                .append("style=\"font-weight:bold; text-align:center;\" ")
+                .append("title=\"")
+                .append(inputExtended != null ? inputExtended : "")
+                .append("\"")
+                .append(">Interval Rule</td></tr>\n");
+
+
+        sb.append("<tr><td title=\"isDisabled\">Active?</td><td>")
+                .append(!isDisabled ? YES : NO)
+                .append("</td></tr>\n");
+
+        // Normal değişkenler: 2 sütunlu satırlar
+        sb.append("<tr><td title=\"partitionLength\">Length</td><td>")
+                .append(partitionLength != null ? partitionLength : "")
+                .append("</td></tr>\n");
+
+        sb.append("<tr><td colspan=\"2\" ")
+                .append("style=\"font-weight:bold; text-align:center;\" ")
+                .append("title=\"")
+                .append(occuranceType != null ? occuranceType.toString() : "")
+                .append("\"")
+                .append(">Occurance Type</td></tr>\n");
+
+         if (isDisabled) {
+            sb.append("<tr><td colspan=\"2\">\n")
+                    .append("<span>The existing interval rule is disabled. You can enable it by removing the ' character at the beginning of the rule text. The default rule is daily.</span>")
+                    .append("</td></tr>\n");
+        } else if (occuranceType.equals(OccuranceType.PATTERNED_BOTH_STRICT) ||
+                occuranceType.equals(OccuranceType.PATTERNED_FILLED_LOOSE) ||
+                occuranceType.equals(OccuranceType.PATTERNED_EMPTY_LOOSE)) {
+
+            // Special case: occurancesListInOrder
+            sb.append("<tr><td colspan=\"2\" style=\"font-weight:bold; text-align:center;\">Pattern</td></tr>\n");
+
+            sb.append("<tr><td colspan=\"2\">\n");
+            sb.append("<table style=\"border-collapse: collapse;margin:auto;\">\n");
+
+            int tableRowDivider = 14;
+            if (occurancesListInOrder != null) {
+                for (int i = 0; i < occurancesListInOrder.size(); i++) {
+                    if (i % tableRowDivider == 0) {
+                        sb.append("<tr>\n");
+                    }
+
+                    int value = occurancesListInOrder.get(i);
+                    String bgColor = value == 1 ? "PaleGreen" : "white";
+
+                    sb.append("<td style=\"width:15px; height:15px; text-align:center; background-color:")
+                            .append(bgColor)
+                            .append("; border:1px solid #ccc; font-size:10px;\">")
+                            .append(value)
+                            .append("</td>\n");
+
+                    if (i % tableRowDivider == (tableRowDivider - 1) || i == occurancesListInOrder.size() - 1) {
+                        sb.append("</tr>\n");
+                    }
+                }
+            }
+
+            sb.append("</table>\n");
+            sb.append("</td></tr>\n");
+
+
+        } else if (occuranceType.equals(OccuranceType.RANDOM_FILLED_LOOSE) ||
+                occuranceType.equals(OccuranceType.RANDOM_FILLED_STRICT) ||
+                occuranceType.equals(OccuranceType.RANDOM_EMPTY_STRICT) ||
+                occuranceType.equals(OccuranceType.RANDOM_EMPTY_LOOSE) ) {
+
+             sb.append("<tr><td title=\"inputExtended\">Rule</td><td>")
+                     .append(inputExtended != null ? inputExtended : "")
+                     .append("</td></tr>\n");
+
+            sb.append("<tr><td title=\"randomOccuranceCount\">Random Count</td><td>")
+                    .append(randomOccuranceCount != null ? randomOccuranceCount : "")
+                    .append("</td></tr>\n");
+
+        } else if (occuranceType.equals(OccuranceType.ONE_FILLED_IN_ONE) ||
+                occuranceType.equals(OccuranceType.ONE_EMPTY_IN_ONE)  ) {
+
+            sb.append("<tr><td title=\"randomOccuranceCount\">Random Count</td><td>")
+                    .append(randomOccuranceCount != null ? randomOccuranceCount : "")
+                    .append("</td></tr>\n");
+
+        } else {
+            sb.append("<tr><td colspan=\"2\">\n")
+                    .append("<span>The interval rule is not set. The default rule is daily.</span>")
+                    .append("</td></tr>\n");
+        }
+
+       // "The default rule is daily. Days marked as \"done\" are considered.";
+
+        if(!isDisabled) {
+            sb.append("<tr><td title=\"isStrict\">Strict?")
+                    .append(isStrict == true ? " <b class=\"blink\">!</b>" : "")
+                    .append("</td><td>")
+                    .append(isStrict == true ? YES : NO)
+                    .append("</td></tr>\n");
+
+            sb.append("<tr><td title=\"isOpposite\">Opposite?")
+                    .append(isOpposite == true ? " <b class=\"blink\">-</b>" : "")
+                    .append("</td><td>")
+                    .append(isOpposite == true ? YES : NO)
+                    .append("</td></tr>\n");
+
+        }
+
+
+        sb.append("</table>");
+
+        return sb.toString();
     }
 
+
+
+    /*
     // Test
     public static void main(String[] args) {
         List<String> testInputs = Arrays.asList("2", "3/5", "0,1,0,1,0,0", "abc", null, "4/xyz");
@@ -177,8 +299,7 @@ public class OccurrenceParser {
             System.out.println(occurrenceParser + " <- " + "Raw Input: " + input);
         }
     }
-
-
+    */
 
 
 }
