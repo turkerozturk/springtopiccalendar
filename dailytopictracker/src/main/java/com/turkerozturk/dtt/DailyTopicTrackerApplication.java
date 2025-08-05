@@ -37,14 +37,26 @@ public class DailyTopicTrackerApplication {
 
 
     public static void main(String[] args) {
-        // Eğer args[0] varsa, sqlite dosya adı olarak kullan
+        // Eger args[0] varsa, sqlite dosya adi olarak kullan
         if (args.length > 0 && !args[0].isBlank()) {
             System.setProperty("spring.datasource.url", "jdbc:sqlite:" + args[0]);
+
+            Flyway.configure()
+                    .dataSource("jdbc:sqlite:" + args[0], null, null)
+                    .load()
+                    .migrate();
+
+        } else {
+            Flyway.configure()
+                    .dataSource("jdbc:sqlite:mydatabase.db", null, null)
+                    .load()
+                    .migrate();
         }
-        //SpringApplication.run(DailyTopicTrackerApplication.class, args);
+
         SpringApplication app = new SpringApplication(DailyTopicTrackerApplication.class);
         app.setBanner(new CustomBanner()); // DailyTopicTracker asciiart on console
         app.run(args);
+
     }
 
 
