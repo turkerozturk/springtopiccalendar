@@ -80,16 +80,6 @@
            color: blue;
        }
 
-       /* Mevcut sütun hizalama stilleri */
-       .add-entry-column {
-           text-align: center;
-       }
-       .edit-topic-column {
-           text-align: center;
-       }
-       .delete-topic-column {
-           text-align: center;
-       }
 
        /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
        #topicsTable input.form-control {
@@ -224,19 +214,21 @@ body {
            style="margin-top: 10px; border-collapse: collapse;">
         <thead>
         <tr>
-            <th>Delete</th>
+            <th style="cursor: pointer;">ID</th>
             <!-- Sıralamayı kolona tıklayarak yaptırmak için onclick -->
-            <th style="cursor: pointer;" onclick="sortTable(1)">ID</th>
-            <th style="cursor: pointer;" onclick="sortTable(2)">Category Name</th>
-            <th>Entry</th>
-            <th style="cursor: pointer;" onclick="sortTable(4)">Topic Name</th>
-            <th style="cursor: pointer;" onclick="sortTable(5)">Description</th>
-            <th style="cursor: pointer;" onclick="sortTable(6)" title="Pinned">📌</th>
+            <!-- <th style="cursor: pointer;">Category Name</th> -->
 
-            <th>Entries</th>
-            <th>Prediction</th>
-            <th>Weight</th>
-            <th>#</th>
+            <th style="cursor: pointer;">Topic Name</th>
+            <!-- <th style="cursor: pointer;">Description</th> -->
+            <!--
+            <th style="cursor: pointer;" title="Pinned">📌</th>
+            -->
+
+            <!-- <th>Entries</th> -->
+            <!-- <th>Prediction</th> -->
+            <!-- <th>Weight</th> -->
+            <!-- <th>#</th> -->
+            <th>Actions</th>
 
 
         </tr>
@@ -247,54 +239,81 @@ body {
         <tbody>
         <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
         <tr th:each="topic, iStat : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
-            <td class="delete-topic-column">
-                <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-                   onclick="return confirm('Are you sure to delete this topic?')">
-                    Delete
-                </a>
+
+            <td style="text-align:center;">
+                <span
+                        th:text="${zeroPaddedTopicId}">
+                    topic id
+                </span>
             </td>
-            <td class="edit-topic-column">
-                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                   th:text="${zeroPaddedTopicId}">
-                    Edit
-                </a>
-            </td>
+
+
+
+
             <!-- Category Name -->
+            <!--
             <td class="crop-text">
                 <a th:href="@{/categories/edit/{id}(id=${topic.category.id}, returnPage= 'topics')}"
                    th:text="${topic.category.name}">
                     Edit Category Name
                 </a>
             </td>
+            -->
 
 
-            <!-- Quick Add Entry -->
-            <td class="add-entry-column">
-                <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
-                   title="+">
-                    +
-                </a>
-            </td>
+
+
             <!-- Topic Name -->
             <td th:text="${topic.name}" class="crop-text">Sample Topic</td>
             <!-- Description -->
-            <td th:text="${topic.description}" class="crop-text">Sample Description</td>
+            <!-- <td th:text="${topic.description}" class="crop-text">Sample Description</td> -->
 
+            <!--
             <td class="text-center">
                 <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
             </td>
+            -->
 
-            <td>
+
+
+
+            <!-- <td th:text="${topic.someTimeLater}">Prediction as Number</td> -->
+
+            <!-- <td th:text="${topic.weight}">Weight as Number</td> -->
+
+
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <!--
+            <td th:text="${iStat.index + 1}">
+            </td>
+            -->
+
+            <td style="text-align:center;">
+                &nbsp;
+                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                   title="Edit Topic">
+                    ✎
+                </a>
+                &nbsp;
+                <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
+                   onclick="return confirm('Are you sure to delete this topic?')"
+                   title="Delete Topic">
+                    🗑
+                </a>
+                &nbsp;
+                <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
+                   title="Add Entry">
+                    +
+                </a>
+                &nbsp;
                 <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
-                   th:text="'☰'">
+                   th:text="'☰'"
+                    title="List Entries">
                     Entries List
                 </a>
-                <!--
-                <a th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
-                   th:text="'📅'">
-                    Entries Weekly Calendar View
-                </a>
-                -->
+                &nbsp;
+
+
                 <a
                         th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
                         th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
@@ -302,20 +321,13 @@ body {
                         hx-trigger="click"
                         hx-swap="innerHTML"
                         onclick="document.getElementById('modal').style.display='block'; return false;"
+                        title="View Weekly Calendar";
                         th:text="'📅'">
                     View Weekly Calendar
                 </a>
+                &nbsp;
 
             </td>
-
-            <td th:text="${topic.someTimeLater}">Prediction as Number</td>
-            <td th:text="${topic.weight}">Weight as Number</td>
-
-
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <td th:text="${iStat.index + 1}">
-            </td>
-
 
 
         </tr>

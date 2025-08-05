@@ -21,8 +21,15 @@
 package com.turkerozturk.dtt;
 
 import com.turkerozturk.dtt.configuration.banner.CustomBanner;
+import org.flywaydb.core.Flyway;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+
+import javax.sql.DataSource;
 
 @SpringBootApplication
 public class DailyTopicTrackerApplication {
@@ -39,4 +46,32 @@ public class DailyTopicTrackerApplication {
         app.setBanner(new CustomBanner()); // DailyTopicTracker asciiart on console
         app.run(args);
     }
+
+    @Bean
+    @DependsOn("flyway") // Flyway bitmeden Hibernate başlamasın
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(dataSource);
+        // diğer konfigürasyonlar (gerekirse)
+        return em;
+    }
+
+    @Bean
+    public Flyway flyway(DataSource dataSource) {
+        Flyway flyway = Flyway.configure()
+                .dataSource(dataSource)
+                .locations("classpath:db/migration")
+                .baselineOnMigrate(false)  // gerekiyorsa true yap
+                .load();
+        return flyway;
+    }
+
+
+    @Bean
+    CommandLineRunner runMigrations(Flyway flyway) {
+        return args -> {
+            flyway.migrate(); // elle tetikle
+        };
+    }
+
 }

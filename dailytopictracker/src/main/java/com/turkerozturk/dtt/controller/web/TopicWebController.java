@@ -38,9 +38,7 @@ import java.io.File;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -71,14 +69,28 @@ public class TopicWebController {
         var categoryList = categoryService.getAllCategories();
 
         // Eğer kategori ID geldiyse filtreli liste, yoksa tüm liste
-        List<Topic> topicList;
+        List<Topic> topicList = null;
         if (categoryId != null) {
             topicList = topicService.getTopicsByCategoryId(categoryId);
             model.addAttribute("selectedCategoryId", categoryId);
         } else {
-            topicList = topicService.getAllTopics();
-            // Seçili kategori yoksa null bırakabiliriz
-            model.addAttribute("selectedCategoryId", null);
+            // Önce en küçük ID'li kategoriyi bul
+            Optional<Category> firstCategoryOpt = categoryService.findFirstByOrderByIdAsc();
+
+            if (firstCategoryOpt.isPresent()) {
+                Category firstCategory = firstCategoryOpt.get();
+
+                // Bu kategoriye ait topic'leri al
+                topicList = topicService.getTopicsByCategoryId(firstCategory.getId());
+
+                model.addAttribute("topics", topicList);
+                model.addAttribute("selectedCategoryId", firstCategory.getId());
+            } else {
+                // Eğer hiç kategori yoksa boş liste gönder
+                model.addAttribute("topics", Collections.emptyList());
+                model.addAttribute("selectedCategoryId", null);
+            }
+
         }
 
         // Modele eklemeler
