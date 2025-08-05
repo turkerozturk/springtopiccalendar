@@ -47,31 +47,6 @@ public class DailyTopicTrackerApplication {
         app.run(args);
     }
 
-    @Bean
-    @DependsOn("flyway") // Flyway bitmeden Hibernate başlamasın
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource);
-        // diğer konfigürasyonlar (gerekirse)
-        return em;
-    }
 
-    @Bean
-    public Flyway flyway(DataSource dataSource) {
-        Flyway flyway = Flyway.configure()
-                .dataSource(dataSource)
-                .locations("classpath:db/migration")
-                .baselineOnMigrate(false)  // gerekiyorsa true yap
-                .load();
-        return flyway;
-    }
-
-
-    @Bean
-    CommandLineRunner runMigrations(Flyway flyway) {
-        return args -> {
-            flyway.migrate(); // elle tetikle
-        };
-    }
 
 }
