@@ -665,6 +665,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 <div th:utext="${topic.intervalRuleInfo}"></div>
 
 
+                <button class="btn btn-outline-info btn-sm" onclick="showPatternHelp()">?</button>
 
 
 
@@ -1086,6 +1087,41 @@ https://github.com/turkerozturk/springtopiccalendar
           }
         });
     </script>
+
+    <script>
+        function showPatternHelp() {
+            const htmlContent = `
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr><th>Character</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Exact match for ONE</td></tr>
+                    <tr><td>0</td><td>Exact match for ZERO</td></tr>
+                    <tr><td>?</td><td>Either 0 or 1 is allowed</td></tr>
+                    <tr><td>*</td><td>At least one must be ONE</td></tr>
+                    <tr><td>&amp;</td><td>At least one must be ZERO</td></tr>
+                    <tr><td>%</td><td>Exactly one must be ONE</td></tr>
+                    <tr><td>#</td><td>Exactly one must be ZERO</td></tr>
+                    <tr><td>+</td><td>All must be either all ONEs or all ZEROs</td></tr>
+                    <tr><td>$</td><td>Exactly two must be ONE</td></tr>
+                    <tr><td>@</td><td>Exactly two must be ZERO</td></tr>
+                    <tr><td>^</td><td>All must be ONE</td></tr>
+                    <tr><td>|</td><td>All must be ZERO</td></tr>
+                </tbody>
+            </table>
+            `;
+
+            const modalBody = document.querySelector('#noteModal2 .modal-body');
+            const modalTitle = document.getElementById('noteModal2Label');
+            if (modalBody && modalTitle) {
+                modalBody.innerHTML = htmlContent;
+                modalTitle.textContent = 'Pattern Help';
+                new bootstrap.Modal(document.getElementById('noteModal2')).show();
+            }
+        }
+    </script>
+
 
 
 </div>
