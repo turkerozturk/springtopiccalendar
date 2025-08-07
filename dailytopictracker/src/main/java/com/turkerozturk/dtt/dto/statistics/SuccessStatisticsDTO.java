@@ -34,4 +34,6 @@ public class SuccessStatisticsDTO {
     private String patternSuccessText;
 
     private String patternFillText;
+
+    private String debugResult;
 }

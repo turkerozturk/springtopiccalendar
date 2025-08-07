@@ -21,7 +21,7 @@ public class SuccessAnalyzer {
     private static final String CARET_SIGN = "^"; // hepsi ONE olmalı
     private static final String PIPE_SIGN = "|"; // hepsi ZERO olmalı
 
-
+    private String debugResult;
 
     public List<Integer> getSuccessArrayNew(
             List<String> rawArray,
@@ -30,6 +30,8 @@ public class SuccessAnalyzer {
             OccurrenceParser occurrenceParser) {
 
         // System.out.println("rawArray: " + rawArray + ", size: " + rawArray.size());
+
+        StringBuilder debugResult = new StringBuilder();
 
 
         int limit = 0;
@@ -341,13 +343,22 @@ public class SuccessAnalyzer {
             }
 
             if (AppConfigReader.isDebugIntervalRuleEnabled()) {
-                System.out.println(String.format("%03d", chunkCounterForDebug) + "\t" +
+                        String debugString =
+                        String.format("%03d", chunkCounterForDebug) + "\t" +
                         (reduced.get(reduced.size() - 1) == 1 ? "match" : "-----") + "\t" +
                         String.format("%03d", i + 1) + "\t" +
-                        chunk);
+                        chunk;
+
+                debugResult.append(debugString);
+                debugResult.append("<br/>");
+
+
             }
 
         }
+
+        setDebugResult(debugResult.toString());
+
 
         return reduced;
     }
@@ -413,6 +424,13 @@ public class SuccessAnalyzer {
         return null;
     }
 
+    public String getDebugResult() {
+        return debugResult;
+    }
+
+    public void setDebugResult(String debugResult) {
+        this.debugResult = debugResult;
+    }
 
     /*
     public static List<Integer> convertEntriesMapToRawArray(Map<Long, Entry> entriesMap) {

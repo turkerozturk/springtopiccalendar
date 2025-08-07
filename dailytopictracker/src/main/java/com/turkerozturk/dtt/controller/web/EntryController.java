@@ -294,6 +294,7 @@ public class EntryController {
         model.addAttribute("patternSuccessRate", successStatisticsDTO.getPatternSuccessRate());
         model.addAttribute("patternSuccessText", successStatisticsDTO.getPatternSuccessText());
         model.addAttribute("patternFillText", successStatisticsDTO.getPatternFillText());
+        model.addAttribute("patternDebugResult", successStatisticsDTO.getDebugResult());
 
 
 
@@ -781,6 +782,7 @@ public class EntryController {
                     occurrenceParser.getOccurancesListInOrder());
                     */
             //System.out.println("reduced size: " + reducedArray.size());
+            successStatisticsDTO.setDebugResult(successAnalyzer.getDebugResult());
 
             //System.out.println("reduced: " + reducedArray);
             double patternSuccessRate = SuccessAnalyzer.getSuccessRate(reducedArray);
@@ -837,6 +839,7 @@ public class EntryController {
 
         }
         // bitti bu kisim patternSuccessRate ile ilgili
+
 
         return successStatisticsDTO;
     }

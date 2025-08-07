@@ -667,6 +667,10 @@ https://github.com/turkerozturk/springtopiccalendar
 
                 <button class="btn btn-outline-info btn-sm" onclick="showPatternHelp()">?</button>
 
+                <button class="btn btn-outline-secondary btn-sm" onclick="showPatternDebug()">Show Pattern Debug</button>
+
+                            <!-- Değişkeni saklayan gizli alan -->
+                <div id="patternDebugData" th:data-pattern="${patternDebugResult}" style="display: none;"></div>
 
 
             </span>
@@ -1122,6 +1126,22 @@ https://github.com/turkerozturk/springtopiccalendar
         }
     </script>
 
+
+    <script>
+        function showPatternDebug() {
+            const patternData = document.getElementById('patternDebugData').dataset.pattern;
+
+            const modalBody = document.querySelector('#noteModal2 .modal-body');
+            const modalTitle = document.getElementById('noteModal2Label');
+            if (modalBody && modalTitle) {
+                //modalBody.textContent = patternData; // pre-line sayesinde satırları korur
+                modalBody.innerHTML = patternData; // örneğin renklendirilmiş HTML varsa
+
+                modalTitle.textContent = 'Pattern Debug Info';
+                new bootstrap.Modal(document.getElementById('noteModal2')).show();
+            }
+        }
+    </script>
 
 
 </div>
