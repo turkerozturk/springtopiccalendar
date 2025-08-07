@@ -11,5 +11,7 @@ public enum OccuranceType {
     ALL_FILLED,
     ALL_EMPTY,
     ONE_FILLED_IN_ONE,
+    PATTERNED_SEMI_STRICT,
+    PATTERNED_ADVANCED,
     ONE_EMPTY_IN_ONE
     }

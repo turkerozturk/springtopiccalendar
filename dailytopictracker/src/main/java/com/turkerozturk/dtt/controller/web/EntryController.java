@@ -731,13 +731,13 @@ public class EntryController {
 
         List<LocalDate> dateRangeBetweenAlignedStartDateAndToday =
                 filterService.buildDateRangeList(startDateAlignedToWeek, today);
-        List<Integer> rawArray = new ArrayList<>(); // tarih araligi boyunca 1 ve 0 lardan olusan doluluk bosluk dizisi.
+        List<String> rawArray = new ArrayList<>(); // tarih araligi boyunca 1 ve 0 lardan olusan doluluk bosluk dizisi.
 
         for(LocalDate d : dateRangeBetweenAlignedStartDateAndToday) {
             if(entryMap.containsKey(d)) {
-                rawArray.add(entryMap.get(d).getStatus() == 1 ? 1 : 0); // entry.status 1 olanlar dolu yani 1, digerleri 0 yani bos.
+                rawArray.add(entryMap.get(d).getStatus() == 1 ? "1" : "0"); // entry.status 1 olanlar dolu yani 1, digerleri 0 yani bos.
             } else {
-                rawArray.add(0); // entry zaten yok ve bos yani 0.
+                rawArray.add("0"); // entry zaten yok ve bos yani 0.
             }
         }
 

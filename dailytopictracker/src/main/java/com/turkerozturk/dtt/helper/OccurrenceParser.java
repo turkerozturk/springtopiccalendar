@@ -11,7 +11,7 @@ public class OccurrenceParser {
 
     private Integer partitionLength;
     private Integer randomOccuranceCount;
-    private List<Integer> occurancesListInOrder;
+    private List<String> occurancesListInOrder;
     private OccuranceType occuranceType;
 
     private boolean isDisabled; // sinif degiskeni olmasinin sebebi frontend'de bilgi amacli gostermek icin.
@@ -80,12 +80,13 @@ public class OccurrenceParser {
 
 
             // Format 3: Comma-separated list
-            if (input.contains(",")) {
-                List<Integer> orderList = new ArrayList<>();
-                String[] parts = input.split(",");
+            if (!input.contains("/")) {
+                List<String> orderList = new ArrayList<>();
+                String[] parts = input.split("");
+
                 for (String part : parts) {
                     try {
-                        orderList.add(Integer.parseInt(part.trim()));
+                        orderList.add(part.trim());
                     } catch (NumberFormatException e) {
                         getDefaultResult(); // Invalid entry
                     }
@@ -93,15 +94,24 @@ public class OccurrenceParser {
                 setPartitionLength(orderList.size());
                 setRandomOccuranceCount(null);
                 setOccurancesListInOrder(orderList);
+
+                setOccuranceType(OccuranceType.PATTERNED_ADVANCED);
+
+                /*
                 if (isStrict) {
-                    setOccuranceType(OccuranceType.PATTERNED_BOTH_STRICT);
+                    //setOccuranceType(OccuranceType.PATTERNED_BOTH_STRICT);
+                    setOccuranceType(OccuranceType.PATTERNED_ADVANCED);
+
                 } else {
                     if (isOpposite) {
                         setOccuranceType(OccuranceType.PATTERNED_EMPTY_LOOSE);
                     } else {
-                        setOccuranceType(OccuranceType.PATTERNED_FILLED_LOOSE);
+                       // setOccuranceType(OccuranceType.PATTERNED_FILLED_LOOSE);
+                        setOccuranceType(OccuranceType.PATTERNED_SEMI_STRICT);
+
                     }
                 }
+                */
             } else if (input.contains("/")) { // Format 2: a/b
                 String[] parts = input.split("/");
                 if (parts.length == 2) {
@@ -202,7 +212,9 @@ public class OccurrenceParser {
                     .append("</td></tr>\n");
         } else if (occuranceType.equals(OccuranceType.PATTERNED_BOTH_STRICT) ||
                 occuranceType.equals(OccuranceType.PATTERNED_FILLED_LOOSE) ||
-                occuranceType.equals(OccuranceType.PATTERNED_EMPTY_LOOSE)) {
+                occuranceType.equals(OccuranceType.PATTERNED_EMPTY_LOOSE) ||
+                 occuranceType.equals(OccuranceType.PATTERNED_SEMI_STRICT) ||
+                         occuranceType.equals(OccuranceType.PATTERNED_ADVANCED) ) {
 
             // Special case: occurancesListInOrder
             sb.append("<tr><td colspan=\"2\" style=\"font-weight:bold; text-align:center;\">Pattern</td></tr>\n");
@@ -217,8 +229,13 @@ public class OccurrenceParser {
                         sb.append("<tr>\n");
                     }
 
-                    int value = occurancesListInOrder.get(i);
-                    String bgColor = value == 1 ? "PaleGreen" : "white";
+                    String value = occurancesListInOrder.get(i);
+                    String bgColor = "white";
+                    if(value.equals("1")) {
+                        bgColor = "PaleGreen";
+                    } else if(value.equals("?")) {
+                        bgColor = "Yellow";
+                    }
 
                     sb.append("<td style=\"width:15px; height:15px; text-align:center; background-color:")
                             .append(bgColor)
