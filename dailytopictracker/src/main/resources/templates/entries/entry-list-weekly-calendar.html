@@ -66,13 +66,26 @@ https://github.com/turkerozturk/springtopiccalendar
                 <th:block th:if="${entry.value != null }">
                     <th:block th:if="${entry.value.status != -1 }">
                         <td th:text="${entry.value.status}"
-                            th:attr="title=${entry.key} + ' ' + ${entry.value.id}, onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                            th:attr="title=${entry.key} + ' ' + ${entry.value.id},
+                            onmouseenter='showCustomTooltip(this)',
+                            onmouseleave='hideCustomTooltip()',
+                            hx-get=@{/entries/{id}/note-full(id=${entry.value.id})}"
                             th:class="'weekly-table-entry-cell status-' + ${entry.value.status}"
                             th:data-ymd="${entry.key}"
                             style="padding:0;"
+
+                            hx-trigger="click"
+                            hx-target="#noteModal2 .modal-body"
+                            hx-swap="innerHTML"
+
+
                         >
                             @
                         </td>
+
+
+
+
 
 
                     </th:block>
@@ -670,7 +683,21 @@ https://github.com/turkerozturk/springtopiccalendar
         <h2 id="custom-tooltip-text" style="margin: 0; font-size: 1.5rem;"></h2>
     </div>
 
-
+    <!-- sayfanın en altına yakın bir yere ekleyin -->
+    <div class="modal fade" id="noteModal2" tabindex="-1" aria-labelledby="noteModal2Label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noteModal2Label">Note Detail</h5>
+                    &nbsp;
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn2">Copy</button>
+                </div>
+                <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
+                    <!-- HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor -->
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     <!-- trend intervals chart ikinci varyasyon -->
@@ -1040,7 +1067,25 @@ https://github.com/turkerozturk/springtopiccalendar
         }
     </script>
 
+    <script>
+        // HTMX olayı: içerik yüklendikten hemen sonra
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+          // Eğer swap hedefi modal-body içindeyse
+          if (evt.detail.target.closest('#noteModal2 .modal-body')) {
+            // Bootstrap modal’ı göster
+            var modalEl = document.getElementById('noteModal2');
+            var modal = new bootstrap.Modal(modalEl);
+            modal.show();
 
+            // Copy butonunu bağla
+            document.getElementById('copyNoteBtn2').onclick = function() {
+              var text = modalEl.querySelector('.modal-body').innerText;
+              navigator.clipboard.writeText(text)
+                .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
+            };
+          }
+        });
+    </script>
 
 
 </div>
