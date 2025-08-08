@@ -336,8 +336,8 @@ public class MeasurementParser implements NoteFieldStructure {
                         .append(String.format("%.2f", diffSumBelowAverage));
                 sb.append("</td>");
 
-                sb.append("<td>");
-                sb.append(sumTotal);
+                sb.append("<td>")
+                        .append(String.format("%.2f", sumTotal));
                 sb.append("</td>");
             sb.append("</tr>");
 
