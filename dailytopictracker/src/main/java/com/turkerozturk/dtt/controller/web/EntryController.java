@@ -267,16 +267,37 @@ public class EntryController {
         Topic topic = topicRepository.findById(topicId).get();
         model.addAttribute("topic", topic);
 
+        Long topicBaseDateMillis = null;
+        if (topic.getBaseDateMillisYmd() != null) { // TODO ve basedate arrayde yoksa, cok eskiyse veya todayden veya enddatedan yeniyse olmayacak sekilde kural koy.
+            topicBaseDateMillis = topic.getBaseDateMillisYmd();
+        } else {
+            topicBaseDateMillis = startDateMillis;
+        }
+
+        Long topicEndDateMillis = null;
+        if (topic.getEndDateMillisYmd() != null) { // TODO ve enddate arrayde yoksa, cok eskiyse veya basedateten eskiyse veya bugunden yeniyse olmayacak sekilde kural koy.
+            topicEndDateMillis = topic.getEndDateMillisYmd();
+        } else {
+            topicEndDateMillis = endDateMillis;
+        }
+
+        // ONEMLI: varsa topicdeki base ve enddate tarih araligina gore daha kisitli veri getirir.
+        // Yani 365 gunluk entries in alt kumesi veya aynisi olabilir.
+        List<Entry> manualEntries = entryService.findByTopicIdAndDateInterval(topicId, topicBaseDateMillis, topicEndDateMillis);
+
+
         // basla bu kisim entry.note lerin topic.dataClassName'da yazan sinif adina gore parse edilmesi
 
         // The critical difference is that isBlank() returns true for whitespace characters, like some escape sequences.
         // On the other hand, isEmpty() only returns true when the String doesn’t contain any character.
         if(topic.getDataClassName() != null && !topic.getDataClassName().isBlank()) {
-            NoteFieldStructure parser = ParserFactory.create(topic.getDataClassName());
-            parser.parseRawData(entries);
+            NoteFieldStructure customParserClass = ParserFactory.create(topic.getDataClassName());
 
-            model.addAttribute("parserReport", parser.getReport());
-            model.addAttribute("parsedDataAsJSON", parser.getParsedDataAsJSON());
+
+            customParserClass.parseRawData(manualEntries);
+
+            model.addAttribute("parserReport", customParserClass.getReport());
+            model.addAttribute("parsedDataAsJSON", customParserClass.getParsedDataAsJSON());
 
             //System.out.println(parser.getParsedDataAsJSON());
         }
