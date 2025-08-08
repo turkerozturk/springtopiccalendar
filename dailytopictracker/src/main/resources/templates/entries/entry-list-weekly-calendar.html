@@ -515,12 +515,12 @@ https://github.com/turkerozturk/springtopiccalendar
 
         <!-- Parser class bolumu -->
         <span class="col-2" style="background-color:WhiteSmoke;padding:1px;">
-                <br/>
+
                 <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
                      th:if="${topic.dataClassName == 'MeasurementParser'}">
                   <canvas id="measurementChart"></canvas>
                 </div>
-                <br/>
+
                 <p th:if="${parserReport != null}" th:utext="${parserReport}">
 
                 </p>
@@ -1037,9 +1037,26 @@ https://github.com/turkerozturk/springtopiccalendar
                         legend: {
                             display: false
                         },
+                        annotation: {
+                            annotations: {
+                                averageLine: {
+                                    type: 'line',
+                                    yMin: parsed.average,
+                                    yMax: parsed.average,
+                                    borderColor: 'blue',
+                                    borderWidth: 1,
+                                    borderDash: [6, 6] // kesikli cizgi
+
+                                }
+                            }
+
+                        }
                     }
                 }
             });
+
+
+
 
 /*]]>*/
 

@@ -218,6 +218,17 @@
             <version>4.5.0</version>
         </dependency>
 
+        <!-- chartjs'de ortalama cizgisi gibi annotationlar gostermek icin gerekli -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/github-com-chartjs-chartjs-plugin-annotation -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.bowergithub.chartjs/chartjs-plugin-annotation -->
+        <!-- calistirmayi beceremedim lokale indirdim tek dosya javascript onu kullaniyorum.
+        <dependency>
+            <groupId>org.webjars.bowergithub.chartjs</groupId>
+            <artifactId>chartjs-plugin-annotation</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        -->
+
         <!-- bu tus kombinasyonu Windows'da degisiklikligi aninda guncelliyor, css denerken cok isime yaradi: -->
         <!-- CTRL + S ile kaydet, CTRL + SHIFT + F9 ile guncelle, F5 ile browseri refresh et. -->
         <!-- https://docs.spring.io/spring-boot/how-to/hotswapping.html devtools sayesinde cache'yi development modda.
