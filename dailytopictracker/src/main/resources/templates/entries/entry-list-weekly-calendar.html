@@ -1003,9 +1003,17 @@ https://github.com/turkerozturk/springtopiccalendar
                     responsive: true,
                     scales: {
                         x: {
+                            type: 'time',
                             title: {
                                 display: false,
                                 text: 'Date'
+                            },
+                            time: {  // ✅ Bu kritik!
+                                unit: 'day', // veya 'month', 'week' ihtiyacına göre
+                                tooltipFormat: 'yyyy-MM-dd',
+                                displayFormats: {
+                                    day: 'yyyy-MM-dd'
+                                }
                             },
                             ticks: {
                                 maxRotation: 90, // maksimum döndürme derecesi
