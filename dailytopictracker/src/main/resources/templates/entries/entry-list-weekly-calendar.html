@@ -850,9 +850,12 @@ https://github.com/turkerozturk/springtopiccalendar
 
         });
 
+
+        // Meger elementin icinde(yani inline) olmayan CSS kodlarini getComputedStyle ile elde etmemiz gerekiyormus. Yoksa bos geliyor.
         function toggleBlinkMarker(td, highlightGradient) {
             if (td.dataset.originalGradient === undefined) {
-                td.dataset.originalGradient = td.style.background || '';
+                const computedBg = getComputedStyle(td).background;
+                td.dataset.originalGradient = computedBg;
                 td.dataset.blinkState = 'off';
             }
 
@@ -866,6 +869,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 td.style.color = 'black';
             }
         }
+
 
     </script>
 
