@@ -368,7 +368,19 @@ public class EntryController {
 
         // BASLA - istatistik - streak
 
-        StreaksDTO streaksDTO = calculateStreaks ( entryMap,  dateRange, totalDays);
+        // Entry'leri tarihiyle eşle
+        Map<LocalDate, Entry> manualEntryMap = manualEntries.stream()
+                .collect(Collectors.toMap(
+                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
+                        Function.identity()
+                ));
+
+        LocalDate topicBaseDateAlignedToWeek = filterService.getStartOfWeek(topic.getBaseDate(), startDay);
+        LocalDate topicEndDateAlignedToWeek = getEndOfWeek(topic.getEndDate(), startDay);
+        List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDateAlignedToWeek, topicEndDateAlignedToWeek);
+
+        // TODO dateRange ve totalDays artık manualEntries ve manual EntryMap dikkate alınarak hesaplamali asagida:
+        StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
         model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
         model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
 
