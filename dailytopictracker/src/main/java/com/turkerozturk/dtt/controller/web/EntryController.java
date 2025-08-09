@@ -268,17 +268,29 @@ public class EntryController {
         model.addAttribute("topic", topic);
 
         Long topicBaseDateMillis = null;
+        LocalDate topicBaseDate = null;
+        //LocalDate topicEndDateAlignedToWeek = null;
+        //LocalDate topicBaseDateAlignedToWeek = null;
         if (topic.getBaseDateMillisYmd() != null) { // TODO ve basedate arrayde yoksa, cok eskiyse veya todayden veya enddatedan yeniyse olmayacak sekilde kural koy.
             topicBaseDateMillis = topic.getBaseDateMillisYmd();
+            topicBaseDate = topic.getBaseDate();
+            //topicBaseDateAlignedToWeek = filterService.getStartOfWeek(topic.getBaseDate(), startDay);
         } else {
             topicBaseDateMillis = startDateMillis;
+            topicBaseDate = startDate;
+            //topicBaseDateAlignedToWeek = startDateAlignedToWeek;
         }
 
         Long topicEndDateMillis = null;
+        LocalDate topicEndDate = null;
         if (topic.getEndDateMillisYmd() != null) { // TODO ve enddate arrayde yoksa, cok eskiyse veya basedateten eskiyse veya bugunden yeniyse olmayacak sekilde kural koy.
             topicEndDateMillis = topic.getEndDateMillisYmd();
+            topicEndDate = topic.getEndDate();
+            //topicEndDateAlignedToWeek = getEndOfWeek(topic.getEndDate(), startDay);
         } else {
             topicEndDateMillis = endDateMillis;
+            topicEndDate = endDate;
+            //topicEndDateAlignedToWeek = endDateAlignedToWeek;
         }
 
         // ONEMLI: varsa topicdeki base ve enddate tarih araligina gore daha kisitli veri getirir.
@@ -375,14 +387,14 @@ public class EntryController {
                         Function.identity()
                 ));
 
-        LocalDate topicBaseDateAlignedToWeek = filterService.getStartOfWeek(topic.getBaseDate(), startDay);
-        LocalDate topicEndDateAlignedToWeek = getEndOfWeek(topic.getEndDate(), startDay);
-        List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDateAlignedToWeek, topicEndDateAlignedToWeek);
 
+
+        List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDate, topicEndDate);
         // TODO dateRange ve totalDays artık manualEntries ve manual EntryMap dikkate alınarak hesaplamali asagida:
         StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
         model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
         model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
+        model.addAttribute("streakTotalDays", manualDateRange.size());
 
         // BITTI - istatistik - streak
 
