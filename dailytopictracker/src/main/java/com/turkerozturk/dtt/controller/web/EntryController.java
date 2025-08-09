@@ -297,6 +297,15 @@ public class EntryController {
         // Yani 365 gunluk entries in alt kumesi veya aynisi olabilir.
         List<Entry> manualEntries = entryService.findByTopicIdAndDateInterval(topicId, topicBaseDateMillis, topicEndDateMillis);
 
+        // Kisitli tarih araligindaki Entry'leri tarihiyle eşle
+        Map<LocalDate, Entry> manualEntryMap = manualEntries.stream()
+                .collect(Collectors.toMap(
+                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
+                        Function.identity()
+                ));
+        List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDate, topicEndDate);
+        WeeklyViewDTO manualWeeklyViewDTO = calculateCalendarRows(manualEntryMap, manualDateRange, topicBaseDate, topicEndDate, zoneId);
+        List<Map<LocalDate, Entry>> manualWeeklyMaps = manualWeeklyViewDTO.getWeeklyMaps();
 
         // basla bu kisim entry.note lerin topic.dataClassName'da yazan sinif adina gore parse edilmesi
 
@@ -338,7 +347,7 @@ public class EntryController {
         List<Integer> status2 = new ArrayList<>();
         int totalStatus0 = 0, totalStatus1 = 0, totalStatus2 = 0;
 
-        for (Map<LocalDate, Entry> map : weeklyMaps) {
+        for (Map<LocalDate, Entry> map : manualWeeklyMaps) {
             int count0 = 0;
             int count1 = 0;
             int count2 = 0;
@@ -380,16 +389,9 @@ public class EntryController {
 
         // BASLA - istatistik - streak
 
-        // Entry'leri tarihiyle eşle
-        Map<LocalDate, Entry> manualEntryMap = manualEntries.stream()
-                .collect(Collectors.toMap(
-                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
-                        Function.identity()
-                ));
 
 
 
-        List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDate, topicEndDate);
         // TODO dateRange ve totalDays artık manualEntries ve manual EntryMap dikkate alınarak hesaplamali asagida:
         StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
         model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
