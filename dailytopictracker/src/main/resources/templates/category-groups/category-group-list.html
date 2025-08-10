@@ -175,8 +175,8 @@
             <col style="width: 32px;">
             <col style="width: 22px;background-color: white;">
             <col style="width: 200px;">
-            <col style="width: 916px;background-color: white;">
-            <col style="width: 110px;">
+            <col style="width: 900px;background-color: white;">
+            <col style="width: 126px;">
         </colgroup>
         <thead>
         <tr>
@@ -191,8 +191,8 @@
         <tbody id="sortable">
         <tr th:each="grp : ${groups}" th:attr="data-id=${grp.id}">
             <td class="move-controls">
-                <a href="#" class="move-up" title="Yukarı Taşı" style="display:none;">&#x25B2;</a> <!-- ▲ -->
-                <a href="#" class="move-down" title="Aşağı Taşı" style="display:none;">&#x25BC;</a> <!-- ▼ -->
+                <a href="#" class="move-up" title="Move Up" style="display:none;">&#x25B2;</a> <!-- ▲ -->
+                <a href="#" class="move-down" title="Move Down" style="display:none;">&#x25BC;</a> <!-- ▼ -->
             </td>
 
             <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
