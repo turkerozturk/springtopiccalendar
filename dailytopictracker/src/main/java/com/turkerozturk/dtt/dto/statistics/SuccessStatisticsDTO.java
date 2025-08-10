@@ -23,6 +23,8 @@ package com.turkerozturk.dtt.dto.statistics;
 import com.turkerozturk.dtt.entity.Topic;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SuccessStatisticsDTO {
 
@@ -36,4 +38,8 @@ public class SuccessStatisticsDTO {
     private String patternFillText;
 
     private String debugResult;
+
+    private List<Integer> matchResult; // intervallerin match edip etmedikleri bilgisini doner, streak hesaplamasinda lazim.
+
+    private int intervalLength;
 }

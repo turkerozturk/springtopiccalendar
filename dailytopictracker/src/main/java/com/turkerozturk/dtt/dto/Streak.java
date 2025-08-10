@@ -6,33 +6,39 @@ import java.time.temporal.ChronoUnit;
 public class Streak {
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer dayCount;
+    private Integer intervalCount;
+    private int streakLength;
+
+
     private int percentage; // 1 ile 100 arası
 
     private int width; // 15 - 200 arasında
     private String color; // HTML hex color
 
-    public Streak(LocalDate startDate, LocalDate endDate, int totalDays) {
+    public Streak(LocalDate startDate, LocalDate endDate, Integer invervalLength) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.dayCount = (int) (ChronoUnit.DAYS.between(startDate, endDate) + 1);
+        streakLength = (int) ( ChronoUnit.DAYS.between(startDate, endDate) + 1 ) / invervalLength;
+        //System.out.println("streak length: " + streakLength);
+        this.intervalCount = invervalLength;
 
-        int rawPercent = (int) Math.round((double) dayCount * 100 / totalDays);
+        int totalDaysTODO = 365;
+        int rawPercent = (int) Math.round((double) streakLength * 100 / totalDaysTODO);
         this.percentage = Math.max(rawPercent, 1); // en az 1
 
-        this.width = calculateWidth(dayCount);
+        this.width = calculateWidth(streakLength);
         this.color = ColorBand.fromPercentage(roundedPercentage()).getHex();
     }
 
-    private int calculateWidth(int dayCount) {
-        if (dayCount <= 10) {
-            return 15 + (int) Math.round((dayCount - 1) * (35.0 / 9)); // 15–50
-        } else if (dayCount <= 100) {
-            return 51 + (int) Math.round((dayCount - 11) * (49.0 / 89)); // 51–100
-        } else if (dayCount <= 1000) {
-            return 101 + (int) Math.round((dayCount - 101) * (49.0 / 899)); // 101–150
-        } else if (dayCount < 10000) {
-            return 151 + (int) Math.round((dayCount - 1001) * (48.0 / 8999)); // 151–199
+    private int calculateWidth(int tervalCount) {
+        if (tervalCount <= 10) {
+            return 15 + (int) Math.round((tervalCount - 1) * (35.0 / 9)); // 15–50
+        } else if (tervalCount <= 100) {
+            return 51 + (int) Math.round((tervalCount - 11) * (49.0 / 89)); // 51–100
+        } else if (tervalCount <= 1000) {
+            return 101 + (int) Math.round((tervalCount - 101) * (49.0 / 899)); // 101–150
+        } else if (tervalCount < 10000) {
+            return 151 + (int) Math.round((tervalCount - 1001) * (48.0 / 8999)); // 151–199
         } else {
             return 200;
         }
@@ -81,8 +87,16 @@ public class Streak {
     // Getter'lar
     public LocalDate getStartDate() { return startDate; }
     public LocalDate getEndDate() { return endDate; }
-    public int getDayCount() { return dayCount; }
+    public int getIntervalCount() { return intervalCount; }
     public int getPercentage() { return percentage; }
     public int getWidth() { return width; }
     public String getColor() { return color; }
+
+    public int getStreakLength() {
+        return streakLength;
+    }
+
+    public void setStreakLength(int streakLength) {
+        this.streakLength = streakLength;
+    }
 }

@@ -9,7 +9,9 @@ import java.util.List;
 @Data
 public class OccurrenceParser {
 
-    private Integer partitionLength;
+
+
+    private Integer partitionLength; //intervalLength
     private Integer randomOccuranceCount;
     private List<String> occurancesListInOrder;
     private OccuranceType occuranceType;

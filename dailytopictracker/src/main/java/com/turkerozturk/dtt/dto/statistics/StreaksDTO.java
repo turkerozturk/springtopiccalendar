@@ -30,5 +30,8 @@ public class StreaksDTO {
 
     private Streak newestStreak;
     private List<Streak> uniqueTopStreaks;
+    private List<Integer> streakCounters; // uniqueTopStreaks ile iliskili ve ayni sirada. Her uniqden kac tane oldugu.
+
+    private List<Streak> allStreaks; // hem debug amacli hem de takvim uzerinde highlight etmek icin kullanilabilir.
 
 }

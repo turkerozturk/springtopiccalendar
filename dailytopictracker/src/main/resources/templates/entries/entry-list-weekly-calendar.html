@@ -534,8 +534,8 @@ https://github.com/turkerozturk/springtopiccalendar
         <span class="col-2" style="background-color:FloralWhite;">
 
 
-                <span style="text-align:center;color:DarkGray !important;">streak statistics for the given [[${streakTotalDays}]]-day date range.<br/>
-                Streaks are calculated for consecutive days only.</span>
+                <span style="text-align:center;color:DarkGray !important;">
+                    Streak statistics for the given [[${streakTotalDays}]]-day date range.</span>
 
 
             <!-- newsest streak (closest to today) chart -->
@@ -563,8 +563,8 @@ https://github.com/turkerozturk/springtopiccalendar
                                             th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
                                      text-align: center !important; font-weight: bold; margin:auto;
                                      width:' + ${newestStreak.width} + 'px;'"
-                                            th:text="${newestStreak.dayCount}"
-                                            th:title="${newestStreak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
+                                            th:text="${newestStreak.streakLength}"
+                                            ></div>
                                 </td>
 
                                       <!-- End Date -->
@@ -589,7 +589,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-                    <tr th:each="streak : ${uniqueTopStreaks}" style="height: 30px;">
+                    <tr th:each="streak, iStats : ${uniqueTopStreaks}" style="height: 30px;">
                         <!-- Start Date -->
                         <td style="width: 100px; text-align: right; padding-right: 2px;">
                             <small th:text="${T(java.time.format.DateTimeFormatter)
@@ -603,8 +603,8 @@ https://github.com/turkerozturk/springtopiccalendar
                                     th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
                              text-align: center !important; font-weight: bold; margin:auto;
                              width:' + ${streak.width} + 'px;'"
-                                    th:text="${streak.dayCount}"
-                                    th:title="${streak.percentage + ' % (percentage over ' + totalDays + ' days)'}"></div>
+                                    th:text="${streak.streakLength}"
+                                    th:title="${'There are ' + streakCounters[iStats.index] + ' more with different date ranges.'}"></div>
                         </td>
 
                         <!-- End Date -->
@@ -619,6 +619,8 @@ https://github.com/turkerozturk/springtopiccalendar
                 </table>
 
                 <br />
+
+
 
             <!-- trend intervals chart ikinci varyasyon-->
             <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"

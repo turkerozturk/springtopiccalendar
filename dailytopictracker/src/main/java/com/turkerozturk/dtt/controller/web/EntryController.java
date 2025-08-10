@@ -328,11 +328,19 @@ public class EntryController {
 
         // basla bu kisim patternSuccessRate ile ilgili
 
+        OccurrenceParser occurrenceParser = new OccurrenceParser();
+
+        occurrenceParser.parse(topic.getIntervalRule());
+        //System.out.println(topic.getIntervalRule());
+
+        //successStatisticsDTO.setIntervalLength(occurrenceParser.getPartitionLength());
+
         SuccessStatisticsDTO successStatisticsDTO = calculateSuccessStatistics( topic,
                 entryMap,
                 entries,
                 endDate,
-                startDateAlignedToWeek);
+                startDateAlignedToWeek,
+                occurrenceParser);
         model.addAttribute("patternSuccessRate", successStatisticsDTO.getPatternSuccessRate());
         model.addAttribute("patternSuccessText", successStatisticsDTO.getPatternSuccessText());
         model.addAttribute("patternFillText", successStatisticsDTO.getPatternFillText());
@@ -391,12 +399,33 @@ public class EntryController {
 
 
 
+        List<Integer> matchResults = successStatisticsDTO.getMatchResult();
+        int intervalLength = successStatisticsDTO.getIntervalLength();
 
         // TODO dateRange ve totalDays artık manualEntries ve manual EntryMap dikkate alınarak hesaplamali asagida:
-        StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
+        Long firstDoneEntryDateMillisYmd1 = entries.stream()
+                .filter(e -> e.getStatus() == 1)
+                .map(Entry::getDateMillisYmd)
+                .min(Long::compareTo)
+                .orElse(null);
+        // yukarida offset null degilse dedigimiz icin bu da null olmaz, o yuzden kontrol eklemedik.
+        LocalDate firstDoneEntryDate1 = Instant
+                .ofEpochMilli(firstDoneEntryDateMillisYmd1)
+                .atZone(AppTimeZoneProvider.getZone())
+                .toLocalDate();
+
+        if (topic.getBaseDateMillisYmd() == null) {
+            topicBaseDate = firstDoneEntryDate1;
+        }
+
+        StreaksDTO streaksDTO = calculateStreaks(topicBaseDate, matchResults,intervalLength,zoneId);
+        //StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
         model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
         model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
+        model.addAttribute("streakCounters", streaksDTO.getStreakCounters());
         model.addAttribute("streakTotalDays", manualDateRange.size());
+        model.addAttribute("allStreaks", streaksDTO.getAllStreaks());
+
 
         // BITTI - istatistik - streak
 
@@ -599,9 +628,136 @@ public class EntryController {
 
     }
 
+    //        int totalDays = (int) ChronoUnit.DAYS.between(baseDate, endDate) + 1;
+//        System.out.println("intervalStarts.size(): " + intervalStarts.size());
+
+    // intervallere gore hesap yapabilen yeni streak metodu
+    private StreaksDTO calculateStreaks(LocalDate baseDate, List<Integer> intervalResults, int intervalLength, ZoneId zoneId) {
+        StreaksDTO streaksDTO = new StreaksDTO();
+        List<Streak> streaks = new ArrayList<>();
+
+        // 1️⃣ Interval tarihlerini üret
+        List<LocalDate> intervalStarts = new ArrayList<>();
+        LocalDate current = baseDate;
+        for (int i = 0; i < intervalResults.size(); i++) {
+            intervalStarts.add(current);
+            //System.out.println(i + ": " + current);
+
+            current = current.plusDays(intervalLength);
+        }
+
+        int debugCounter = 1;
+        int streakLength;
+        List<String> debugList = new ArrayList<>();
+        // 2️⃣ Ardışık 1'lerden streak listesi oluştur
+        int streakStartIdx = -1;
+        for (int i = 0; i < intervalResults.size(); i++) {
+            if (intervalResults.get(i) == 1) {
+                if (streakStartIdx == -1) {
+                    streakStartIdx = i; // streak başlangıcı
+                }
+            } else {
+                if (streakStartIdx != -1) {
+                    // streak bitti
+                    //basla BLOK
+                    LocalDate streakStartDate = intervalStarts.get(streakStartIdx);
+                    LocalDate streakEndDate = intervalStarts.get(i - 1).plusDays(intervalLength - 1);
+                    streakLength = (int) ( ChronoUnit.DAYS.between(streakStartDate, streakEndDate) + 1 ) / intervalLength;
+
+                    Streak streak = new Streak(streakStartDate,
+                            streakEndDate,
+                            intervalLength);
+                    streaks.add(streak);
+                    debugList.add(debugCounter + ". " + streakStartDate + " streakLength: " + streakLength + " " + streakEndDate + " intervalLength: " + intervalLength);
+                    debugCounter++;
+                    // bitti BLOK
+                    streakStartIdx = -1;
+                }
+            }
+        }
+
+        // Listenin sonunda streak bitmemişse (yani sonu 1 ile bitiyorsa) ekle
+        if (streakStartIdx != -1) {
+            LocalDate streakStartDate = intervalStarts.get(streakStartIdx);
+            LocalDate streakEndDate = intervalStarts.get(intervalResults.size() - 1).plusDays(intervalLength - 1);
+            streakLength = (int) (ChronoUnit.DAYS.between(streakStartDate, streakEndDate) + 1) / intervalLength;
+
+            Streak streak = new Streak(streakStartDate,
+                    streakEndDate,
+                    intervalLength);
+            streaks.add(streak);
+            debugList.add(debugCounter + ". " + streakStartDate + " streakLength: " + streakLength + " " + streakEndDate + " intervalLength: " + intervalLength);
+        }
 
 
-    private StreaksDTO calculateStreaks (Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange, int totalDays) {
+        //System.out.println("streaks.size(): " + streaks.size());
+        /*
+        for(String s: debugList) {
+            System.out.println(s);
+        }
+        */
+       // System.out.println("streaks2.size(): " + streaks.size());
+
+        if (streaks.isEmpty()) {
+            streaksDTO.setNewestStreak(null);
+            streaksDTO.setUniqueTopStreaks(Collections.emptyList());
+            streaksDTO.setStreakCounters(Collections.emptyList());
+            return streaksDTO;
+        }
+
+        // 3️⃣ newestStreak: bitiş tarihi en yeni olan
+        Streak newestStreak = streaks.stream()
+                .max(Comparator.comparing(Streak::getEndDate))
+                .orElse(null);
+       // System.out.println("\n\n -----------------------------");
+       // System.out.println(newestStreak.getIntervalCount());
+       // System.out.println(newestStreak.getStartDate());
+       // System.out.println(newestStreak.getEndDate());
+        streaksDTO.setNewestStreak(newestStreak);
+
+        // 4️⃣ uniqueTopStreaks ve streakCounters
+        // önce uzunluk -> tüm streakler map'i
+        Map<Integer, List<Streak>> groupedByLength = streaks.stream()
+                .collect(Collectors.groupingBy(Streak::getStreakLength));
+
+        // her uzunluktan en yeni olanı seç
+        List<Streak> uniqueTopStreaks = groupedByLength.values().stream()
+                .map(list -> list.stream()
+                        .max(Comparator.comparing(Streak::getEndDate))
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // sıralama: newest streak en başta, sonra tarihe göre
+        uniqueTopStreaks.sort(Comparator.comparing(Streak::getEndDate).reversed());
+
+        // counter listesi (paralel sıra)
+        List<Integer> streakCounters = uniqueTopStreaks.stream()
+                .map(s -> groupedByLength.get(s.getStreakLength()).size())
+                .collect(Collectors.toList());
+
+        streaksDTO.setUniqueTopStreaks(uniqueTopStreaks);
+        streaksDTO.setStreakCounters(streakCounters);
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < streakCounters.size(); i++) {
+            sb.append(streakCounters.get(i));
+            sb.append("\t");
+            sb.append(uniqueTopStreaks.get(i).getStreakLength());
+            sb.append("\n");
+        }
+       // System.out.println(sb);
+
+        return streaksDTO;
+    }
+
+
+
+
+
+        // ardisik gunleri hesaplayan eski streak hesabi metodu.
+    /*
+        private StreaksDTO calculateStreaks (Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange, int totalDays) {
 
         StreaksDTO streaksDTO = new StreaksDTO();
 
@@ -639,7 +795,7 @@ public class EntryController {
 
         // select top 10 streaks
         List<Streak> topStreaks = streaks.stream()
-                .sorted(Comparator.comparingLong(Streak::getDayCount).reversed()
+                .sorted(Comparator.comparingLong(Streak::getIntervalCount).reversed()
                 )
                 //.limit(10)
                 .collect(Collectors.toList());
@@ -650,8 +806,8 @@ public class EntryController {
         Map<Integer, Streak> uniqueByDayCount = new LinkedHashMap<>();
 
         for (Streak streak : topStreaks) {
-            if (!uniqueByDayCount.containsKey(streak.getDayCount())) {
-                uniqueByDayCount.put(streak.getDayCount(), streak); // ilk karşılaşılan (yani en güncel) eklenecek
+            if (!uniqueByDayCount.containsKey(streak.getIntervalCount())) {
+                uniqueByDayCount.put(streak.getIntervalCount(), streak); // ilk karşılaşılan (yani en güncel) eklenecek
             }
         }
 
@@ -668,7 +824,7 @@ public class EntryController {
         return streaksDTO;
     }
 
-
+*/
 
     private WeeklyViewDTO calculateCalendarRows(Map<LocalDate, Entry> entryMap, List<LocalDate> dateRange,
                                                 LocalDate startDate, LocalDate endDate, ZoneId zoneId) {
@@ -770,7 +926,8 @@ public class EntryController {
                                                            Map<LocalDate, Entry> entryMap,
                                                            List<Entry> entries,
                                                            LocalDate today,
-                                                           LocalDate startDateAlignedToWeek) {
+                                                           LocalDate startDateAlignedToWeek,
+                                                            OccurrenceParser occurrenceParser) {
 
         SuccessStatisticsDTO successStatisticsDTO = new SuccessStatisticsDTO();
 
@@ -811,9 +968,7 @@ public class EntryController {
         //int divider = topic.getSomeTimeLater() == null || topic.getSomeTimeLater() <= 0 ? 1 : topic.getSomeTimeLater().intValue(); // prediction degeri olmayan topiclerde gunde 1 olarak varsaymis olur.
         //System.out.println("divider: " + divider);
 
-        OccurrenceParser occurrenceParser = new OccurrenceParser();
-        occurrenceParser.parse(topic.getIntervalRule());
-        //System.out.println(topic.getIntervalRule());
+
 
         //
         if(offsetA != null) {
@@ -864,6 +1019,11 @@ public class EntryController {
             patternSuccessText.append("(from first 'done' day to today)");
             */
             successStatisticsDTO.setPatternSuccessText(patternSuccessText.toString());
+
+
+            // bu iki degisken onemli cunku geri dondukten sonra baska hesaplamalarda da kullanilacak.
+            successStatisticsDTO.setMatchResult(reducedArray);  // streak gibi hesaplar icin gerekli.
+            successStatisticsDTO.setIntervalLength(occurrenceParser.getPartitionLength()); // streak gibi hesaplar icin gerekli.
 
 
             // bu kisim prediction yoksa yani divider 1 den kucukse yani topic.someTimeLater 0 veya null ise doluluk orani gostermek icin.
