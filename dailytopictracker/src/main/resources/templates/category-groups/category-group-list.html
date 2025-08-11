@@ -112,6 +112,16 @@
     background: #a7d6e8;
     background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
  }
+
+.blink_me {
+  animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
     </style>
 
 
@@ -218,7 +228,7 @@
                         <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0}">
                             (
 
-                            <span
+                            <span class="blink_me"
                                   th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
                                   th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
                                   hx-target="#warningModal .modal-body"
@@ -438,6 +448,9 @@ WebJars path'leri şu yapıyı izler:
 
 
 </script>
+
+
+
 
 </body>
 </html>
