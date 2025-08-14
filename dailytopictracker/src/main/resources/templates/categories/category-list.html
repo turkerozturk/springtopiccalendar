@@ -116,7 +116,7 @@
     </div>
 
 
-
+    <div style="background-color:rgba(203, 231, 242, 0.50);">
 
     <!-- Tablo -->
     <table id="categoriesTable" class="table table-striped table-bordered table-sm">
@@ -125,17 +125,19 @@
 
             <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 0, false)">ID</th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Name</th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)" title="Topics Count">T</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Category</th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)" title="Group Number">G</th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)" title="Is Archived">A</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)" title="Topics Count">Topics Count</th>
 
-            <th>Actions</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)" title="Group Number">Group ID</th>
 
-            <th>#</th>
+            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)" title="Is Archived">Archived</th>
+
+            <th style="cursor: pointer;">Actions</th>
+
+            <!-- <th>#</th> -->
         </tr>
 
 
@@ -144,20 +146,27 @@
         <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
         <tr th:each="cat, iStat : ${categories}" th:with="zeroPaddedCategoryId=${#numbers.formatInteger(cat.id, 4)}">
             <td th:text="${zeroPaddedCategoryId}" class="text-center">1</td>
+
+
+
+
+
             <td>
                 <a th:href="@{/topics(categoryId=${cat.id})}"
                    target="_self" th:text="${cat.name}" th:title="${cat.name}">
-                </a>&nbsp;/&nbsp;
-
-                <a href="/category-groups" th:text="${cat.categoryGroup.name}">Category Group</a>
-
+                </a>&nbsp;
             </td>
+
+
             <td th:text="${cat.topics.size()}" class="text-center">0</td>
 
-            <td th:text="${cat.categoryGroup.id}"
-                th:title="${cat.categoryGroup.name}"
-                class="text-center">0</td>
 
+
+            <td class="text-center">
+            <a href="/category-groups" th:title="${cat.categoryGroup.name}"
+               th:text="${cat.categoryGroup.id}"
+               >Category Group</a>
+            </td>
 
             <td
                     th:text="${cat.archived ? 'Yes' : 'No'}"
@@ -168,12 +177,12 @@
 
 
             <td class="text-center">
-                <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}">
+                <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}" title="Edit Category">
                     ✎
                 </a>
                 &nbsp;
                 <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
-
+                    title="Delete Category"
                    onclick="return confirmDelete()">
                     🗑
                 </a>
@@ -186,11 +195,14 @@
             </td>
 
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <td th:text="${iStat.index + 1}">
+          <!--  <td th:text="${iStat.index + 1}">
             </td>
+            -->
         </tr>
         </tbody>
     </table>
+    </div>
+
 </div>
 
 <!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
@@ -202,7 +214,8 @@ WebJars path'leri şu yapıyı izler:
 
 <script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
 
-<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+ <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
 
 <!-- https://datatables.net/plug-ins/sorting/turkish-string -->
 <script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
@@ -214,7 +227,27 @@ WebJars path'leri şu yapıyı izler:
 <script>
 
     $(document).ready( function () {
-    let table = new DataTable('#categoriesTable');
+    let table = new DataTable('#categoriesTable', {
+        columnDefs: [
+                        { width: 60, targets: 0 },
+                        { width: 260, targets: 1 },
+                        { width: 60, targets: 2 },
+                        { width: 60, targets: 3 },
+                        { width: 60, targets: 4 }
+                    ],
+        fixedColumns: true,
+        paging: false,
+        scrollCollapse: true,
+        scrollX: false,
+        scrollY: 600
+    });
+
+
+
+
+
+
+
 
     } );
 </script>
