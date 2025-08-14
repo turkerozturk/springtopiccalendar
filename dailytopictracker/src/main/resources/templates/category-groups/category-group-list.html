@@ -192,21 +192,22 @@
         <tr>
             <th></th> <!-- Tutamak sütunu -->
             <th class="text-center" style="background-color: lightgray;"
-                title="Categories in the category group with a high ID number appear first in the tracker view.">ID</th>
+                title="Hover on to the table row number to see the category group ID number.">#</th>
             <th class="text-center" style="background-color: lightgray;">Group Name</th>
             <th class="text-center" style="background-color: lightgray;">Categories</th>
             <th class="text-center" style="background-color: lightgray;">Actions</th>
         </tr>
         </thead>
         <tbody id="sortable">
-        <tr th:each="grp : ${groups}" th:attr="data-id=${grp.id}">
+        <tr th:each="grp, jStats : ${groups}" th:attr="data-id=${grp.id}">
             <td class="move-controls">
                 <a href="#" class="move-up" title="Move Up" style="display:none;">&#x25B2;</a> <!-- ▲ -->
                 <a href="#" class="move-down" title="Move Down" style="display:none;">&#x25BC;</a> <!-- ▼ -->
             </td>
 
-            <td th:text="${#numbers.formatInteger(grp.id, 2)}" style="text-align:right;"
-            th:title="${ 'This category group has ' + grp.categories.size + ' categories.' }">1</td>
+            <td th:text="${#numbers.formatInteger((jStats.index + 1), 2)}"
+                 style="text-align:right;"
+            th:title="${ 'CategoryGroup ID = ' + grp.id + '. This category group has ' + grp.categories.size + ' categories.' }">1</td>
             <td class="vertical" th:style="${ 'background-color:' + grp.backgroundColor + '; text-align:center;' }">
                 <span th:text="${grp.name}"
                       style="background-color: azure;
@@ -303,6 +304,7 @@
                    title="Add Category">&nbsp;＋</a>
                 <!-- intelligent report for only one category group -->
                 <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
+                   th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }"
                 >&nbsp;🧠</a>
             </td>
         </tr>
