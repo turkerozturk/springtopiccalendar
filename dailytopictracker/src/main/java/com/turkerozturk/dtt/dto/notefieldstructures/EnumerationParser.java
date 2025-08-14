@@ -23,6 +23,7 @@ package com.turkerozturk.dtt.dto.notefieldstructures;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Note;
+import com.turkerozturk.dtt.entity.Topic;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -50,7 +51,7 @@ public class EnumerationParser implements NoteFieldStructure {
 
     @Override
     public String getName() {
-        return "Enumeration Parser";
+        return "EnumerationParser";
     }
 
     @Override
@@ -62,55 +63,101 @@ public class EnumerationParser implements NoteFieldStructure {
     public void parseRawData(List<Entry> entries) {
         statsMap.clear();
 
-        // 1) Filter + group
-        Map<String, List<Entry>> grouped = entries.stream()
-                .filter(e -> e.getStatus() == 1)
-                .collect(Collectors.groupingBy(e -> {
-                    Note entryNote = e.getNote();
-                    String note = null;
-                    if(entryNote != null) {
-                        note = entryNote.getContent();
-                    } else {
-                        if (note == null || note.trim().isEmpty()) {
-                            return "EMPTY";
-                        }
-                    }
-                    String firstLine = note.split("\\R", 2)[0].trim();
-                    return firstLine.isEmpty() ? "EMPTY" : firstLine;
-                }));
+        // Grup -> tarih listesi
+        Map<String, List<LocalDate>> dateMap = new HashMap<>();
 
-        // 2) Sort keys by locale
-        List<String> sortedKeys = new ArrayList<>(grouped.keySet());
-        Collator collator = Collator.getInstance(locale);
-        sortedKeys.sort(collator);
-        // 3) Build stats
+        for (Entry e : entries) {
+            if (e.getStatus() != 1) continue;
+
+            String note = e.getNote().getContent();
+            String firstLine = (note == null ? "" : note.split("\\R", 2)[0]).trim();
+            if (firstLine.isEmpty()) firstLine = "EMPTY";
+
+            String[] parts = firstLine.split(",");
+            LocalDate entryDate = Instant.ofEpochMilli(e.getDateMillisYmd())
+                    .atZone(zoneId)
+                    .toLocalDate();
+
+            for (String p : parts) {
+                String token = p.trim();
+                if (token.isEmpty()) token = "EMPTY";
+
+                // İlk harf büyük, geri kalanı küçük
+                token = token.substring(0, 1).toUpperCase(locale) +
+                        token.substring(1).toLowerCase(locale);
+
+                dateMap.computeIfAbsent(token, k -> new ArrayList<>()).add(entryDate);
+            }
+        }
+
         LocalDate today = LocalDate.now(zoneId);
 
+        // Locale'e göre sıralama
+        List<String> sortedKeys = new ArrayList<>(dateMap.keySet());
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        sortedKeys.sort(collator);
+
+        // Her grup için istatistik
         for (String key : sortedKeys) {
-            List<Entry> groupEntries = grouped.get(key);
-            // Sort by date ascending
-            List<LocalDate> dates = groupEntries.stream()
-                    .map(e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate())
-                    .sorted()
-                    .collect(Collectors.toList());
+            List<LocalDate> dates = new ArrayList<>(dateMap.get(key));
+            Collections.sort(dates);
 
-            int count = dates.size();
-            LocalDate lastDate = dates.get(count - 1);
+            int originalCount = dates.size(); // gerçek entry sayısı
+            boolean addedToday = false;
 
+            if (!dates.isEmpty()) {
+                // Konu (topic) sonlandırılmamışsa today ekle
+                Topic topic = null;
+                for (Entry e : entries) {
+                    if (e.getStatus() == 1) {
+                        String note = e.getNote().getContent();
+                        String firstLine = (note == null ? "" : note.split("\\R", 2)[0]).trim();
+                        if (firstLine.isEmpty()) firstLine = "EMPTY";
+                        String[] parts = firstLine.split(",");
+                        for (String p : parts) {
+                            String token = p.trim();
+                            if (token.isEmpty()) token = "EMPTY";
+                            token = token.substring(0, 1).toUpperCase(locale) +
+                                    token.substring(1).toLowerCase(locale);
+                            if (token.equals(key)) {
+                                topic = e.getTopic();
+                                break;
+                            }
+                        }
+                        if (topic != null) break;
+                    }
+                }
+                if (topic != null && topic.getEndDate() == null) {
+                    dates.add(today);
+                    Collections.sort(dates);
+                    addedToday = true;
+                }
+            }
+
+            // Ortalama gün farkı hesapla
             double avgDays;
-            if (count > 1) {
+            if (dates.size() > 1) {
                 long totalDiff = 0;
-                for (int i = 1; i < count; i++) {
+                for (int i = 1; i < dates.size(); i++) {
                     totalDiff += ChronoUnit.DAYS.between(dates.get(i - 1), dates.get(i));
                 }
-                avgDays = (double) totalDiff / (count - 1);
+                avgDays = (double) totalDiff / (dates.size() - 1);
             } else {
                 avgDays = ChronoUnit.DAYS.between(dates.get(0), today);
             }
 
-            statsMap.put(key, new GroupStats(count, lastDate, avgDays));
+            // lastDate: today eklenmişse sondan bir önceki tarih
+            LocalDate lastDate = addedToday
+                    ? dates.get(dates.size() - 2)
+                    : dates.get(dates.size() - 1);
+
+            // count: today eklenmişse bile orijinal sayı
+            statsMap.put(key, new GroupStats(originalCount, lastDate, avgDays));
         }
     }
+
+
 
     @Override
     public String getParsedDataAsJSON() {
@@ -136,7 +183,7 @@ public class EnumerationParser implements NoteFieldStructure {
     @Override
     public String getReport() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<table><tr><th>Group</th><th>Count</th><th>Last Date</th><th>Avg Days</th></tr>");
+        sb.append("<table class=\"table table-sm table-bordered\"><tr><th>Group</th><th>Count</th><th>Last Date</th><th>Avg Days</th></tr>");
         DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
         for (Map.Entry<String, GroupStats> e : statsMap.entrySet()) {
             GroupStats gs = e.getValue();
@@ -148,6 +195,10 @@ public class EnumerationParser implements NoteFieldStructure {
                     .append("</tr>");
         }
         sb.append("</table>");
+
+        sb.append("<span>").append("Parser: ")
+                .append(getName());
+        sb.append("</span>");
         return sb.toString();
     }
 
