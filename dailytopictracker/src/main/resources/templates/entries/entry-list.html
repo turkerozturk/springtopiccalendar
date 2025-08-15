@@ -55,7 +55,7 @@
               .edit-entry-column {
                   text-align: center;
               }
-              .delete-entry-column {
+              .actions-column {
                   text-align: center;
               }
 
@@ -116,7 +116,7 @@
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
     <!-- Yeni Entry Butonu -->
     <div th:if="${topic == null}" style="margin-top:4px;">
-        <a th:href="@{/entries/new?returnPage=entries}" class="btn btn-secondary btn-sm" style="color:white;">Add New Entry</a>
+        <a th:href="@{/entries/new?returnPage=entries}" class="btn btn-secondary btn-sm" style="color:white;">New Entry</a>
     </div>
 </div>
 
@@ -246,6 +246,7 @@
 
 </div>
 
+    <div style="background-color:rgba(203, 231, 242, 0.50);">
     <!-- Entries Tablosu -->
     <table id="entries-table" class="table table-sm table-striped table-bordered align-middle caption-top">
         <caption>
@@ -279,7 +280,7 @@
 
                 <th:block th:if="${topic.predictionDate != null and topic.someTimeLater != null and topic.someTimeLater != 0}">
                     <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                       th:text="${topic.name}"
+                       th:text="${topic.name + ' ✎'}"
                        th:title="${T(java.time.format.DateTimeFormatter)
                                 .ofPattern('yyyy-MM-dd')
                                 .format(topic.predictionDate.atStartOfDay(zoneId))
@@ -293,7 +294,7 @@
 
                 <th:block th:if="${topic.predictionDate == null or topic.someTimeLater == null or topic.someTimeLater == 0}">
                     <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                       th:text="${topic.name}"
+                       th:text="${topic.name + ' ✎'}"
                        th:title="${'You can manually add the next date prediction on topic settings.'}"
                        style="margin-top: 1.33em;
                             margin-bottom: 1.33em;
@@ -305,61 +306,55 @@
             </th:block>
         </caption>
         <thead>
-        <tr>
-            <th>Delete</th>
+        <tr style="text-align: center;">
+            <th>#</th>
             <th>ID</th>
             <th>Date</th>
-            <th>Status</th>
-            <th>Topic/Category</th>
+            <th title="Entry Status" style="width:30px; max-width:30px;">S</th>
+            <th th:if="${topic == null}">Topic/Category</th>
             <th>Note</th>
-            <th>#</th>
+            <th>Actions</th>
+
         </tr>
         </thead>
         <tbody>
         <tr th:each="entry, iStat : ${entriesPage.content}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
-            <td class="delete-entry-column">
-                <a th:href="@{/entries/delete/{id}(id=${entry.id},
-                                            categoryId=${entry.topic.category.id},
-                                            topicId=${entry.topic.id},
-                                            returnPage=entries
-                                            )}"
 
-                   onclick="return confirmDelete()">
-                    Delete
-                </a>
+            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <td th:text="${iStat.index + 1}" style="color:lightgray; width:70px; max-width:70px;">
             </td>
-            <td class="edit-entry-column">
-                <a th:href="@{/entries/edit/{id}(id=${entry.id},
-                                            categoryId=${entry.topic.category.id},
-                                            topicId=${entry.topic.id},
-                                            returnPage=entries
-                                            )}"
-                   th:text="${zeroPaddedEntryId}"
-                   target="_blank" rel="noopener noreferrer">
-                    Edit
-                </a>
+
+            <td class="edit-entry-column" style="color:darkgray; width:70px; max-width:70px; text-align:center;">
+                <span
+                   th:text="${zeroPaddedEntryId}">
+                    ID
+                </span>
             </td>
-            <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+            <td style="color:black; width:100px; max-width:100px;"
+                    th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
                               .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
                               .atZone(T(java.time.ZoneId).systemDefault())
                               .toLocalDate())}"
                 th:title="${entry.dateMillisYmd}">
             </td>
-            <td th:text="${entry.status}" th:class="'pivot-table-entry-cell status-' + ${entry.status}">Status</td>
+
+            <td th:text="${entry.status}"
+                th:class="'pivot-table-entry-cell status-' + ${entry.status}"
+            style="text-align:center;">Entry Status</td>
 
 
 
-            <td>
+            <td th:if="${topic == null}">
 
-                <a th:href="@{/topics/edit/{id}(id=${entry.topic.id})}" th:text="${entry.topic.name}" style="margin-top: 1.33em;
-    margin-bottom: 1.33em;
-    margin-left: 0;
-    margin-right: 0;
-    font-weight: normal;">Topic Name</a>
+                <a th:href="@{/topics/edit/{id}(id=${entry.topic.id})}" th:text="${entry.topic.name}"
+                   style="margin-top: 1.33em; margin-bottom: 1.33em; margin-left: 0; margin-right: 0; font-weight: normal;">Topic Name
+                </a>
+
                 /
-                <a th:href="@{/topics(categoryId=${entry.topic.category.id}) }" th:text="${entry.topic.category.name}">Category Name</a>
+                    <a th:href="@{/topics(categoryId=${entry.topic.category.id}) }" th:text="${entry.topic.category.name}">Category Name</a>
 
             </td>
+
 
 
             <td>
@@ -370,21 +365,42 @@
                         hx-trigger="click"
                         hx-target="#noteModal .modal-body"
                         hx-swap="innerHTML">
-                  <span th:text="${entry.note != null ? #strings.abbreviate(entry.note.content, 30) : ''}">
+                  <span th:text="${entry.note != null ? #strings.abbreviate(entry.note.content, 75) : ''}">
                     Entry Note as Snippet
                   </span>
                 </span>
             </td>
 
+            <td class="actions-column" style="width:100px; max-width:100px; text-align:center;">
+                &nbsp;
+                <a th:href="@{/entries/edit/{id}(id=${entry.id},
+                                            categoryId=${entry.topic.category.id},
+                                            topicId=${entry.topic.id},
+                                            returnPage=entries
+                                            )}"
+                   target="_blank" rel="noopener noreferrer"
+                   title="Edit Entry">
+                    ✎
+                </a>
+                &nbsp;
+                <a th:href="@{/entries/delete/{id}(id=${entry.id},
+                                            categoryId=${entry.topic.category.id},
+                                            topicId=${entry.topic.id},
+                                            returnPage=entries
+                                            )}"
 
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <td th:text="${iStat.index + 1}">
+                   onclick="return confirmDelete()"
+                   title="Delete Entry">
+                    🗑
+                </a>
+                &nbsp;
             </td>
+
 
         </tr>
         </tbody>
     </table>
-
+    </div>
 
 
 

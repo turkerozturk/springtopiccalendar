@@ -6,12 +6,28 @@ https://github.com/turkerozturk/springtopiccalendar
 
 <div xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
+    <style>
+        .edit-icon {
+            visibility: hidden; /* başlangıçta görünmez */
+            margin-left: 5px;
+        }
+
+        a:hover .edit-icon {
+            visibility: visible;
+        }
+    </style>
 
     <table class="table-bordered">
 
         <caption style="background-color:black;">
-            <h4 th:text="${topic.name}" style="font-weight:bold;color:white;text-align:right;margin-right:130px;"></h4>
+            <h4 style="font-weight:bold;color:white;text-align:right;margin-right:130px;">
+                <a th:href="@{/topics/edit/{id}(id=${topic.id})}" style="text-decoration:none; color:white;">
+                    <span th:text="${topic.name}"></span>
+                    <span class="edit-icon">✎</span>
+                </a>
+            </h4>
         </caption>
+
 
         <thead>
 

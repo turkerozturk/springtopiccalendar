@@ -146,16 +146,17 @@ body {
              seçiliyse ?catId=xxx şeklinde gönder -->
         <a th:if="${selectedCategoryId != null}"
            th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
-           class="btn btn-secondary btn-sm" style="color:white;">
-            Create New Topic
+           class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
+            New Topic
         </a>
         <a th:if="${selectedCategoryId == null}"
            th:href="@{/topics/create}"
            class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-            Create New Topic
+            New Topic
         </a>
     </div>
 </div>
+
 
 
 <div class="container my-2" style="max-width: 1000px;">
