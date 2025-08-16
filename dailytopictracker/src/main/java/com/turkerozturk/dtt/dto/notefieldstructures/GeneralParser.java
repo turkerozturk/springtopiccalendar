@@ -114,36 +114,44 @@ public class GeneralParser implements NoteFieldStructure {
         // Count of status==1 entries
         generalCount = dates.size();
 
-        // Density-based average: days per occurrence
+        // Density-based average: days per occurrence (general)
         generalAvgDays = (generalCount > 0) ? ((double) generalDaysRange / generalCount) : 0.0;
 
-        // Segments
+// Segments
         int segments = decideSegmentCount(generalDaysRange);
         if (segments > 1) {
             segmentResults = calculateSegmentAverages(dates, generalStart, generalEnd, segments);
 
             double segmentAvgSums = 0.0;
             int calculatedSize = segmentResults.size();
+
             for (SegmentResult s : segmentResults) {
-                if(s.avgDays != null) {
-                    double segmentAvg = s.avgDays;
-                    segmentAvgSums += segmentAvg;
+                if (s.avgDays != null) {
+                    // segmentte entry varsa hesaplanmış değeri kullan
+                    segmentAvgSums += s.avgDays;
                 } else {
-                    calculatedSize--;
+                    // segmentte hiç entry yok → o segmentin tamamı boş
+                    long segDays = (s.end.toEpochDay() - s.start.toEpochDay()) + 1;
+                    segmentAvgSums += segDays;  // bu segmentin yoğunluğu = tüm günler boş
                 }
             }
+
             segmentedAvgDays = segmentAvgSums / calculatedSize;
 
+            // Stability index
             stabilityIndex = segmentedAvgDays - generalAvgDays;
-            if (Math.abs(stabilityIndex) < 0.5) {
+
+            // Esnek eşik: genel ortalamanın %10'u
+            double threshold = 0.1 * generalAvgDays;
+            if (Math.abs(stabilityIndex) < threshold) {
                 stabilityComment = "Very stable (almost no variation)";
             } else if (stabilityIndex > 0) {
                 stabilityComment = "Entries are more evenly spread across segments (general average is lower)";
             } else {
                 stabilityComment = "Entries are denser in some segments (general average is higher)";
             }
-
         }
+
     }
 
     /**
