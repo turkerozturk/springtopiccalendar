@@ -181,7 +181,7 @@ public class OccurrenceParser {
     public String toHTML() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<table style=\"border: solid 1px; text-align:left;width:100%;\">\n");
+        sb.append("<table class=\"table table-sm table-bordered\">\n");
 
 
         sb.append("<tr><td colspan=\"2\" ")
@@ -268,7 +268,27 @@ public class OccurrenceParser {
                     .append(randomOccuranceCount != null ? randomOccuranceCount : "")
                     .append("</td></tr>\n");
 
-        } else if (occuranceType.equals(OccuranceType.ONE_FILLED_IN_ONE) ||
+             if(!isDisabled) {
+
+
+                 sb.append("<tr><td title=\"isStrict\">Strict?")
+                         .append(isStrict == true ? " <b class=\"blink\">!</b>" : "")
+                         .append("</td><td>")
+                         .append(isStrict == true ? YES : NO)
+                         .append("</td></tr>\n");
+
+                 sb.append("<tr><td title=\"isOpposite\">Opposite?")
+                         .append(isOpposite == true ? " <b class=\"blink\">-</b>" : "")
+                         .append("</td><td>")
+                         .append(isOpposite == true ? YES : NO)
+                         .append("</td></tr>\n");
+
+             }
+
+
+
+
+         } else if (occuranceType.equals(OccuranceType.ONE_FILLED_IN_ONE) ||
                 occuranceType.equals(OccuranceType.ONE_EMPTY_IN_ONE)  ) {
 
             sb.append("<tr><td title=\"randomOccuranceCount\">Random Count</td><td>")
@@ -283,20 +303,6 @@ public class OccurrenceParser {
 
        // "The default rule is daily. Days marked as \"done\" are considered.";
 
-        if(!isDisabled) {
-            sb.append("<tr><td title=\"isStrict\">Strict?")
-                    .append(isStrict == true ? " <b class=\"blink\">!</b>" : "")
-                    .append("</td><td>")
-                    .append(isStrict == true ? YES : NO)
-                    .append("</td></tr>\n");
-
-            sb.append("<tr><td title=\"isOpposite\">Opposite?")
-                    .append(isOpposite == true ? " <b class=\"blink\">-</b>" : "")
-                    .append("</td><td>")
-                    .append(isOpposite == true ? YES : NO)
-                    .append("</td></tr>\n");
-
-        }
 
 
         sb.append("</table>");
