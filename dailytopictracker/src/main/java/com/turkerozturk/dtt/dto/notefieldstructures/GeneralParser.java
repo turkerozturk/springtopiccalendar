@@ -29,22 +29,39 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+import java.time.format.DateTimeFormatter;
+
 public class GeneralParser implements NoteFieldStructure {
 
     private final Locale locale;
     private final ZoneId zoneId;
+    private final int minSegmentDays; // heuristic for decideSegmentCount
 
-    private double generalAvg;
-    private int generalCount;
-    private long generalDaysRange;
+    // General results
+    private double generalAvgDays = 0.0; // days per occurrence (density)
+    private int generalCount = 0;        // # of status==1 entries
+    private long generalDaysRange = 0;   // inclusive day count
+    private LocalDate generalStart = null;
+    private LocalDate generalEnd = null; // inclusive end (topic.endDate or today)
 
+    // Segmented results
     private List<SegmentResult> segmentResults = new ArrayList<>();
+
+    private double segmentedAvgDays = 0.0; // butun segment ortalamalarinin ortalamasi.
+
+    double stabilityIndex;
+    String stabilityComment;
 
     public GeneralParser() {
 
         this.zoneId = AppTimeZoneProvider.getZone();
         this.locale = Locale.ENGLISH;
+        int minSegmentDays = 7;
+        this.minSegmentDays = Math.max(1, minSegmentDays);
+
     }
+
 
     @Override
     public String getName() {
@@ -53,104 +70,162 @@ public class GeneralParser implements NoteFieldStructure {
 
     @Override
     public String getDescription() {
-        return "Calculates overall and segmented average repetition days for a topic.";
+        return "Calculates overall and segmented density-based average recurrence (days per status==1) for a single topic.";
     }
-
-
 
     @Override
     public void parseRawData(List<Entry> entries) {
-        if (entries.isEmpty()) return;
+        // Reset
+        generalAvgDays = 0.0;
+        generalCount = 0;
+        generalDaysRange = 0;
+        generalStart = null;
+        generalEnd = null;
+        segmentResults.clear();
 
-        // Tek topic
+        if (entries == null || entries.isEmpty()) return;
+
+        // Assumption: all entries belong to the same topic
         Topic topic = entries.get(0).getTopic();
 
-        // Sadece status=1 olan entry’lerin tarihleri
+        // Status==1 dates, sorted
         List<LocalDate> dates = entries.stream()
                 .filter(e -> e.getStatus() == 1)
                 .map(e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate())
                 .sorted()
                 .collect(Collectors.toList());
 
-        if (dates.isEmpty()) return;
+        if (dates.isEmpty()) return; // nothing to compute
 
+        generalStart = dates.get(0); // inclusive
+
+        // End = topic.endDate (inclusive) if present, else today (inclusive)
         LocalDate today = LocalDate.now(zoneId);
-        LocalDate lastDate = dates.get(dates.size() - 1);
+        LocalDate topicEnd = null; // Adjust here if your Topic end date type differs
+        if (topic != null) {
+            // If your model uses a different type (e.g., Long millis), convert it here instead.
+            topicEnd = topic.getEndDate(); // <-- assumes LocalDate, adapt if necessary
+        }
+        generalEnd = (topicEnd != null) ? topicEnd : today;
 
-        // Genel ortalama
-        boolean addToday = (topic != null && topic.getEndDate() == null && !lastDate.equals(today));
-        this.generalAvg = calculateAverageDays(dates, addToday ? today : null);
-        this.generalCount = dates.size();
-        LocalDate endDate = addToday ? today : lastDate;
-        this.generalDaysRange = ChronoUnit.DAYS.between(dates.get(0), endDate);
+        // Inclusive day count in range [generalStart, generalEnd]
+        generalDaysRange = ChronoUnit.DAYS.between(generalStart, generalEnd) + 1;
 
-        // Bölme kararı
-        int segments = decideSegmentCount(this.generalDaysRange);
-        this.segmentResults.clear();
+        // Count of status==1 entries
+        generalCount = dates.size();
 
+        // Density-based average: days per occurrence
+        generalAvgDays = (generalCount > 0) ? ((double) generalDaysRange / generalCount) : 0.0;
+
+        // Segments
+        int segments = decideSegmentCount(generalDaysRange);
         if (segments > 1) {
-            List<SegmentResult> segs = calculateSegmentAverages(dates, addToday ? today : null, segments);
-            this.segmentResults.addAll(segs);
+            segmentResults = calculateSegmentAverages(dates, generalStart, generalEnd, segments);
+
+            double segmentAvgSums = 0.0;
+            int calculatedSize = segmentResults.size();
+            for (SegmentResult s : segmentResults) {
+                if(s.avgDays != null) {
+                    double segmentAvg = s.avgDays;
+                    segmentAvgSums += segmentAvg;
+                } else {
+                    calculatedSize--;
+                }
+            }
+            segmentedAvgDays = segmentAvgSums / calculatedSize;
+
+            stabilityIndex = segmentedAvgDays - generalAvgDays;
+            if (Math.abs(stabilityIndex) < 0.5) {
+                stabilityComment = "Very stable (almost no variation)";
+            } else if (stabilityIndex > 0) {
+                stabilityComment = "Entries are more evenly spread across segments (general average is lower)";
+            } else {
+                stabilityComment = "Entries are denser in some segments (general average is higher)";
+            }
+
         }
     }
 
-    private double calculateAverageDays(List<LocalDate> dates, LocalDate extraEnd) {
-        List<LocalDate> temp = new ArrayList<>(dates);
-        if (extraEnd != null) temp.add(extraEnd);
-        Collections.sort(temp);
-
-        if (temp.size() < 2) return 0.0;
-
-        long totalDiff = 0;
-        for (int i = 1; i < temp.size(); i++) {
-            totalDiff += ChronoUnit.DAYS.between(temp.get(i - 1), temp.get(i));
-        }
-        return (double) totalDiff / (temp.size() - 1);
+    /**
+     * Decide how many equal segments to split the inclusive range into.
+     * Heuristic: aim for segments of at least minSegmentDays, capped at 5 segments.
+     */
+    private int decideSegmentCount(long totalDaysInclusive) {
+        if (totalDaysInclusive <= 0) return 1;
+        int bySize = (int) (totalDaysInclusive / minSegmentDays);
+        int segments = Math.max(1, Math.min(5, bySize));
+        return segments;
     }
 
-    private int decideSegmentCount(long totalDays) {
-        if (totalDays < 6) return 1; // çok kısa aralık bölünmez
-        if (totalDays <= 15) return 3;
-        if (totalDays <= 30) return 4;
-        return 5; // daha uzun ise daha çok segment
-    }
-
-    private List<SegmentResult> calculateSegmentAverages(List<LocalDate> dates, LocalDate extraEnd, int segments) {
+    /**
+     * Split [start, end] inclusive into k nearly-equal segments and compute density-based averages per segment.
+     * If a segment has zero entries, avgDays is null.
+     */
+    private List<SegmentResult> calculateSegmentAverages(List<LocalDate> sortedDates,
+                                                         LocalDate start,
+                                                         LocalDate end,
+                                                         int k) {
         List<SegmentResult> results = new ArrayList<>();
-        LocalDate start = dates.get(0);
-        LocalDate end = (extraEnd != null) ? extraEnd : dates.get(dates.size() - 1);
-        long totalDays = ChronoUnit.DAYS.between(start, end);
-        long segLength = totalDays / segments;
+        if (k <= 0) return results;
 
-        for (int i = 0; i < segments; i++) {
-            LocalDate segStart = start.plusDays(i * segLength);
-            LocalDate segEnd = (i == segments - 1) ? end : segStart.plusDays(segLength);
+        long totalDays = ChronoUnit.DAYS.between(start, end) + 1; // inclusive length
+        if (totalDays <= 0) return results;
 
-            // Segment içindeki tarihleri bul
-            List<LocalDate> segDates = dates.stream()
-                    .filter(d -> !d.isBefore(segStart) && !d.isAfter(segEnd))
-                    .collect(Collectors.toList());
+        long baseLen = totalDays / k;           // at least 1 because we cap k in decide
+        long remainder = totalDays % k;         // distribute +1 to the first 'remainder' segments
 
-            double avg = calculateAverageDays(segDates, segEnd);
-            results.add(new SegmentResult(avg, segDates.size(), ChronoUnit.DAYS.between(segStart, segEnd)));
+        // Two-pointer sweep on dates
+        int idx = 0;
+        int n = sortedDates.size();
+
+        LocalDate segStart = start;
+        for (int i = 0; i < k; i++) {
+            long len = baseLen + (i < remainder ? 1 : 0);
+            LocalDate segEnd = segStart.plusDays(len - 1); // inclusive
+
+            // Count dates within [segStart, segEnd]
+            int count = 0;
+            while (idx < n && (sortedDates.get(idx).isBefore(segStart))) {
+                idx++; // advance to first date >= segStart (safety if any)
+            }
+            int j = idx;
+            while (j < n && !sortedDates.get(j).isAfter(segEnd)) {
+                count++; j++;
+            }
+            idx = j; // next segment continues from here
+
+            Double avgDays = (count > 0) ? ((double) len / count) : null;
+            results.add(new SegmentResult(avgDays, count, len, segStart, segEnd));
+
+            segStart = segEnd.plusDays(1);
         }
         return results;
     }
 
     @Override
     public String getParsedDataAsJSON() {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"general\":{")
-                .append("\"avgDays\":").append(String.format(Locale.US, "%.2f", generalAvg)).append(",")
+        sb.append("{");
+        sb.append("\"general\":{")
+                .append("\"avgDays\":").append(String.format(Locale.US, "%.2f", generalAvgDays)).append(",")
                 .append("\"count\":").append(generalCount).append(",")
-                .append("\"daysRange\":").append(generalDaysRange)
+                .append("\"daysRange\":").append(generalDaysRange).append(",")
+                .append("\"startDate\":\"").append(generalStart == null ? "" : generalStart.format(fmt)).append("\",")
+                .append("\"endDate\":\"").append(generalEnd == null ? "" : generalEnd.format(fmt)).append("\"")
                 .append("},\"segments\":[");
+
         for (int i = 0; i < segmentResults.size(); i++) {
             SegmentResult s = segmentResults.get(i);
             if (i > 0) sb.append(",");
-            sb.append("{\"avgDays\":").append(String.format(Locale.US, "%.2f", s.avgDays))
-                    .append(",\"count\":").append(s.count)
-                    .append(",\"daysRange\":").append(s.daysRange).append("}");
+            sb.append("{")
+                    .append("\"avgDays\":")
+                    .append(s.avgDays == null ? "null" : String.format(Locale.US, "%.2f", s.avgDays)).append(",")
+                    .append("\"count\":").append(s.count).append(",")
+                    .append("\"daysRange\":").append(s.daysRange).append(",")
+                    .append("\"startDate\":\"").append(s.start.format(fmt)).append("\",")
+                    .append("\"endDate\":\"").append(s.end.format(fmt)).append("\"")
+                    .append("}");
         }
         sb.append("]}");
         return sb.toString();
@@ -158,38 +233,77 @@ public class GeneralParser implements NoteFieldStructure {
 
     @Override
     public String getReport() {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
         StringBuilder sb = new StringBuilder();
-        sb.append("<table border='1'>");
+        sb.append("<table class=\"table table-sm table-bordered\">");
 
-        sb.append("<tr><th colspan='3'>Genel Ortalama</th></tr>")
-                .append("<tr><th>Ortalama Gün</th><th>Entry Sayısı</th><th>Aralık (gün)</th></tr>")
-                .append("<tr><td>").append(String.format(Locale.US, "%.2f", generalAvg))
-                .append("</td><td>").append(generalCount)
-                .append("</td><td>").append(generalDaysRange).append("</td></tr>");
+        // General
+        sb.append("<tr><th colspan='3'>General Average</th></tr>")
+                .append("<tr><th>Average Days</th><th>Entry Count</th><th>Range (days)</th></tr>");
+        String generalTitle = (generalStart != null && generalEnd != null)
+                ? (generalStart.format(fmt) + " → " + generalEnd.format(fmt))
+                : "";
+        sb.append("<tr>")
+                .append("<td>").append(String.format(Locale.US, "%.2f", generalAvgDays)).append("</td>")
+                .append("<td>").append(generalCount).append("</td>")
+                .append("<td title='").append(escapeHtml(generalTitle)).append("'>")
+                .append(generalDaysRange).append("</td>")
+                .append("</tr>");
 
+        // Segments
         if (!segmentResults.isEmpty()) {
-            sb.append("<tr><th colspan='3'>Bölmeli Ortalamalar</th></tr>")
-                    .append("<tr><th>Ortalama Gün</th><th>Entry Sayısı</th><th>Aralık (gün)</th></tr>");
+            sb.append("<tr><th colspan='3'>Segmented Averages</th></tr>")
+                    .append("<tr><th>Average Days</th><th>Entry Count</th><th>Range (days)</th></tr>");
             for (SegmentResult s : segmentResults) {
-                sb.append("<tr><td>").append(String.format(Locale.US, "%.2f", s.avgDays))
-                        .append("</td><td>").append(s.count)
-                        .append("</td><td>").append(s.daysRange).append("</td></tr>");
+                String title = s.start.format(fmt) + " → " + s.end.format(fmt);
+                sb.append("<tr>")
+                        .append("<td>")
+                        .append(s.avgDays == null ? "—" : String.format(Locale.US, "%.2f", s.avgDays))
+                        .append("</td>")
+                        .append("<td>").append(s.count).append("</td>")
+                        .append("<td title='").append(escapeHtml(title)).append("'>")
+                        .append(s.daysRange).append("</td>")
+                        .append("</tr>");
             }
+
+            sb.append("<tr><td colspan='2'>Average Over Segments</td>");
+            sb.append("<th>")
+                    .append(String.format(Locale.US, "%.2f", segmentedAvgDays))
+                    .append("</th></tr>");
+
+
+            sb.append("<tr><td colspan='2' title='Segmented average days - General average days'>Stability Index</td>")
+                    .append("<td  title='less than half is stable, negative is unstable, positive means more even.'>")
+                    .append(String.format(Locale.US, "%.2f", stabilityIndex))
+                    .append("</td></tr>");
+            sb.append("<tr><td colspan='3'>").append(stabilityComment)
+                    .append("</td></tr>");
+
+
         }
 
         sb.append("</table>");
         return sb.toString();
     }
 
-    private static class SegmentResult {
-        double avgDays;
-        int count;
-        long daysRange;
+    private static String escapeHtml(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
+    }
 
-        SegmentResult(double avgDays, int count, long daysRange) {
+    private static class SegmentResult {
+        final Double avgDays; // null if no entries in segment
+        final int count;
+        final long daysRange; // inclusive length
+        final LocalDate start; // inclusive
+        final LocalDate end;   // inclusive
+
+        SegmentResult(Double avgDays, int count, long daysRange, LocalDate start, LocalDate end) {
             this.avgDays = avgDays;
             this.count = count;
             this.daysRange = daysRange;
+            this.start = start;
+            this.end = end;
         }
     }
 }
