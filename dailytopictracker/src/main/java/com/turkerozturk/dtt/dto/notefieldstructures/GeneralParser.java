@@ -252,9 +252,9 @@ public class GeneralParser implements NoteFieldStructure {
                 ? (generalStart.format(fmt) + " → " + generalEnd.format(fmt))
                 : "";
         sb.append("<tr>")
-                .append("<td>").append(String.format(Locale.US, "%.2f", generalAvgDays)).append("</td>")
-                .append("<td>").append(generalCount).append("</td>")
-                .append("<td title='").append(escapeHtml(generalTitle)).append("'>")
+                .append("<td style=\"background-color:lightyellow;font-weight:bold;\">").append(String.format(Locale.US, "%.2f", generalAvgDays)).append("</td>")
+                .append("<td style=\"background-color:lightgreen;\">").append(generalCount).append("</td>")
+                .append("<td title='").append(escapeHtml(generalTitle)).append("' style=\"background-color:snow;\">")
                 .append(generalDaysRange).append("</td>")
                 .append("</tr>");
 
@@ -275,9 +275,9 @@ public class GeneralParser implements NoteFieldStructure {
             }
 
             sb.append("<tr><td colspan='2'>Average Over Segments</td>");
-            sb.append("<th>")
+            sb.append("<td style=\"background-color:lightyellow;font-weight:bold;\">")
                     .append(String.format(Locale.US, "%.2f", segmentedAvgDays))
-                    .append("</th></tr>");
+                    .append("</td></tr>");
 
 
             sb.append("<tr><td colspan='2' title='Segmented average days - General average days'>Stability Index</td>")
