@@ -81,23 +81,23 @@ https://github.com/turkerozturk/springtopiccalendar
 
                 <th:block th:if="${entry.value != null }">
                     <th:block th:if="${entry.value.status != -1 }">
-                        <td th:text="${entry.value.status}"
-                            th:attr="title=${entry.key} + ' ' + ${entry.value.id},
-                            onmouseenter='showCustomTooltip(this)',
-                            onmouseleave='hideCustomTooltip()',
-                            hx-get=@{/entries/{id}/note-full(id=${entry.value.id})}"
+                        <td
+                            th:attr="data-tooltip=${entry.key} + '&lt;br&gt;entry id: ' + ${entry.value.id},
+                                     onmouseenter='showCustomTooltip(this)',
+                                     onmouseleave='hideCustomTooltip()',
+                                     hx-get=@{/entries/{id}/note-full(id=${entry.value.id})}"
                             th:class="'weekly-table-entry-cell status-' + ${entry.value.status}"
                             th:data-ymd="${entry.key}"
                             style="padding:0;"
-
                             hx-trigger="click"
                             hx-target="#noteModal2 .modal-body"
                             hx-swap="innerHTML"
-
-
                         >
-                            @
+                            <span th:if="${!#strings.isEmpty(entry.value.note.content)}"
+                                  th:text="${'@'}"></span>
+
                         </td>
+
 
 
 
@@ -109,9 +109,9 @@ https://github.com/turkerozturk/springtopiccalendar
 
                     <!-- visualising disabled cells, no data, outside of date range -->
                     <th:block th:if="${entry.value.status == -1 }">
-                        <td th:text="''"
+                        <td th:text="'&nbsp;'"
                             style="background-color:WhiteSmoke;padding:0;"
-                            th:attr="title=${entry.key} + ' [Outside of the date range]', onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
+                            th:attr="data-tooltip=${entry.key} + '&lt;br&gt;[Outside of the date range]', onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                             th:data-ymd="${entry.key}"
                         >
                             X
@@ -123,7 +123,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
                 <th:block th:if="${entry.value == null }">
                     <td class="weekly-table-entry-cell"
-                        th:title="${entry.key}"
+                        th:data-tooltip="${entry.key}"
                         th:attr="onmouseenter='showCustomTooltip(this)', onmouseleave='hideCustomTooltip()'"
                         th:data-ymd="${entry.key}"
                         style="padding:0;"
@@ -703,7 +703,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
     <div id="custom-tooltip-popup" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
     background-color: white; border: 2px solid gray; padding: 20px 30px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-radius: 10px;">
-        <h2 id="custom-tooltip-text" style="margin: 0; font-size: 1.5rem;"></h2>
+        <div id="custom-tooltip-text" style="margin: 0; font-size: 1.5rem;"></div>
     </div>
 
     <!-- sayfanın en altına yakın bir yere ekleyin -->
@@ -1100,17 +1100,18 @@ https://github.com/turkerozturk/springtopiccalendar
         function showCustomTooltip(element) {
           const popup = document.getElementById('custom-tooltip-popup');
           const popupText = document.getElementById('custom-tooltip-text');
-          const titleText = element.getAttribute('title');
+          const tooltipHtml = element.getAttribute('data-tooltip');
 
-          if (!titleText) return;
+          if (!tooltipHtml) return;
 
-          popupText.textContent = titleText;
+          popupText.innerHTML = tooltipHtml; // HTML yorumlansın diye textContent değil innerHTML
           popup.style.display = 'block';
 
           tooltipTimeout = setTimeout(() => {
             popup.style.display = 'none';
           }, 5000);
         }
+
 
         function hideCustomTooltip() {
           const popup = document.getElementById('custom-tooltip-popup');
@@ -1147,6 +1148,15 @@ https://github.com/turkerozturk/springtopiccalendar
                     <tr><th>Character</th><th>Description</th></tr>
                 </thead>
                 <tbody>
+
+                    <tr><th colspan="2">Beginning Characters</th></tr>
+
+                    <tr><td>'</td><td>Disable</td></tr>
+                    <tr><td>!</td><td>Strict</td></tr>
+                    <tr><td>-</td><td>Opposite</td></tr>
+
+                    <tr><th colspan="2">Rule Characters</th></tr>
+
                     <tr><td>1</td><td>Exact match for ONE</td></tr>
                     <tr><td>0</td><td>Exact match for ZERO</td></tr>
                     <tr><td>?</td><td>Either 0 or 1 is allowed</td></tr>
