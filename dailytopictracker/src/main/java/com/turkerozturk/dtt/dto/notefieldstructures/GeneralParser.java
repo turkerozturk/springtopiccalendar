@@ -97,15 +97,18 @@ public class GeneralParser implements NoteFieldStructure {
 
         if (dates.isEmpty()) return; // nothing to compute
 
-        generalStart = dates.get(0); // inclusive
 
         // End = topic.endDate (inclusive) if present, else today (inclusive)
         LocalDate today = LocalDate.now(zoneId);
+        LocalDate topicStart = null;
         LocalDate topicEnd = null; // Adjust here if your Topic end date type differs
         if (topic != null) {
             // If your model uses a different type (e.g., Long millis), convert it here instead.
+            topicStart = topic.getBaseDate();
             topicEnd = topic.getEndDate(); // <-- assumes LocalDate, adapt if necessary
         }
+        generalStart = (topicStart != null) ? topicStart : dates.get(0); // inclusive
+
         generalEnd = (topicEnd != null) ? topicEnd : today;
 
         // Inclusive day count in range [generalStart, generalEnd]

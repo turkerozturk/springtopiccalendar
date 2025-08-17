@@ -260,7 +260,7 @@ public class OccurrenceParser {
                 occuranceType.equals(OccuranceType.RANDOM_EMPTY_STRICT) ||
                 occuranceType.equals(OccuranceType.RANDOM_EMPTY_LOOSE) ) {
 
-             sb.append("<tr><td title=\"inputExtended\">Rule</td><td>")
+             sb.append("<tr><td title=\"inputExtended\">Rule</td><td style=\"background-color:lightyellow;\">")
                      .append(inputExtended != null ? inputExtended : "")
                      .append("</td></tr>\n");
 

@@ -139,7 +139,7 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
 
     @Query("SELECT e FROM Entry e WHERE " +
             "(:topicId IS NULL OR e.topic.id = :topicId) AND " +
-            "e.dateMillisYmd BETWEEN :startDateMillis AND :endDateMillis")
+            "e.dateMillisYmd BETWEEN :startDateMillis AND :endDateMillis ORDER BY e.dateMillisYmd ASC")
     List<Entry> findByTopicIdAndDateInterval(
             @Param("topicId") Long topicId,
             @Param("startDateMillis") long startDateMillis,
