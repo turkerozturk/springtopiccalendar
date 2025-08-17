@@ -185,6 +185,7 @@ public class EnumerationParser implements NoteFieldStructure {
         StringBuilder sb = new StringBuilder();
         sb.append("<table class=\"table table-sm table-bordered\"><tr><th>Group</th><th>Count</th><th>Last Date</th><th>Avg Days</th></tr>");
         DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE;
+        int totalCount = 0;
         for (Map.Entry<String, GroupStats> e : statsMap.entrySet()) {
             GroupStats gs = e.getValue();
             sb.append("<tr>")
@@ -193,7 +194,16 @@ public class EnumerationParser implements NoteFieldStructure {
                     .append("<td>").append(gs.lastDate.format(fmt)).append("</td>")
                     .append("<td>").append(String.format("%.2f", gs.avgDays)).append("</td>")
                     .append("</tr>");
+            totalCount += gs.count;
         }
+        sb.append("<tr>")
+                .append("<td colspan=\"4\">")
+                .append("").append(totalCount).append(" items in ")
+                .append(statsMap.size()).append(" different things,")
+                .append("</td>")
+                .append("</tr>");
+
+
         sb.append("</table>");
 
         sb.append("<span>").append("Parser: ")
