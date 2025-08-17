@@ -35,102 +35,97 @@
 
     <style>
 
-        .status-0 {
-                    background-color: gainsboro !important;
-        }
-        .status-1 {
-            background-color: palegreen !important;
-        }
-        .status-2 {
-            background-color: tomato !important;
-        }
-        .status-3 {
-            background-color: LightBlue !important;
-        }
-
-
-        #categorySelect {
-          max-width: 250px; /* Genişliği sınırla */
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-        }
+        body {
+        background-color: #DFDBE5;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='77' height='107' viewBox='0 0 77 107'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='stamp-collection' fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M46 101a5 5 0 0 1 5 5h5a5 5 0 0 1 10 0h5a5 5 0 0 1 5-5v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10V6a5 5 0 0 1-5-5h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0H6a5 5 0 0 1-5 5v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 5 5h5a5 5 0 0 1 10 0h5a5 5 0 0 1 10 0h5a5 5 0 0 1 5-5zm15-2a7 7 0 0 0-6.71 5h-1.58a7 7 0 0 0-13.42 0h-1.58a7 7 0 0 0-13.42 0h-1.58a7 7 0 0 0-13.42 0H7.71A7.01 7.01 0 0 0 3 99.29v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58A7 7 0 0 0 3 9.29V7.71A7.02 7.02 0 0 0 7.71 3h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58A7.02 7.02 0 0 0 74 7.71v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7.01 7.01 0 0 0-4.71 4.71h-1.58A7 7 0 0 0 61 99zM12 12h53v83H12V12zm51 81H14V14h49v79z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
 
 
 
-        .fonbg {
-            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-        }
-
-        #topicsTable {
-
-
-          background-color: WhiteSmoke;
-          border: 3px solid black;
-       }
-       /* Mevcut link stilleri korundu */
-       a {
-           text-decoration: none;
-           color: inherit;
-       }
-       a:visited {
-           color: inherit;
-       }
-       a:hover {
-           color: blue;
-       }
-
-
-       /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
-       #topicsTable input.form-control {
-           width: 100%; /* Hücrenin tamamını kaplasın */
-       }
-
-       .crop-text {
-         white-space: nowrap;
-         overflow: hidden;
-         position: relative;
-         max-width: 200px;
-       }
-
-
-
-/* https://css-pattern.com/checkerboard-optical-illusion/ */
-body {
-  --s: 300px; /* control the size*/
-  --c1: #d7c9a8;
-  --c2: #f1eccf;
-
-  --c:var(--c1) 0;
-  --g:conic-gradient(at 50% 25%,#0000 75%,var(--c));
-  background:
-    repeating-linear-gradient(#0000 0 48%,var(--c) 50%),var(--g),
-    conic-gradient(#0000 75%,var(--c)) calc(var(--s)/4) calc(var(--s)/2),
-    var(--g) calc(var(--s)/2) var(--s) var(--c2);
-  background-size: var(--s) var(--s),var(--s) calc(2*var(--s));
+.status-0 {
+           background-color: gainsboro !important;
+}
+.status-1 {
+   background-color: palegreen !important;
+}
+.status-2 {
+   background-color: tomato !important;
+}
+.status-3 {
+   background-color: LightBlue !important;
 }
 
 
- #navigation-panel button, a{
-   border-radius:10px !important;
- }
+#categorySelect {
+ max-width: 250px; /* Genişliği sınırla */
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ overflow: hidden;
+}
 
 
-       #navigation-panel {
-    max-width: 640px;
-    margin-top: 10px;
-    margin-bottom: 5px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 3px;
-    border: 2px solid DarKGray;
-    border-radius: 7px 7px 7px 7px;
 
-    /* https://cssgradient.io/ */
+.fonbg {
+   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+}
 
-    background: #a7d6e8;
-    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
- }
+#topicsTable {
+
+
+ background-color: WhiteSmoke;
+ border: 3px solid black;
+}
+/* Mevcut link stilleri korundu */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:visited {
+  color: inherit;
+}
+a:hover {
+  color: blue;
+}
+
+
+/* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
+#topicsTable input.form-control {
+  width: 100%; /* Hücrenin tamamını kaplasın */
+}
+
+.crop-text {
+white-space: nowrap;
+overflow: hidden;
+position: relative;
+max-width: 200px;
+}
+
+
+
+
+
+
+
+#navigation-panel button, a{
+border-radius:10px !important;
+}
+
+
+#navigation-panel {
+max-width: 640px;
+margin-top: 10px;
+margin-bottom: 5px;
+margin-left: auto;
+margin-right: auto;
+padding: 3px;
+border: 2px solid DarKGray;
+border-radius: 7px 7px 7px 7px;
+
+/* https://cssgradient.io/ */
+
+background: #a7d6e8;
+background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+}
 
     </style>
 </head>
