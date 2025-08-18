@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.controller.web;
 
 
+import com.turkerozturk.dtt.component.MarkdownService;
 import com.turkerozturk.dtt.dto.notefieldstructures.NoteFieldStructure;
 import com.turkerozturk.dtt.dto.notefieldstructures.ParserFactory;
 import com.turkerozturk.dtt.dto.statistics.OverallStatisticsDTO;
@@ -81,11 +82,13 @@ public class EntryController {
 
     private final CategoryRepository categoryRepository;
 
+    private final MarkdownService markdownService;
+
     @Value("${week.start.day:MONDAY}")
     private String startDayOfWeek;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository, MarkdownService markdownService) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.filterService = entryService;
@@ -93,6 +96,7 @@ public class EntryController {
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.categoryRepository = categoryRepository;
+        this.markdownService = markdownService;
     }
 
     @GetMapping
@@ -265,6 +269,8 @@ public class EntryController {
 
 
         Topic topic = topicRepository.findById(topicId).get();
+        String descriptionHtml = markdownService.render(topic.getDescription());
+        topic.setDescriptionAsHtml(descriptionHtml);
         model.addAttribute("topic", topic);
 
         Long topicBaseDateMillis = null;
@@ -1488,12 +1494,17 @@ public class EntryController {
     @ResponseBody
     public String getFullNote(@PathVariable Long id) {
         return entryRepository.findById(id)
-                .map(e -> e.getNote() != null ? convertUrlsToLinksSafe(e.getNote().getContent()) : "")
+                .map(e -> e.getNote() != null ? convertToMarkdownHtml(e.getNote().getContent()) : "")
                 .orElse("");
     }
 
+    public String convertToMarkdownHtml(String text) {
+        String converted = markdownService.render(text);
+        return converted;
+    }
 
     public String convertUrlsToLinksSafe(String text) {
+
         if (text == null) return "";
 
         // 1. HTML karakterlerini escape et (örneğin: <, >, &, ")
@@ -1508,6 +1519,7 @@ public class EntryController {
         return escaped.replaceAll(urlRegex,
                 "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>");
     }
+
 
 
 

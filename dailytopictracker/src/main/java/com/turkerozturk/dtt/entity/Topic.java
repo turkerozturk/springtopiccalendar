@@ -75,6 +75,10 @@ public class Topic {
         return occurrenceParser.toHTML();
     }
 
+    // for markdown, related with MarkdownService.java component and flexmark library.
+    @Transient
+    private String descriptionAsHtml;
+
     /**
      * -- GETTER --
      * Veritabanında kaydı yok, 2025-05-15 gibi string biçiminde ymd tarih için
