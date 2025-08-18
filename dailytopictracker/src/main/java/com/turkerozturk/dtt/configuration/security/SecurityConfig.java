@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.configuration.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,15 +31,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-
+    // application.properties'e hangi enum degerini yazdiyak o sayfaya yonlenmesi icin.
+    @Value("${app.login.redirectTarget:HOME}")
+    private String redirectTargetRaw; // dogrudan RedirectTarget yapmadik cunku yanlis yazim varsa hata vermemesi icin fromString metodumuzla kontrol etmek istiyoruz..
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        RedirectTarget redirectTarget = RedirectTarget.fromString(redirectTargetRaw);
+
         return http
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)  // <<--- her zaman buraya yönlendir
+                        .defaultSuccessUrl(redirectTarget.getUrl(), true)  // <<--- login olunca gidecegi sayfayi artik properties dosyasindan aliyor.
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
