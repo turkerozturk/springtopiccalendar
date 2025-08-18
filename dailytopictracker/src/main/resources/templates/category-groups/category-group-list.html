@@ -84,6 +84,10 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
 
+        .categories-cell {
+            background-color: rgba(255, 255, 255, 0.60) ;
+        }
+
  #navigation-panel button, a{
    border-radius:10px !important;
  }
@@ -181,7 +185,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         </colgroup>
         <thead>
         <tr>
-            <th></th> <!-- Tutamak sütunu -->
+            <th class="text-center">🤚</th> <!-- Tutamak sütunu -->
             <th class="text-center" style="background-color: lightgray;"
                 title="Hover on to the table row number to see the category group ID number.">#</th>
             <th class="text-center" style="background-color: lightgray;">Group Name</th>
@@ -190,7 +194,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         </tr>
         </thead>
         <tbody id="sortable">
-        <tr th:each="grp, jStats : ${groups}" th:attr="data-id=${grp.id}">
+        <tr th:each="grp, jStats : ${groups}" th:attr="data-id=${grp.id}"
+            th:style="${ 'background-color:' + grp.backgroundColor + ';' }">
             <td class="move-controls">
                 <a href="#" class="move-up" title="Move Up" style="display:none;">&#x25B2;</a> <!-- ▲ -->
                 <a href="#" class="move-down" title="Move Down" style="display:none;">&#x25BC;</a> <!-- ▼ -->
@@ -199,13 +204,13 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             <td th:text="${#numbers.formatInteger((jStats.index + 1), 2)}"
                  style="text-align:right;"
             th:title="${ 'CategoryGroup ID = ' + grp.id + '. This category group has ' + grp.categories.size + ' categories.' }">1</td>
-            <td class="vertical" th:style="${ 'background-color:' + grp.backgroundColor + '; text-align:center;' }">
+            <td class="vertical" style="text-align:center;">
                 <span th:text="${grp.name}"
                       style="background-color: azure;
                         padding: 3px;
                         border: 2px solid DarKGray;
                         border-radius: 7px 7px 7px 7px;">Group Name</span></td>
-            <td>
+            <td class="categories-cell">
                 <a th:if="${grp.categories.size == 0}"
                    th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
                    title="Add Category" style="font-family:sans-serif;">Add Category</a>
