@@ -376,11 +376,16 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <input type="hidden" th:field="*{statuses}" />
                 <input type="hidden" th:field="*{categoryId}" />
                 <input type="hidden" th:field="*{entriesThreshold}" />
+                <input type="hidden" th:field="*{categoryGroupId}" />
 
                 <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
                     category▶️
                 </button>
             </form>
+
+            <a th:href="@{/reports/cg?categoryGroupId={id}(id=${filterDto.categoryGroupId})}"
+               th:title="${ 'Open category group in intelligent report view.' }"
+            >&nbsp;🧠</a>
 
         </th:block>
 </div>
@@ -763,6 +768,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <th class="text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
+
+
         </tr>
         </thead>
 
@@ -1051,6 +1059,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         th:text="'📅'">
                     View Weekly Calendar
                 </a>
+            </td>
+
+
+            <td>
+                <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
             </td>
 
 

@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.controller;
 
+import com.turkerozturk.dtt.entity.CategoryGroup;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -120,11 +121,15 @@ public class EntryFilterController {
         List<Entry> filteredEntries;
         if(categoryId!=null) {
             filterDto.setCategoryId(categoryId);
+            Optional<Category> categoryGroupOpt = categoryRepository.findById(categoryId);
+            filterDto.setCategoryGroupId(categoryGroupOpt.get().getId());
         } else {
             List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
             if (!cats.isEmpty()) {
                 categoryId = cats.get(0).getId();
                 filterDto.setCategoryId(categoryId);
+                CategoryGroup categoryGroup = cats.get(0).getCategoryGroup();
+                filterDto.setCategoryGroupId(categoryGroup.getId());
             }
         }
         List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
@@ -389,6 +394,9 @@ public class EntryFilterController {
         Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
+        CategoryGroup categoryGroup = selectedCategory.getCategoryGroup();
+        filterDto.setCategoryGroupId(categoryGroup.getId());
+
         return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
         // return "view-tracker/filter-form"; // gives Document Expired error Bu sorunun standart cozumu PRG (Post-Redirect-Get) desenidir.
 
@@ -459,6 +467,9 @@ public class EntryFilterController {
         // we need this to get the "archived" value
         Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
+
+        CategoryGroup categoryGroup = selectedCategory.getCategoryGroup();
+        filterDto.setCategoryGroupId(categoryGroup.getId());
 
         return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
         // return "view-tracker/filter-form"; // gives Document Expired error Bu sorunun standart cozumu PRG (Post-Redirect-Get) desenidir.
@@ -779,6 +790,9 @@ public class EntryFilterController {
         int newIdx = (idx <= 0) ? size - 1 : idx - 1;
         filterDto.setCategoryId(cats.get(newIdx).getId());
 
+        CategoryGroup categoryGroup = cats.get(newIdx).getCategoryGroup();
+        filterDto.setCategoryGroupId(categoryGroup.getId());
+
         return applyCategoryShiftingFilter(filterDto, model, session, reportType);
     }
 
@@ -809,6 +823,9 @@ public class EntryFilterController {
         // yeni index: eğer null ya da son ise başa git, değilse idx+1
         int newIdx = (idx < 0 || idx == size - 1) ? 0 : idx + 1;
         filterDto.setCategoryId(cats.get(newIdx).getId());
+
+        CategoryGroup categoryGroup = cats.get(newIdx).getCategoryGroup();
+        filterDto.setCategoryGroupId(categoryGroup.getId());
 
         return applyCategoryShiftingFilter(filterDto, model, session, reportType);
     }

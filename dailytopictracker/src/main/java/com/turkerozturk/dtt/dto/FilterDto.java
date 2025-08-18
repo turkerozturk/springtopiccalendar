@@ -32,6 +32,8 @@ import java.util.List;
 @ValidDateRange
 public class FilterDto {
 
+    private Long categoryGroupId;
+
     private Long categoryId;
 
     // Çoklu topic seçimi için topic id listesi
