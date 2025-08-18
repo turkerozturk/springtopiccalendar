@@ -5,6 +5,9 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import org.springframework.stereotype.Component;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
+
 @Component
 public class MarkdownService {
     private final Parser parser;
@@ -17,8 +20,15 @@ public class MarkdownService {
 
     public String render(String markdown) {
         if (markdown == null || markdown.isBlank()) return "";
+
+        // Markdown -> HTML
         Node document = parser.parse(markdown);
-        //System.out.println(renderer.render(document));
-        return renderer.render(document);
+        String unsafeHtml = renderer.render(document);
+
+        // HTML'i temizle (XSS korumasi)
+        String safeHtml = Jsoup.clean(unsafeHtml, Safelist.basicWithImages());
+
+        return safeHtml;
     }
 }
+
