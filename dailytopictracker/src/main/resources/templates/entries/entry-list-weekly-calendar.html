@@ -214,7 +214,8 @@ span.col-2 {
                          style="max-height:135px; object-fit:cover;" />
                 </div>
                 <div class="card-body p-2" style="font-size:0.9rem;">
-                    <p class="card-text text-secondary mb-0" th:text="${#strings.abbreviate(topic.description,200)}">Topic description</p>
+                    <p class="card-text text-secondary mb-0" th:utext="${topic.descriptionAsHtml}">Topic description</p>
+
                 </div>
 
         </span>
