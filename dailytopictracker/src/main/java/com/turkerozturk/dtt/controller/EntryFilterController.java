@@ -121,8 +121,10 @@ public class EntryFilterController {
         List<Entry> filteredEntries;
         if(categoryId!=null) {
             filterDto.setCategoryId(categoryId);
-            Optional<Category> categoryGroupOpt = categoryRepository.findById(categoryId);
-            filterDto.setCategoryGroupId(categoryGroupOpt.get().getId());
+            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+            if(categoryOpt.isPresent()) {
+                filterDto.setCategoryGroupId(categoryOpt.get().getCategoryGroup().getId());
+            }
         } else {
             List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
             if (!cats.isEmpty()) {
