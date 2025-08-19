@@ -23,6 +23,9 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
 
+    <link rel="stylesheet" type="text/css" href="/webjars/easymde/2.18.0/dist/easymde.min.css">
+
+
     <style>
         form {
             background-color: WhiteSmoke;
@@ -160,8 +163,8 @@
 
 
         <div class="mb-3 row">
+            <!-- markdown easymde -->
             <label for="note_content" class="col-sm-2 col-form-label col-form-label-sm">Note:</label>
-
             <div class="col-sm-9">
                 <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control"></textarea>
             </div>
@@ -334,7 +337,14 @@ WebJars path'leri şu yapıyı izler:
     }
 </script>
 
-
+<script src="/webjars/easymde/2.18.0/dist/easymde.min.js"></script>
+<script>
+    var easyMDE = new EasyMDE({
+        element: document.getElementById("note_content"),
+        spellChecker: false,
+        forceSync: true  // <-- onemli: EasyMDE icerigini textarea ile senkronize eder
+    });
+</script>
 
 
 
