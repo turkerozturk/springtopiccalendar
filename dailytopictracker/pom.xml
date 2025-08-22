@@ -77,6 +77,12 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+
         <!-- Spring Boot Test (isteğe bağlı) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
