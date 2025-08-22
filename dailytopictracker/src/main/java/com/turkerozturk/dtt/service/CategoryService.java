@@ -102,25 +102,7 @@ public class CategoryService {
                 .toInstant()
                 .toEpochMilli();
 
-
         List<CategoryEntryStatsDto> statsDtos = categoryRepository.getCategoryEntryStats(todayYmd);
-
-        // basla --- statsDtos daki predictionCount sayisi yanlis geleceginden asagidaki kod ile duzeltiyoruz.
-        List<Object[]> predictionCounts = topicRepository.getPredictionCountsPerCategory(todayYmd);
-        Map<Long, Long> predictionMap = predictionCounts.stream()
-                .collect(Collectors.toMap(
-                        obj -> (Long) obj[0],
-                        obj -> (Long) obj[1]
-                ));
-
-        statsDtos.forEach(dto -> {
-            Long prediction = predictionMap.get(dto.getCategoryId());
-            if (prediction != null) {
-                dto.setPredictionCount(prediction);
-            }
-        });
-        // bitti
-
 
         return statsDtos;
     }
