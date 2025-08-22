@@ -21,6 +21,8 @@
 package com.turkerozturk.dtt.service;
 
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.i18n.LocaleContextHolder;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.CategoryEntryStatsDto;
@@ -95,6 +97,7 @@ public class CategoryService {
         }
     }
 
+    @Cacheable("categoryStats")
     public List<CategoryEntryStatsDto> getCategoryStats() {
         ZoneId zoneId = timeZoneProvider.getZoneId();
         Long todayYmd = LocalDate.now(zoneId)
