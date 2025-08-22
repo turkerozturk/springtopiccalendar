@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.CategoryGroup;
@@ -40,6 +41,7 @@ public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Lo
 
     List<CategoryGroup> findAllByOrderByIdDesc();
 
+    @EntityGraph(attributePaths = "categories")
     List<CategoryGroup> findAllByOrderByPriorityDesc();
 
 
