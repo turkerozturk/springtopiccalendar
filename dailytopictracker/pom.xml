@@ -81,6 +81,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
+        <!--  Caffeine is a high performance, near optimal caching library. It provides an in-memory cache using a Google Guava inspired API.  -->
+        <!-- bunun ayarlamasi application.properties'den yapiliyor -->
+        <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
 
 
         <!-- Spring Boot Test (isteğe bağlı) -->
