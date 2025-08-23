@@ -44,6 +44,9 @@ public class CategoryGroup {
     @Column(name="background_color", nullable = false)
     private String backgroundColor;
 
+    @Column(name = "image_file_name")
+    private String imageFileName;
+
     @OneToMany(mappedBy = "categoryGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories = new ArrayList<>();
 
