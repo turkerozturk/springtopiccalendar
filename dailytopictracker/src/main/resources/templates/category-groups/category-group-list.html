@@ -177,18 +177,18 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <table id="category-groups-table">
         <colgroup>
-            <col style="width: 32px;">
             <col style="width: 22px;background-color: white;">
-            <col style="width: 200px;">
-            <col style="width: 900px;background-color: white;">
+            <col style="width: 120px;">
+            <col style="width: 120px;">
+            <col style="width: 892px;background-color: white;">
             <col style="width: 126px;">
         </colgroup>
         <thead>
         <tr>
-            <th class="text-center">🤚</th> <!-- Tutamak sütunu -->
             <th class="text-center" style="background-color: lightgray;"
                 title="Hover on to the table row number to see the category group ID number.">#</th>
             <th class="text-center" style="background-color: lightgray;">Group Name</th>
+            <th class="text-center">🤚</th> <!-- Tutamak sütunu -->
             <th class="text-center" style="background-color: lightgray;">Categories</th>
             <th class="text-center" style="background-color: lightgray;">Actions</th>
         </tr>
@@ -196,33 +196,72 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         <tbody id="sortable">
         <tr th:each="grp, jStats : ${groups}" th:attr="data-id=${grp.id}"
             th:style="${ 'background-color:' + grp.backgroundColor + ';' }">
-            <td class="move-controls">
-                <a href="#" class="move-up" title="Move Up" style="display:none;">&#x25B2;</a> <!-- ▲ -->
-                <a href="#" class="move-down" title="Move Down" style="display:none;">&#x25BC;</a> <!-- ▼ -->
-            </td>
+
+
+
+
+
 
             <td th:text="${#numbers.formatInteger((jStats.index + 1), 2)}"
                  style="text-align:right;"
             th:title="${ 'CategoryGroup ID = ' + grp.id + '. This category group has ' + grp.categories.size + ' categories.' }">1</td>
 
-            <td class="vertical"
-                th:style="'text-align:center;
-               background-image:url(' + (${grp.imageFileName != null} ? '/topicimages/' + ${grp.imageFileName} : '') + ');
-               background-size:cover;
-               background-repeat:no-repeat;
-               background-position:center;
-               position:relative;'">
 
+
+            <td class="vertical" style="text-align:center; height:110px;
+                                        position:relative; padding:6px;">
+
+
+
+                <!-- Yazı her zaman görünsün -->
                 <span th:text="${grp.name}"
-                      style="background-color:rgba(240, 255, 255, 0.5);
-                             padding:3px;
-                             border:2px solid DarkGray;
-                             border-radius:7px;">
+                      style="position:relative;
+                 z-index:1;
+                 background-color:rgba(240, 255, 255, 0.7);
+                 padding:3px 6px;
+                 border:2px solid DarkGray;
+                 border-radius:7px;
+                 font-weight:bold;">
                     Group Name
                 </span>
+
             </td>
 
 
+            <td class="move-controls" style="text-align:center; height:110px;
+                                        position:relative; padding:6px;">
+                <!-- Eğer imageFileName varsa resim div'i -->
+                <div th:if="${grp.imageFileName != null and !#strings.isEmpty(grp.imageFileName)}"
+                     style="position:absolute;
+                top:6px; left:6px; right:6px; bottom:6px;
+                display:flex; justify-content:center; align-items:center;
+                z-index:0;">
+                    <img th:src="@{ ${grp.imageFileName}}"
+                         style="max-height:100px;
+                    min-height:100px;
+                    max-width:100px;
+                    min-width:100px;
+                    object-fit:contain;
+                    opacity:0.8;
+                    border-radius:12px;
+                    box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
+                </div>
+
+                <div>
+                    <a href="#" class="move-up" title="Move Up"
+                       style="display:none; z-index:1; position:relative; font-size: medium;
+                   background-color:rgba(240, 255, 255, 0.7); padding:3px 6px;
+                   border:2px solid DarkGray;
+                   border-radius:7px;">&#x25B2;</a> <!-- ▲ -->
+                    <br />
+                    <a href="#" class="move-down" title="Move Down"
+                       style="display:none; z-index:1; position:relative; font-size: medium;
+                   background-color:rgba(240, 255, 255, 0.7); padding:3px 6px;
+                   border:2px solid DarkGray;
+                   border-radius:7px;">&#x25BC;</a> <!-- ▼ -->
+                </div>
+
+            </td>
 
 
 
@@ -306,6 +345,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                 </th:block>
             </td>
             <td class="text-center">
+                <div class="actions" style="display: none;">
                 <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
                    class=" btn-sm btn-outline-secondary" title="Edit Category Group">✎&nbsp;</a>
                 <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
@@ -318,6 +358,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                 <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
                    th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }"
                 >&nbsp;🧠</a>
+                </div>
             </td>
         </tr>
         </tbody>
@@ -404,9 +445,11 @@ WebJars path'leri şu yapıyı izler:
       $("#sortable tr").hover(
         function () {
           $(this).find(".move-up, .move-down").show();
+          $(this).find(".actions").show();
         },
         function () {
           $(this).find(".move-up, .move-down").hide();
+          $(this).find(".actions").hide();
         }
       );
 

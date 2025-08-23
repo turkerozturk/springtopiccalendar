@@ -59,10 +59,34 @@
             />
         </div>
 
-        <div class="mb-3">
-            <label for="imageFileName" class="form-label">Image File Name:</label>
-            <input type="text" id="imageFileName" th:field="*{imageFileName}" class="form-control" />
-        </div>
+
+
+
+        <th:block th:if="${imageFilePaths} != null">
+
+            <div class="mb-3">
+                <th:block th:if="${imageFilePaths.size != null && imageFilePaths.size > 0}">
+                    <label for="imageFileName" class="form-label">Image File:</label>
+                    <select id="imageFileName" th:field="*{imageFileName}" class="form-select" onchange="updatePreview(this)">
+                        <option value="" disabled>Select Image</option>
+                        <option th:each="path : ${imageFilePaths}"
+                                th:value="${path}"
+                                th:text="${path}"
+                                th:selected="${path}">
+                        </option>
+                    </select>
+                </th:block>
+            </div>
+
+
+            <div class="mb-3" style="text-align:center;">
+                <!-- varsayilan olarak /images/default.png yerine '' var artik cunku resim istenmeyebilir. -->
+                <img id="imagePreview" th:src="@{${group.imageFileName != null} ? ${group.imageFileName} : ''}"
+                     width="135" height="135" alt="Selected Image" style="object-fit: contain; border: 1px solid #ccc;" />
+            </div>
+
+        </th:block>
+
 
 
         <div class="mb-3">
@@ -78,5 +102,20 @@
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script>
+    function updatePreview(selectElement) {
+        const selectedValue = selectElement.value;
+        const imagePreview = document.getElementById("imagePreview");
+        if (selectedValue && selectedValue.trim() !== "") {
+            imagePreview.src = selectedValue;
+        } else {
+            imagePreview.src = "/images/default.png";
+        }
+    }
+</script>
+
+
+
 </body>
 </html>

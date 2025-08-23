@@ -35,11 +35,9 @@ import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.service.CategoryService;
 
+import java.io.File;
 import java.text.Collator;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -107,6 +105,9 @@ public class CategoryGroupController {
         categoryGroup.setBackgroundColor(defaultBgColor);
         model.addAttribute("group", categoryGroup);
         model.addAttribute("returnPage", returnPage);
+        List<String> imageFilePaths = collectImagePaths();
+        model.addAttribute("imageFilePaths", imageFilePaths);
+
 
         return "category-groups/category-group-form";
     }
@@ -153,6 +154,9 @@ public class CategoryGroupController {
         CategoryGroup grp = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id:"+id));
         model.addAttribute("group", grp);
+        List<String> imageFilePaths = collectImagePaths();
+        model.addAttribute("imageFilePaths", imageFilePaths);
+
         return "category-groups/category-group-form";
     }
 
@@ -218,5 +222,60 @@ public class CategoryGroupController {
         );
         return "redirect:/category-groups";
     }
+
+    // codes below are related with topic images
+    private static final String TOPIC_IMAGES_DIR = "topicimages";
+
+    private static final List<String> SUPPORTED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".gif", ".svg");
+
+    public void ensureTopicImagesDirectoryExists() {
+        File dir = new File(TOPIC_IMAGES_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
+    public List<String> collectImagePaths() {
+        ensureTopicImagesDirectoryExists();
+
+        List<String> result = new ArrayList<>();
+        result.add(""); // default secenek bos olmasi yani resim istemiyorum secenegi.
+        //result.add("/images/default.png");
+
+        File baseDir = new File(TOPIC_IMAGES_DIR);
+        collectRecursive(baseDir, result, baseDir.getAbsolutePath());
+
+        // necessary to remove eduplicates
+        result = new ArrayList<>(new LinkedHashSet<>(result));
+
+        //Collections.sort(result.subList(1, result.size())); // default.png dışındakileri alfabetik sırala
+
+        return result;
+    }
+
+    private void collectRecursive(File currentDir, List<String> result, String basePath) {
+        File[] files = currentDir.listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                collectRecursive(file, result, basePath);
+            } else if (isSupportedImage(file.getName())) {
+                String relativePath = file.getAbsolutePath().substring(basePath.length()).replace(File.separatorChar, '/');
+                if (relativePath.startsWith("/")) {
+                    relativePath = relativePath.substring(1);
+                }
+                result.add("/topicimages/" + relativePath);
+            }
+        }
+
+    }
+
+    private boolean isSupportedImage(String name) {
+        String lower = name.toLowerCase();
+        return SUPPORTED_EXTENSIONS.stream().anyMatch(lower::endsWith);
+    }
+
+
 }
 
