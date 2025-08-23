@@ -507,10 +507,9 @@ span.col-2 {
 
 
 
+                        <td th:style="${dayNamesLong[i]} == ${todayDateDayName} ? 'background-color: lightyellow;' : ''">
 
-                        <td th:style="${dayNames[i]} == ${todayDateDayName} ? 'background-color: lightyellow;' : ''">
-
-                            <span style="margin: 0 auto;" th:text="${dayNames[i]}"></span>
+                            <span style="margin: 0 auto;" th:text="${dayNamesLong[i]}"></span>
 
                         </td>
 
@@ -957,7 +956,7 @@ span.col-2 {
     <script th:inline="javascript">
         /*<![CDATA[*/
         var status1Counts = [[${status1}]];
-        var labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var labels = [[${dayNamesShort}]];
 
         new Chart(document.getElementById('status1Chart'), {
             type: 'pie',

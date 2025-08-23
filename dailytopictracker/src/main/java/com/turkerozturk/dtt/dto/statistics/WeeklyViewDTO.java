@@ -23,8 +23,8 @@ package com.turkerozturk.dtt.dto.statistics;
 import com.turkerozturk.dtt.entity.Entry;
 import lombok.Data;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,5 +39,7 @@ public class WeeklyViewDTO {
     private List<String> bottom3ColumnDates;
 
     private List<Map<LocalDate, Entry>> weeklyMaps;
+
+    private List<DayOfWeek> dayOfWeeks;
 
 }

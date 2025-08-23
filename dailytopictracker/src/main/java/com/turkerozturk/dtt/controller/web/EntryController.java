@@ -200,6 +200,9 @@ public class EntryController {
 
         // Repository'den verileri al
         List<Entry> entries = entryService.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
+        if (entries == null || entries.size() == 0) {
+            return "entries/entry-list-weekly-calendar-empty";
+        }
         //System.out.println(startDateMillis + " " + endDateMillis + " " + entries.size());
         for(Entry ent : entries) {
             if(ent.getStatus() == 1) {
@@ -218,6 +221,7 @@ public class EntryController {
         String startDateDayName = startDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         model.addAttribute("startDateDayName", startDateDayName);
         String todayDateDayName = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        //System.out.println("BUGUNN: " + todayDateDayName);
         model.addAttribute("todayDateDayName", todayDateDayName);
         String endDateDayName = endDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         //model.addAttribute("endDateDayName", endDateDayName);
@@ -389,6 +393,24 @@ public class EntryController {
             status1.add(count1);
             status2.add(count2);
         }
+
+        List<DayOfWeek> dayOfWeeks = manualWeeklyViewDTO.getDayOfWeeks();
+        List<String> dayNamesShort = new ArrayList<>();
+        List<String> dayNamesLong = new ArrayList<>();
+
+        for (int z = 0; z < status1.size(); z++) {
+            dayNamesShort.add(dayOfWeeks.get(z).getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
+            dayNamesLong.add(dayOfWeeks.get(z).getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+
+        }
+        model.addAttribute("dayNamesShort", dayNamesShort);
+        model.addAttribute("dayNamesLong", dayNamesLong);
+
+        /*
+        for (int z = 0; z < status1.size(); z++) {
+            System.out.println(status1.get(z) + " " + dayNamesShort.get(z));
+        }
+        */
 
         model.addAttribute("status0", status0);
         model.addAttribute("status1", status1);
@@ -845,10 +867,21 @@ public class EntryController {
         DateTimeFormatter formatter6 = DateTimeFormatter.ofPattern("yy");
 
 
+        List<DayOfWeek> dayOfWeeks = new ArrayList<>();
         // 7 adet gün Map'i oluştur
         List<Map<LocalDate, Entry>> weeklyMaps = new ArrayList<>();
+        DayOfWeek dow = startDate.getDayOfWeek();//DayOfWeek.valueOf(startDayOfWeek);
+        int startOrdinal = dow.getValue();
+
         for (int i = 0; i < 7; i++) {
             weeklyMaps.add(new LinkedHashMap<>());
+
+
+            int ordinal = (startOrdinal + i) % 7;
+            DayOfWeek dowww = DayOfWeek.of(ordinal == 0 ? 7 : ordinal);
+            dayOfWeeks.add(dowww);
+
+
         }
 
         List<String> top1ColumnDates = new LinkedList<>();
@@ -920,6 +953,7 @@ public class EntryController {
         weeklyViewDTO.setTop2ColumnDates(top2ColumnDates);
         weeklyViewDTO.setTop3ColumnDates(top3ColumnDates);
         weeklyViewDTO.setWeeklyMaps(weeklyMaps);
+        weeklyViewDTO.setDayOfWeeks(dayOfWeeks);
 
         return weeklyViewDTO;
 
