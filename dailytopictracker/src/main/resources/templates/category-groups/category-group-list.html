@@ -204,12 +204,28 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             <td th:text="${#numbers.formatInteger((jStats.index + 1), 2)}"
                  style="text-align:right;"
             th:title="${ 'CategoryGroup ID = ' + grp.id + '. This category group has ' + grp.categories.size + ' categories.' }">1</td>
-            <td class="vertical" style="text-align:center;">
+
+            <td class="vertical"
+                th:style="'text-align:center;
+               background-image:url(' + (${grp.imageFileName != null} ? '/topicimages/' + ${grp.imageFileName} : '') + ');
+               background-size:cover;
+               background-repeat:no-repeat;
+               background-position:center;
+               position:relative;'">
+
                 <span th:text="${grp.name}"
-                      style="background-color: azure;
-                        padding: 3px;
-                        border: 2px solid DarKGray;
-                        border-radius: 7px 7px 7px 7px;">Group Name</span></td>
+                      style="background-color:rgba(240, 255, 255, 0.5);
+                             padding:3px;
+                             border:2px solid DarkGray;
+                             border-radius:7px;">
+                    Group Name
+                </span>
+            </td>
+
+
+
+
+
             <td class="categories-cell">
                 <a th:if="${grp.categories.size == 0}"
                    th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"

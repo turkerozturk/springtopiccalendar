@@ -180,6 +180,7 @@ public class CategoryGroupController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CategoryGroup id: " + id));
         managed.setName(formGroup.getName());
         managed.setBackgroundColor(formGroup.getBackgroundColor());
+        managed.setImageFileName(formGroup.getImageFileName());
         repo.save(managed);
         redirectAttrs.addFlashAttribute("success", "Category group updated successfully.");
         return "redirect:/category-groups";
