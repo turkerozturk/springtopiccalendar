@@ -1052,7 +1052,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                 <a
                         th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
-                        th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                        th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id}, fragment='true')}"
                         hx-target="#modal-content"
                         hx-trigger="click"
                         hx-swap="innerHTML"

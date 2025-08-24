@@ -1,10 +1,127 @@
-<!--
-This file is part of the DailyTopicTracker project.
-Please refer to the project's README.md file for additional details.
-https://github.com/turkerozturk/springtopiccalendar
--->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 
-<div xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+
+
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8"/>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <title>Weekly Calendar</title>
+
+    <style>
+
+        .weekly-table-entry-cell {
+                    text-align: center;      /* yatay ortalama */
+                    vertical-align: middle;  /* dikey ortalama */
+                    min-width: 20px;
+                    min-height: 20px;
+
+                    max-width: 20px;         /* Maksimum genişlik  */
+                    max-height: 20px;         /* Maksimum genişlik  */
+
+                    width: 20px;             /* Sabit genişlik  */
+                    height: 20px;
+                    padding: 0px;
+
+
+                }
+
+        a {
+                    text-decoration: none;
+                    color: inherit;
+                    }
+
+                    a:visited {
+                        color: inherit;
+                    }
+
+                    a:hover {
+                        color: blue;
+                    }
+
+                .centered {
+                max-width: fit-content;
+                  margin-left: auto;
+                  margin-right: auto;
+                  }
+
+                .pivot-table-entry-cell {
+                    text-align: center;      /* yatay ortalama */
+                    vertical-align: middle;  /* dikey ortalama */
+                    min-width: 20px;
+                    min-height: 20px;
+
+                    max-width: 20px;         /* Maksimum genişlik  */
+                    max-height: 20px;         /* Maksimum genişlik  */
+
+                    width: 20px;             /* Sabit genişlik  */
+                    height: 20px;
+                    padding: 0px;
+
+                    background-color: WhiteSmoke !important;
+
+                }
+
+                .pivot-table-entry-cell a {
+                text-decoration: none;   /* alt çizgiyi kaldır */
+                color: inherit;          /* bulunduğu hücrenin rengini kullan */
+                    padding: 0px;
+
+                }
+
+                .pivot-table-entry-cell a:visited {
+                    color: inherit;          /* tıklanmış linkin rengini değiştirme */
+                }
+
+                 caption {
+                    color: WhiteSmoke !important;
+                }
+
+        .status-0 {
+         /*   background-color: gainsboro !important; */
+         background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
+
+        }
+        .status-1 {
+           /* background-color: palegreen !important; */
+            background: radial-gradient(circle, palegreen 30%, rgba(255, 255, 255, 1) 100%);
+
+        }
+        .status-2 {
+        /*    background-color: tomato !important; */
+        background: radial-gradient(circle, Tomato 30%, rgba(255, 255, 255, 1) 100%);
+
+        }
+        .status-3 {
+            background-color: LightBlue !important;
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+    <!-- Buradaki div senin asıl fragment -->
+    <div th:fragment="content" th:remove="tag">
+        <!-- senin entry-list içeriğin buraya gelecek -->
 
     <style>
         .edit-icon {
@@ -17,7 +134,7 @@ https://github.com/turkerozturk/springtopiccalendar
         }
     </style>
 
-    <table class="table-bordered">
+    <table class="table-bordered" >
 
         <caption style="background-color:black;">
             <h4 style="font-weight:bold;color:white;text-align:right;margin-right:130px;">
@@ -804,7 +921,12 @@ span.col-2 {
     </script>
     -->
 
-
+        <!-- chart -->
+        <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
+        <script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
+        <!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
+        <script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
 
 
     <script>
@@ -1207,5 +1329,13 @@ span.col-2 {
     </script>
 
 
-</div>
 
+    </div>
+
+
+    <script type="text/javascript"
+            th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+
+</body>
+</html>

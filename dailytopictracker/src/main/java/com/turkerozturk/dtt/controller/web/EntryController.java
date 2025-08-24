@@ -168,6 +168,7 @@ public class EntryController {
             @RequestParam(name = "topicId", required = false) Long topicId,
             @RequestParam(required = false) String startDateString,
             @RequestParam(required = false) String endDateString,
+            @RequestParam(required = false, defaultValue = "false") boolean fragment, // aymi html dosyasini hem htmx ile hem de dogrudan cagirdigimizda ayirdedici olmasi icin.
             Model model) {
 
         int totalDays = 364;
@@ -485,7 +486,8 @@ public class EntryController {
 
         model.addAttribute("zoneId", zoneId);
 
-        return "entries/entry-list-weekly-calendar";
+        return fragment ? "entries/entry-list-weekly-calendar :: content"
+                        : "entries/entry-list-weekly-calendar";
 
     }
 

@@ -304,7 +304,8 @@ https://github.com/turkerozturk/springtopiccalendar
             <td>
                 <a
                         th:href="@{/entries/weekly-calendar?topicId={id}(id=${item.topic.id})}"
-                        th:attr="hx-get=@{/entries/weekly-calendar?topicId={id}(id=${item.topic.id})}"
+                        th:attr="hx-get=@{/entries/weekly-calendar(topicId=${item.topic.id}, fragment='true')}"
+
                         hx-target="#modal-content"
                         hx-trigger="click"
                         hx-swap="innerHTML"
