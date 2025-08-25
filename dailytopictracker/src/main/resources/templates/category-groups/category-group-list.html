@@ -110,10 +110,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 .blink_me {
   animation: blinker 2s linear infinite;
+  background-color:yellow;
 }
 
 @keyframes blinker {
-  50% {
+  80% {
     opacity: 0;
   }
 }
@@ -272,9 +273,13 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                 <th:block th:each="cat, iStats : ${grp.categories}">
                     <span th:classappend="${cat.archived} ? ' css-archived' : ''"
                           style="display: inline-block; white-space: normal;">
-                            [<a th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
+                            [<a th:if="${!cat.archived}"
+                                th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
                                  th:text="${cat.name}"></a>
 
+                            <span th:if="${cat.archived}"
+                                  title="This category is archived. Some pages appear after removing the archive option from the category settings."
+                                  th:text="${cat.name}"></span>
 
                         <!-- Sayısal değerler (parantez + semboller) -->
                         <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0}">
