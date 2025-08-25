@@ -269,8 +269,16 @@ public class EntryFilterController {
                     topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
             return "view-tracker/filter-form";
         }
+        /*
+        StringBuilder sb = new StringBuilder();
+        sb.append("FILTERDTO: \r\n");
+        sb.append(filterDto.getCategoryId());
+        sb.append("\r\n");
+        sb.append(filterDto.getTopicIds().size());
+        sb.append("\r\n");
 
-
+        System.out.println(sb);
+        */
 
 
         // Aynı filtre sorgusunu çalıştır
@@ -284,7 +292,6 @@ public class EntryFilterController {
 
         // === (1) Session'a filtre bilgisini saklayalım ===
         session.setAttribute("currentFilterDto", filterDto);
-
 
 
         if(reportType.equals("normal")) {
@@ -324,9 +331,10 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
-        model.addAttribute("selectedCategory", selectedCategory);
-
+        if(filterDto.getCategoryId() != null) {
+            Optional<Category> selectedCategoryOpt = categoryRepository.findById(filterDto.getCategoryId());
+            selectedCategoryOpt.ifPresent(category -> model.addAttribute("selectedCategory", category));
+        }
         return "view-tracker/filter-form";
     }
 
