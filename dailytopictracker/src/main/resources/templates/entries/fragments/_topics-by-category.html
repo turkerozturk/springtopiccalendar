@@ -26,6 +26,15 @@ filtre yapmak gerekir, sonra da pivot tablodaki topic sutun basligindaki arti is
  gorunur. topics eleman sayisi 20 den fazla ise scrollable-topics-table diye isimlendirdigimiz css sinifi devreye girer
  css kodu filter-form.html sayfasindadir. -->
 <div th:fragment="topicList">
+
+
+
+    <a th:href="@{/topics/create(categoryId=${categoryId},returnPage=pivottable)}">Create A New Topic</a>
+    <br/>
+
+    <br/>
+    <h5 class="offcanvas-title">OR add an entry</h5>
+
     <div
             th:classappend="${#lists.size(topics) > 20} ? ' scrollable-topics-table' : ''"
             class="mb-3">
@@ -47,11 +56,7 @@ filtre yapmak gerekir, sonra da pivot tablodaki topic sutun basligindaki arti is
             </tbody>
         </table>
     </div>
-    <br/>
-    <h5 class="offcanvas-title">OR</h5>
-    <br/>
 
-    <a th:href="@{/topics/create(categoryId=${categoryId},returnPage=pivottable)}">Create A New Topic</a>
 </div>
 
 </body>

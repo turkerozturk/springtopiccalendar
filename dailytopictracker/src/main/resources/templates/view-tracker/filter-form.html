@@ -65,7 +65,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
  }
 
 #navigation-panel {
-    max-width: 640px;
+    max-width: 740px;
     margin-top: 10px;
     margin-bottom: 5px;
     margin-left: auto;
@@ -345,7 +345,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     </form>
 
     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-            aria-controls="offcanvasTop">Toggle Filter</button>
+            aria-controls="offcanvasTop"><i class="fa-solid fa-toggle-on"></i> Toggle Filter</button>
 
         <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
             [Category navigation is disabled.]
@@ -753,7 +753,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 id="header-next-prediction"
                 style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion<br />(day)</th>
 
-            <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
             <th class="text-center status-1" style="vertical-align: middle;"
                 id="header-last-done"
@@ -769,7 +768,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <th class="text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
 
+            <th class="text-center" style="vertical-align: middle;" title="List Entries">☰</th>
+
             <th class="text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
+
+            <th class="text-center" style="vertical-align: middle;" title="Pinned">📌</th>
+
 
 
         </tr>
@@ -785,9 +789,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
             <td id="topic-name">
-                <a th:href="@{/entries(topicId=${topic.id})}"
+                <span
                    th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
-                </a>
+                </span>
             </td>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
@@ -958,9 +962,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <td class="text-center">
-                <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
-            </td>
 
             <!-- lastPastEntryDate varsa -->
             <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
@@ -1062,10 +1063,18 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </a>
             </td>
 
+            <td>
+                <a title="Entries List" th:href="@{/entries(topicId=${topic.id})}">☰</a>
+            </td>
 
             <td>
                 <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
             </td>
+
+            <td class="text-center">
+                <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
+            </td>
+
 
 
         </tr>
@@ -1140,7 +1149,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         id="topicsOffcanvas"
         aria-labelledby="topicsOffcanvasLabel">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="topicsOffcanvasLabel">Add Topics From This Category</h5>
+
+        <h5 class="offcanvas-title" id="topicsOffcanvasLabel">
+            <th:block th:if="${filterDto.categoryId != null}" th:text="${selectedCategory.name}">
+                Add
+            </th:block>
+            </h5>
         <button
                 type="button"
                 class="btn-close"

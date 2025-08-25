@@ -112,7 +112,7 @@ border-radius:10px !important;
 
 
 #navigation-panel {
-max-width: 640px;
+max-width: 740px;
 margin-top: 10px;
 margin-bottom: 5px;
 margin-left: auto;
@@ -142,12 +142,12 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
         <a th:if="${selectedCategoryId != null}"
            th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
            class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-            New Topic
+            <i class="fa-solid fa-circle-plus"></i> New Topic
         </a>
         <a th:if="${selectedCategoryId == null}"
            th:href="@{/topics/create}"
            class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-            New Topic
+            <i class="fa-solid fa-circle-plus"></i> New Topic
         </a>
     </div>
 </div>

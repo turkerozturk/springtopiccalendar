@@ -18,8 +18,12 @@ https://github.com/turkerozturk/springtopiccalendar
             <th style="min-width:115px; max-width:115px;">Date</th>
             <th style="min-width:200px; max-width:200px;">Topic</th>
             <th style="min-width:30px; max-width:30px;" title="Status">S</th>
-            <th style="min-width:280px; max-width:280px;">Entry Note</th>
+            <th style="min-width:240px; max-width:280px;">Entry Note</th>
             <th style="min-width:20px; max-width:20px;">📅</th>
+            <th style="min-width:20px; max-width:20px;"><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></th>
+            <th style="min-width:20px; max-width:20px;">☰</th>
+
+
 
 
         </tr>
@@ -179,9 +183,8 @@ https://github.com/turkerozturk/springtopiccalendar
             <!-- entry gercekse bu td yi koy-->
 
             <td>
-                <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
-                   title="Click to open the Tracker gage"
-                   th:text="${#temporals.format(item.dateLocal, 'yyyy-MM-dd EEE')}">Edit Existing Entry</a>
+                <span
+                   th:text="${#temporals.format(item.dateLocal, 'yyyy-MM-dd EEE')}">Date</span>
             </td>
 
 
@@ -190,11 +193,11 @@ https://github.com/turkerozturk/springtopiccalendar
 
             <!-- TOPIC sutunu -->
             <td>
-                <a th:href="@{/entries(topicId=${item.topic.id})}"
+                <span
                    th:text="${#strings.abbreviate(item.topic.name, 27)}"
-                   th:title="${item.topic.name + (!#strings.isEmpty(item.topic.description) ? ': ' + item.topic.description : '')}">
+                   >
                     Topic
-                </a>
+                </span>
             </td>
 
 
@@ -312,6 +315,19 @@ https://github.com/turkerozturk/springtopiccalendar
                         onclick="document.getElementById('modal').style.display='block'; return false;"
                         th:text="'📅'">
                     View Weekly Calendar
+                </a>
+            </td>
+
+            <td>
+                <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.topic.category.id})}"
+                   title="Click to open the Tracker gage"
+                   ><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></a>
+            </td>
+
+            <td>
+                <a th:href="@{/entries(topicId=${item.topic.id})}"
+                   th:title="${'Click to view ' + item.topic.name + ' entries.'}">
+                    ☰
                 </a>
             </td>
 

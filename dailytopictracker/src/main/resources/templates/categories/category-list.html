@@ -77,7 +77,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
         #navigation-panel {
-            max-width: 640px;
+            max-width: 740px;
             margin-top: 10px;
             margin-bottom: 5px;
             margin-left: auto;
@@ -98,7 +98,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 <div  id="navigation-panel">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
     <div style="margin-top:4px;">
-        <a th:href="@{/categories/create(returnPage='categories')}" class="btn btn-secondary btn-sm" style="color:white;">New Category</a>
+        <a th:href="@{/categories/create(returnPage='categories')}"
+           class="btn btn-secondary btn-sm" style="color:white;"><i class="fa-solid fa-circle-plus"></i> New Category</a>
 
     </div>
 </div>
