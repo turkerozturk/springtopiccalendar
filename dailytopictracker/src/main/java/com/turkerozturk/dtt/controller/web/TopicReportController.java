@@ -20,10 +20,19 @@
  */
 package com.turkerozturk.dtt.controller.web;
 
+
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.*;
+
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
+
+
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -38,6 +47,10 @@ import com.turkerozturk.dtt.repository.EntryRepository;
 import com.turkerozturk.dtt.service.TopicService;
 
 import java.awt.*;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -485,7 +498,8 @@ public class TopicReportController {
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         // PDF dokümanı
-        Document document = new Document(PageSize.A4, 36, 36, 54, 54); // marginler
+
+        Document document = new Document(new Rectangle(PageSize.A4), 36, 36, 54, 54); // marginler
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
 
         // Header & Footer
@@ -504,8 +518,20 @@ public class TopicReportController {
 
         document.open();
 
+        // src/main/resources/fonts/NotoSans-VariableFont_wdth,wght.ttf
+        String fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
+        String fontPathCourier = "fonts/unifont-16.0.04.ttf";
+        // Normal yazilar icin
+        BaseFont bf = loadFont(fontPath);
+        Font headerFont = new Font(bf, 14, Font.BOLD);
+        Font cellFont   = new Font(bf, 10);
+
+        // Semboller icin
+        BaseFont bfCourier = loadFont(fontPathCourier);
+        Font cellFontCourier = new Font(bfCourier, 10);
+
         // Başlık
-        Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+        //Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, "UTF8", 14);
         Paragraph title = new Paragraph("Daily Topic Tracker Report", headerFont);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
@@ -514,13 +540,13 @@ public class TopicReportController {
         // Tablo: kolon sayısını ayarlayalım
         PdfPTable table = new PdfPTable(9);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{1f, 2f, 2f, 1f, 2f, 1.5f, 2f, 3f, 1f}); // 15.5 f
-        table.setWidths(new float[]{0.8f, 2f, 2f, 0.6f, 2.8f, 1f, 2.3f, 3f, 1f});
+        table.setWidths(new float[]{0.6f, 2f, 2.6f, 0.5f, 2.2f, 0.8f, 3.5f, 2.8f, 0.5f});
 
         table.setHeaderRows(1); // her sayfada tekrar eder
 
         Font thFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9);
-        String[] headers = {"No", "Group", "Category", "Wt", "Date", "Diff", "Topic", "Note", "Status"};
+        // wt = weight, s = status, sutunu asagi kaydirmasin diye kisalttim.
+        String[] headers = {"No", "Group", "Category", "Wt", "Date", "Diff", "Topic", "Note", "S"};
         for (String h : headers) {
             PdfPCell cell = new PdfPCell(new Phrase(h, thFont));
             cell.setBackgroundColor(Color.LIGHT_GRAY);
@@ -532,49 +558,68 @@ public class TopicReportController {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd EEE", Locale.ENGLISH);
         LocalDate today = LocalDate.now(zoneId);
 
+       // PdfContentByte cb = writer.getDirectContent();
+       // Font cellFont = FontFactory.getFont(FontFactory.HELVETICA, 10);
+
         for (DatedTopicViewModel d : allItems) {
             rowNum++;
 
             // No
-            table.addCell(String.format("%03d", rowNum));
+            PdfPCell cell0 = fitTextToCell(String.format("%03d", rowNum), cellFontCourier, 25f);
+            cell0.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell0.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.addCell(cell0);
 
             // Group
-            table.addCell(limit(d.getTopic().getCategory().getCategoryGroup().getName(), 10));
+            table.addCell(fitTextToCell(d.getTopic().getCategory().getCategoryGroup().getName(),
+                    cellFont, 70f));
 
             // Category
-            table.addCell(limit(d.getTopic().getCategory().getName(), 10));
+            table.addCell(fitTextToCell(d.getTopic().getCategory().getName(), cellFont, 90f));
 
             // Weight
-            table.addCell(String.format("%02d", d.getTopic().getWeight()));
+            PdfPCell cell3 = fitTextToCell(String.format("%02d", d.getTopic().getWeight()), cellFontCourier, 30f);
+            cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.addCell(cell3);
 
             // Date
-            table.addCell(d.getDateLocal().format(fmt));
+            PdfPCell cell4 = fitTextToCell(d.getDateLocal().format(fmt), cellFontCourier, 80f);
+            cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell4.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.addCell(cell4);
+
 
             // Diff
             int diff = (int) ChronoUnit.DAYS.between(today, d.getDateLocal());
-            table.addCell(String.format("%+03d", diff));
+            PdfPCell cell5 = fitTextToCell(String.format("%+04d", diff), cellFontCourier, 30f);
+            cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell5.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            table.addCell(cell5);
 
             // Topic
-            table.addCell(limit(d.getTopic().getName(), 10));
+            table.addCell(fitTextToCell(d.getTopic().getName(), cellFont, 120f));
 
             // Note
             String note = d.getEntry() != null && d.getEntry().getNote() != null && d.getEntry().getNote().getContent() != null
                     ? d.getEntry().getNote().getContent()
                     : "";
-            table.addCell(limit(note, 20));
+            table.addCell(fitTextToCell(note, cellFont, 95f));
 
             // Status
             PdfPCell statusCell;
             switch (d.getStatus()) {
-                case 1: statusCell = new PdfPCell(new Phrase("✔")); break;
-                case 2: statusCell = new PdfPCell(new Phrase("!")); break;
+                case 1: statusCell = new PdfPCell(new Phrase("✔", cellFontCourier)); break; // ✔ = \u2714
+                case 2: statusCell = new PdfPCell(new Phrase("⚠", cellFontCourier)); break; // ⚠
                 case 0:
-                    statusCell = new PdfPCell(new Phrase(""));
+                    statusCell = new PdfPCell(new Phrase("", cellFontCourier));
                     statusCell.setBackgroundColor(Color.GRAY);
                     break;
                 case 3:
-                default: statusCell = new PdfPCell(new Phrase("")); break;
+                default: statusCell = new PdfPCell(new Phrase("☐", cellFontCourier)); break; // ☐
             }
+            statusCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            statusCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
             table.addCell(statusCell);
         }
 
@@ -590,6 +635,43 @@ public class TopicReportController {
 
 
 
+    private PdfPCell fitTextToCell(String text, Font font, float maxWidth) {
+        if (text == null) return null;
+
+        final float fix = 5; // bu fix degiskeni sayesinde alt satira gecis yok gibi gorunuyor.
+        maxWidth = maxWidth - fix;
+
+        float width = font.getBaseFont().getWidthPoint(text, font.getSize());
+        if (width <= maxWidth) return new PdfPCell(new Phrase(text, font));
+
+        String tilda = "~";
+        float tildaWidth = font.getBaseFont().getWidthPoint(tilda, font.getSize());
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            float w = font.getBaseFont().getWidthPoint(sb.toString() + c, font.getSize());
+            if (w + tildaWidth > maxWidth) break;
+            if(c == '\r') break;
+            if(c == '\n') break;
+            sb.append(c);
+        }
+
+        PdfPCell pdfPCell = new PdfPCell(new Phrase(sb.toString() + tilda, font));
+        pdfPCell.setNoWrap(true);
+
+        return pdfPCell;
+    }
+
+
+    private BaseFont loadFont(String resourcePath) throws IOException, DocumentException {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new FileNotFoundException("Font not found: " + resourcePath);
+            }
+            byte[] fontBytes = is.readAllBytes();
+            return BaseFont.createFont(resourcePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, fontBytes, null);
+        }
+    }
 
 
 
