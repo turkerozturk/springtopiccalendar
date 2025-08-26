@@ -22,10 +22,14 @@ package com.turkerozturk.dtt.controller.web;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
+import com.lowagie.text.Image;
 import com.lowagie.text.pdf.*;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+import org.apache.pdfbox.io.IOUtils;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +59,38 @@ class HeaderFooterPageEvent extends PdfPageEventHelper {
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
+
+        //SADECE ILK SAYFADA LOGO
+        if (writer.getPageNumber() == 1) {
+            float docWidth = document.getPageSize().getWidth();
+            float docHeight = document.getPageSize().getHeight();
+
+            InputStream logoStream = getClass().getResourceAsStream("/static/images/logo.png");
+            Image logo = null;
+            try {
+                logo = Image.getInstance(IOUtils.toByteArray(logoStream));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            logo.scaleToFit(60, 60); // kare, title’dan biraz büyük
+            float x = (docWidth / 2) + 37;  // ortalamak için - yarı genişlik
+            float y = (docHeight / 2) + 322;         // sayfanın ortası civarı
+
+            PdfContentByte canvas = writer.getDirectContentUnder();
+            PdfGState gs1 = new PdfGState();
+            gs1.setFillOpacity(0.4f); // şeffaflık
+            canvas.saveState();
+            canvas.setGState(gs1);
+            logo.setAbsolutePosition(x, y);
+            canvas.addImage(logo);
+            canvas.restoreState();
+        }
+
+
+
+
+        //FOOTER
         PdfContentByte cb = writer.getDirectContent();
         float centerX = (document.right() - document.left()) / 2 + document.leftMargin();
         float baseY = document.bottom() - 15;
