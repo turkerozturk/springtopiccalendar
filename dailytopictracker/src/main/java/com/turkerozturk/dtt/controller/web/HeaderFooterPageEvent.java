@@ -28,12 +28,22 @@ import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import org.apache.pdfbox.io.IOUtils;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
+import javax.imageio.ImageIO;
 
 /**
  * PdfWriter.getPageNumber() ile o anki sayfa numarasını alabiliyoruz ama toplam sayfa sayısı henüz belli olmuyor. PDF motoru sayfa sayısını ancak doküman kapandıktan sonra biliyor.
@@ -60,7 +70,7 @@ class HeaderFooterPageEvent extends PdfPageEventHelper {
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
 
-        //SADECE ILK SAYFADA LOGO
+        // --- SADECE ILK SAYFADA LOGO -----------------------------------------------
         if (writer.getPageNumber() == 1) {
             float docWidth = document.getPageSize().getWidth();
             float docHeight = document.getPageSize().getHeight();
@@ -87,10 +97,30 @@ class HeaderFooterPageEvent extends PdfPageEventHelper {
             canvas.restoreState();
         }
 
+        // --- QR kod her sayfada -------------------------------------------------------------
+        try {
+            BufferedImage qrImage = generateQRCodeImage(
+                    "https://github.com/turkerozturk/springtopiccalendar", 100, 100);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(qrImage, "png", baos);
+            Image pdfQr = Image.getInstance(baos.toByteArray());
+
+            pdfQr.setAbsolutePosition(
+                    document.left() - 0,
+                    document.bottom() - 52
+            );
+            pdfQr.scaleToFit(50, 50);    // boyut ayari
+
+            writer.getDirectContent().addImage(pdfQr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
 
-        //FOOTER
+
+        // --- FOOTER --------------------------------------------------------------------
         PdfContentByte cb = writer.getDirectContent();
         float centerX = (document.right() - document.left()) / 2 + document.leftMargin();
         float baseY = document.bottom() - 15;
@@ -111,12 +141,18 @@ class HeaderFooterPageEvent extends PdfPageEventHelper {
         Phrase visitPhrase = new Phrase(
                 "Visit DailyTopicTracker at https://github.com/turkerozturk/springtopiccalendar",
                 fontGraySmall); // TODO url yi application.properties gibi merkezi bir yere al.
-        ColumnText.showTextAligned(cb, Element.ALIGN_LEFT, visitPhrase, document.left(), baseY - 24, 0);
+        ColumnText.showTextAligned(cb, Element.ALIGN_LEFT, visitPhrase, document.left() + 45, baseY - 20, 0);
     }
 
     @Override
     public void onCloseDocument(PdfWriter writer, Document document) {
         Phrase totalPhrase = new Phrase(String.valueOf(writer.getPageNumber() - 1), fontBlack);
         ColumnText.showTextAligned(total, Element.ALIGN_LEFT, totalPhrase, 0, 0, 0);
+    }
+
+    public static BufferedImage generateQRCodeImage(String text, int width, int height) throws WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 }
