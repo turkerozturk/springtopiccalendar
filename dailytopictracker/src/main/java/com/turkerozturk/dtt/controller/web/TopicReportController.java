@@ -30,7 +30,6 @@ import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
 
 
-
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -501,21 +500,8 @@ public class TopicReportController {
 
         Document document = new Document(new Rectangle(PageSize.A4), 36, 36, 54, 54); // marginler
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
-
-        // Header & Footer
-        writer.setPageEvent(new PdfPageEventHelper() {
-            @Override
-            public void onEndPage(PdfWriter writer, Document document) {
-                PdfContentByte cb = writer.getDirectContent();
-                Phrase footer = new Phrase(String.format("Page %d", writer.getPageNumber()),
-                        FontFactory.getFont(FontFactory.HELVETICA, 8));
-                ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
-                        footer,
-                        (document.right() - document.left()) / 2 + document.leftMargin(),
-                        document.bottom() - 10, 0);
-            }
-        });
-
+        // Header & Footer, PdfPageEventHelper sinifini extend ettik cunku toplam sayfa no'yu gormek istiyoruz:
+        writer.setPageEvent(new HeaderFooterPageEvent());
         document.open();
 
         // src/main/resources/fonts/NotoSans-VariableFont_wdth,wght.ttf
