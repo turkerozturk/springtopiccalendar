@@ -1,0 +1,4 @@
+CREATE TABLE category_profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE
+);

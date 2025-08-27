@@ -1,4 +1,3 @@
-<!-- src/main/resources/templates/category-groups/category-groups-list.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -19,17 +18,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/manifest.json">
 
-    <title>Category Groups</title>
-
-
+    <title>Category Profiles</title>
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.css}">
-
-
-
 
     <style>
 
@@ -42,51 +34,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
 
-/* https://www.computerhope.com/htmcolor.htm#color-codes */
-/* https://www.htmltables.io/blog/html-table-borders */
-        #category-groups-table {
-
-          background-color: WhiteSmoke;
-         border: 3px solid black;
-           border-collapse: separate;
-
-           min-width:1280px;
-           max-width:1280px;
-       }
-       #category-groups-table td
-       {
-           border: 1px solid gray;
-       }
-       #category-groups-table .vertical
-       {
-           border: 1px solid gray;
-           font-family:sans-serif;
-           color:black;
-       }
-
-       .css-archived {
-         background-color: lightgray;
-       }
-
-       a {
-       text-decoration: none;
-       color: inherit;
-       }
-
-       a:visited {
-           color: inherit;
-       }
-
-       a:hover {
-           color: blue;
-       }
-
-
-
-
-        .categories-cell {
-            background-color: rgba(255, 255, 255, 0.60) ;
-        }
 
  #navigation-panel button, a{
    border-radius:10px !important;
@@ -108,418 +55,68 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
  }
 
-.blink_me {
-  animation: blinker 2s linear infinite;
-  background-color:yellow;
-}
-
-@keyframes blinker {
-  80% {
-    opacity: 0;
-  }
-}
-    </style>
-
-
-    <!-- these styles below are for moving category group rows -->
-    <style>
-
-        .move-controls {
-            width: 40px;
-            text-align: center;
-            font-size: 12px;
-            line-height: 1; /* Satır yüksekliğini sabit tutar */
-        }
-
-        .move-controls a {
-            text-decoration: none;
-            color: #444;
-            margin: 2px;
-            display: inline-block;
-        }
-
-        #sortable tr:hover .move-controls a {
-            display: inline-block;
-        }
-
-        tr.swapped-success {
-            background-color: #ccffcc !important; /* yeşil */
-            transition: background-color 1s ease;
-        }
-
-        tr.swapped-fail {
-            background-color: #ffcccc !important; /* kırmızı */
-            transition: background-color 1s ease;
-        }
-
 
     </style>
+
+
 
 </head>
 <body>
 
-
 <div  id="navigation-panel">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
     <div style="margin-top:4px;">
-        <a href="/category-groups/new" class="btn btn-secondary btn-sm" style="color:white;">
-            <i class="fa-solid fa-circle-plus"></i> New Category Group</a>
+        <a th:href="@{/profiles/new}" class="btn btn-secondary btn-sm" style="color:white;">
+            <i class="fa-solid fa-circle-plus"></i> New Profile</a>
 
-        <a href="/profiles" class="btn btn-secondary btn-sm" style="color:white;"
-        title="By creating category profiles, you can disable categories you won't be using at the moment.
-        This is a great convenience if you have a lot of categories.">
-            <i class="fa-solid fa-list"></i> Category Profiles
-        </a>
+        <form th:action="@{/profiles/unarchive-all}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-sm btn-secondary">
+                <i class="fa fa-archive" aria-hidden="true"></i>Unarchive All</button>
+        </form>
+
     </div>
 </div>
-
 
 <div class="container my-2">
 
 
+    <h1><span class="fonbg">Category Profiles</span></h1>
 
-    <h1><span class="fonbg">Category Groups</span></h1>
 
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
-    <table id="category-groups-table">
-        <colgroup>
-            <col style="width: 22px;background-color: white;">
-            <col style="width: 120px;">
-            <col style="width: 120px;">
-            <col style="width: 892px;background-color: white;">
-            <col style="width: 126px;">
-        </colgroup>
+    <table class="table table-sm table-bordered">
         <thead>
         <tr>
-            <th class="text-center" style="background-color: lightgray;"
-                title="Hover on to the table row number to see the category group ID number.">#</th>
-            <th class="text-center" style="background-color: lightgray;">Group Name</th>
-            <th class="text-center">🤚</th> <!-- Tutamak sütunu -->
-            <th class="text-center" style="background-color: lightgray;">Categories</th>
-            <th class="text-center" style="background-color: lightgray;">Actions</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Categories</th>
+            <th>Actions</th>
         </tr>
         </thead>
-        <tbody id="sortable">
-        <tr th:each="grp, jStats : ${groups}" th:attr="data-id=${grp.id}"
-            th:style="${ 'background-color:' + grp.backgroundColor + ';' }">
+        <tbody>
+        <tr th:each="p : ${profiles}"
+            th:classappend="${p.id} == ${activeProfileId} ? 'table-success'">
 
-
-
-
-
-
-            <td th:text="${#numbers.formatInteger((jStats.index + 1), 2)}"
-                 style="text-align:right;"
-            th:title="${ 'CategoryGroup ID = ' + grp.id + '. This category group has ' + grp.categories.size + ' categories.' }">1</td>
-
-
-
-            <td class="vertical" style="text-align:center; height:110px;
-                                        position:relative; padding:6px;">
-
-
-
-                <!-- Yazı her zaman görünsün -->
-                <span th:text="${grp.name}"
-                      style="position:relative;
-                 z-index:1;
-                 background-color:rgba(240, 255, 255, 0.7);
-                 padding:3px 6px;
-                 border:2px solid DarkGray;
-                 border-radius:7px;
-                 font-weight:bold;">
-                    Group Name
-                </span>
-
+            <td th:text="${p.id}"></td>
+            <td th:text="${p.name}"></td>
+            <td>
+                <span th:each="c : ${p.categories}" class="badge bg-secondary me-1"
+                      th:text="${c.name}"></span>
             </td>
-
-
-            <td class="move-controls" style="text-align:center; height:110px;
-                                        position:relative; padding:6px;">
-                <!-- Eğer imageFileName varsa resim div'i -->
-                <div th:if="${grp.imageFileName != null and !#strings.isEmpty(grp.imageFileName)}"
-                     style="position:absolute;
-                top:6px; left:6px; right:6px; bottom:6px;
-                display:flex; justify-content:center; align-items:center;
-                z-index:0;">
-                    <img th:src="@{ ${grp.imageFileName}}"
-                         style="max-height:100px;
-                    min-height:100px;
-                    max-width:100px;
-                    min-width:100px;
-                    object-fit:contain;
-                    opacity:0.8;
-                    border-radius:12px;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
-                </div>
-
-                <div>
-                    <a href="#" class="move-up" title="Move Up"
-                       style="display:none; z-index:1; position:relative; font-size: medium;
-                   background-color:rgba(240, 255, 255, 0.7); padding:3px 6px;
-                   border:2px solid DarkGray;
-                   border-radius:7px;">&#x25B2;</a> <!-- ▲ -->
-                    <br />
-                    <a href="#" class="move-down" title="Move Down"
-                       style="display:none; z-index:1; position:relative; font-size: medium;
-                   background-color:rgba(240, 255, 255, 0.7); padding:3px 6px;
-                   border:2px solid DarkGray;
-                   border-radius:7px;">&#x25BC;</a> <!-- ▼ -->
-                </div>
-
-            </td>
-
-
-
-            <td class="categories-cell">
-                <a th:if="${grp.categories.size == 0}"
-                   th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
-                   title="Add Category" style="font-family:sans-serif;">Add Category</a>
-                <th:block th:each="cat, iStats : ${grp.categories}">
-                    <span th:classappend="${cat.archived} ? ' css-archived' : ''"
-                          style="display: inline-block; white-space: normal;">
-                            [<a th:if="${!cat.archived}"
-                                th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
-                                 th:text="${cat.name}"></a>
-
-                            <span th:if="${cat.archived}"
-                                  title="This category is archived. Some pages appear after removing the archive option from the category settings."
-                                  th:text="${cat.name}"></span>
-
-                        <!-- Sayısal değerler (parantez + semboller) -->
-                        <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0}">
-                            (
-
-                            <span class="blink_me"
-                                  th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
-                                  hx-target="#warningModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#warningModal">
-                                ⚠ <span th:text="${cat.warningCount}"></span>
-                                  <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0 or cat.predictionCount > 0}"
-                                        style="color:black;">, </span>
-                            </span>
-
-
-                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
-                            <!-- mesela 🔜 mor renkli. Ama renksiz veya farkli renkte kullanmak icin &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  -->
-                            <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/neutrals/category/{id}(id=${cat.id})}"
-                                  hx-target="#neutralModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#neutralModal">
-                                &#128284;&#xfe0e;
-                                <span th:text="${cat.futureNotMarked}"></span>
-                                <span th:if="${cat.todayDone > 0 or cat.predictionCount >0}" style="color:black;">, </span>
-                            </span>
-
-
-                            <span th:if="${cat.todayDone > 0}" style="color:darkgreen; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/dones/category/{id}(id=${cat.id})}"
-                                  hx-target="#doneModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#doneModal"
-                            >✅ <span th:text="${cat.todayDone}"></span>
-                            <span th:if="${cat.predictionCount > 0}" style="color:black;">, </span>
-                            </span>
-
-
-                            <!-- https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI-->
-                            <!-- https://www.unicodepedia.com/unicode/geometric-shapes/25a0/black-square/ ■ -->
-                            <span th:if="${cat.predictionCount > 0}" style="color:lightskyblue; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/predictions/category/{id}(id=${cat.id})}"
-                                  hx-target="#predictionModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#predictionModal"
-                            >&#9632;&#xfe0e; <span th:text="${cat.predictionCount}"></span>
-                            </span>
-
-                            )
-
-
-                        </span>
-
-
-
-
-                              <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
-                                 th:title="${cat.name} + ' [click to edit this category]' "
-                              >✎</a>]
-                            </span>
-                    <span th:if="${grp.categories.size != iStats.index + 1}">&nbsp;</span>
-                </th:block>
-            </td>
-            <td class="text-center">
-                <div class="actions" style="display: none;">
-                <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
-                   class=" btn-sm btn-outline-secondary" title="Edit Category Group">✎&nbsp;</a>
-                <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
-                   class=" btn-sm btn-outline-danger"
-                   th:onclick="return confirm('Delete this [[${grp.name}]] group?');"
-                   title="Delete Category Group">&nbsp;🗑</a>
-                <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
-                   title="Add Category">&nbsp;＋</a>
-                <!-- intelligent report for only one category group -->
-                <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
-                   th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }"
-                >&nbsp;🧠</a>
-                </div>
+            <td>
+                <a th:href="@{|/profiles/${p.id}/edit|}" class="btn btn-sm btn-warning">Edit</a>
+                <form th:action="@{|/profiles/${p.id}/delete|}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger"
+                            th:onclick="return confirm('Delete this [[${p.name}]] category profile?');"
+                    >Delete</button>
+                </form>
+                <form th:action="@{|/profiles/${p.id}/activate|}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-primary">Activate</button>
+                </form>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
-
-<!-- htmx & bootstrap modal for status = 2 -->
-<div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="warningModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="warningModalLabel">Warning Entries</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- HTMX içerigi buraya gelecek -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- htmx & bootstrap modal for status = 0 -->
-<div class="modal fade" id="neutralModal" tabindex="-1" aria-labelledby="neutralModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="neutralModalLabel">Neutral Entries</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- HTMX içerigi buraya gelecek -->
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- htmx & bootstrap modal for status = 1 -->
-<div class="modal fade" id="doneModal" tabindex="-1" aria-labelledby="doneModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="doneModalLabel">Done Entries</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- HTMX içerigi buraya gelecek -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- htmx & bootstrap modal for status = 3 -->
-<div class="modal fade" id="predictionModal" tabindex="-1" aria-labelledby="predictionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="predictionModalLabel">Predictions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- HTMX içerigi buraya gelecek -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
-
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-WebJars path'leri şu yapıyı izler:
-/webjars/{artifactId}/{version}/{dosya}
--->
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.js}"></script>
-
-<!-- these scripts below are for moving category group rows -->
-<script>
-    $(function () {
-      $("#sortable tr").hover(
-        function () {
-          $(this).find(".move-up, .move-down").show();
-          $(this).find(".actions").show();
-        },
-        function () {
-          $(this).find(".move-up, .move-down").hide();
-          $(this).find(".actions").hide();
-        }
-      );
-
-      $(".move-up").click(function (e) {
-        e.preventDefault();
-        const row = $(this).closest("tr");
-        const prev = row.prev("tr");
-        if (prev.length === 0) return;
-
-        const draggedId = row.data("id");
-        const targetId = prev.data("id");
-
-        row.insertBefore(prev);
-        sendSwapRequest(draggedId, targetId, row);
-      });
-
-      $(".move-down").click(function (e) {
-        e.preventDefault();
-        const row = $(this).closest("tr");
-        const next = row.next("tr");
-        if (next.length === 0) return;
-
-        const draggedId = row.data("id");
-        const targetId = next.data("id");
-
-        next.insertBefore(row); // sırayı değiştir
-        sendSwapRequest(draggedId, targetId, row);
-      });
-
-      function sendSwapRequest(draggedId, targetId, row) {
-        const csrfToken = $('meta[name="_csrf"]').attr('content');
-        const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
-
-        $.ajax({
-          url: "/api/category-groups/swap-priority",
-          method: "POST",
-          contentType: "application/json",
-          data: JSON.stringify({ draggedId, targetId }),
-          beforeSend: function (xhr) {
-            xhr.setRequestHeader(csrfHeader, csrfToken);
-          },
-          success: function () {
-            row.addClass("swapped-success");
-            setTimeout(() => row.removeClass("swapped-success"), 1000);
-          },
-          error: function () {
-            row.addClass("swapped-fail");
-            setTimeout(() => row.removeClass("swapped-fail"), 1000);
-          }
-        });
-      }
-});
-
-
-</script>
-
-
-
-
 </body>
 </html>
