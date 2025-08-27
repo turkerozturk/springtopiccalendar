@@ -458,21 +458,29 @@ public class TopicReportController {
     @GetMapping("/allPrint")
     public void print(HttpServletResponse response,
                       Model model,
-                      @RequestParam(name = "categoryGroupId", required=false) Long categoryGroupId) throws Exception {
+                      @RequestParam(name = "categoryGroupId", required=false) Long categoryGroupId,
+                      @RequestParam(name = "exclude0", required=false) Integer exclude0
+                      ) throws Exception {
+
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
-        List<Topic> importants, neutrals, predictions, finisheds;
+        List<Topic> importants, neutrals, predictions;
+        List<Topic> finisheds = new ArrayList<>();
 
         if(categoryGroupId == null) {
             importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
             neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
             predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
-            finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+            if(exclude0 == null || exclude0 != 1) {
+                finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+            }
         } else {
             importants = topicReportCatGrpService.getAllUrgentTopicsSortedByMostRecentWarning(categoryGroupId);
             neutrals = topicReportCatGrpService.getNextNeutralTopics(neutralItemsLimit, categoryGroupId);
             predictions = topicReportCatGrpService.getTopicsWithPredictionDateBeforeOrEqualToday(categoryGroupId);
-            finisheds = topicReportCatGrpService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit, categoryGroupId);
+            if(exclude0 == null || exclude0 != 1) {
+                finisheds = topicReportCatGrpService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit, categoryGroupId);
+            }
         }
 
         // ADIM 1
@@ -482,7 +490,10 @@ public class TopicReportController {
         List<DatedTopicViewModel> neutralItems = getNeutrals(neutrals, predictions, zoneId);
 
         // ADIM 3
-        List<DatedTopicViewModel> finishedItems = getFinisheds(finisheds, predictions, zoneId);
+        List<DatedTopicViewModel> finishedItems = new ArrayList<>();
+        if(exclude0 == null || exclude0 != 1) {
+            finishedItems = getFinisheds(finisheds, predictions, zoneId);
+        }
 
         // ADIM 4
         List<DatedTopicViewModel> predictionItems = getPredictions(predictions, zoneId);
@@ -492,7 +503,9 @@ public class TopicReportController {
         allItems.addAll(importantItems);
         allItems.addAll(neutralItems);
         allItems.addAll(predictionItems);
-        allItems.addAll(finishedItems); // TODO bunlari enable disable edilebilir yap veya printer icin ayri yap.
+        if(exclude0 == null || exclude0 != 1) {
+            allItems.addAll(finishedItems); // TODO bunlari enable disable edilebilir yap veya printer icin ayri yap.
+        }
         allItems.sort(Comparator.comparing(DatedTopicViewModel::getDateLocal).reversed());
 
 
