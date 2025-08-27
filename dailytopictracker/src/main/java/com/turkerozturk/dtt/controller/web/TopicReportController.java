@@ -594,7 +594,7 @@ public class TopicReportController {
 
             // Diff
             int diff = (int) ChronoUnit.DAYS.between(today, d.getDateLocal());
-            PdfPCell cell5 = fitTextToCell(String.format("%+04d", diff), cellFontCourier, 30f);
+            PdfPCell cell5 = fitTextToCell(String.format("%+05d", diff), cellFontCourier, 30f);
             cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
             cell5.setVerticalAlignment(Element.ALIGN_MIDDLE);
             table.addCell(cell5);
@@ -640,21 +640,35 @@ public class TopicReportController {
     private PdfPCell fitTextToCell(String text, Font font, float maxWidth) {
         if (text == null) return null;
 
-        final float fix = 5; // bu fix degiskeni sayesinde alt satira gecis yok gibi gorunuyor.
-        maxWidth = maxWidth - fix;
+        // İlk satırı al (CR, LF, CRLF hepsi için)
+        String firstLine = text.split("\r\n|\r|\n", 2)[0];
 
-        float width = font.getBaseFont().getWidthPoint(text, font.getSize());
-        if (width <= maxWidth) return new PdfPCell(new Phrase(text, font));
+        // Hücreyi oluştur (önce boş içerikle, padding değerlerini okuyabilmek için)
+        PdfPCell dummyCell = new PdfPCell();
+        float paddingLeft = dummyCell.getPaddingLeft();
+        float paddingRight = dummyCell.getPaddingRight();
+
+        // Metin için gerçekten kullanılabilir alan
+        float effectiveWidth = maxWidth - (paddingLeft + paddingRight);
+
+        float width = font.getBaseFont().getWidthPoint(firstLine, font.getSize());
+        if (width <= effectiveWidth) {
+            PdfPCell cell = new PdfPCell(new Phrase(firstLine, font));
+            cell.setNoWrap(true);
+            return cell;
+        }
 
         String tilda = "~";
         float tildaWidth = font.getBaseFont().getWidthPoint(tilda, font.getSize());
 
         StringBuilder sb = new StringBuilder();
-        for (char c : text.toCharArray()) {
+        for (char c : firstLine.toCharArray()) {
             float w = font.getBaseFont().getWidthPoint(sb.toString() + c, font.getSize());
-            if (w + tildaWidth > maxWidth) break;
-            if(c == '\r') break;
-            if(c == '\n') break;
+
+            int totalWidth = (int) Math.floor(w + tildaWidth);
+            int limit = (int) Math.floor(effectiveWidth);
+
+            if (totalWidth >= limit) break;
             sb.append(c);
         }
 
@@ -663,6 +677,9 @@ public class TopicReportController {
 
         return pdfPCell;
     }
+
+
+
 
 
     private BaseFont loadFont(String resourcePath) throws IOException, DocumentException {
