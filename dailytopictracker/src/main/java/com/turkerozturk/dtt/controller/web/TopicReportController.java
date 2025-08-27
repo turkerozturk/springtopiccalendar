@@ -30,6 +30,7 @@ import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
 
 
+import com.turkerozturk.dtt.service.TopicReportCatGrpService;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.repository.EntryRepository;
 import com.turkerozturk.dtt.service.TopicService;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.awt.*;
 
@@ -78,6 +80,9 @@ public class TopicReportController {
 
     @Autowired
     private TopicService topicService;
+
+    @Autowired
+    private TopicReportCatGrpService topicReportCatGrpService;
 
     public TopicReportController(AppTimeZoneProvider timeZoneProvider) {
         this.timeZoneProvider = timeZoneProvider;
@@ -451,13 +456,24 @@ public class TopicReportController {
 */
 
     @GetMapping("/allPrint")
-    public void print(HttpServletResponse response) throws Exception {
+    public void print(HttpServletResponse response,
+                      Model model,
+                      @RequestParam(name = "categoryGroupId", required=false) Long categoryGroupId) throws Exception {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
-        List<Topic> importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
-        List<Topic> neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
-        List<Topic> predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
-        List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+        List<Topic> importants, neutrals, predictions, finisheds;
+
+        if(categoryGroupId == null) {
+            importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
+            neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
+            predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
+            finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+        } else {
+            importants = topicReportCatGrpService.getAllUrgentTopicsSortedByMostRecentWarning(categoryGroupId);
+            neutrals = topicReportCatGrpService.getNextNeutralTopics(neutralItemsLimit, categoryGroupId);
+            predictions = topicReportCatGrpService.getTopicsWithPredictionDateBeforeOrEqualToday(categoryGroupId);
+            finisheds = topicReportCatGrpService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit, categoryGroupId);
+        }
 
         // ADIM 1
         List<DatedTopicViewModel> importantItems = getImportant(importants, predictions, zoneId);
