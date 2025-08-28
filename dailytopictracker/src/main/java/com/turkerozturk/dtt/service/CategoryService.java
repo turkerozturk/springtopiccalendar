@@ -20,6 +20,8 @@
  */
 package com.turkerozturk.dtt.service;
 
+import com.turkerozturk.dtt.entity.CategoryProfile;
+import com.turkerozturk.dtt.repository.CategoryProfileRepository;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -37,9 +39,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -48,6 +48,10 @@ public class CategoryService {
 
     @Autowired
     private TopicRepository topicRepository;
+
+    @Autowired
+    private CategoryProfileRepository categoryProfileRepository;
+
 
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -93,6 +97,15 @@ public class CategoryService {
                     throw new IllegalStateException("Cannot delete category with associated topics.");
                 }
             }
+
+            // Tüm profillerden kategoriyi çıkar
+            List<CategoryProfile> profiles = categoryProfileRepository.findAll();
+            for (CategoryProfile profile : profiles) {
+                if (profile.getCategories().remove(category)) {
+                    categoryProfileRepository.save(profile);
+                }
+            }
+
             categoryRepository.delete(category);
         }
     }
