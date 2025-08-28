@@ -82,6 +82,14 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <h1><span class="fonbg">Category Profiles</span></h1>
 
+    <div th:if="${activeProfileId == null}" class="alert alert-info py-1 px-2 small">
+        <i class="fa fa-info-circle"></i>
+        No active profile selected (all categories are unarchived)
+    </div>
+    <div th:if="${activeProfileId != null}" class="alert alert-success py-1 px-2 small">
+        <i class="fa fa-check-circle"></i>
+        Active profile ID: <span th:text="${activeProfileId}"></span>
+    </div>
 
 
     <table class="table table-sm table-bordered">

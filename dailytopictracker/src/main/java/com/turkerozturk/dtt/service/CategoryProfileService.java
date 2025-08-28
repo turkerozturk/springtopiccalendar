@@ -49,8 +49,10 @@ public class CategoryProfileService {
 
     public Optional<Long> getActiveProfileId() {
         return settingRepository.findByKey(SELECTED_PROFILE_KEY)
+                .filter(s -> s.getValue() != null) // null olan değerleri at
                 .map(s -> Long.valueOf(s.getValue()));
     }
+
 
     @Transactional
     public void resetAllCategoriesUnarchived() {
