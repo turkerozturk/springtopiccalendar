@@ -1,4 +1,4 @@
-package com.turkerozturk.dttlauncher;/*
+/*
  * This file is part of the DailyTopicTracker project.
  * Please refer to the project's README.md file for additional details.
  * https://github.com/turkerozturk/springtopiccalendar
@@ -18,6 +18,7 @@ package com.turkerozturk.dttlauncher;/*
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
+package com.turkerozturk.dttlauncher;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -27,9 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.ServerSocket;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -38,7 +37,6 @@ import java.util.concurrent.*;
 import java.util.Properties;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,7 +73,65 @@ public class LaunchDTT extends JFrame {
     private final JButton btnClear = new JButton("🗑"); // Unicode trash can
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
     private int serverPort;
-    private String serverUrl = "http://localhost:";
+    private String serverUrlScheme;
+
+    private static final int DEFAULT_HTTP_PORT = 8080;
+    private static final int DEFAULT_HTTPS_PORT = 8443;
+
+
+    private void loadServerConfig() {
+        String userDir = System.getProperty("user.dir");
+        File propFile = new File(userDir, "application.properties");
+
+        boolean sslEnabled = true; // default
+        int httpPort = DEFAULT_HTTP_PORT;
+        int httpsPort = DEFAULT_HTTPS_PORT;
+
+        if (propFile.exists()) {
+            Properties props = new Properties();
+            try (FileInputStream in = new FileInputStream(propFile)) {
+                props.load(in);
+
+                // read app.ssl.enabled
+                String sslEnabledProp = props.getProperty("app.ssl.enabled");
+                if (sslEnabledProp != null) {
+                    sslEnabled = Boolean.parseBoolean(sslEnabledProp.trim());
+                }
+
+                // read server.http.port
+                String httpPortProp = props.getProperty("server.http.port");
+                if (httpPortProp != null) {
+                    httpPort = Integer.parseInt(httpPortProp.trim());
+                }
+
+                // read server.port (https port)
+                String httpsPortProp = props.getProperty("server.port");
+                if (httpsPortProp != null) {
+                    httpsPort = Integer.parseInt(httpsPortProp.trim());
+                }
+
+
+            } catch (IOException | NumberFormatException e) {
+                appendLog("[WARN] Could not read application.properties, using defaults.\n");
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (sslEnabled) {
+            this.serverPort = httpsPort;
+            this.serverUrlScheme = "https://localhost:";
+            sb.append("SSL is enabled on application.properties file. " + "\n");
+        } else {
+            this.serverPort = httpPort;
+            this.serverUrlScheme = "http://localhost:";
+            sb.append("SSL is disabled on application.properties file. " + "\n");
+        }
+
+
+        appendLog(sb + "The URL that will open after the application runs: " + serverUrlScheme + serverPort + "\n");
+    }
+
+
 
     // Process
     private Process process;
@@ -99,7 +155,9 @@ public class LaunchDTT extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
 
-        serverPort = readServerPort();
+        loadServerConfig();
+
+        //serverPort = readServerPort();
 
         // loads *.db filenames into a list box if they exist. If not, you cannot see the list box.
         loadDbFileNames();
@@ -159,10 +217,10 @@ public class LaunchDTT extends JFrame {
             }
         });
 
-        btnOpenApplicationWebPage.setToolTipText("Open " + serverUrl + serverPort);
+        btnOpenApplicationWebPage.setToolTipText("Open " + serverUrlScheme + serverPort);
         btnOpenApplicationWebPage.addActionListener( e -> {
 
-            openBrowser(serverUrl + serverPort);
+            openBrowser(serverUrlScheme + serverPort);
 
         });
 
@@ -368,12 +426,15 @@ public class LaunchDTT extends JFrame {
             }
             // Eğer STARTING moddaysak actuator'a bak
             if (currentStatus == AppStatus.STARTING) {
-                boolean up = isApplicationUp(serverUrl + serverPort + "/actuator/health");
+                // Actuator /health'e GET isteği atıp, "status":"UP" içeriyorsa true döner
+                HealthChecker healthChecker = new HealthChecker();
+
+                boolean up = healthChecker.isApplicationUp(serverUrlScheme + serverPort + "/actuator/health");
                 if (up) {
                     appendLog("[INFO] Application is UP. Opening browser...\n");
                     setStatus(AppStatus.RUNNING);
                     // Tarayıcı aç (isteğe bağlı; Windows)
-                    openBrowser(serverUrl + serverPort);
+                    openBrowser(serverUrlScheme + serverPort);
                 }
             }
         }, 1, 1, TimeUnit.SECONDS);
@@ -423,32 +484,10 @@ public class LaunchDTT extends JFrame {
         });
     }
 
-    // Actuator /health'e GET isteği atıp, "status":"UP" içeriyorsa true döner
-    private boolean isApplicationUp(String healthUrl) {
-        try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(healthUrl).openConnection();
-            conn.setConnectTimeout(1000);
-            conn.setReadTimeout(2000);
-            int code = conn.getResponseCode();
-            if (code == 200) {
-                // Yanıt metnini oku
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    // "status":"UP"
-                    if (sb.indexOf("\"status\":\"UP\"") >= 0) {
-                        return true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            // Sessiz geçebiliriz, demek ki UP değil ya da bağlantı hatası
-        }
-        return false;
-    }
+
+
+
+
 
     // Metin alanına log ekleme (Swing thread'i üzerinden)
     private void appendLog(String text) {
@@ -525,27 +564,8 @@ public class LaunchDTT extends JFrame {
 
     }
 
-    private static final int DEFAULT_SERVER_PORT = 8080;
-    private int readServerPort() {
-        String userDir = System.getProperty("user.dir");
-        File propFile = new File(userDir, "application.properties");
-        if (!propFile.exists()) {
-            return DEFAULT_SERVER_PORT;
-        }
 
-        Properties props = new Properties();
-        try (FileInputStream in = new FileInputStream(propFile)) {
-            props.load(in);
-            String port = props.getProperty("server.port");
-            if (port != null) {
-                return Integer.parseInt(port.trim());
-            }
-        } catch (IOException | NumberFormatException e) {
-            // İsterseniz loglayabilirsiniz
-        }
 
-        return DEFAULT_SERVER_PORT;
-    }
 
     private boolean isPortInUse(int port) {
         try (ServerSocket socket = new ServerSocket(port)) {
