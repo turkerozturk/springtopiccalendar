@@ -69,9 +69,9 @@
             <configuration>
               <target>
                 <copy file="README.md"
-                      todir="release/" />
+                      todir="release/nonessential/" />
                 <copy file="LICENSE"
-                      tofile="release/license.txt" />
+                      tofile="release/nonessential/license.txt" />
               </target>
             </configuration>
           </execution>
@@ -126,6 +126,8 @@
               <target>
                 <mkdir dir="release/topicimages" />
                 <mkdir dir="${project.basedir}/topicimages" />
+                <mkdir dir="release/nonessential" />
+
               </target>
             </configuration>
           </execution>
@@ -140,12 +142,12 @@
             <configuration>
               <target name="create-zip">
                 <!-- release-zip klasorunu olustur -->
-                <mkdir dir="release/release-zip" />
+                <mkdir dir="release/nonessential" />
 
                 <!-- release klasorunun icerigini ziple, zip dosyasini release/release-zip altina koy -->
-                <zip destfile="release/release-zip/daily-topic-tracker.zip" basedir="release">
+                <zip destfile="release/nonessential/daily-topic-tracker.zip" basedir="release">
                   <!-- release klasorunun kendisi degil, sadece icerigi eklensin -->
-                  <exclude name="release-zip/**" />
+                  <exclude name="nonessential/**" />
                 </zip>
               </target>
             </configuration>

@@ -213,7 +213,7 @@
                                 <copy file="target/${project.build.finalName}.exe"
                                       todir="../release/" />
                                 <copy file="target/generated-docs/how-to-compile.pdf"
-                                      todir="../release/" />
+                                      todir="../release/nonessential/" />
                             </target>
                         </configuration>
                     </execution>
