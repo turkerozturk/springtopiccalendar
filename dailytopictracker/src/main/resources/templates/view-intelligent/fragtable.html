@@ -11,17 +11,17 @@ https://github.com/turkerozturk/springtopiccalendar
     <table id="status-table" class="status-table" style="white-space: nowrap;">
         <thead>
         <tr>
-            <th style="min-width:200px; max-width:200px;">Category Group</th>
-            <th style="min-width:200px; max-width:200px;">Category</th>
-            <th style="min-width:30px; max-width:30px;" title="row counter">#</th>
-            <th style="min-width:45px; max-width:45px;">Days</th>
-            <th style="min-width:115px; max-width:115px;">Date</th>
-            <th style="min-width:200px; max-width:200px;">Topic</th>
-            <th style="min-width:30px; max-width:30px;" title="Status">S</th>
-            <th style="min-width:240px; max-width:280px;">Entry Note</th>
-            <th style="min-width:20px; max-width:20px;">📅</th>
-            <th style="min-width:20px; max-width:20px;"><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></th>
-            <th style="min-width:20px; max-width:20px;">☰</th>
+            <th style="min-width:150px;">Category Group</th>
+            <th style="min-width:150px;">Category</th>
+            <th style="width:30px; min-width:30px; max-width:30px;" title="row counter">#</th>
+            <th style="width:45px; min-width:45px; max-width:45px;">Days</th>
+            <th style="width:115px; min-width:115px; max-width:115px;">Date</th>
+            <th style="min-width:150px;">Topic</th>
+            <th style="width:30px; min-width:30px; max-width:30px;" title="Status">S</th>
+            <th style="min-width:150px;">Entry Note</th>
+            <th style="width:20px; min-width:20px; max-width:20px;">📅</th>
+            <th style="width:20px; min-width:20px; max-width:20px;"><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></th>
+            <th style="width:20px; min-width:20px; max-width:20px;">☰</th>
 
 
 
@@ -32,12 +32,12 @@ https://github.com/turkerozturk/springtopiccalendar
         <tr th:each="item, iStats : ${filteredItems}"
             th:class="${item.dateLocal} == ${today} ? 'highlight-today' : 'normal-table-row'">
 
-            <td th:text="${#strings.abbreviate(item.topic.category.categoryGroup.name, 27)}"
+            <td th:text="${item.topic.category.categoryGroup.name}"
                 th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
 
             <td>
                 <a th:href="'/categories/info/' + ${item.topic.category.id}"
-                   th:text="${#strings.abbreviate(item.topic.category.name, 27)}"
+                   th:text="${item.topic.category.name}"
                    th:title="${item.topic.category.name}"
                    th:classappend="${item.topic.category.archived} ? ' css-archived' : ''">Category</a>
             </td>
@@ -195,7 +195,9 @@ https://github.com/turkerozturk/springtopiccalendar
             <td>
                 <span
                    th:text="${#strings.abbreviate(item.topic.name, 27)}"
-                   >
+                   th:title="${item.topic.name}"
+
+                >
                     Topic
                 </span>
             </td>
