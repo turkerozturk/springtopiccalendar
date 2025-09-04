@@ -43,11 +43,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
        /* https://stackoverflow.com/questions/3203252/unicode-character-as-bullet-for-list-item-in-css */
-       ul li {
+       ul.somedescription li {
          list-style: none;
          padding: 0px;
        }
-       ul li:before {
+       ul.somedescription li:before {
          content: "\2606";
          margin: 0 1em;    /* any design */
        }
@@ -321,20 +321,144 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
         }
 
+        /* FREEZE islemi yapilirken o sutunun tablonun en sol veya en sagdan kac pixel mesafede oldugunu hesaplamak gerekir. Hesap dinamik yapilirsa daha iyi olur. */
+
+        /* NOT Freeze sütun */
+        #pivot-table .not-frozen {
+
+          /* bu bos stilin amaci, freeze edip etmemek icin ileride not frozen olanlari hizli bulmak.  */
+
+        }
+
         /* Freeze sol sütun */
-        #pivot-table .left-frozen {
+        #pivot-table .left-frozen-topic {
           position: sticky;
           left: 0;
-          background: #f8f8f8;
+          background: white;
           z-index: 2;
         }
 
-        /* Freeze sağ sütun */
-        #pivot-table .right-frozen {
+        #pivot-table .left-frozen-category {
+          /*
           position: sticky;
-          right: 0;
-          background: #f8f8f8;
+          left: TODO hesapla;
+          background: white;
           z-index: 2;
+          */
+        }
+
+
+        /* sağdan 1. sütun */
+        #pivot-table .right-frozen-count {
+          position: sticky;
+          max-width: 75px;
+          width: 75px;
+          min-width: 75px;
+          right: 400;
+          background: white;
+          z-index: 2;
+          font-family: monospace, monospace;
+          overflow:hidden;
+          whites-pace:nowrap;
+        }
+
+        /* sağdan 2. sütun */
+        #pivot-table .right-frozen-prediction {
+          position: sticky;
+          max-width: 75px;
+          width: 75px;
+          min-width: 75px;
+          right: 325px; /* sütun genişliğine göre ayarla */
+          z-index: 2;
+          font-family: monospace, monospace;
+        }
+
+        /* sağdan 3. sütun */
+        #pivot-table .right-frozen-last-done {
+          position: sticky;
+          max-width: 75px;
+          width: 75px;
+          min-width: 75px;
+          right: 250px;
+          z-index: 2;
+          font-family: monospace, monospace;
+        }
+
+        /* sağdan 4. sütun */
+        #pivot-table .right-frozen-first-warn {
+          position: sticky;
+          max-width: 75px;
+          width: 75px;
+          min-width: 75px;
+          right: 175px; /* sütun genişliğine göre ayarla */
+          z-index: 2;
+          font-family: monospace, monospace;
+        }
+
+        /* sağdan 5. sütun */
+        #pivot-table .right-frozen-upcoming {
+          position: sticky;
+          max-width: 75px;
+          width: 75px;
+          min-width: 75px;
+          right: 100px; /* sütun genişliğine göre ayarla */
+          z-index: 2;
+        }
+
+        /* sağdan 6. sütun */
+        #pivot-table .right-frozen-weekly {
+          position: sticky;
+          background: white;
+          max-width: 25px;
+          width: 25px;
+          min-width: 25px;
+          right: 75px;
+          z-index: 2;
+          padding: 0px;
+          border: 1px solid black;
+          text-align: center;
+        }
+
+        /* sağdan 7. sütun */
+        #pivot-table .right-frozen-entries {
+          position: sticky;
+          background: white;
+          max-width: 25px;
+          width: 25px;
+          min-width: 25px;
+          right: 50px;
+          z-index: 2;
+          padding: 0px;
+          border: 1px solid black;
+          text-align: center;
+        }
+
+        /* sağdan 8. sütun */
+        #pivot-table .right-frozen-edit {
+          position: sticky;
+          background: white;
+          max-width: 25px;
+          width: 25px;
+          min-width: 25px;
+          right: 25px; /* sütun genişliğine göre ayarla */
+          z-index: 2;
+          padding: 0px;
+          border: 1px solid black;
+          text-align: center;
+        }
+
+        /* sağdan 9. sütun */
+        #pivot-table .right-frozen-pin {
+          position: sticky;
+          background: white;
+          max-width: 25px;
+          width: 25px;
+          min-width: 25px;
+          right: 0px;
+          z-index: 2;
+          padding: 0px;
+          border: 1px solid black;
+          text-align: center;
         }
 
         /* Responsive gizleme: 1024px altında bazı sağ sütunlar collapse olsun */
@@ -343,8 +467,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
            /* visibility: collapse; */
           }
         }
-
-
 
     </style>
 </head>
@@ -655,7 +777,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
     <div class="alert alert-success centered">
         <h1><span class="fonbg">Tracker</span></h1>
-        <ul>
+        <ul class="somedescription">
             <li>You can use the <b>◀️category▶️</b> navigation buttons to view the tables.</li>
             <li>Or select a category from filter. To see the filter interface, click <b>Toggle Filter</b> button.</li>
         <li>Or select a category from the <b>Category Groups</b> page.</li>
@@ -677,24 +799,24 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
         <colgroup>
 
-            <col class="left-frozen">
+            <col class="left-frozen-topic">
 
             <!-- kondisyonal sütun: category kolon elementi sadece tek bir kategori seçilmediğinde görünsün -->
-            <col class="left-frozen" th:if="${filterDto.categoryId == null}">
+            <col class="left-frozen-category" th:if="${filterDto.categoryId == null}">
 
             <col th:span="${pivotData.dateRange.size}"> <!-- ortadaki dinamik kolonlar -->
 
-            <col class="right-frozen">
-            <col class="not-frozen">
-            <col class="right-frozen">
+            <col class="right-frozen-count">
+            <col class="right-frozen-prediction">
+            <col class="right-frozen-last-done">
 
-            <col class="right-frozen">
-            <col class="right-frozen">
-            <col class="right-frozen">
+            <col class="right-frozen-first-warn">
+            <col class="right-frozen-upcoming">
+            <col class="right-frozen-weekly">
 
-            <col class="right-frozen">
-            <col class="right-frozen">
-            <col class="right-frozen">
+            <col class="right-frozen-entries">
+            <col class="right-frozen-edit">
+            <col class="right-frozen-pin">
 
         </colgroup>
 
@@ -739,7 +861,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <tr>
 
             <!-- ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
-            <th class="left-frozen">
+            <th class="left-frozen-topic">
                 <!-- Tıklayınca sıralama yapsın -->
                 <span onclick="sortPivotTableByColumn(0)" style="cursor: pointer;">Topic</span>
 
@@ -772,7 +894,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
-            <th  class="left-frozen" th:if="${filterDto.categoryId == null}">
+            <th  class="left-frozen-category" th:if="${filterDto.categoryId == null}">
 
                 <span onclick="sortPivotTableByColumn(1)" style="cursor: pointer;">Category</span>
 
@@ -815,34 +937,34 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <th class="right-frozen text-center" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
+            <th class="right-frozen-count text-center" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
 
         <!--    <th class="text-center" style="vertical-align: middle;">Visible<br />Row<br />Num</th> -->
 
-            <th class="text-center status-3"
+            <th class="right-frozen-prediction text-center status-3"
                 id="header-next-prediction"
                 style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion<br />(day)</th>
 
 
-            <th class="right-frozen text-center status-1" style="vertical-align: middle;"
+            <th class="right-frozen-last-done text-center status-1" style="vertical-align: middle;"
                 id="header-last-done"
                 title="Last Past Done Entry Date: Shows the day count and the date(hover mouse) of the 'done(green colored)' entry closest to the current day in the past.">Last<br />Done<br />(day)</th>
 
-            <th class="right-frozen text-center status-2"
+            <th class="right-frozen-first-warn text-center status-2"
                 id="header-first-warn"
                 style="vertical-align: middle;" title="First Warning Entry Date: Shows the day count and the date(hover mouse) of the 'warn(red colored)' entry amongst all entries for a topic. It is a negative number if it is in the past. ">First<br />Warn<br />(day)</th>
 
-            <th class="right-frozen text-center status-0"
+            <th class="right-frozen-upcoming text-center status-0"
                 id="header-upcoming-note"
                 style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note<br />(day)</th>
 
-            <th class="right-frozen text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
+            <th class="right-frozen-weekly text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
 
-            <th class="right-frozen text-center" style="vertical-align: middle;" title="List Entries">☰</th>
+            <th class="right-frozen-entries text-center" style="vertical-align: middle;" title="List Entries">☰</th>
 
-            <th class="right-frozen text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
+            <th class="right-frozen-edit text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
 
-            <th class="right-frozen text-center" style="vertical-align: middle;" title="Pinned">📌</th>
+            <th class="right-frozen-pin text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
 
 
@@ -858,14 +980,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <tr th:each="topic, iStat : ${pivotData.topicList}">
 
             <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
-            <td class="left-frozen" id="topic-name">
+            <td class="left-frozen-topic" id="topic-name">
                 <span
                    th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
                 </span>
             </td>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
-            <td class="left-frozen" id="category-name" th:if="${filterDto.categoryId == null}" th:text="${topic.category.name}"></td>
+            <td class="left-frozen-category" id="category-name" th:if="${filterDto.categoryId == null}" th:text="${topic.category.name}"></td>
 
             <!-- Ardından pivotData.dateRange kadar hücre -->
             <!-- pivotData.dateRange kadar hücre -->
@@ -928,7 +1050,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
             <!-- turker topic'in toplam görünen "done" entry sayısı -->
-            <td class="right-frozen text-center">
+            <td class="right-frozen-count" style="text-align: center; background-color: white;">
                 <span th:text="${pivotData.status1Counts[topic.id]} ?: 0">0</span>
             </td>
 
@@ -952,7 +1074,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId))
                                       + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="status-3" style="text-align: center; white-space: nowrap; overflow: hidden;">
+                            class="right-frozen-prediction status-3"
+                            style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}">🔥🔥️</a>
                         </td>
                     </th:block>
@@ -963,7 +1086,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="status-3" style="text-align: center; white-space: nowrap; overflow: hidden;">
+                            class="right-frozen-prediction status-3"
+                            style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">💧💧</a>
                         </td>
@@ -980,7 +1104,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="status-5" style="text-align: center; white-space: nowrap; overflow: hidden;">
+                            class="right-frozen-prediction status-5"
+                            style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">🔔</a>
                         </td>
@@ -995,8 +1120,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                                class="status-5"
-                                style="text-align: center; white-space: nowrap; overflow: hidden;">
+                                class="right-frozen-prediction status-5"
+                                style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                    style="">🔥</a>
                             </td>
@@ -1007,8 +1132,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                                class="status-5"
-                                style="text-align: center; white-space: nowrap; overflow: hidden;">
+                                class="right-frozen-prediction status-5"
+                                style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                    style="">💧</a>
                             </td>
@@ -1027,7 +1152,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!-- predictionDate yoksa -->
             <th:block th:if="${topic.predictionDate == null or #strings.isEmpty(topic.predictionDate)}"
             >
-                <td title="You can manually add the next date prediction on topic settings." style="text-align: center; white-space: nowrap; overflow: hidden;"
+                <td title="You can manually add the next date prediction on topic settings."
+                    style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;"
+                    class="right-frozen-prediction"
                     >
                     <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                        style="">ℹ️</a>
@@ -1046,8 +1173,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
                                         + ' days before)' }"
-                    class="right-frozen last-done"
-                    style="text-align: center">
+                    class="right-frozen-last-done last-done"
+                    style="text-align: center; background-color: white;">
 
                     <!-- how many days has past until today -->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
@@ -1060,8 +1187,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <th:block th:if="${topic.lastPastEntryDate == null or #strings.isEmpty(topic.lastPastEntryDate)}"
             >
                 <td title="At least one entry with the status 'done(green colored)' closest to the current day in the past is required."
-                    style="text-align: center"
-                    class="right-frozen">
+                    style="text-align: center; background-color: white;"
+                    class="right-frozen-last-done">
                     &nbsp;
                 </td>
             </th:block>
@@ -1078,8 +1205,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate )
                                         + ' days)' }"
-                    class="right-frozen first-warn"
-                    style="text-align: center">
+                    class="right-frozen-first-warn first-warn"
+                    style="text-align: center; background-color: white;">
 
                     <!-- how many days has past until today -->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
@@ -1091,8 +1218,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!-- firstWarningEntryDate yoksa -->
             <th:block th:if="${topic.firstWarningEntryDate == null or #strings.isEmpty(topic.firstWarningEntryDate)}"
             >
-                <td title="At least one entry with the status 'warning(red colored)' is required." style="text-align: center"
-                    class="right-frozen">
+                <td title="At least one entry with the status 'warning(red colored)' is required."
+                    style="text-align: center; background-color: white;"
+                    class="right-frozen-first-warn">
                     &nbsp;
                 </td>
             </th:block>
@@ -1107,8 +1235,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         +  T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate )
                                         + ' days)' }"
-                    class="right-frozen upcoming-note"
-                    style="text-align: center">
+                    class="right-frozen-upcoming upcoming-note"
+                    style="text-align: center; background-color: white;">
 
                     <!-- how many days has past until today -->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
@@ -1120,13 +1248,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!-- firsFutureNeutralEntryDate yoksa -->
             <th:block th:if="${topic.firstFutureNeutralEntryDate == null or #strings.isEmpty(topic.firstFutureNeutralEntryDate)}"
             >
-                <td title="At least one entry with the status 'not marked(gray colored)' in the future is required." style="text-align: center"
-                    class="right-frozen">
+                <td title="At least one entry with the status 'not marked(gray colored)' in the future is required."
+                    style="text-align: center; background-color: white;"
+                    class="right-frozen-upcoming">
                     &nbsp;
                 </td>
             </th:block>
 
-            <td class="right-frozen">
+            <td class="right-frozen-weekly">
 
                 <a
                         th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
@@ -1140,15 +1269,15 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </a>
             </td>
 
-            <td class="right-frozen">
+            <td class="right-frozen-entries">
                 <a title="Entries List" th:href="@{/entries(topicId=${topic.id})}">☰</a>
             </td>
 
-            <td class="right-frozen">
+            <td class="right-frozen-edit">
                 <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
             </td>
 
-            <td class="right-frozen text-center">
+            <td class="right-frozen-pin text-center">
                 <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
             </td>
 
