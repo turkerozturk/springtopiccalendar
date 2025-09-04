@@ -32,45 +32,75 @@ background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox=
 
         }
     </style>
+    <style>
+        html, body {
+          height: 100%;
+          overflow-x: hidden; /* yatay kaymayı engelle */
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
-<div class="container d-flex justify-content-center align-items-center" style="margin-top:50px;">
-    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
-        <div class="text-center mb-4">
-            <i class="fas fa-user-circle fa-3x text-primary"></i>
-            <h4 class="mt-2">Daily Topic Tracker</h4>
-            <p class="text-muted">Login</p>
+<div class="container d-flex justify-content-center align-items-center ">
+    <div class="card shadow rounded-3 mt-3" style="width: 100%; max-width: 400px;">
+        <div class="card-body">
+
+
+            <div class="card-title text-center ">
+                <h4 class="mb-0">Daily Topic Tracker</h4><br/>
+                <img src="/favicon-60x60.png" /><br/>
+                <span class="text-muted text-center">Login</span>
+
+            </div>
+
+
+
+
+
+
+
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Username</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt me-2"></i>Login</button>
+                </div>
+            </form>
+
+            <!-- Feedback Messages -->
+            <div th:if="${param.error}" class="alert alert-danger mt-3" role="alert">
+                <i class="fas fa-exclamation-circle me-1"></i> Invalid username or password.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success mt-3" role="alert">
+                <i class="fas fa-check-circle me-1"></i> You have been logged out.
+            </div>
+            <div class="mt-2">&nbsp;</div>
+
+            <!-- Uyarı Mesajı (Collapse ile) -->
             <div th:if="${isDefaultPassword}" class="alert alert-warning" role="alert">
-                For better security, please change the default password in <code>application.properties</code> by editing the line<br>
-                <code>spring.security.user.password={noop}admin</code><br>
-                Replace <code>admin</code> with another password and restart the application.<br>
-                You can also change the username (currently <strong>admin</strong>) in the same file.<br>
-                Additionally, in this version the password is in plain text so anyone with access to your computer can see it.
+                Default username: <b>admin</b>, password: <b>admin</b>
+                <a class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" href="#warningDetails" role="button">
+                    Read more..
+                </a>
+                <div class="collapse mt-2" id="warningDetails">
+                    <p class="mb-0">
+
+                        For better security, please change the default password in <code>application.properties</code> by editing the line<br>
+                        <code>spring.security.user.password={noop}admin</code><br>
+                        Replace <code>admin</code> with another password and restart the application.<br>
+                        You can also change the username (currently <strong>admin</strong>) in the same file.<br>
+                        Additionally, in this version the password is in plain text so anyone with access to your computer can see it.                    </p>
+                </div>
             </div>
 
-        </div>
-        <form th:action="@{/login}" method="post">
-            <div class="mb-3">
-                <label for="username" class="form-label"><i class="fas fa-user me-2"></i>Username</label>
-                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required autofocus>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
-            </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt me-2"></i>Login</button>
-            </div>
-        </form>
-
-        <!-- Feedback Messages -->
-        <div th:if="${param.error}" class="alert alert-danger mt-3" role="alert">
-            <i class="fas fa-exclamation-circle me-1"></i> Invalid username or password.
-        </div>
-        <div th:if="${param.logout}" class="alert alert-success mt-3" role="alert">
-            <i class="fas fa-check-circle me-1"></i> You have been logged out.
         </div>
     </div>
 </div>
