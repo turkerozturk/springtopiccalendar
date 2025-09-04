@@ -5,42 +5,86 @@ https://github.com/turkerozturk/springtopiccalendar
 -->
 <div th:fragment="fragnavigation" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
-    <div>
-        <a href="/" class="btn btn-secondary btn-sm" style="color:white;">🏠 Home</a>
-        <a href="/category-groups" class="btn btn-secondary btn-sm"
-            style="color:white;"><i class="fa-solid fa-layer-group"></i> Category Groups</a>
-        <a href="/categories" class="btn btn-secondary btn-sm"
-           th:if="${hasCategoryGroups}" style="color:white;">☰ Categories</a>
 
-        <th:block th:if="${hasCategories}">
-            <!-- Eğer filterDto ve categoryId varsa -->
-            <a th:if="${filterDto != null and filterDto.categoryId != null}"
-               th:href="@{/topics(categoryId=${filterDto.categoryId})}"
-               class="btn btn-secondary btn-sm" style="color:white;">
-               ☰ Topics
-            </a>
 
-            <!-- Yoksa parametresiz versiyon -->
-            <a th:if="${filterDto == null or filterDto.categoryId == null}"
-               th:href="@{/topics}"
-               class="btn btn-secondary btn-sm" style="color:white;">
-                ☰ Topics
-            </a>
-        </th:block>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary rounded mb-3">
+        <div class="container-fluid">
 
-        <th:block th:if="${hasTopics}">
-            <a href="/entries" class="btn btn-secondary btn-sm"
-               style="color:white;">☰ Entries</a>
-            <a href="/entry-filter/form" class="btn btn-secondary btn-sm" style="color:white;"><i class="fa-solid fa-gear" style="color: #FFD43B;"></i> Tracker</a>
-            <a href="/reports/all" class="btn btn-secondary btn-sm" style="color:white;">🧠 Report</a>
-        </th:block>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit"  class="btn btn-secondary btn-sm"
-            title="Logout">
-                <i class="fa fa-sign-out" aria-hidden="true"></i>
+            <!-- Sol tarafta logo veya Home -->
+            <a class="navbar-brand" href="/">🏠 Home</a>
+
+            <!-- Mobil icin toggle butonu -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                    aria-controls="mainNavbar" aria-expanded="false" aria-label="Menüyü Aç/Kapat">
+                <span class="navbar-toggler-icon"></span>
             </button>
-        </form>
-    </div>
 
+            <!-- Menü içerikleri -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a href="/category-groups" class="nav-link"
+                           style="color:white;"><i class="fa-solid fa-layer-group"></i> Category Groups</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/categories" class="nav-link"
+                           th:if="${hasCategoryGroups}" style="color:white;">☰ Categories</a>
+                    </li>
+
+                    <li class="nav-item" th:if="${hasCategories}">
+                        <!-- Eğer filterDto ve categoryId varsa -->
+                        <a th:if="${filterDto != null and filterDto.categoryId != null}"
+                           th:href="@{/topics(categoryId=${filterDto.categoryId})}"
+                           class="nav-link" style="color:white;">
+                            ☰ Topics
+                        </a>
+
+                        <!-- Yoksa parametresiz versiyon -->
+                        <a th:if="${filterDto == null or filterDto.categoryId == null}"
+                           th:href="@{/topics}"
+                           class="nav-link" style="color:white;">
+                            ☰ Topics
+                        </a>
+                    </li>
+
+                    <th:block th:if="${hasTopics}">
+
+                        <li class="nav-item">
+                            <a href="/entries" class="nav-link"
+                            style="color:white;">☰ Entries</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/entry-filter/form" class="nav-link" style="color:white;">
+                                <i class="fa-solid fa-gear" style="color: #FFD43B;"></i> Tracker</a>
+                        </li>
+
+                        <li class="nav-item"><a href="/reports/all" class="nav-link" style="color:white;">🧠 Report</a>
+                        </li>
+
+
+                    </th:block>
+
+                    <li class="nav-item">
+
+                    <form th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit"  class="nav-link"
+                                title="Logout">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                        </button>
+                    </form>
+
+                    </li>
+
+                    <li th:if="${showExtra}" class="nav-item">
+                        <a class="nav-link" href="/ozel">sayfalara ozel menuler</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
 
 </div>
