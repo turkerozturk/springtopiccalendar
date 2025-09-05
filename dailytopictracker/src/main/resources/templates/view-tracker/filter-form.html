@@ -37,6 +37,19 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
 
+    .hidden-col {
+      display: none;
+    }
+    .left-frozen-topic {
+      min-width: 200px;
+      max-width: 200px;
+    }
+    @media (max-width: 1024px) {
+      .left-frozen-topic {
+        min-width: 75px;
+        max-width: 75px;
+      }
+    }
 
 
 
@@ -116,11 +129,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
- #pivot-table {
-    background-color: WhiteSmoke;
-    border: 3px solid black;
-
- }
 
 
 
@@ -134,8 +142,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
          #topic-name {
            white-space: nowrap;
            overflow: hidden;
-           position: relative;
-           max-width: 200px;
+         /*  position: relative;
+            max-width: 200px; */
          }
 
          #category-name {
@@ -195,6 +203,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                    background-color: WhiteSmoke;
 
                }
+
+                /* https://www.w3schools.com/howto/howto_css_disable_text_selection.asp */
+               .prevent-select {
+                  -webkit-user-select: none; /* Safari */
+                  -ms-user-select: none; /* IE 10 and IE 11 */
+                  user-select: none; /* Standard syntax */
+                }
 
                .pivot-table-entry-cell a {
                text-decoration: none;   /* alt çizgiyi kaldır */
@@ -309,16 +324,37 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           overflow-x: auto;
           max-width: 100%;
         }
-
-        #pivot-table {
-        /*  border-collapse: collapse; */
-          min-width: 1024px; /* küçük ekranlarda scrollbar */
+        .scrollbar-top {
+          overflow-x: auto;
+          overflow-y: hidden;
+          height: 20px;           /* scrollbar yüksekliği */
+          max-width: 100%;
         }
+        .scrollbar-top::-webkit-scrollbar {
+          height: 16px;           /* Chrome için scrollbar boyutu */
+        }
+
+
+
+
+         #pivot-table {
+
+
+            /* min-width: 1024px; */ /* küçük ekranlarda scrollbar */
+
+            background-color: WhiteSmoke;
+            border: 3px solid black;
+            border-collapse: separate; /* sticky'De cercevelerin gorunmesi icin lazim. https://stackoverflow.com/questions/50361698/border-style-do-not-work-with-sticky-position-element */
+            border-spacing: 0; /* separate yapinca hucrelerin duvarlari bagimsiz olur ve ayri ayri gorunur, arada bosluk olmamasi icin. */
+         }
 
         #pivot-table th, #pivot-table td {
           /* padding: 4px 8px; */
+            border-right: 1px solid black; /* yatay borderlar gorunmuyordu. Hücrelere yatay çizgi eklemek icin. cunku tablonun kendisinde border-collapse: separate kullanınca hücrelerin sınırları ayrı olur. O yüzden td ve th elementlerine doğrudan border verdik */
+            border-left: 0px solid black; /* yatay borderlar gorunmuyordu. Hücrelere yatay çizgi eklemek icin. cunku tablonun kendisinde border-collapse: separate kullanınca hücrelerin sınırları ayrı olur. O yüzden td ve th elementlerine doğrudan border verdik */
 
-
+            border-top: 1px solid black;
+            border-spacing: 0;
         }
 
         /* FREEZE islemi yapilirken o sutunun tablonun en sol veya en sagdan kac pixel mesafede oldugunu hesaplamak gerekir. Hesap dinamik yapilirsa daha iyi olur. */
@@ -336,6 +372,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           left: 0;
           background: white;
           z-index: 2;
+         /* max-width: 100px;
+          width: 100px;
+          min-width: 100px; */
         }
 
         #pivot-table .left-frozen-category {
@@ -360,6 +399,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           font-family: monospace, monospace;
           overflow:hidden;
           whites-pace:nowrap;
+
         }
 
         /* sağdan 2. sütun */
@@ -371,6 +411,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           right: 325px; /* sütun genişliğine göre ayarla */
           z-index: 2;
           font-family: monospace, monospace;
+
+          background: white;
+
         }
 
         /* sağdan 3. sütun */
@@ -391,8 +434,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           width: 75px;
           min-width: 75px;
           right: 175px; /* sütun genişliğine göre ayarla */
-          z-index: 2;
+          z-index: 50 !important;
           font-family: monospace, monospace;
+
         }
 
         /* sağdan 5. sütun */
@@ -415,7 +459,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           right: 75px;
           z-index: 2;
           padding: 0px;
-          border: 1px solid black;
           text-align: center;
         }
 
@@ -429,42 +472,41 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           right: 50px;
           z-index: 2;
           padding: 0px;
-          border: 1px solid black;
           text-align: center;
         }
+
+
 
         /* sağdan 8. sütun */
-        #pivot-table .right-frozen-edit {
-          position: sticky;
-          background: white;
-          max-width: 25px;
-          width: 25px;
-          min-width: 25px;
-          right: 25px; /* sütun genişliğine göre ayarla */
-          z-index: 2;
-          padding: 0px;
-          border: 1px solid black;
-          text-align: center;
-        }
-
-        /* sağdan 9. sütun */
         #pivot-table .right-frozen-pin {
           position: sticky;
           background: white;
           max-width: 25px;
           width: 25px;
           min-width: 25px;
-          right: 0px;
+          right: 25px;
           z-index: 2;
           padding: 0px;
-          border: 1px solid black;
+          text-align: center;
+        }
+
+        /* sağdan 9. sütun */
+        #pivot-table .right-frozen-edit {
+          position: sticky;
+          background: white;
+          max-width: 25px;
+          width: 25px;
+          min-width: 25px;
+          right: 0px; /* sütun genişliğine göre ayarla */
+          z-index: 2;
+          padding: 0px;
           text-align: center;
         }
 
         /* Responsive gizleme: 1024px altında bazı sağ sütunlar collapse olsun */
         @media (max-width: 1024px) {
           #pivot-table col.hide-on-small {
-           /* visibility: collapse; */
+            /* visibility: collapse; */
           }
         }
 
@@ -478,84 +520,104 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
 
-    <div style="margin-top:4px;">
+    <div>
+
+        <div class="mt-1 text-center">
+
+            <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
+
+                <button class="btn btn-sm btn-primary" type="button"
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+                        title="Toggle Filter"
+                        aria-controls="offcanvasTop"><i class="fa-solid fa-toggle-on"></i> Filter</button>
+
+
+                <a th:href="@{/reports/cg?categoryGroupId={id}(id=${filterDto.categoryGroupId})}"
+                   th:title="${ 'Open category group in intelligent report view.' }"
+                   class="btn btn-sm btn-secondary"
+                >&nbsp;🧠 Cat. Report</a>
+
+            </th:block>
+
+            <button class="btn btn-sm btn-primary" onClick="toggleColumns()" title="Toggle Columns"
+                    type="button" >
+                <i class="fa-solid fa-toggle-on"></i> Columns
+            </button>
+
+        </div>
+
+        <div class="mt-1 text-center">
+
+
+                <!-- Önceki & Sonraki & Temizle -->
+                <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
+                    <!-- Gizli alanlar -->
+                    <input type="hidden" th:field="*{topicIds}"/>
+                    <input type="hidden" th:field="*{startDate}"/>
+                    <input type="hidden" th:field="*{endDate}"/>
+                    <input type="hidden" th:field="*{statuses}"/>
+                    <input type="hidden" th:field="*{categoryId}"/>
+                    <input type="hidden" th:field="*{entriesThreshold}" />
+
+                    <button type="submit" title="Previous Date Range" class="btn btn-secondary btn-sm">◀️date</button>
+                </form>
 
 
 
+                <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
+                    <!-- Gizli alanlar -->
+                    <input type="hidden" th:field="*{topicIds}"/>
+                    <input type="hidden" th:field="*{startDate}"/>
+                    <input type="hidden" th:field="*{endDate}"/>
+                    <input type="hidden" th:field="*{statuses}"/>
+                    <input type="hidden" th:field="*{categoryId}"/>
+                    <input type="hidden" th:field="*{entriesThreshold}" />
 
-    <!-- Önceki & Sonraki & Temizle -->
-    <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
-        <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}"/>
-        <input type="hidden" th:field="*{startDate}"/>
-        <input type="hidden" th:field="*{endDate}"/>
-        <input type="hidden" th:field="*{statuses}"/>
-        <input type="hidden" th:field="*{categoryId}"/>
-        <input type="hidden" th:field="*{entriesThreshold}" />
+                    <button type="submit" title="Next Date Range" class="btn btn-secondary btn-sm">date▶️</button>
+                </form>
 
-        <button type="submit" title="Previous Date Range" class="btn btn-secondary btn-sm">◀️date</button>
-    </form>
+                <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
+                    [Category navigation is disabled.]
+                </th:block>
+                <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
+                    <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
+                    <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
+                          method="post" style="display:inline;">
+                        <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
+                        <input type="hidden" th:field="*{topicIds}" />
+                        <input type="hidden" th:field="*{startDate}" />
+                        <input type="hidden" th:field="*{endDate}" />
+                        <input type="hidden" th:field="*{statuses}" />
+                        <input type="hidden" th:field="*{categoryId}" />
+                        <input type="hidden" th:field="*{entriesThreshold}" />
 
-
-    <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
-        <!-- Gizli alanlar -->
-        <input type="hidden" th:field="*{topicIds}"/>
-        <input type="hidden" th:field="*{startDate}"/>
-        <input type="hidden" th:field="*{endDate}"/>
-        <input type="hidden" th:field="*{statuses}"/>
-        <input type="hidden" th:field="*{categoryId}"/>
-        <input type="hidden" th:field="*{entriesThreshold}" />
-
-        <button type="submit" title="Next Date Range" class="btn btn-secondary btn-sm">date▶️</button>
-    </form>
-
-    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
-            aria-controls="offcanvasTop"><i class="fa-solid fa-toggle-on"></i> Toggle Filter</button>
-
-        <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
-            [Category navigation is disabled.]
-        </th:block>
-        <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
-
-            <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
-            <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
-                  method="post" style="display:inline;">
-                <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
-                <input type="hidden" th:field="*{topicIds}" />
-                <input type="hidden" th:field="*{startDate}" />
-                <input type="hidden" th:field="*{endDate}" />
-                <input type="hidden" th:field="*{statuses}" />
-                <input type="hidden" th:field="*{categoryId}" />
-                <input type="hidden" th:field="*{entriesThreshold}" />
-
-                <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
-                    ◀️category
-                </button>
-            </form>
+                        <button type="submit" class="btn btn-sm btn-secondary" title="Previous Category">
+                            ◀️category
+                        </button>
+                    </form>
 
 
-            <form th:action="@{/entry-filter/nextCategory}" th:object="${filterDto}"
-                  method="post" style="display:inline; margin-left:4px;">
-                <input type="hidden" th:field="*{topicIds}" />
-                <input type="hidden" th:field="*{startDate}" />
-                <input type="hidden" th:field="*{endDate}" />
-                <input type="hidden" th:field="*{statuses}" />
-                <input type="hidden" th:field="*{categoryId}" />
-                <input type="hidden" th:field="*{entriesThreshold}" />
-                <input type="hidden" th:field="*{categoryGroupId}" />
+                    <form th:action="@{/entry-filter/nextCategory}" th:object="${filterDto}"
+                          method="post" style="display:inline; margin-left:4px;">
+                        <input type="hidden" th:field="*{topicIds}" />
+                        <input type="hidden" th:field="*{startDate}" />
+                        <input type="hidden" th:field="*{endDate}" />
+                        <input type="hidden" th:field="*{statuses}" />
+                        <input type="hidden" th:field="*{categoryId}" />
+                        <input type="hidden" th:field="*{entriesThreshold}" />
+                        <input type="hidden" th:field="*{categoryGroupId}" />
 
-                <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
-                    category▶️
-                </button>
-            </form>
+                        <button type="submit" class="btn btn-sm btn-secondary" title="Next Category">
+                            category▶️
+                        </button>
+                    </form>
 
-            <a th:href="@{/reports/cg?categoryGroupId={id}(id=${filterDto.categoryGroupId})}"
-               th:title="${ 'Open category group in intelligent report view.' }"
-            >&nbsp;🧠</a>
+                </th:block>
 
-        </th:block>
-</div>
+        </div>
+
+    </div>
 
 
 </div> <!-- end div of background css pattern -->
@@ -793,6 +855,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     <!-- Tabloyu sarmalayan scrollable container -->
     <div style="overflow-x: auto; max-width: 100%;">
 
+        <div class="scrollbar-top"></div>
+
         <div class="table-wrapper">
 
     <table id="pivot-table" class="table-bordered table-sm caption-top">
@@ -806,17 +870,18 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <col th:span="${pivotData.dateRange.size}"> <!-- ortadaki dinamik kolonlar -->
 
-            <col class="right-frozen-count">
+            <col class="right-frozen-count hidden-col">
             <col class="right-frozen-prediction">
             <col class="right-frozen-last-done">
 
-            <col class="right-frozen-first-warn">
+            <col class="right-frozen-first-warn hidden-col">
             <col class="right-frozen-upcoming">
             <col class="right-frozen-weekly">
 
             <col class="right-frozen-entries">
-            <col class="right-frozen-edit">
             <col class="right-frozen-pin">
+            <col class="right-frozen-edit">
+
 
         </colgroup>
 
@@ -889,12 +954,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                            id="topicSearchBox"
                            placeholder="Search Topic..."
                            onkeyup="filterPivotTable()"
-                           style="width: 100px;"/>
+                           style="width: 90px;"/>
                 </div>
             </th>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
-            <th  class="left-frozen-category" th:if="${filterDto.categoryId == null}">
+            <th  class="left-frozen-category prevent-select" th:if="${filterDto.categoryId == null}">
 
                 <span onclick="sortPivotTableByColumn(1)" style="cursor: pointer;">Category</span>
 
@@ -912,7 +977,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
             <th:block th:each="day : ${pivotData.dateRange}">
                 <td th:if="${day.equals(today)}"
-                class="pivot-table-entry-header highlighted-day">
+                class="pivot-table-entry-header prevent-select highlighted-day">
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
                       class="vertical-text"
@@ -926,7 +991,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     ${#temporals.dayOfWeek(day) >= 1 && #temporals.dayOfWeek(day) <= 7 &&
                      day.isAfter( startOfWeek.minusDays(1) ) &&
                      day.isBefore(startOfWeek.plusDays(7))} ? 'highlighted-week' : ''"
-                    class="pivot-table-entry-header">
+                    class="pivot-table-entry-header prevent-select">
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
                       class="vertical-text"
@@ -937,11 +1002,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <th class="right-frozen-count text-center" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
+            <th class="right-frozen-count text-center prevent-select" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
 
         <!--    <th class="text-center" style="vertical-align: middle;">Visible<br />Row<br />Num</th> -->
 
-            <th class="right-frozen-prediction text-center status-3"
+            <th class="right-frozen-prediction prevent-select text-center status-3"
                 id="header-next-prediction"
                 style="vertical-align: middle;" title="Prediction">Next<br />Pre<br />dic<br />tion<br />(day)</th>
 
@@ -958,14 +1023,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 id="header-upcoming-note"
                 style="vertical-align: middle;" title="First Future Neutral Entry Date: Shows the day count and the date(hover mouse) of the 'not marked(gray colored)' entry closest to the current day in the future.">Upco<br />ming<br />Note<br />(day)</th>
 
-            <th class="right-frozen-weekly text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
+            <th class="right-frozen-weekly prevent-select text-center" style="vertical-align: middle;" title="Weekly Calendar View">📅</th>
 
-            <th class="right-frozen-entries text-center" style="vertical-align: middle;" title="List Entries">☰</th>
+            <th class="right-frozen-entries prevent-select text-center" style="vertical-align: middle;" title="List Entries">☰</th>
 
-            <th class="right-frozen-edit text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
+            <th class="right-frozen-pin prevent-select text-center" style="vertical-align: middle;" title="Pinned">📌</th>
 
-            <th class="right-frozen-pin text-center" style="vertical-align: middle;" title="Pinned">📌</th>
-
+            <th class="right-frozen-edit prevent-select text-center" style="vertical-align: middle;" title="Edit Topic">✎</th>
 
 
         </tr>
@@ -980,10 +1044,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <tr th:each="topic, iStat : ${pivotData.topicList}">
 
             <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
-            <td class="left-frozen-topic" id="topic-name">
-                <span
+            <td class="left-frozen-topic" id="topic-name" style="width: 100px;">
+                <th:block
                    th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
-                </span>
+                </th:block>
             </td>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
@@ -999,7 +1063,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <th:block th:if="${entriesForDay != null}">
                     <td th:each="entryItem : ${entriesForDay}"
                         th:if="${entryItem.status != 3}"
-                        th:class="'pivot-table-entry-cell status-' + ${entryItem.status}">
+                        th:class="'pivot-table-entry-cell prevent-select status-' + ${entryItem.status}">
 
                         <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
                                            categoryId=${topic.category.id},
@@ -1023,7 +1087,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
                 <th:block th:if="${entriesForDay == null or #lists.isEmpty(entriesForDay)}">
-                    <td class="pivot-table-entry-cell">
+                    <td class="pivot-table-entry-cell prevent-select">
                         <a th:href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
@@ -1036,7 +1100,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
                 <th:block th:if="${entriesForDay != null
                      and !#lists.isEmpty(entriesForDay.?[status == 3])}">
-                    <td th:class="'pivot-table-entry-cell status-3'">
+                    <td th:class="'pivot-table-entry-cell  prevent-select status-3'">
                         <a th:href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
@@ -1074,7 +1138,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId))
                                       + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="right-frozen-prediction status-3"
+                            class="right-frozen-prediction  prevent-select status-3"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}">🔥🔥️</a>
                         </td>
@@ -1086,7 +1150,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="right-frozen-prediction status-3"
+                            class="right-frozen-prediction prevent-select status-3"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">💧💧</a>
@@ -1104,7 +1168,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                            class="right-frozen-prediction status-5"
+                            class="right-frozen-prediction prevent-select status-5"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                             <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                style="">🔔</a>
@@ -1120,7 +1184,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                                class="right-frozen-prediction status-5"
+                                class="right-frozen-prediction prevent-select status-5"
                                 style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                    style="">🔥</a>
@@ -1132,7 +1196,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
-                                class="right-frozen-prediction status-5"
+                                class="right-frozen-prediction prevent-select status-5"
                                 style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
                                 <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                                    style="">💧</a>
@@ -1154,7 +1218,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             >
                 <td title="You can manually add the next date prediction on topic settings."
                     style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;"
-                    class="right-frozen-prediction"
+                    class="right-frozen-prediction prevent-select"
                     >
                     <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
                        style="">ℹ️</a>
@@ -1255,7 +1319,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </td>
             </th:block>
 
-            <td class="right-frozen-weekly">
+            <td class="right-frozen-weekly prevent-select">
 
                 <a
                         th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
@@ -1269,19 +1333,17 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </a>
             </td>
 
-            <td class="right-frozen-entries">
+            <td class="right-frozen-entries prevent-select">
                 <a title="Entries List" th:href="@{/entries(topicId=${topic.id})}">☰</a>
             </td>
 
-            <td class="right-frozen-edit">
-                <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
-            </td>
-
-            <td class="right-frozen-pin text-center">
+            <td class="right-frozen-pin prevent-select text-center">
                 <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
             </td>
 
-
+            <td class="right-frozen-edit prevent-select">
+                <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
+            </td>
 
         </tr>
 
@@ -1290,6 +1352,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     </table>
 
     </div> <!-- end of table-wrapper -->
+    </div>
 
         <!-- Eger hic topic yoksa bilgilendirici mesaj goster-->
         <th:block th:if="${pivotData.topicList == null or #lists.isEmpty(pivotData.topicList)}">
@@ -1304,7 +1367,6 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-    </div>
 </div>
 
 <!-- Modal yapısı weekly entry calendar icin -->
@@ -1673,9 +1735,73 @@ $(document).ready(function () {
 
 
 
+<script>
+    // Toggle edilecek sütun class'larını buraya yaz
+    const colClassNames = [
+      "right-frozen-count",
+      "right-frozen-prediction",
+      "right-frozen-last-done",
+      "right-frozen-first-warn",
+      "right-frozen-upcoming",
+      "right-frozen-weekly",
+       "right-frozen-entries",
+       "right-frozen-pin"
+       // "right-frozen-edit",
+    ];
 
+    let toggled = false; // durum bilgisini tutuyoruz
 
+    function toggleColumns() {
+      toggled = !toggled;
 
+      colClassNames.forEach(colClass => {
+        document.querySelectorAll("." + colClass).forEach(cell => {
+          cell.classList.toggle("hidden-col", toggled);
+        });
+      });
+
+      const leftCol = document.querySelector(".left-frozen-topic");
+      if (leftCol) {
+        // leftCol.style.width = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
+       // leftCol.style.maxWidth = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
+       // leftCol.style.minWidth = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
+      }
+    }
+
+    // Sayfa yüklendiğinde ekran genişliğine göre otomatik toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.innerWidth < 1024) {
+        // küçük ekran
+        if (!toggled) toggleColumns();
+      }
+    });
+
+    // İstersen resize olduğunda da otomatik ayarlanabilir:
+    // window.addEventListener("resize", () => {
+    //   if (window.innerWidth < 1024 && !toggled) {
+    //     toggleColumns();
+    //   } else if (window.innerWidth >= 1024 && toggled) {
+    //     toggleColumns();
+    //   }
+    // });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const topScroll = document.querySelector(".scrollbar-top");
+      const tableWrapper = document.querySelector(".table-wrapper");
+
+      // üst scroll genişliğini tablo genişliğiyle aynı yap
+      topScroll.innerHTML = '<div style="width:' + tableWrapper.scrollWidth + 'px"></div>';
+
+      topScroll.addEventListener("scroll", () => {
+        tableWrapper.scrollLeft = topScroll.scrollLeft;
+      });
+      tableWrapper.addEventListener("scroll", () => {
+        topScroll.scrollLeft = tableWrapper.scrollLeft;
+      });
+    });
+</script>
 
 
 </body>

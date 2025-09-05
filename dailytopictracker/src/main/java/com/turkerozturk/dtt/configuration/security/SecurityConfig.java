@@ -47,7 +47,8 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/health", "/img/**", "/static/**", "/webjars/**", "/static/css/**", "/api/**")
+                        .requestMatchers("/actuator/health", "/actuator/health", "/img/**",
+                                "/static/**", "/webjars/**", "/static/css/**", "/api/**", "/favicon-*.png")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
