@@ -97,12 +97,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
 
 
-     /* offcanvasdaki topic listesi iceren tablo asagi dogru cok uzamasin diye scrollbar gosterir gerektiginde. */
-    .scrollable-topics-table {
-      max-height: 600px;      /* ~20 satırlık yükseklik, ihtiyaca göre ayarlayın */
-      overflow-y: auto;       /* dikey kaydırma */
-      /* isterseniz yatay kaydırma da istemiyorsanız overflow-x: hidden; ekleyin */
-    }
+
 
 
 .fonbg {
@@ -279,12 +274,57 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
                 }
 
     </style>
+
+    <style>
+        .table-wrapper {
+          overflow-x: auto;
+          max-width: 100%;
+        }
+
+/*
+        table.status-table {
+          border-collapse: collapse;
+          white-space: nowrap;
+        }
+
+        table.status-table th,
+        table.status-table td {
+          border: 1px solid black;
+          padding: 4px;
+          text-align: left;
+        }
+*/
+        /* Mobil için gizle/göster */
+        @media (max-width: 768px) {
+          .scroll-controls {
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+            gap: 10px;
+          }
+        }
+
+        @media (min-width: 769px) {
+          .scroll-controls {
+            display: none; /* Masaüstünde buton yok */
+          }
+        }
+    </style>
 </head>
 <body>
 
 
 <div  id="navigation-panel">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+
+    <div class="scroll-controls" style="text-align: center;">
+        <button onclick="prevCols()" class="btn btn-sm btn-secondary" title="Swipe Left">
+            ◀️ Swipe Left
+        </button>
+        <button onclick="nextCols()" class="btn btn-sm btn-secondary" title="Swipe Right">
+             Swipe Right ▶️
+        </button>
+    </div>
 </div>
 
 <div class="align-center-horizontal" style="margin-top:4px;">
@@ -389,6 +429,47 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
           navigator.clipboard.writeText(text)
             .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
         };
+      }
+    });
+</script>
+
+
+
+<script>
+    const table = document.getElementById("status-table");
+    const cols = table.querySelectorAll("thead th");
+    let startIndex = 0;
+    const windowSize = 4; // mobilde aynı anda görünen sütun sayısı
+
+    function showColumns() {
+      cols.forEach((col, i) => {
+        const show = i >= startIndex && i < startIndex + windowSize;
+        table.querySelectorAll("tr").forEach(row => {
+          if (row.cells[i]) {
+            row.cells[i].style.display = show ? "" : "none";
+          }
+        });
+      });
+    }
+
+    function nextCols() {
+      if (startIndex + windowSize < cols.length) {
+        startIndex++;
+        showColumns();
+      }
+    }
+
+    function prevCols() {
+      if (startIndex > 0) {
+        startIndex--;
+        showColumns();
+      }
+    }
+
+    // İlk yüklemede mobil için çalıştır
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.innerWidth <= 768) {
+        showColumns();
       }
     });
 </script>
