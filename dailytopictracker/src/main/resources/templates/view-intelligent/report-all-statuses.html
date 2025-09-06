@@ -444,15 +444,23 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
     document.addEventListener("DOMContentLoaded", () => {
       tables = Array.from(document.querySelectorAll(".status-table"));
-      if (window.innerWidth <= 768) {
-        showColumns();
-      }
+
+      handleResize(); // sayfa yüklenince çalışsın
+
+      window.addEventListener("resize", handleResize);
     });
+
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        showColumns(); // mobil görünüme geç
+      } else {
+        resetColumns(); // masaüstü görünüme geç
+      }
+    }
 
     function showColumns() {
       tables.forEach(table => {
         const cols = table.querySelectorAll("thead th");
-
         cols.forEach((col, i) => {
           const show = i >= startIndex && i < startIndex + windowSize;
           table.querySelectorAll("tr").forEach(row => {
@@ -461,12 +469,18 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
             }
           });
         });
-
-        // repaint hatasını engellemek için:
-        table.style.willChange = "contents";
-        table.offsetHeight; // force reflow
-        table.style.willChange = "auto";
       });
+    }
+
+    function resetColumns() {
+      tables.forEach(table => {
+        table.querySelectorAll("tr").forEach(row => {
+          Array.from(row.cells).forEach(cell => {
+            cell.style.display = ""; // hepsini geri aç
+          });
+        });
+      });
+      startIndex = 0; // swipe başlangıcını sıfırla
     }
 
     function nextCols() {
