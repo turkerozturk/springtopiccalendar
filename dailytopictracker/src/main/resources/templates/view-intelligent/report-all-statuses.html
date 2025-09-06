@@ -434,8 +434,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
     });
 </script>
 
-
-
+<!-- Script that causes all .status-table tables to shift left one column at a time when they are below a certain resolution. -->
+<!-- Two swipe buttons appear, they are used to scroll. -->
 <script>
 
     let tables = [];
@@ -483,6 +483,30 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
         showColumns();
       }
     }
+
+</script>
+
+<!-- Mobile swipe support - Let's add a touch event so it works with a finger without a button: -->
+<script>
+
+    let touchStartX = 0;
+
+    document.addEventListener("touchstart", e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener("touchend", e => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const diff = touchEndX - touchStartX;
+
+      if (Math.abs(diff) > 50) { // min kaydırma mesafesi
+        if (diff < 0) {
+          nextCols();
+        } else {
+          prevCols();
+        }
+      }
+    });
 
 </script>
 
