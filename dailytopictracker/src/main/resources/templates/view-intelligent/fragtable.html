@@ -3,13 +3,13 @@ This file is part of the DailyTopicTracker project.
 Please refer to the project's README.md file for additional details.
 https://github.com/turkerozturk/springtopiccalendar
 -->
-<div th:fragment="fragtable(filteredItems)" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+<div th:fragment="fragtable(filteredItems, tableId)" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
 
     <div class="table-wrapper">
 
 
-    <table id="status-table" class="status-table" style="white-space: nowrap;">
+    <table th:id="${tableId}" class="status-table" style="white-space: nowrap;">
         <thead>
         <tr>
             <th style="min-width:150px;">Category Group</th>

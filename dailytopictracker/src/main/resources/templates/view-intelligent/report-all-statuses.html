@@ -106,7 +106,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
 /* https://www.computerhope.com/htmcolor.htm#color-codes */
 /* https://www.htmltables.io/blog/html-table-borders */
-  #status-table {
+  .status-table {
         background-color: rgba(0, 0, 0, 0.3) !important;
         border: 3px solid  black;
         border-collapse: separate;
@@ -116,15 +116,15 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
         width: 100%;
 
     }
-    .#status-table td,
-    #status-table th{
+    .status-table td,
+    .status-table th{
         border: 1px solid black;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
 
     }
-     #status-table th{
+     .status-table th{
         color: WhiteSmoke;
     }
     .normal-table-row{
@@ -344,21 +344,22 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
         <a  th:if="${categoryGroupId != null}" th:href="${ '/reports/allPrint?categoryGroupId=' + categoryGroupId + '&exclude0=1'}" class="btn btn-secondary btn-sm" style="color:white;" title="Print">🖶</a>
 
     </h3>
-    <div th:replace="~{view-intelligent/fragtable :: fragtable(${allItems})}"></div>
+
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${allItems}, 'status-table-1')}"></div>
     <br/>
 
-
-    <h3 title="If topic weight is more than or equal to zero and category is archived"><span class="fonbg">Archived Items</span></h3>
-    <div th:replace="~{view-intelligent/fragtable :: fragtable(${archivedItems})}"></div>
+    <h3><span class="fonbg">Archived Items</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${archivedItems}, 'status-table-2')}"></div>
     <br/>
 
-    <h3 title="If topic weight is less than zero and category is not archived"><span class="fonbg">Items (Not Important)</span></h3>
-    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightItems})}"></div>
+    <h3><span class="fonbg">Items (Not Important)</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightItems}, 'status-table-3')}"></div>
     <br/>
 
-    <h3 title="If topic weight is less than zero and category is archived"><span class="fonbg">Archived Items (Not Important)</span></h3>
-    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightArchivedItems})}"></div>
+    <h3><span class="fonbg">Archived Items (Not Important)</span></h3>
+    <div th:replace="~{view-intelligent/fragtable :: fragtable(${negativeWeightArchivedItems}, 'status-table-4')}"></div>
     <br/>
+
 
 </div>
 
@@ -436,24 +437,41 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
 
 <script>
-    const table = document.getElementById("status-table");
-    const cols = table.querySelectorAll("thead th");
+
+    let tables = [];
     let startIndex = 0;
-    const windowSize = 4; // mobilde aynı anda görünen sütun sayısı
+    const windowSize = 4;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      tables = Array.from(document.querySelectorAll(".status-table"));
+      if (window.innerWidth <= 768) {
+        showColumns();
+      }
+    });
 
     function showColumns() {
-      cols.forEach((col, i) => {
-        const show = i >= startIndex && i < startIndex + windowSize;
-        table.querySelectorAll("tr").forEach(row => {
-          if (row.cells[i]) {
-            row.cells[i].style.display = show ? "" : "none";
-          }
+      tables.forEach(table => {
+        const cols = table.querySelectorAll("thead th");
+
+        cols.forEach((col, i) => {
+          const show = i >= startIndex && i < startIndex + windowSize;
+          table.querySelectorAll("tr").forEach(row => {
+            if (row.cells[i]) {
+              row.cells[i].style.display = show ? "" : "none";
+            }
+          });
         });
+
+        // repaint hatasını engellemek için:
+        table.style.willChange = "contents";
+        table.offsetHeight; // force reflow
+        table.style.willChange = "auto";
       });
     }
 
     function nextCols() {
-      if (startIndex + windowSize < cols.length) {
+      const cols = tables[0]?.querySelectorAll("thead th");
+      if (cols && startIndex + windowSize < cols.length) {
         startIndex++;
         showColumns();
       }
@@ -466,12 +484,6 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
       }
     }
 
-    // İlk yüklemede mobil için çalıştır
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.innerWidth <= 768) {
-        showColumns();
-      }
-    });
 </script>
 
 </body>
