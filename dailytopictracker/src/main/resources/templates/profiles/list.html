@@ -60,6 +60,13 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     </style>
 
+    <style>
+        .success-color {
+            background-color: lightblue;
+        }
+
+    </style>
+
 
 
 </head>
@@ -70,12 +77,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     <div style="margin-top:4px;">
         <a th:href="@{/profiles/new}" class="btn btn-secondary btn-sm" style="color:white;">
             <i class="fa-solid fa-circle-plus"></i> New Profile</a>
-
-        <form th:action="@{/profiles/unarchive-all}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-sm btn-secondary">
-                <i class="fa fa-archive" aria-hidden="true"></i>Unarchive All</button>
-        </form>
-
+        <a th:href="@{/category-groups}" class="btn btn-secondary btn-sm" style="color:white;">
+            <i class="fa-solid fa-layer-group"></i> Category Groups</a>
     </div>
 </div>
 
@@ -86,47 +89,132 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <div th:if="${activeProfileId == null}" class="alert alert-info py-1 px-2 small">
         <i class="fa fa-info-circle"></i>
-        No active profile selected (all categories are unarchived)
+        All categories are active(their archive options are cleared).
     </div>
     <div th:if="${activeProfileId != null}" class="alert alert-success py-1 px-2 small">
         <i class="fa fa-check-circle"></i>
         Active profile ID: <span th:text="${activeProfileId}"></span>
     </div>
 
+    <div class="row row-cols-1 g-2">
 
-    <table class="table table-sm table-bordered">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Categories</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="p : ${profiles}"
-            th:classappend="${p.id} == ${activeProfileId} ? 'table-success'">
 
-            <td th:text="${p.id}"></td>
-            <td th:text="${p.name}"></td>
-            <td>
-                <span th:each="c : ${p.categories}" class="badge bg-secondary me-1"
-                      th:text="${c.name}"></span>
-            </td>
-            <td>
-                <a th:href="@{|/profiles/${p.id}/edit|}" class="btn btn-sm btn-warning">Edit</a>
-                <form th:action="@{|/profiles/${p.id}/delete|}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-sm btn-danger"
-                            th:onclick="return confirm('Delete this [[${p.name}]] category profile?');"
-                    >Delete</button>
-                </form>
-                <form th:action="@{|/profiles/${p.id}/activate|}" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-sm btn-primary">Activate</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+
+        <!-- butun kategorileri aktif yapmak icin-->
+        <div class="card shadow-sm" th:classappend="${activeProfileId} == null ? ' success-color'">
+            <div class="card-body py-2" th:classappend="${activeProfileId} == null ? ' success-color'">
+
+                <!-- Üst satır: ID, Name (crop), Actions -->
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <span class="flex-grow-1">
+                        <span class="fw-bold me-2">0</span>&nbsp;
+                        <span class="text-truncate"
+                              style="max-width: 150px;"
+                              title="All Categories">All Categories (default option)</span>
+                    </span>
+
+                    <div class="d-flex">
+                        <form th:action="@{/profiles/unarchive-all}" method="post" class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-link text-primary"
+                                    title="Activate (Unarchive All)">
+
+                                <i class="fa-regular"
+                                   th:classappend="${activeProfileId} == null ? ' fa-square-check text-success' : ' fa-square text-secondary' "></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Alt satır: Categories inline -->
+                <div class="mt-2">
+                    <a class="btn p-0 ms-1" data-bs-toggle="collapse" href="#warningDetails" role="button">
+                        <i>[Click to read the instructions]</i>
+                    </a>
+                    <div class="collapse mt-2" id="warningDetails">
+
+                        <br/>A category profile, when activated, is used to temporarily reduce the number of tables in the tracker view.
+                        <br/>
+
+
+                        <br/>Click the checkbox icon for the category profile you want to activate.
+                        <br/>
+
+                        <br/>Deleting a category profile will not result in data loss.
+                        <br/>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+
+        <!-- dinamik olarak tum kategori profilleri -->
+        <div class="col" th:each="p : ${profiles}">
+            <div class="card shadow-sm">
+                <div class="card-body py-2" th:classappend="${p.id} == ${activeProfileId} ? ' success-color'">
+
+                    <!-- Üst satır: ID, Name (crop), Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span class="flex-grow-1">
+
+                            <span class="fw-bold me-2" th:text="${p.id}"></span>&nbsp;
+
+                            <span class="text-truncate"
+                                  style="max-width: 150px;"
+                                  th:text="${p.name}"
+                                  th:title="${p.name}"></span>
+
+                        </span>
+
+                        <div class="d-flex">
+
+                            <form th:action="@{|/profiles/${p.id}/delete|}"
+                                  method="post" class="d-inline">
+                                <button type="submit"
+                                        class="btn btn-link text-secondary me-1"
+                                        th:onclick="return confirm('Delete this [[${p.name}]] profile?');"
+                                        title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            <a th:href="@{|/profiles/${p.id}/edit|}"
+                               class="btn btn-link text-warning me-1"
+                               title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{|/profiles/${p.id}/activate|}"
+                                  method="post" class="d-inline">
+                                <button type="submit"
+                                        class="btn btn-link"
+                                        title="Activate">
+                                    <i class="fa-regular"
+                                       th:classappend="${p.id} == ${activeProfileId} ? ' fa-square-check text-success' : ' fa-square text-secondary' "></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Alt satır: Categories inline -->
+                    <div class="mt-2">
+                        <span th:each="c : ${p.categoriesSorted}"
+                              class="badge bg-secondary me-1"
+                              th:text="${c.name}"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 <script type="text/javascript"

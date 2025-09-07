@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 // CategoryProfile.java
@@ -26,4 +27,13 @@ public class CategoryProfile {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
+
+    // yukaridaki set'i sort edemedigimiz icin yapay zeka asagidaki cozumu onerdi:
+    @Transient
+    private List<Category> categoriesSorted;
+
+
+
+
+
 }

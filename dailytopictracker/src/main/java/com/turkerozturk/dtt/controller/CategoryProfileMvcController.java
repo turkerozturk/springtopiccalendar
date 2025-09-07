@@ -7,13 +7,14 @@ import com.turkerozturk.dtt.repository.CategoryProfileRepository;
 import com.turkerozturk.dtt.repository.CategoryRepository;
 import com.turkerozturk.dtt.service.CategoryProfileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
+import java.text.Collator;
+import java.util.*;
 
 @Controller
 @RequestMapping("/profiles")
@@ -26,10 +27,24 @@ public class CategoryProfileMvcController {
 
     @GetMapping
     public String listProfiles(Model model) {
-        model.addAttribute("profiles", categoryProfileRepository.findAll());
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        Collator collator = Collator.getInstance(currentLocale);
+
+        List<CategoryProfile> profiles = categoryProfileRepository.findAll();
+
+        profiles.forEach(p -> {
+            List<Category> sortedCategories = new ArrayList<>(p.getCategories());
+            sortedCategories.sort(Comparator.comparing(Category::getName, collator));
+            // geçici olarak modele konulacak property
+            p.setCategoriesSorted(sortedCategories);
+        });
+
+        model.addAttribute("profiles", profiles);
         model.addAttribute("activeProfileId", categoryProfileService.getActiveProfileId().orElse(null));
         return "profiles/list";
     }
+
+
 
 
     @GetMapping("/new")
