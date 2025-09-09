@@ -48,7 +48,7 @@
     <form th:action="@{/entries/save}" th:object="${entry}" method="post">
         <fieldset>
 
-            <legend th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry'}"></legend>
+            <legend th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry (id: ' + entry.id + ')'}"></legend>
 
 
         <!-- Kaynak URL'deki parametreyle gelen categoryId'yi burada saklıyoruz -->

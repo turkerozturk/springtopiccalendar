@@ -103,7 +103,7 @@ public class EntryController {
     public String listEntries(
             @RequestParam(name = "topicId", required = false) Long topicId,
             @RequestParam(name = "page", required = false) Integer page,  // Artık default yok
-            @RequestParam(name = "size", defaultValue = "20") int size,
+            @RequestParam(name = "size", defaultValue = "100") int size,
             Model model) {
 
         ZoneId zoneId = timeZoneProvider.getZoneId();
@@ -129,23 +129,25 @@ public class EntryController {
         Page<Entry> entriesPage;
 
         if (topicId != null) {
-            entriesPage = entryRepository.findByTopicId(topicId, pageable);
+            entriesPage = entryRepository.findByTopicIdOrderByDateMillisYmdDescIdDesc(topicId, pageable);
             Topic topic = topicRepository.findById(topicId).orElseThrow();
             model.addAttribute("topic", topic);
             String topicDescriptionAsHtml = convertUrlsToLinksSafe(topic.getDescription());
             model.addAttribute("topicDescriptionAsHtml", topicDescriptionAsHtml);
 
         } else {
-            entriesPage = entryRepository.findAll(pageable);
+            entriesPage = entryRepository.findAllByOrderByDateMillisYmdDescIdDesc(pageable);
         }
 
         model.addAttribute("entriesPage", entriesPage);
         model.addAttribute("topicId", topicId);
 
+        final int pagingDistance = 4;
+
         int current = entriesPage.getNumber();
         int total = entriesPage.getTotalPages();
-        int start = Math.max(0, current - 5);
-        int end = Math.min(total - 1, current + 5);
+        int start = Math.max(0, current - pagingDistance);
+        int end = Math.min(total - 1, current + pagingDistance);
 
         model.addAttribute("startPage", start);
         model.addAttribute("endPage", end);

@@ -20,8 +20,13 @@
  */
 package com.turkerozturk.dtt.entity;
 
+import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Entity
@@ -55,7 +60,35 @@ public class Entry {
     public Entry() {
     }
 
+    /** Veritabanında kaydı yok, sadece hesaplamak için */
+    @Transient
+    private LocalDate date;
 
+
+
+
+    /**
+     * ZoneId’yi AppTimeZoneProvider’dan alıp
+     * sadece tarih (LocalDate) kısmını hesaplayan getter
+     */
+    public LocalDate getDate() {
+        if (date == null && dateMillisYmd != null) {
+            date = Instant
+                    .ofEpochMilli(dateMillisYmd)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
+        }
+        return date;
+    }
+
+
+    @Transient
+    private String dateFormatted;
+
+    public String getDateFormatted() {
+
+        return getDate().format(DateTimeFormatter.ISO_DATE);
+    }
 
 }
 
