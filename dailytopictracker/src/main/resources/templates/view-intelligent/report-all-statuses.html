@@ -118,7 +118,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
     }
     .status-table td,
     .status-table th{
-        border: 1px solid black;
+        border: 0px solid black;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -338,10 +338,10 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
     <h3 title="If topic weight is more than or equal to zero and category is not archived"><span class="fonbg">Items</span>
 
         <a  th:if="${categoryGroupId == null}" href="/reports/allPrint" class="btn btn-secondary btn-sm" style="color:white;" title="Download as printable PDF"><i class="fa-regular fa-file-pdf" style="color: PaleGreen;"></i></a>
-        <a  th:if="${categoryGroupId != null}" th:href="${ '/reports/allPrint?categoryGroupId=' + categoryGroupId }" class="btn btn-secondary btn-sm" style="color:white;" title="Print"><i class="fa-regular fa-file-pdf" style="color: LightBlue;"></i></a>
+        <a  th:if="${categoryGroupId != null}" th:href="${ '/reports/allPrint?categoryGroupId=' + categoryGroupId }" class="btn btn-secondary btn-sm" style="color:white;" title="Print"><i class="fa-regular fa-file-pdf" style="color: PaleGreen;"></i></a>
         &nbsp;
-        <a  th:if="${categoryGroupId == null}" href="/reports/allPrint?exclude0=1" class="btn btn-secondary btn-sm" style="color:white;" title="Download as printable PDF without finished entries">🖶</a>
-        <a  th:if="${categoryGroupId != null}" th:href="${ '/reports/allPrint?categoryGroupId=' + categoryGroupId + '&exclude0=1'}" class="btn btn-secondary btn-sm" style="color:white;" title="Print">🖶</a>
+        <a  th:if="${categoryGroupId == null}" href="/reports/allPrint?exclude0=1" class="btn btn-secondary btn-sm" style="color:white;" title="Download as printable PDF without finished entries"><i class="fa-regular fa-file-pdf" style="color: LightBlue;"></i></a>
+        <a  th:if="${categoryGroupId != null}" th:href="${ '/reports/allPrint?categoryGroupId=' + categoryGroupId + '&exclude0=1'}" class="btn btn-secondary btn-sm" style="color:white;" title="Print"><i class="fa-regular fa-file-pdf" style="color: LightBlue;"></i></a>
 
     </h3>
 
@@ -441,8 +441,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 <script>
 
     let tables = [];
-    let startIndex = 0;
-    const windowSize = 4;
+    let startIndex = 3; // 0 from first column. I set it to 3 to show (diff days, date, topic name, entry status) on small mobile screen by default.
+    const windowSize = 4; // number of columns to display simultaneously on a small mobile screen
 
     document.addEventListener("DOMContentLoaded", () => {
       tables = Array.from(document.querySelectorAll(".status-table"));
