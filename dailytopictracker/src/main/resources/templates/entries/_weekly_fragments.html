@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- _fragments.html -->
+<div th:fragment="topicBox(topic)">
+    <div class="text-center p-2 bg-light">
+        <img th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
+             alt="Topic Image"
+             class="img-fluid rounded"
+             style="max-height:135px; object-fit:cover;" />
+    </div>
+    <div style="font-size:0.9rem; text-align:left; padding:12px;">
+        <p th:utext="${topic.descriptionAsHtml}">Topic description</p>
+    </div>
+</div>
+
+
+
+<div th:fragment="datesTableBox(totalDays, beginDate, zoneId, oldestDoneDate, topic, today, finishDate)">
+
+    <table class="table table-sm table-border" style="margin:auto;">
+        <tr>
+            <td title="Since today is included in the number of days before today, it is stated separately as + 1.">
+                Total Days
+            </td>
+            <td th:text="${totalDays} + ' + 1' ">
+
+            </td>
+        </tr>
+        <tr>
+            <td title="The date the time period begins. Calculations begin on this date.">
+                Begin date
+            </td>
+
+            <td th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(beginDate.atStartOfDay(zoneId))}"
+            >
+            </td>
+        </tr>
+        <tr>
+            <td title="If there is, the date of the first, i.e. the oldest, 'done' entry here, after the calculation start date.">
+                Oldest done date
+            </td>
+            <td th:text="${oldestDoneDate}">
+
+            </td>
+        </tr>
+        <tr>
+            <td title="If set, some calculations start from the 'base date' instead of the 'oldest done date'.">
+                Base date
+            </td>
+
+            <td>
+                            <span id="baseDatePlaceHolder"
+                                  th:if="${topic.baseDate != null or !#strings.isEmpty(topic.baseDate)}"
+                                  th:text="${T(java.time.format.DateTimeFormatter)
+                                                  .ofPattern('yyyy-MM-dd')
+                                                  .format(topic.baseDate.atStartOfDay(zoneId))}"
+                            >
+                            </span>
+            </td>
+        </tr>
+        <tr>
+            <td title="If set, some calculations will end on the 'end date' instead of the 'finish date'.">
+                End date
+            </td>
+            <td>
+                            <span id="endDatePlaceHolder"
+                                  th:if="${topic.endDate != null or !#strings.isEmpty(topic.endDate)}"
+                                  th:text="${T(java.time.format.DateTimeFormatter)
+                                                  .ofPattern('yyyy-MM-dd')
+                                                  .format(topic.endDate.atStartOfDay(zoneId))}">
+                            </span>
+            </td>
+        </tr>
+        <tr>
+            <td title="Today's date">
+                Today's date
+            </td>
+            <td th:text="${today}">
+
+            </td>
+        </tr>
+        <tr>
+            <td title="The date of the last 'done' entry, if available.">
+                Newest done date
+            </td>
+            <td th:text="${topic.lastPastEntryDate}">
+
+            </td>
+        </tr>
+        <tr>
+            <td title="The date on which the time period ends. Calculations end on this date.">
+                Finish date
+            </td>
+            <td th:text="${finishDate}">
+
+            </td>
+        </tr>
+    </table>
+
+
+    <!-- filter-form'da pivot tabledaki kodlar, prediction, warn, done, not marked tarihlerini gösterir. -->
+    <table class="table table-sm" style="margin-top:10px;">
+        <caption style="color:DarkGray !important;text-align:center;">
+            (This table is not limited to 365 days).<br/>
+
+            <th:block th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}">
+                Prediction is set to every <span th:text="${topic.someTimeLater}"
+                                                 class="status-3" style="text-align: center; font-size:2em;">
+                            </span> days<br/>
+            </th:block>
+
+            <th:block th:if="${topic.someTimeLater == null || topic.someTimeLater == 0}">
+                Prediction is not set.
+
+            </th:block>
+
+        </caption>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Days</th>
+        </tr>
+
+        </thead>
+        <tbody>
+
+
+        <!-- firstWarningEntryDate varsa -->
+        <tr th:if="${topic.firstWarningEntryDate != null or !#strings.isEmpty(topic.firstWarningEntryDate)}">
+
+
+
+            <td th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))}"
+
+                class="status-2" style="text-align: center">
+            </td>
+
+            <td>First Warn</td>
+
+            <td th:title="${'First Warn: '
+                                                + T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.firstWarningEntryDate.atStartOfDay(zoneId))
+                                                + ' ('
+                                                +  T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate )
+                                                + ' days)' }"
+                class="first-warn"
+                style="text-align: center">
+
+                <!-- how many days has past until today -->
+                <span th:text="${T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate ) }">
+                            </span>
+            </td>
+
+
+        </tr>
+
+
+        <!-- firsFutureNeutralEntryDate varsa -->
+        <tr th:if="${topic.firstFutureNeutralEntryDate != null or !#strings.isEmpty(topic.firstFutureNeutralEntryDate)}">
+
+
+
+            <td th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))}"
+
+                class="status-0" style="text-align: center">
+            </td>
+
+            <td title="upcoming note only appears if it is between today and the future.">Upcoming Note</td>
+
+            <td th:title="${'Upcoming in: '
+                                                + T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.firstFutureNeutralEntryDate.atStartOfDay(zoneId))
+                                                + ' ('
+                                                +  T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate )
+                                                + ' days)' }"
+                class="upcoming-note"
+                style="text-align: center">
+
+                <!-- how many days has past until today -->
+                <span th:text="${T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate ) }">
+                            </span>
+            </td>
+
+
+        </tr>
+
+        <!-- predictionDate varsa -->
+        <tr th:if="${topic.predictionDate != null or !#strings.isEmpty(topic.predictionDate)}">
+
+            <td id="predictionDatePlaceHolder"
+                th:text="${T(java.time.format.DateTimeFormatter)
+                                            .ofPattern('yyyy-MM-dd')
+                                            .format(topic.predictionDate.atStartOfDay(zoneId))}"
+
+                class="status-3" style="text-align: center">
+            </td>
+
+            <td>Prediction</td>
+
+            <td
+                    class="status-3" style="text-align: center">
+                <!-- how many days has past until today -->
+                <span th:text="${T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.predictionDate ) }">
+                            </span>
+            </td>
+
+
+
+        </tr>
+
+        <!-- lastPastEntryDate varsa -->
+        <tr th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
+
+
+            <td th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.lastPastEntryDate.atStartOfDay(zoneId))}"
+
+                class="status-1" style="text-align: center">
+            </td>
+
+            <td>Last Done</td>
+
+            <td th:title="${'Last done: '
+                                                + T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yyyy-MM-dd')
+                                                .format(topic.lastPastEntryDate.atStartOfDay(zoneId))
+                                                + ' ('
+                                                +  T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between(topic.lastPastEntryDate, T(java.time.LocalDate).now(zoneId))
+                                                + ' days before)' }"
+                class="last-done"
+                style="text-align: center">
+
+                <!-- how many days has past until today -->
+                <span th:text="${T(java.time.temporal.ChronoUnit)
+                                    .DAYS.between(T(java.time.LocalDate).now(zoneId), topic.lastPastEntryDate)}">
+                            </span>
+            </td>
+
+
+        </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<div th:fragment="weekdaysBox(streakTotalDays, dayNamesLong, todayDateDayName, status0, status1, status2, totalStatus0, totalStatus1, totalStatus2)">
+
+    <!-- chart -->
+    <div style="max-width:200px;max-height:200px;margin-left:auto;margin-right:auto;">
+        <canvas id="status1Chart" ></canvas>
+    </div>
+
+    <!-- some statistics -->
+    <table style="border:1px;border-collapse: collapse;margin-left:auto;margin-right:auto;">
+        <caption style="text-align:center;color:DarkGray !important;">
+            Entry statuses for the given [[${streakTotalDays}]]-day date range.
+        </caption>
+        <thead>
+        <tr>
+            <th>Weekday</th>
+            <th>Note</th>
+            <th>Done</th>
+            <th>Warn</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="i : ${#numbers.sequence(0, 6)}">
+
+
+
+            <td th:style="${dayNamesLong[i]} == ${todayDateDayName} ? 'background-color: lightyellow;' : ''">
+
+                <span style="margin: 0 auto;" th:text="${dayNamesLong[i]}"></span>
+
+            </td>
+
+            <td th:text="${status0[i]}"></td>
+            <td th:text="${status1[i]}"></td>
+            <td th:text="${status2[i]}"></td>
+        </tr>
+        <tr>
+            <td><b>Total</b></td>
+            <td th:text="${totalStatus0}" class="status-0" style="font-weight:bold;"></td>
+            <td th:text="${totalStatus1}" class="status-1" style="font-weight:bold;"></td>
+            <td th:text="${totalStatus2}" class="status-2" style="font-weight:bold;"></td>
+
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<div th:fragment="customParserBox(topic, parserReport)">
+
+    <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
+         th:if="${topic.dataClassName == 'MeasurementParser'}">
+        <canvas id="measurementChart"></canvas>
+    </div>
+
+    <p th:if="${parserReport != null}" th:utext="${parserReport}">
+
+    </p>
+    <p th:if="${parserReport == null}" style="color:gray;">
+        This field will appear blank if a parser is not selected in the topic settings.
+    </p>
+</div>
+
+
+
+<div th:fragment="streaksBox(streakTotalDays, newestStreak, uniqueTopStreaks, streakCounters)">
+
+
+    <span style="text-align:center;color:DarkGray !important;">
+                    Streak statistics for the given [[${streakTotalDays}]]-day date range.</span>
+
+
+    <!-- newsest streak (closest to today) chart -->
+    <th:block th:if="${newestStreak != null}">
+        <!-- newest streak chart -->
+        <table style="width: 100%">
+            <caption style="text-align:center;color:DarkGray !important;">
+                Newest Streak
+            </caption>
+            <tbody>
+
+
+
+            <tr style="height: 30px;">
+                <!-- Start Date -->
+                <td style="width: 100px; text-align: right; padding-right: 2px;">
+                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('yy-MM-dd')
+                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"></small>
+                </td>
+
+                <!-- Bar with Count -->
+                <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                    <div
+                            th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                                     text-align: center !important; font-weight: bold; margin:auto;
+                                     width:' + ${newestStreak.width} + 'px;'"
+                            th:text="${newestStreak.streakLength}"
+                    ></div>
+                </td>
+
+                <!-- End Date -->
+                <td style="width: 100px; text-align: left; padding-left: 2px;">
+                    <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                        .ofPattern('MM-dd')
+                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"></small>
+
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </th:block>
+
+
+    <!-- top streaks chart -->
+    <table style="width: 100%">
+        <caption style="text-align:center;color:DarkGray !important;">
+            Top Streaks (closest unique one)
+        </caption>
+        <tbody>
+
+
+
+        <tr th:each="streak, iStats : ${uniqueTopStreaks}" style="height: 30px;">
+            <!-- Start Date -->
+            <td style="width: 100px; text-align: right; padding-right: 2px;">
+                <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('yy-MM-dd')
+                                                .format(streak.startDate.atStartOfDay(zoneId))}"></small>
+            </td>
+
+            <!-- Bar with Count -->
+            <td style="width: 100%; text-align: center; background-color:WhiteSmoke;">
+                <div
+                        th:style="'background-color: #e35b93 !important; height: 20px; color: white !important;
+                             text-align: center !important; font-weight: bold; margin:auto;
+                             width:' + ${streak.width} + 'px;'"
+                        th:text="${streak.streakLength}"
+                        th:title="${'There are ' + streakCounters[iStats.index] + ' more with different date ranges.'}"></div>
+            </td>
+
+            <!-- End Date -->
+            <td style="width: 100px; text-align: left; padding-left: 2px;">
+                <small th:text="${T(java.time.format.DateTimeFormatter)
+                                                .ofPattern('MM-dd')
+                                                .format(streak.endDate.atStartOfDay(zoneId))}"></small>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br />
+
+
+
+    <!-- trend intervals chart ikinci varyasyon-->
+    <!-- <canvas  th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}"
+             id="intervalChart2" width="150" height="75"></canvas>
+    -->
+
+
+
+</div>
+
+
+<div th:fragment="rulesBox(topic, patternSuccessRate, patternSuccessText, patternDebugResult)">
+
+
+
+    <th:block th:if="${topic.someTimeLater != null && topic.someTimeLater > 0}">
+        <h3 th:if="${patternSuccessRate != null}"
+            th:text="${'Ratio: ' + T(java.lang.Math).round(patternSuccessRate * 100) + ' %'}"
+            title="It is the percentage ratio of those with and without at least one 'done entry' in each
+                    section, after dividing the days between the first 'done entry' date and 'todays date' by the
+                    'prediction date'.">
+        </h3>
+        <span th:if="${patternSuccessRate != null}"
+              th:utext="${patternSuccessText}"
+        ></span>
+    </th:block>
+    <!-- disable patternFillText until doing it correct. TODO
+    <h3 th:if="${patternSuccessRate != null}"
+        th:text="${'Fill Rate: ' + T(java.lang.Math).round(patternSuccessRate * 100) + ' %'}"
+        title="It is the occupancy rate of the days in the date range from the first 'done' entry to today.">
+    </h3>
+    <span th:if="${patternSuccessRate != null}"
+          th:utext="${patternFillText}"
+    ></span>
+    -->
+
+
+
+    <div th:utext="${topic.intervalRuleInfo}"></div>
+
+
+    <button class="btn btn-outline-info btn-sm" onclick="showPatternHelp()">?</button>
+
+    <button class="btn btn-outline-secondary btn-sm" onclick="showPatternDebug()">Show Pattern Debug</button>
+
+    <!-- Değişkeni saklayan gizli alan -->
+    <div id="patternDebugData" th:data-pattern="${patternDebugResult}" style="display: none;"></div>
+
+</div>
