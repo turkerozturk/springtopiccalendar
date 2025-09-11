@@ -65,40 +65,47 @@ public class TopicWebController {
     @GetMapping
     public String listTopics(@RequestParam(value = "categoryId", required = false) Long categoryId,
                              Model model) {
-        // Tüm kategorileri drop-down'da göstermek için çekelim
+
         var categoryList = categoryService.getAllCategories();
+        List<Topic> topicList;
+        Long selectedCategoryId;
+        String selectedCategoryName;
 
-        // Eğer kategori ID geldiyse filtreli liste, yoksa tüm liste
-        List<Topic> topicList = null;
-        if (categoryId != null) {
-            topicList = topicService.getTopicsByCategoryId(categoryId);
-            model.addAttribute("selectedCategoryId", categoryId);
-        } else {
-            // Önce en küçük ID'li kategoriyi bul
+        if (categoryId == null) {
             Optional<Category> firstCategoryOpt = categoryService.findFirstByOrderByIdAsc();
-
             if (firstCategoryOpt.isPresent()) {
                 Category firstCategory = firstCategoryOpt.get();
-
-                // Bu kategoriye ait topic'leri al
-                topicList = topicService.getTopicsByCategoryId(firstCategory.getId());
-
-                model.addAttribute("topics", topicList);
-                model.addAttribute("selectedCategoryId", firstCategory.getId());
+                selectedCategoryId = firstCategory.getId();
+                selectedCategoryName = firstCategory.getName();
+                topicList = topicService.getTopicsByCategoryId(selectedCategoryId);
             } else {
-                // Eğer hiç kategori yoksa boş liste gönder
-                model.addAttribute("topics", Collections.emptyList());
-                model.addAttribute("selectedCategoryId", null);
+                selectedCategoryId = null;
+                selectedCategoryName = "None";
+                topicList = Collections.emptyList();
             }
-
+        } else if (Objects.equals(categoryId, -1L)) {
+            // All seçildi
+            selectedCategoryId = -1L;
+            selectedCategoryName = "All";
+            topicList = topicService.findAll();
+        } else {
+            selectedCategoryId = categoryId;
+            selectedCategoryName = categoryService.findById(categoryId)
+                    .map(Category::getName)
+                    .orElse("Unknown");
+            topicList = topicService.getTopicsByCategoryId(categoryId);
         }
 
-        // Modele eklemeler
         model.addAttribute("topics", topicList);
         model.addAttribute("categories", categoryList);
+        model.addAttribute("selectedCategoryId", selectedCategoryId);
+        model.addAttribute("selectedCategoryName", selectedCategoryName);
 
-        return "topics/topic-list"; // templates/topics.html
+
+        return "topics/topic-list";
     }
+
+
 
 
 

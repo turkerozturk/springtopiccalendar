@@ -284,4 +284,7 @@ public class TopicService {
     }
 
 
+    public List<Topic> findAll() {
+        return topicRepository.findAll();
+    }
 }

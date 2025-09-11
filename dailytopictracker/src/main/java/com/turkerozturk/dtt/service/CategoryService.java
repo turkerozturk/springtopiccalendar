@@ -127,4 +127,8 @@ public class CategoryService {
     public Optional<Category> findFirstByOrderByIdAsc() {
         return categoryRepository.findFirstByOrderByIdAsc();
     }
+
+    public Optional<Category> findById(Long categoryId) {
+        return categoryRepository.findById(categoryId);
+    }
 }

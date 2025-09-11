@@ -57,7 +57,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
 #categorySelect {
- max-width: 250px; /* Genişliği sınırla */
+/* max-width: 250px; *//* Genişliği sınırla */
  text-overflow: ellipsis;
  white-space: nowrap;
  overflow: hidden;
@@ -94,10 +94,12 @@ a:hover {
 }
 
 .crop-text {
+/*
 white-space: nowrap;
 overflow: hidden;
 position: relative;
 max-width: 200px;
+*/
 }
 
 
@@ -129,314 +131,305 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
     </style>
 </head>
-<body>
+    <body>
 
 
-<div  id="navigation-panel">
-    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+        <div  id="navigation-panel">
+            <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
 
-    <div>
-        <!-- "Create New Topic" butonu -->
-        <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
-             seçiliyse ?catId=xxx şeklinde gönder -->
-        <a th:if="${selectedCategoryId != null}"
-           th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
-           class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-            <i class="fa-solid fa-circle-plus"></i> New Topic
-        </a>
-        <a th:if="${selectedCategoryId == null}"
-           th:href="@{/topics/create}"
-           class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-            <i class="fa-solid fa-circle-plus"></i> New Topic
-        </a>
-    </div>
-</div>
-
-
-
-<div class="container my-2" style="max-width: 1000px;">
-
-
-    <h1><span class="fonbg">Topics</span></h1>
-
-
-
-
-    <div style="background-color:WhiteSmoke;">
-
-    <!-- Hata mesajı varsa göster -->
-    <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
-        <p th:text="${errorMessage}"></p>
-    </div>
-
-    <!-- 1️⃣ Filtre Kutusu -->
-    <div class="row align-items-center mb-3">
-        <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
-        <div class="col-auto">
-            <input type="text"
-                   id="categoryTextFilter"
-                   class="form-control"
-                   placeholder="Category Containing..">
+            <div>
+                <!-- "Create New Topic" butonu -->
+                <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
+                     seçiliyse ?catId=xxx şeklinde gönder -->
+                <a th:if="${selectedCategoryId != null}"
+                   th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
+                   class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
+                    <i class="fa-solid fa-circle-plus"></i> New Topic
+                </a>
+                <a th:if="${selectedCategoryId == null}"
+                   th:href="@{/topics/create}"
+                   class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
+                    <i class="fa-solid fa-circle-plus"></i> New Topic
+                </a>
+            </div>
         </div>
 
 
-    <!-- Kategori Seçimi -->
 
-
-        <label for="categorySelect" class="col-auto col-form-label">Category: </label>
-        <div class="col-auto">
-            <select id="categorySelect"
-                    class="form-select"
-                    onchange="onCategoryChange()">
-                <option value="">All</option>
-                <!-- Tüm kategoriler listeleniyor -->
-                <option th:each="cat : ${categories}"
-                        th:value="${cat.id}"
-                        th:attr="data-fulltext=${cat.name}, title=${cat.name}"
-                        th:text="${cat.name}"
-                        th:selected="${cat.id} == ${selectedCategoryId}">
-                </option>
-
-            </select>
+        <!-- Hata mesajı varsa göster -->
+        <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
+            <p th:text="${errorMessage}"></p>
         </div>
-    </div>
 
-</div>
-
-
-    <!-- Topics Tablosu -->
-    <table id="topicsTable"
-           class="table table-striped table-bordered table-sm align-middle"
-           style="margin-top: 10px; border-collapse: collapse;">
-        <thead>
-        <tr>
-            <th style="cursor: pointer;">ID</th>
-            <!-- Sıralamayı kolona tıklayarak yaptırmak için onclick -->
-            <!-- <th style="cursor: pointer;">Category Name</th> -->
-
-            <th style="cursor: pointer;">Topic Name</th>
-            <!-- <th style="cursor: pointer;">Description</th> -->
-            <!--
-            <th style="cursor: pointer;" title="Pinned">📌</th>
-            -->
-
-            <!-- <th>Entries</th> -->
-            <!-- <th>Prediction</th> -->
-            <!-- <th>Weight</th> -->
-            <!-- <th>#</th> -->
-            <th>Actions</th>
+        <div class="container my-2">
 
 
-        </tr>
+            <h1><span class="fonbg">Topics</span></h1>
 
-
-        </thead>
-
-        <tbody>
-        <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
-        <tr th:each="topic, iStat : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
-
-            <td style="text-align:center;">
-                <span
-                        th:text="${zeroPaddedTopicId}">
-                    topic id
+            <div style="width:100%; text-align:right; background-color:rgba(203, 231, 242, 0.50);">
+                <span th:text="'Current Filter: ' + (${selectedCategoryName} != null ? ${selectedCategoryName} : 'None')">
+                        Filter
                 </span>
-            </td>
-
-
-
-
-            <!-- Category Name -->
-            <!--
-            <td class="crop-text">
-                <a th:href="@{/categories/edit/{id}(id=${topic.category.id}, returnPage= 'topics')}"
-                   th:text="${topic.category.name}">
-                    Edit Category Name
-                </a>
-            </td>
-            -->
-
-
-
-
-            <!-- Topic Name -->
-            <td th:text="${topic.name}" class="crop-text">Sample Topic</td>
-            <!-- Description -->
-            <!-- <td th:text="${topic.description}" class="crop-text">Sample Description</td> -->
-
-            <!--
-            <td class="text-center">
-                <span th:text="${topic.pinned} ? '📌' : '&nbsp;'"></span>
-            </td>
-            -->
-
-
-
-
-            <!-- <td th:text="${topic.someTimeLater}">Prediction as Number</td> -->
-
-            <!-- <td th:text="${topic.weight}">Weight as Number</td> -->
-
-
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-            <!--
-            <td th:text="${iStat.index + 1}">
-            </td>
-            -->
-
-            <td style="text-align:center;">
-                &nbsp;
-                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                   title="Edit Topic">
-                    ✎
-                </a>
-                &nbsp;
-                <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-                   onclick="return confirm('Are you sure to delete this topic?')"
-                   title="Delete Topic">
-                    🗑
-                </a>
-                &nbsp;
-                <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
-                   title="Add Entry">
-                    +
-                </a>
-                &nbsp;
-                <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
-                   th:text="'☰'"
-                    title="List Entries">
-                    Entries List
-                </a>
                 &nbsp;
 
-
-                <a
-                        th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
-                        th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id}, fragment='true')}"
-                        hx-target="#modal-content"
-                        hx-trigger="click"
-                        hx-swap="innerHTML"
-                        onclick="document.getElementById('modal').style.display='block'; return false;"
-                        title="View Weekly Calendar";
-                        th:text="'📅'">
-                    View Weekly Calendar
+                <a class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" href="#details" role="button">
+                    <!-- selectedCategoryName controller tarafından geliyor; null ise 'None' göster -->
+                    <span>
+                        Expand Filter
+                    </span>
                 </a>
-                &nbsp;
+            </div>
 
-            </td>
+            <div class="collapse mt-2" id="details">
+                <div style="background-color:WhiteSmoke;">
+                    <div class="row align-items-center mb-3">
+                        <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
+                        <div class="col-auto">
+                            <input type="text" id="categoryTextFilter" class="form-control" placeholder="Category Containing..">
+                        </div>
 
+                        <label for="categorySelect" class="col-auto col-form-label">Category: </label>
+                        <div class="col-auto">
+                            <select id="categorySelect" class="form-select" onchange="onCategoryChange()">
+                                <!-- All = -1 -->
+                                <option th:value="-1" th:selected="${selectedCategoryId == -1}">All</option>
 
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-
-<!-- Modal yapısı weekly entry calendar icin -->
-<div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
-    <button onclick="document.getElementById('modal').style.display='none'"
-            style="background-color:WhiteSmoke;"
-    >Close</button>
-    <div class="modal-content" id="modal-content">
-        <!-- İçerik buraya yüklenecek -->
-    </div>
-</div>
-
-
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-WebJars path'leri şu yapıyı izler:
-/webjars/{artifactId}/{version}/{dosya}
--->
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
-
-<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
-<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+                                <!-- Gerçek kategoriler -->
+                                <option th:each="cat : ${categories}"
+                                        th:value="${cat.id}"
+                                        th:text="${cat.name}"
+                                        th:selected="${cat.id == selectedCategoryId}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
-<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
-<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
-
-<!-- chart -->
-<script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
-<script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
-<!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
-<script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
-
-<!-- Modal yapısı weekly entry calendar icin -->
-<script>
-    // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
-    document.getElementById('modal').addEventListener('click', function (event) {
-        const modalContent = document.getElementById('modal-content');
-        if (!modalContent.contains(event.target)) {
-            this.style.display = 'none';
-        }
-    });
-</script>
-
-<script>
-
-    $(document).ready( function () {
-    let table = new DataTable('#topicsTable');
-
-    } );
-</script>
-
-<script th:inline="javascript">
-    function onCategoryChange() {
-        var categoryId = document.getElementById("categorySelect").value;
-        var baseUrl = /*[[ @{/topics} ]]*/;  // Bu satır, server tarafında /topics olarak parse edilecek
-
-        if (categoryId === "") {
-            window.location.href = baseUrl;
-        } else {
-            window.location.href = baseUrl + "?categoryId=" + categoryId;
-        }
-    }
-</script>
-
-<!-- 3️⃣ Filtreleme için JS -->
-<script>
-    (function(){
-      const filterInput = document.getElementById('categoryTextFilter');
-      const selectEl    = document.getElementById('categorySelect');
-
-      // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
-      const dummyOption = { value: '', text: 'All' };
-      const categoryOptions = Array.from(selectEl.options)
-        .filter(opt => opt.value !== '')    // value="" olan dummy'yi at
-        .map(opt => ({
-              value: opt.value,
-              text: opt.dataset.fulltext || opt.text
-            }));
-
-      filterInput.addEventListener('input', function(){
-        const term = this.value.trim().toLowerCase();
-
-        // 2️⃣ Select'i temizle
-        selectEl.innerHTML = '';
-
-        // 3️⃣ En başa hep dummy seçeneğini ekle
-        selectEl.add(new Option(dummyOption.text, dummyOption.value));
-
-        // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
-        categoryOptions
-          .filter(({ text }) => term === '' || text.toLowerCase().includes(term))
-          .forEach(({ text, value }) => {
-            const opt = new Option(text, value);
-            opt.dataset.fulltext = text;
-            opt.title = text;
-            selectEl.add(opt);
-          });
-      });
-    })();
-</script>
 
 
-</body>
+            <div style="background-color: white;">
+                <!-- Topics Tablosu -->
+                <table id="topicsTable"
+                       class="table table-striped table-bordered table-sm align-middle"
+                       style="margin-top: 10px; border-collapse: collapse;">
+                    <thead>
+                    <tr>
+                        <th style="cursor: pointer;">ID</th>
+
+
+
+                        <th style="cursor: pointer;">Topic Name</th>
+
+                    </tr>
+
+
+                    </thead>
+
+                    <tbody>
+                    <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
+                    <tr th:each="topic, iStat : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
+
+                        <td style="text-align:center;">
+                            <span
+                                    th:text="${zeroPaddedTopicId}">
+                                topic id
+                            </span>
+                        </td>
+
+
+
+                        <!-- Topic Name -->
+                        <td>
+                            <span th:text="${topic.name}" class="crop-text">
+                                Sample Topic
+                            </span>
+                            <br/>
+
+
+
+
+
+                            &nbsp;
+                            <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
+                               onclick="return confirm('Are you sure to delete this topic?')"
+                               title="Delete Topic">
+                                🗑
+                            </a>
+                            &nbsp;
+                            <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
+                               title="Add Entry">
+                                +
+                            </a>
+                            &nbsp;
+                            <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
+                               th:text="'☰'"
+                                title="List Entries">
+                                Entries List
+                            </a>
+                            &nbsp;
+
+
+                            <a
+                                    th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
+                                    th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id}, fragment='true')}"
+                                    hx-target="#modal-content"
+                                    hx-trigger="click"
+                                    hx-swap="innerHTML"
+                                    onclick="document.getElementById('modal').style.display='block'; return false;"
+                                    title="View Weekly Calendar";
+                                    th:text="'📅'">
+                                View Weekly Calendar
+                            </a>
+                            &nbsp;
+
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                               title="Edit Topic">
+                                ✎
+                            </a>
+
+                            <!--
+                        <div class="crop-text" style="width: 100%; text-align: right; color: gray;">
+                            <a th:href="@{/categories/edit/{id}(id=${topic.category.id}, returnPage= 'topics')}"
+                               th:text="${topic.category.name}">
+                                Edit Category Name
+                            </a>
+                        </div>
+                            -->
+                            &nbsp;
+
+                        </td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
+        <!-- Modal yapısı weekly entry calendar icin -->
+        <div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
+            <button onclick="document.getElementById('modal').style.display='none'"
+                    style="background-color:WhiteSmoke;"
+            >Close</button>
+            <div class="modal-content" id="modal-content">
+                <!-- İçerik buraya yüklenecek -->
+            </div>
+        </div>
+
+
+        <!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+        cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+        WebJars path'leri şu yapıyı izler:
+        /webjars/{artifactId}/{version}/{dosya}
+        -->
+        <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+        <script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+        <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
+        <!-- https://datatables.net/plug-ins/sorting/turkish-string -->
+        <script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+
+        <!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+        <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+        <!-- chart -->
+        <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
+        <script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
+        <!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
+        <script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
+
+        <!-- Modal yapısı weekly entry calendar icin -->
+        <script>
+            // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
+            document.getElementById('modal').addEventListener('click', function (event) {
+                const modalContent = document.getElementById('modal-content');
+                if (!modalContent.contains(event.target)) {
+                    this.style.display = 'none';
+                }
+            });
+        </script>
+
+        <script>
+
+            $(document).ready( function () {
+                let table = new DataTable('#topicsTable', {
+                    pageLength: 50
+                });
+
+            });
+        </script>
+
+        <script th:inline="javascript">
+            function onCategoryChange() {
+                var categoryId = document.getElementById("categorySelect").value;
+                var baseUrl = /*[[ @{/topics} ]]*/;  // Bu satır, server tarafında /topics olarak parse edilecek
+
+                if (categoryId === "") {
+                    window.location.href = baseUrl;
+                } else {
+                    window.location.href = baseUrl + "?categoryId=" + categoryId;
+                }
+            }
+        </script>
+
+        <!-- 3️⃣ Filtreleme için JS -->
+        <script>
+            (function(){
+              const filterInput = document.getElementById('categoryTextFilter');
+              const selectEl    = document.getElementById('categorySelect');
+
+              // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
+              const dummyOption = { value: '-1', text: 'All' };
+              const categoryOptions = Array.from(selectEl.options)
+                  .filter(opt => opt.value !== '-1') // All hariç gerçek kategoriler
+                  .map(opt => ({
+                      value: opt.value,
+                      text: opt.dataset.fulltext || opt.text
+                    }));
+
+
+                filterInput.addEventListener('input', function(){
+                const term = this.value.trim().toLowerCase();
+
+                // 2️⃣ Select'i temizle
+                selectEl.innerHTML = '';
+
+                // 3️⃣ En başa hep dummy seçeneğini ekle
+                selectEl.add(new Option(dummyOption.text, dummyOption.value));
+
+                // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
+                categoryOptions
+                  .filter(({ text }) => term === '' || text.toLowerCase().includes(term))
+                  .forEach(({ text, value }) => {
+                    const opt = new Option(text, value);
+                    opt.dataset.fulltext = text;
+                    opt.title = text;
+                    selectEl.add(opt);
+                  });
+              });
+            })();
+        </script>
+
+        <script th:inline="javascript">
+            function onCategoryChange() {
+              var selectEl = document.getElementById("categorySelect");
+              var categoryId = selectEl.value;
+              var baseUrl = /*[[@{/topics}]]*/ '/topics';
+
+              // -1 gelirse controller 'All' olarak işliyor; isterseniz baseUrl (param yok) de gönderebilirsiniz.
+              window.location.href = baseUrl + "?categoryId=" + encodeURIComponent(categoryId);
+            }
+        </script>
+
+
+
+    </body>
 </html>
