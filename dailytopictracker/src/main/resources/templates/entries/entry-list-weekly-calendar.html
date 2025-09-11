@@ -351,7 +351,7 @@
 
 
         <!-- Asagidaki bloktakiler mobil cihazda gorunmezken masaustu genis ekranda gorunurler. Yanyana 6 tane bolum seklinde -->
-        <div class="row d-none d-md-flex" style="height:500px;">
+        <div th:if="${!isMobile}" class="row d-none d-md-flex" style="height:500px;">
             <div class="col-2 bg-light p-1" style="height:100%; overflow-y:auto;">
                 <th:block th:replace="~{entries/_weekly_fragments :: topicBox(${topic})}"></th:block>
             </div>
@@ -375,7 +375,7 @@
 
 
         <!-- Asagidaki bloktakiler saga sola kaydirilabilir ve sadece mobilde gorunurler. Daha dogrusu yukaridaki gorunmuyorken asagidaki gorunur. -->
-        <div class="d-flex d-md-none overflow-x-auto"
+        <div th:if="${isMobile}" class="d-flex d-md-none overflow-x-auto"
              style="scroll-snap-type: x mandatory; height:500px;">
             <div class="flex-shrink-0 w-100 bg-light p-1" style="scroll-snap-align: start;">
                 <th:block th:replace="~{entries/_weekly_fragments :: topicBox(${topic})}"></th:block>
@@ -685,44 +685,62 @@
     </script>
 
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        var status1Counts = [[${status1}]];
-        var labels = [[${dayNamesShort}]];
 
-        new Chart(document.getElementById('status1Chart'), {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Status 1 Entries',
-                    data: status1Counts,
-                    backgroundColor: [
-                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                        '#9966FF', '#FF9F40', '#66BB6A'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Distribution of entries marked as "Done" by day of the week'
-                    }
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            var status1Counts = [[${status1}]];
+            var labels = [[${dayNamesShort}]];
+
+            var ctx = document.getElementById('status1Chart');
+            var statusChart;
+
+            function initStatusChart() {
+                if (!ctx) return;
+                if (statusChart) {
+                    statusChart.destroy(); // varsa temizle
                 }
+                statusChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Status 1 Entries',
+                            data: status1Counts,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                                '#9966FF', '#FF9F40', '#66BB6A'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: {
+                                display: true,
+                                text: 'Distribution of entries marked as "Done" by day of the week'
+                            }
+                        }
+                    }
+                });
             }
-        });
-        /*]]>*/
-    </script>
+
+            document.addEventListener("DOMContentLoaded", initStatusChart);
+
+            // HTMX ile parça yüklenirse tekrar çiz
+            document.body.addEventListener("htmx:afterSwap", initStatusChart);
+
+            // Ekran genişliği değişince grafiği yeniden boyutlandır
+            window.addEventListener("resize", function() {
+                if (statusChart) statusChart.resize();
+            });
+            /*]]>*/
+        </script>
 
 
 
 
-    <script th:inline="javascript" th:if="${topic.dataClassName == 'MeasurementParser'}">
+        <script th:inline="javascript" th:if="${topic.dataClassName == 'MeasurementParser'}">
         /*<![CDATA[*/
 
         var parsed = JSON.parse(/*[[${parsedDataAsJSON}]]*/ "null");

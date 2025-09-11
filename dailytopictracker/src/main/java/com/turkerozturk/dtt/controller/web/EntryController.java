@@ -167,6 +167,7 @@ public class EntryController {
 
     @GetMapping("weekly-calendar")
     public String listEntriesWeekView(
+            HttpServletRequest request,
             @RequestParam(name = "topicId", required = false) Long topicId,
             @RequestParam(required = false) String startDateString,
             @RequestParam(required = false) String endDateString,
@@ -175,6 +176,11 @@ public class EntryController {
 
         int totalDays = 364;
         model.addAttribute("totalDays", totalDays);
+
+        // bunu chartlar icin yaptim. Ileride sablonlari mobil ve masaustu icin duzenleyince gerek kalmayabilir.
+        String userAgent = request.getHeader("User-Agent");
+        boolean isMobile = userAgent != null && userAgent.toLowerCase().matches(".*(mobile|android|iphone|ipad).*");
+        model.addAttribute("isMobile", isMobile);
 
 
         ZoneId zoneId = timeZoneProvider.getZoneId();
