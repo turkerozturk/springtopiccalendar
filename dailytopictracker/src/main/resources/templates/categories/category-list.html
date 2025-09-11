@@ -92,6 +92,34 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
          }
     </style>
+
+    <style>
+        #categoriesTable th:nth-child(1),
+        #categoriesTable td:nth-child(1) {
+          max-width: 6ch;
+          text-align: right;
+          white-space: nowrap;
+        }
+
+        #categoriesTable th:nth-child(3),
+        #categoriesTable td:nth-child(3) {
+          max-width: 5ch;
+          text-align: right;
+          white-space: nowrap;
+        }
+
+        #categoriesTable th:nth-child(2),
+        #categoriesTable td:nth-child(2) {
+          width: 100%; /* kalan alanı alsın */
+        }
+
+    </style>
+
+
+
+
+
+
 </head>
 <body>
 
@@ -121,19 +149,22 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         <thead>
         <tr>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 0, false)">ID</th>
+            <th style="cursor: pointer;" title="Category ID">ID</th>
 
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 1, false)">Category</th>
+            <th style="cursor: pointer;" title="Category Name">Category</th>
 
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 2, true)" title="Topics Count">Topics Count</th>
+            <th style="cursor: pointer;" title="Topics Count">
+                <i class="fa fa-list-ol"></i>
+            </th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 3, true)" title="Group Number">Group ID</th>
 
-            <th style="cursor: pointer;"  onclick="sortTable('categoriesTable', 4, false)" title="Is Archived">Archived</th>
 
-            <th style="cursor: pointer;">Actions</th>
+
+
+
+
 
             <!-- <th>#</th> -->
         </tr>
@@ -143,54 +174,69 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         <tbody>
         <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
         <tr th:each="cat, iStat : ${categories}" th:with="zeroPaddedCategoryId=${#numbers.formatInteger(cat.id, 4)}">
-            <td th:text="${zeroPaddedCategoryId}" class="text-center">1</td>
+
+            <td class="text-center">
+                <span th:text="${zeroPaddedCategoryId}"></span>
 
 
+                <br/>
+                <i class="fa"
+                   th:classappend="${cat.archived} ? ' fa-eye-slash' : ' fa-eye' "
+                   th:style=" 'color: ' + (${cat.archived} ? ' gray;' : ' black;') "
 
+                   aria-hidden="true"></i>
+            </td>
 
 
             <td>
-                <a th:href="@{/topics(categoryId=${cat.id})}"
-                   target="_self" th:text="${cat.name}" th:title="${cat.name}">
-                </a>&nbsp;
+                <span th:text="${cat.name}"></span>
+                <br/>
+
+                <div>
+
+                    <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
+                       title="Delete Category"
+                       onclick="return confirmDelete()">
+                        🗑
+                    </a>
+                    &nbsp;
+                    <!-- Her kategori satırında, yeni topic oluşturma linki -->
+                    <a th:href="@{/topics/create(categoryId=${cat.id})}"
+                       target="_blank" title="Add Topic">
+                        ＋
+                    </a>
+                    &nbsp;
+
+                    <a th:href="@{/topics(categoryId=${cat.id})}"
+                       target="_self" th:title="${cat.name}">☰
+                    </a>
+                    &nbsp;
+
+                    <a th:if="${!cat.archived}"
+                       style="display: inline-block; white-space: normal;"
+                       th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
+                       >
+                        <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>
+                    </a>
+
+
+
+                        <i th:if="${cat.archived}" class="fa-solid fa-gear" style="color: gray;"></i>
+
+                    &nbsp;
+
+                    <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}" title="Edit Category">
+                        ✎
+                    </a>
+                </div>
             </td>
 
 
-            <td th:text="${cat.topics.size()}" class="text-center">0</td>
+            <td th:text="${cat.topics.size()}" class="text-center align-middle">0</td>
 
 
 
-            <td class="text-center">
-            <a href="/category-groups" th:title="${cat.categoryGroup.name}"
-               th:text="${cat.categoryGroup.id}"
-               >Category Group</a>
-            </td>
 
-            <td
-                    th:text="${cat.archived ? 'Yes' : 'No'}"
-                    class="text-center"
-                    th:classappend="${cat.archived} ? ' css-archived' : ''">
-            </td>
-
-
-
-            <td class="text-center">
-                <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}" title="Edit Category">
-                    ✎
-                </a>
-                &nbsp;
-                <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
-                    title="Delete Category"
-                   onclick="return confirmDelete()">
-                    🗑
-                </a>
-                &nbsp;
-                <!-- Her kategori satırında, yeni topic oluşturma linki -->
-                <a th:href="@{/topics/create(categoryId=${cat.id})}"
-                   target="_blank" title="Add Topic">
-                    ＋
-                </a>
-            </td>
 
             <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
           <!--  <td th:text="${iStat.index + 1}">
@@ -223,32 +269,21 @@ WebJars path'leri şu yapıyı izler:
 
 
 <script>
-
-    $(document).ready( function () {
-    let table = new DataTable('#categoriesTable', {
-        columnDefs: [
-                        { width: 60, targets: 0 },
-                        { width: 260, targets: 1 },
-                        { width: 60, targets: 2 },
-                        { width: 60, targets: 3 },
-                        { width: 60, targets: 4 }
-                    ],
-        fixedColumns: true,
-        paging: false,
-        scrollCollapse: true,
-        scrollX: false,
-        scrollY: 600
+    $(document).ready(function () {
+        let table = new DataTable('#categoriesTable', {
+            columnDefs: [
+                { targets: 0, width: "1%", className: "text-end" },  // ID
+                { targets: 1, width: "auto" },                       // Name
+                { targets: 2, width: "1%", className: "text-end" }   // Count
+            ],
+            paging: false,
+            scrollCollapse: true,
+            scrollX: false,
+            scrollY: 600
+        });
     });
-
-
-
-
-
-
-
-
-    } );
 </script>
+
 
 
 
