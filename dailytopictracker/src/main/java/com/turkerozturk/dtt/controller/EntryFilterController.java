@@ -83,6 +83,11 @@ public class EntryFilterController {
     @Value("${week.start.day:MONDAY}")
     private String startDayOfWeek;
 
+    @Value("${tracker.date-range.before-days:7}")
+    private int previousRangeDays;
+
+    @Value("${tracker.date-range.after-days:7}")
+    private int nextRangeDays;
 
     /**
      * Filtre formunu ilk kez açarken varsayılan değerleri doldurup
@@ -112,9 +117,9 @@ public class EntryFilterController {
         // This week (7 days of date range)
         LocalDate endOfWeek = startOfWeek.plusDays(6);
         // I decided to add previous week to the date range too:
-        filterDto.setStartDate(startOfWeek.minusDays(7));
+        filterDto.setStartDate(startOfWeek.minusDays(previousRangeDays));
         // I decided to add next week to the date range too:
-        filterDto.setEndDate(endOfWeek.plusDays(7));
+        filterDto.setEndDate(endOfWeek.plusDays(nextRangeDays));
 
         // topicIds/statuses boş => “hepsi” gibi davranacak
 
