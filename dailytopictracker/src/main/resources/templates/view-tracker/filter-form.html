@@ -511,6 +511,33 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         }
 
     </style>
+
+    <style>
+        /* Masaüstü: tüm sütunlar görünsün, sticky olmasın */
+        @media (min-width: 1025px) {
+          #pivot-table td[class^="right-frozen-"],
+          #pivot-table th[class^="right-frozen-"] {
+            position: static !important;
+            display: table-cell !important;
+          }
+        }
+
+        /* Mobil: sadece aktif sütun freeze olur */
+        @media (max-width: 1024px) {
+          #pivot-table td[class^="right-frozen-"],
+          #pivot-table th[class^="right-frozen-"] {
+            display: none; /* default gizle */
+          }
+          #pivot-table td.active-col,
+          #pivot-table th.active-col {
+            display: table-cell !important;
+            position: sticky;
+            right: 0;
+            background: white;
+            z-index: 2;
+          }
+        }
+    </style>
 </head>
 <body>
 
@@ -541,10 +568,16 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             </th:block>
 
-            <button class="btn btn-sm btn-primary" onClick="toggleColumns()" title="Toggle Columns"
-                    type="button" >
-                <i class="fa-solid fa-toggle-on"></i> Columns
-            </button>
+
+            <!-- frozen columnlari kaydiran Prev/Next butonları sadece mobilde görünsün -->
+            <div id="col-carousel-controls" class="d-flex justify-content-end mt-1 d-md-none">
+                <button class="btn btn-sm btn-secondary me-2" onclick="showPrevCol()">
+                    <i class="fa-solid fa-chevron-left"></i> prev. col.
+                </button>
+                <button class="btn btn-sm btn-secondary" onclick="showNextCol()">
+                    next col. <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
 
         </div>
 
@@ -1737,8 +1770,8 @@ $(document).ready(function () {
 
 
 
+
 <script>
-    // Toggle edilecek sütun class'larını buraya yaz
     const colClassNames = [
       "right-frozen-count",
       "right-frozen-prediction",
@@ -1746,46 +1779,41 @@ $(document).ready(function () {
       "right-frozen-first-warn",
       "right-frozen-upcoming",
       "right-frozen-weekly",
-       "right-frozen-entries",
-       "right-frozen-pin"
-       // "right-frozen-edit",
+      "right-frozen-entries",
+      "right-frozen-pin",
+      "right-frozen-edit"
     ];
 
-    let toggled = false; // durum bilgisini tutuyoruz
+    let currentIndex = colClassNames.length - 1; // başlangıç: 9. sütun
 
-    function toggleColumns() {
-      toggled = !toggled;
-
-      colClassNames.forEach(colClass => {
-        document.querySelectorAll("." + colClass).forEach(cell => {
-          cell.classList.toggle("hidden-col", toggled);
+    function updateVisibleCol() {
+      // önce tüm sütunlardan active-col'u kaldır
+      colClassNames.forEach(cn => {
+        document.querySelectorAll("." + cn).forEach(cell => {
+          cell.classList.remove("active-col");
         });
       });
 
-      const leftCol = document.querySelector(".left-frozen-topic");
-      if (leftCol) {
-        // leftCol.style.width = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
-       // leftCol.style.maxWidth = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
-       // leftCol.style.minWidth = toggled ? "100px" : "200px"; // toggle durumuna göre genişlik
-      }
+      // sadece currentIndex'teki sütun aktif olsun
+      const activeClass = colClassNames[currentIndex];
+      document.querySelectorAll("." + activeClass).forEach(cell => {
+        cell.classList.add("active-col");
+      });
     }
 
-    // Sayfa yüklendiğinde ekran genişliğine göre otomatik toggle
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.innerWidth < 1024) {
-        // küçük ekran
-        if (!toggled) toggleColumns();
-      }
-    });
+    function showPrevCol() {
+      currentIndex = (currentIndex - 1 + colClassNames.length) % colClassNames.length;
+      updateVisibleCol();
+    }
 
-    // İstersen resize olduğunda da otomatik ayarlanabilir:
-    // window.addEventListener("resize", () => {
-    //   if (window.innerWidth < 1024 && !toggled) {
-    //     toggleColumns();
-    //   } else if (window.innerWidth >= 1024 && toggled) {
-    //     toggleColumns();
-    //   }
-    // });
+    function showNextCol() {
+      currentIndex = (currentIndex + 1) % colClassNames.length;
+      updateVisibleCol();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateVisibleCol(); // ilk açılışta ayarla
+    });
 </script>
 
 <script>
