@@ -393,7 +393,7 @@
                 <th:block th:replace="~{entries/_weekly_fragments :: streaksBox(${streakTotalDays}, ${newestStreak}, ${uniqueTopStreaks}, ${streakCounters})}"></th:block>
             </div>
             <div class="flex-shrink-0 w-100 bg-light p-1" style="scroll-snap-align: start;">
-                <th:block :replace="~{entries/_weekly_fragments :: rulesBox(${topic}, ${patternSuccessRate}, ${patternSuccessText}, ${patternDebugResult})}"></th:block>
+                <th:block th:replace="~{entries/_weekly_fragments :: rulesBox(${topic}, ${patternSuccessRate}, ${patternSuccessText}, ${patternDebugResult})}"></th:block>
             </div>
 
         </div>

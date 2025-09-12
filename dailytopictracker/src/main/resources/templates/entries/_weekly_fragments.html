@@ -351,7 +351,8 @@
                 <td style="width: 100px; text-align: right; padding-right: 2px;">
                     <small th:text="${T(java.time.format.DateTimeFormatter)
                                                         .ofPattern('yy-MM-dd')
-                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"></small>
+                                                        .format(newestStreak.startDate.atStartOfDay(zoneId))}"
+                           style="white-space: nowrap;"></small>
                 </td>
 
                 <!-- Bar with Count -->
@@ -368,7 +369,8 @@
                 <td style="width: 100px; text-align: left; padding-left: 2px;">
                     <small th:text="${T(java.time.format.DateTimeFormatter)
                                                         .ofPattern('MM-dd')
-                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"></small>
+                                                        .format(newestStreak.endDate.atStartOfDay(zoneId))}"
+                           style="white-space: nowrap;"></small>
 
                 </td>
             </tr>
@@ -391,7 +393,8 @@
             <td style="width: 100px; text-align: right; padding-right: 2px;">
                 <small th:text="${T(java.time.format.DateTimeFormatter)
                                                 .ofPattern('yy-MM-dd')
-                                                .format(streak.startDate.atStartOfDay(zoneId))}"></small>
+                                                .format(streak.startDate.atStartOfDay(zoneId))}"
+                       style="white-space: nowrap;"></small>
             </td>
 
             <!-- Bar with Count -->
@@ -408,7 +411,8 @@
             <td style="width: 100px; text-align: left; padding-left: 2px;">
                 <small th:text="${T(java.time.format.DateTimeFormatter)
                                                 .ofPattern('MM-dd')
-                                                .format(streak.endDate.atStartOfDay(zoneId))}"></small>
+                                                .format(streak.endDate.atStartOfDay(zoneId))}"
+                       style="white-space: nowrap;"></small>
 
             </td>
         </tr>
