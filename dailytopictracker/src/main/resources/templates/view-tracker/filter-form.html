@@ -535,7 +535,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <a th:href="@{/reports/cg?categoryGroupId={id}(id=${filterDto.categoryGroupId})}"
                    th:title="${ 'Open category group in intelligent report view.' }"
                    class="btn btn-sm btn-secondary"
-                >&nbsp;🧠 Cat. Report</a>
+                >
+                    &nbsp;<i class="fa-solid fa-table-list" style="color: #ff8000;"></i> Cat. Report
+                </a>
 
             </th:block>
 
@@ -1072,12 +1074,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
                     <span th:title="${entryItem.note.content}"
                           class="entry-with-content">
-                        @
+                        <i class="fa-brands fa-readme" style="color: blue;"></i>
                     </span>
                             </th:block>
                             <th:block th:if="${#strings.isEmpty(entryItem.note.content)}">
                     <span th:title="${'Entry ' + entryItem.id}">
-                        @
+                        &nbsp;
                     </span>
                             </th:block>
                         </a>

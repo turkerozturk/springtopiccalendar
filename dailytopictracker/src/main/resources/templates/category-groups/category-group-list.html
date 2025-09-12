@@ -79,7 +79,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 .cg-actions a {
-  margin-left: 8px;
+  margin-right: 6px;
   text-decoration: none;
 }
 
@@ -223,6 +223,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     </div>
 
+    <div th:if="${grp.imageFileName == null or #strings.isEmpty(grp.imageFileName)}" class="cg-left">
+        <!-- resim yokken collapse olmmamasi icin. Boyle iyi gorunuyor, yoksa css grid ile bu kismi gostermeme cozumu dusunecektim.
+        Fakat gostermemek yerine bos gostermek, kullanicinin belirledigi arkaplan renginden dolayi guzel oldu. -->
+    </div>
+
     <!-- Sağ sütun -->
     <div class="cg-right">
         <!-- Üst satır: numara + isim + actions -->
@@ -231,17 +236,21 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
             <span class="cg-name" th:text="${grp.name}">Group Name</span>
             <div class="cg-actions">
 
-                <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
-                   class=" btn-sm btn-outline-secondary" title="Edit Category Group">✏️</a>
                 <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
                    class=" btn-sm btn-outline-danger"
                    th:onclick="return confirm('Delete this [[${grp.name}]] group?');"
                    title="Delete Category Group">🗑️</a>
+                <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
+                   class=" btn-sm btn-outline-secondary" title="Edit Category Group">
+                    <i class="fa-solid fa-pencil" style="color: #808080;"></i>
+                ️</a>
                 <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
                    title="Add Category">➕</a>
                 <!-- intelligent report for only one category group -->
                 <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
-                   th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }">📊</a>
+                   th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }">
+                    <i class="fa-solid fa-table-list" style="color: #ff8000;"></i>
+                </a>
             </div>
         </div>
 
