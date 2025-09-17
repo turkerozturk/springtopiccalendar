@@ -11,6 +11,9 @@
     <!-- meta -->
     <meta charset="UTF-8">
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <!-- favicon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -1098,7 +1101,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <th:block th:if="${entriesForDay != null}">
                     <td th:each="entryItem : ${entriesForDay}"
                         th:if="${entryItem.status != 3}"
-                        th:class="'pivot-table-entry-cell prevent-select status-' + ${entryItem.status}">
+                        th:class="'pivot-table-entry-cell prevent-select status-' + ${entryItem.status}"
+                        th:data-entry-id="${entryItem.id}"
+                        th:data-category-id="${topic.category.id}"
+                        th:data-topic-id="${topic.id}"
+                        th:data-date-local="${day}"
+                        th:data-old-status="${entryItem.status}"
+                    >
 
                         <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
                                            categoryId=${topic.category.id},
@@ -1122,7 +1131,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                 <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
                 <th:block th:if="${entriesForDay == null or #lists.isEmpty(entriesForDay)}">
-                    <td class="pivot-table-entry-cell prevent-select">
+                    <td class="pivot-table-entry-cell prevent-select"
+                        th:data-category-id="${topic.category.id}"
+                        th:data-date-local="${day}"
+                        th:data-topic-id="${topic.id}"
+                    >
                         <a th:href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
@@ -1135,7 +1148,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
                 <th:block th:if="${entriesForDay != null
                      and !#lists.isEmpty(entriesForDay.?[status == 3])}">
-                    <td th:class="'pivot-table-entry-cell  prevent-select status-3'">
+                    <td th:class="'pivot-table-entry-cell  prevent-select status-3'"
+                        th:data-category-id="${topic.category.id}"
+                        th:data-date-local="${day}"
+                        th:data-topic-id="${topic.id}"
+                        data-old-status="3"
+                    >
                         <a th:href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
@@ -1832,6 +1850,89 @@ $(document).ready(function () {
       });
     });
 </script>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content text-center p-3">
+            <h6 class="mb-3">Set Status</h6>
+            <div class="d-flex justify-content-around">
+                <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
+                <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
+                <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        let pressTimer;
+        let currentCell;
+
+        $(".pivot-table-entry-cell").on("mousedown touchstart", function () {
+            let cell = $(this);
+            pressTimer = window.setTimeout(function () {
+                currentCell = cell;
+                $("#statusModal").modal("show");
+            }, 500); // 2 saniye
+        }).on("mouseup mouseleave touchend", function () {
+            clearTimeout(pressTimer);
+        });
+
+        $(".status-btn").on("click", function () {
+            let status = $(this).data("status");
+            let oldStatus = currentCell.data("old-status");
+            let entryId = currentCell.data("entry-id");
+            let topicId = currentCell.data("topic-id");
+            let categoryId = currentCell.data("category-id");
+            let localDate = currentCell.data("date-local");
+
+            const csrfToken = $('meta[name="_csrf"]').attr('content');
+            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+            $.ajax({
+                url: "/api/entries/status",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    entryId: entryId,
+                    topicId: topicId,
+                    categoryId: categoryId,
+                    localDate: localDate,
+                    status: status,
+                    oldStatus: oldStatus
+                }),
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken);
+                },
+                success: function (resp) {
+                    // status-* class’ını güncelle
+                    currentCell.removeClass("status-0 status-1 status-2 status-3")
+                               .addClass("status-" + resp.status)
+                               .data("entry-id", resp.id)
+                               .data("old-status", resp.status);
+
+                // hücre içeriğini güncelle (1. çeşit formatı)
+                const newHtml = `
+                    <a href="/entries/edit/${resp.id}?categoryId=${currentCell.data("category-id")}&returnPage=pivottable">
+                        <span title="Entry ${resp.id}">&nbsp;</span>
+                    </a><br>
+                `;
+                currentCell.html(newHtml);
+
+                    $("#statusModal").modal("hide");
+                },
+                error: function () {
+                    alert("Error updating status");
+                }
+            });
+        });
+    });
+</script>
+
 
 
 </body>
