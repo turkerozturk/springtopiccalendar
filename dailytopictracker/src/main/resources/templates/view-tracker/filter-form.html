@@ -230,7 +230,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                    background-color: rgba(255, 255, 255, 0.5);
                }
 
-               a.add-new-entry {
+               span.add-new-entry {
                  color: transparent;
                  transition: color 0.3s ease;
 
@@ -245,7 +245,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                  padding: 0px;
                }
 
-               a.add-new-entry:hover {
+               span.add-new-entry:hover {
                  color: black;
                  background-color:honeydew;
                  font-size: 16px;
@@ -1109,9 +1109,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         th:data-old-status="${entryItem.status}"
                     >
 
-                        <a th:href="@{/entries/edit/{id}(id=${entryItem.id},
+                        <span th:data-href="@{/entries/edit/{id}(id=${entryItem.id},
                                            categoryId=${topic.category.id},
-                                           returnPage=pivottable)}">
+                                           returnPage=pivottable)}"
+                              class="fake-link"
+
+                        >
 
                             <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
                     <span th:title="${entryItem.note.content}"
@@ -1124,7 +1127,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         &nbsp;
                     </span>
                             </th:block>
-                        </a>
+                        </span>
                         <br/>
                     </td>
                 </th:block>
@@ -1136,12 +1139,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         th:data-date-local="${day}"
                         th:data-topic-id="${topic.id}"
                     >
-                        <a th:href="@{/entries/new(topicId=${topic.id},
+                        <span th:data-href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
                                        returnPage=pivottable)}"
+
                            title="Add New Entry"
-                           class="add-new-entry">+</a>
+                           class="add-new-entry fake-link">+</span>
                     </td>
                 </th:block>
 
@@ -1154,12 +1158,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         th:data-topic-id="${topic.id}"
                         data-old-status="3"
                     >
-                        <a th:href="@{/entries/new(topicId=${topic.id},
+                        <span th:data-href="@{/entries/new(topicId=${topic.id},
                                        dateYmd=${day},
                                        categoryId=${topic.category.id},
                                        returnPage=pivottable)}"
+
                            title="Add New Entry"
-                           class="add-new-entry">+</a>
+                           class="add-new-entry fake-link">+</span>
                     </td>
                 </th:block>
 
@@ -1862,26 +1867,27 @@ $(document).ready(function () {
                 <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
                 <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
                 <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
+                <!-- Edit/New Entry butonu -->
+                <button class="btn edit-btn" style="width:50px;height:50px;">
+                    <i class="fa-solid fa-pencil" style="color:#808080;"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+
 <script>
     $(function () {
-        let pressTimer;
         let currentCell;
 
-        $(".pivot-table-entry-cell").on("mousedown touchstart", function () {
-            let cell = $(this);
-            pressTimer = window.setTimeout(function () {
-                currentCell = cell;
-                $("#statusModal").modal("show");
-            }, 500); // 2 saniye
-        }).on("mouseup mouseleave touchend", function () {
-            clearTimeout(pressTimer);
+        // Hücreye tıklanınca modal aç
+        $(".pivot-table-entry-cell").on("click", function () {
+            currentCell = $(this);
+            $("#statusModal").modal("show");
         });
 
+        // Status değiştirme
         $(".status-btn").on("click", function () {
             let status = $(this).data("status");
             let oldStatus = currentCell.data("old-status");
@@ -1915,13 +1921,13 @@ $(document).ready(function () {
                                .data("entry-id", resp.id)
                                .data("old-status", resp.status);
 
-                // hücre içeriğini güncelle (1. çeşit formatı)
-                const newHtml = `
-                    <a href="/entries/edit/${resp.id}?categoryId=${currentCell.data("category-id")}&returnPage=pivottable">
-                        <span title="Entry ${resp.id}">&nbsp;</span>
-                    </a><br>
-                `;
-                currentCell.html(newHtml);
+                    // hücre içeriğini güncelle (artık <span data-href> formatıyla)
+                    const newHtml = `
+                        <span data-href="/entries/edit/${resp.id}?categoryId=${currentCell.data("category-id")}&returnPage=pivottable" class="fake-link">
+                            <span title="Entry ${resp.id}">&nbsp;</span>
+                        </span><br>
+                    `;
+                    currentCell.html(newHtml);
 
                     $("#statusModal").modal("hide");
                 },
@@ -1930,8 +1936,19 @@ $(document).ready(function () {
                 }
             });
         });
+
+        // Edit/New Entry butonuna tıklayınca hücredeki data-href'e git
+        $(".edit-btn").on("click", function () {
+            if (currentCell) {
+                const link = currentCell.find("span[data-href]").data("href");
+                if (link) {
+                    window.location.href = link;
+                }
+            }
+        });
     });
 </script>
+
 
 
 
