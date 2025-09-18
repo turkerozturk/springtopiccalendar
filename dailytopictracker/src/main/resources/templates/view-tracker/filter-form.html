@@ -43,16 +43,30 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     .hidden-col {
       display: none;
     }
+
     .left-frozen-topic {
       min-width: 200px;
       max-width: 200px;
+      transition: all 0.3s ease;
     }
+
+    .left-frozen-topic.expanded {
+      min-width: 400px;
+      max-width: 400px;
+    }
+
     @media (max-width: 1024px) {
       .left-frozen-topic {
         min-width: 75px;
         max-width: 75px;
       }
+
+      .left-frozen-topic.expanded {
+        min-width: 250px;
+        max-width: 250px;
+      }
     }
+
 
 
 
@@ -375,9 +389,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           left: 0;
           background: white;
           z-index: 2;
-         /* max-width: 100px;
-          width: 100px;
-          min-width: 100px; */
+         /*  width ayarlarini yukarida baska cssye aldik expand ve shrink islemleri sebebiyle. left-frozen-topic diye ara bulursun */
         }
 
         #pivot-table .left-frozen-category {
@@ -994,6 +1006,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                            onkeyup="filterPivotTable()"
                            style="width: 90px;"/>
                 </div>
+                <button id="toggle-topic-col" class="btn btn-sm btn-outline-secondary mb-2">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+
+
             </th>
 
             <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
@@ -1949,6 +1966,22 @@ $(document).ready(function () {
     });
 </script>
 
+
+<script>
+    $(function () {
+        $("#toggle-topic-col").on("click", function () {
+            $(".left-frozen-topic").toggleClass("expanded");
+
+            // ikon değiştir
+            let icon = $(this).find("i");
+            if ($(".left-frozen-topic").hasClass("expanded")) {
+                icon.removeClass("fa-angles-right").addClass("fa-angles-left");
+            } else {
+                icon.removeClass("fa-angles-left").addClass("fa-angles-right");
+            }
+        });
+    });
+</script>
 
 
 
