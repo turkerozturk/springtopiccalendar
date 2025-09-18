@@ -8,13 +8,13 @@
     -->
     <title>Entry Filter and Pivot Table</title>
 
-    <!-- meta -->
+    <!--/* meta */-->
     <meta charset="UTF-8">
 
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
-    <!-- favicon -->
+    <!--/* favicon */-->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -584,7 +584,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <!-- frozen columnlari kaydiran Prev/Next butonları sadece mobilde görünsün -->
+            <!--/* frozen columnlari kaydiran Prev/Next butonları sadece mobilde görünsün */-->
             <div id="col-carousel-controls" class="d-flex justify-content-end mt-1 d-md-none">
                 <button class="btn btn-sm btn-secondary me-2" onclick="showPrevCol()">
                     <i class="fa-solid fa-chevron-left"></i> prev. col.
@@ -599,9 +599,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <div class="mt-1 text-center">
 
 
-                <!-- Önceki & Sonraki & Temizle -->
+                <!--/* Önceki & Sonraki & Temizle */-->
                 <form th:action="@{/entry-filter/previous}" th:object="${filterDto}" method="post" style="display:inline;">
-                    <!-- Gizli alanlar -->
+                    <!--/* Gizli alanlar */-->
                     <input type="hidden" th:field="*{topicIds}"/>
                     <input type="hidden" th:field="*{startDate}"/>
                     <input type="hidden" th:field="*{endDate}"/>
@@ -615,7 +615,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
                 <form th:action="@{/entry-filter/next}" th:object="${filterDto}" method="post" style="display:inline;">
-                    <!-- Gizli alanlar -->
+                    <!--/* Gizli alanlar */-->
                     <input type="hidden" th:field="*{topicIds}"/>
                     <input type="hidden" th:field="*{startDate}"/>
                     <input type="hidden" th:field="*{endDate}"/>
@@ -631,10 +631,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </th:block>
                 <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
-                    <!-- filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin -->
+                    <!--/* filter-form içinde, categorySelect’in hemen yanına ya da uygun bir yere ekleyin */-->
                     <form th:action="@{/entry-filter/previousCategory}" th:object="${filterDto}"
                           method="post" style="display:inline;">
-                        <!-- mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli -->
+                        <!--/* mevcut filterDto alanlarının tamamı gizli alan olarak gönderilmeli */-->
                         <input type="hidden" th:field="*{topicIds}" />
                         <input type="hidden" th:field="*{startDate}" />
                         <input type="hidden" th:field="*{endDate}" />
@@ -670,7 +670,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
     </div>
 
 
-</div> <!-- end div of background css pattern -->
+</div> <!--/* end div of background css pattern */-->
 
 
 
@@ -682,14 +682,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-<!-- <h1>Entry Filtre Formu</h1> -->
+<!--/* <h1>Entry Filtre Formu</h1> */-->
 
-<!-- Validasyon hataları -->
-<!-- TODO
+<!--/* Validasyon hataları */-->
+<!--/* TODO
 <div th:if="${#fields.hasErrors('*')}">
     <p style="color:red" th:each="err : ${#fields.errors('*')}" th:text="${err}"></p>
 </div>
--->
+*/-->
 
 
             <h2 >
@@ -702,10 +702,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                  >
                 <div >
 
-                    <!-- Form Başlangıcı -->
+                    <!--/* Form Başlangıcı */-->
                     <form th:action="@{/entry-filter/apply}" th:object="${filterDto}" method="post">
 
-                        <!-- 1️⃣ Filtre Kutusu -->
+                        <!--/* 1️⃣ Filtre Kutusu */-->
                         <div class="row mb-3">
                             <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
                             <div class="col-sm-8">
@@ -716,7 +716,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </div>
                         </div>
 
-                        <!-- 2️⃣ Kategori Seçimi -->
+                        <!--/* 2️⃣ Kategori Seçimi */-->
                         <div class="row mb-3">
                             <label for="categorySelect" class="col-sm-4 col-form-label">Category:</label>
                             <div class="col-sm-8">
@@ -733,7 +733,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </div>
                         </div>
 
-                        <!-- Topic Çoklu Seçimi -->
+                        <!--/* Topic Çoklu Seçimi */-->
                         <div class="row mb-3">
                             <label for="topicsSelect" class="col-sm-4 col-form-label">
                                 Topic (multi):
@@ -752,7 +752,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </div>
                         </div>
 
-                        <!-- Tarih Aralığı: Başlangıç Tarihi -->
+                        <!--/* Tarih Aralığı: Başlangıç Tarihi */-->
                         <div class="row mb-3" id="startDateContainer">
                             <div class="input-group startDateStyle date">
                                 <label for="startDate" class="col-sm-4 col-form-label">
@@ -764,14 +764,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                 />
                                 <span class="input-group-append">
                                          <button class="btn btn-outline-secondary" type="button">
-                                             <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
+                                             <!--/* https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp */-->
                                              <i class="far fa-calendar" aria-hidden="true"></i>
                                          </button>
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Tarih Aralığı: Bitiş Tarihi -->
+                        <!--/* Tarih Aralığı: Bitiş Tarihi */-->
                         <div class="row mb-3" id="endDateContainer">
                             <div class="input-group endDateStyle date">
                                 <label for="endDate" class="col-sm-4 col-form-label">
@@ -789,7 +789,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </div>
                         </div>
 
-                        <!-- Status Çoklu -->
+                        <!--/* Status Çoklu */-->
                         <div class="row mb-3">
                             <label for="statuses" class="col-sm-4 col-form-label">
                                 Status (multi):
@@ -808,7 +808,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         </div>
 
 
-                        <!-- 6️⃣ Entries Threshold -->
+                        <!--/* 6️⃣ Entries Threshold */-->
                         <div class="row mb-3">
                             <label for="entriesThreshold" class="col-sm-4 col-form-label">
                                 Entries Threshold:
@@ -819,7 +819,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                             onclick="decrementThreshold()">
                                         &minus;
                                     </button>
-                                    <!-- binds to FilterDto.entriesThreshold -->
+                                    <!--/* binds to FilterDto.entriesThreshold */-->
                                     <input type="number"
                                            id="entriesThreshold"
                                            class="form-control text-center"
@@ -846,7 +846,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-                        <!-- Filtrele Butonu -->
+                        <!--/* Filtrele Butonu */-->
                         <div class="row mb-3">
                             <div class="col-sm-12 text-center">
                                 <button type="submit" class="btn btn-primary">
@@ -855,7 +855,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </div>
                         </div>
                     </form>
-                    <!-- Form Bitişi -->
+                    <!--/* Form Bitişi */-->
 
                 </div>
             </div>
@@ -873,17 +873,17 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 <hr/>
 
-<!-- Seçili Kategori'ye ait tüm topicler için new entry ekleme linklerin basılacağı placeholder, js bağlantılı  -->
+<!--/* Seçili Kategori'ye ait tüm topicler için new entry ekleme linklerin basılacağı placeholder, js bağlantılı  */-->
 <div id="newEntryLinksContainer" style="margin-top: 10px; max-width:800px; background-color:honeydew;"  class="centered">
     When you select a category from the category filter, the entry adding links will appear here.
 </div>
 
     </div></div>
 
-<!-- Filtre Sonuçları -->
+<!--/* Filtre Sonuçları */-->
 
 
-<!-- Pivot tablo -->
+<!--/* Pivot tablo */-->
 
 <th:block th:if="${filterDto.categoryId == null}" >
 
@@ -902,7 +902,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 <div th:if="${filterDto.categoryId != null}" class="centered">
 
-    <!-- Tabloyu sarmalayan scrollable container -->
+    <!--/* Tabloyu sarmalayan scrollable container */-->
     <div style="overflow-x: auto; max-width: 100%;">
 
         <div class="scrollbar-top"></div>
@@ -915,10 +915,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <col class="left-frozen-topic">
 
-            <!-- kondisyonal sütun: category kolon elementi sadece tek bir kategori seçilmediğinde görünsün -->
+            <!--/* kondisyonal sütun: category kolon elementi sadece tek bir kategori seçilmediğinde görünsün */-->
             <col class="left-frozen-category" th:if="${filterDto.categoryId == null}">
 
-            <col th:span="${pivotData.dateRange.size}"> <!-- ortadaki dinamik kolonlar -->
+            <col th:span="${pivotData.dateRange.size}"> <!--/* ortadaki dinamik kolonlar */-->
 
             <col class="right-frozen-count hidden-col">
             <col class="right-frozen-prediction">
@@ -940,20 +940,20 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
-                <!-- iterate with status -->
+                <!--/* iterate with status */-->
                 <span th:each="cat, iStats : ${allCategories}"
                       th:if="${cat.id} == ${filterDto.categoryId}">
 
-                <!-- your existing link -->
+                <!--/* your existing link */-->
                 <a th:text="${'-&nbsp;' + cat.name}"
                    th:title="${'Click to rename'}"
                    th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">
                 </a>
 
-                            <!-- position / total -->
+                            <!--/* position / total */-->
                 <span class="ms-2"
                       th:text=" '(' + ${iStats.count} + ' / ' + ${allCategories.size() + ')' }">
-                  <!-- e.g. “3 / 10” -->
+                  <!--/* e.g. “3 / 10” */-->
                 </span>
               </span>
 
@@ -971,18 +971,18 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         </caption>
 
 
-        <!-- Tablonun başlığı (thead) -->
+        <!--/* Tablonun başlığı (thead) */-->
         <thead>
         <tr>
 
-            <!-- ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
+            <!--/* ilk sütun Topic başlığı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) */-->
             <th class="left-frozen-topic">
-                <!-- Tıklayınca sıralama yapsın -->
+                <!--/* Tıklayınca sıralama yapsın */-->
                 <span onclick="sortPivotTableByColumn(0)" style="cursor: pointer;">Topic</span>
 
-                <!-- HTMX ayarları -->
+                <!--/* HTMX ayarları */-->
 
-                <!-- 1) Offcanvas’ı tetikleyecek düğme -->
+                <!--/* 1) Offcanvas’ı tetikleyecek düğme */-->
                 <button
                         th:if="${filterDto.categoryId != null}"
                 class="btn btn-primary"
@@ -998,7 +998,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </button>
 
 
-                <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
+                <!--/* Altına veya yanına bir arama kutusu koyuyoruz */-->
                 <div>
                     <input type="text"
                            id="topicSearchBox"
@@ -1013,13 +1013,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             </th>
 
-            <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
+            <!--/* kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün */-->
             <th  class="left-frozen-category prevent-select" th:if="${filterDto.categoryId == null}">
 
                 <span onclick="sortPivotTableByColumn(1)" style="cursor: pointer;">Category</span>
 
 
-                <!-- Altına veya yanına bir arama kutusu koyuyoruz -->
+                <!--/* Altına veya yanına bir arama kutusu koyuyoruz */-->
                 <div>
                     <input type="text"
                            id="categorySearchBox"
@@ -1029,7 +1029,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </div>
             </th>
 
-            <!-- Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte -->
+            <!--/* Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte */-->
             <th:block th:each="day : ${pivotData.dateRange}">
                 <td th:if="${day.equals(today)}"
                 class="pivot-table-entry-header prevent-select highlighted-day">
@@ -1059,7 +1059,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
             <th class="right-frozen-count text-center prevent-select" style="vertical-align: middle;">Visible<br />Done<br />Count<br /></th>
 
-        <!--    <th class="text-center" style="vertical-align: middle;">Visible<br />Row<br />Num</th> -->
+        <!--/*    <th class="text-center" style="vertical-align: middle;">Visible<br />Row<br />Num</th> */-->
 
             <th class="right-frozen-prediction prevent-select text-center status-3"
                 id="header-next-prediction"
@@ -1094,27 +1094,27 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-        <!-- Eger en az bir topic varsa -->
-        <!-- Her topic için bir satır -->
+        <!--/* Eger en az bir topic varsa */-->
+        <!--/* Her topic için bir satır */-->
         <tr th:each="topic, iStat : ${pivotData.topicList}">
 
-            <!-- ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) -->
+            <!--/* ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) */-->
             <td class="left-frozen-topic" id="topic-name" style="width: 100px;">
                 <th:block
                    th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
                 </th:block>
             </td>
 
-            <!-- kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün -->
+            <!--/* kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün */-->
             <td class="left-frozen-category" id="category-name" th:if="${filterDto.categoryId == null}" th:text="${topic.category.name}"></td>
 
-            <!-- Ardından pivotData.dateRange kadar hücre -->
-            <!-- pivotData.dateRange kadar hücre -->
+            <!--/* Ardından pivotData.dateRange kadar hücre */-->
+            <!--/* pivotData.dateRange kadar hücre */-->
 
             <th:block th:each="day : ${pivotData.dateRange}"
                       th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
 
-                <!-- 1) Var olan (status!=3) entry’leri link şeklinde göster -->
+                <!--/* 1) Var olan (status!=3) entry’leri link şeklinde göster */-->
                 <th:block th:if="${entriesForDay != null}">
                     <td th:each="entryItem : ${entriesForDay}"
                         th:if="${entryItem.status != 3}"
@@ -1149,7 +1149,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     </td>
                 </th:block>
 
-                <!-- 2a) Eğer hiç entry yoksa 'New Entry' linki göster -->
+                <!--/* 2a) Eğer hiç entry yoksa 'New Entry' linki göster */-->
                 <th:block th:if="${entriesForDay == null or #lists.isEmpty(entriesForDay)}">
                     <td class="pivot-table-entry-cell prevent-select"
                         th:data-category-id="${topic.category.id}"
@@ -1166,7 +1166,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     </td>
                 </th:block>
 
-                <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                <!--/* 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse */-->
                 <th:block th:if="${entriesForDay != null
                      and !#lists.isEmpty(entriesForDay.?[status == 3])}">
                     <td th:class="'pivot-table-entry-cell  prevent-select status-3'"
@@ -1188,27 +1188,27 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <!-- turker topic'in toplam görünen "done" entry sayısı -->
+            <!--/* turker topic'in toplam görünen "done" entry sayısı */-->
             <td class="right-frozen-count" style="text-align: center; background-color: white;">
                 <span th:text="${pivotData.status1Counts[topic.id]} ?: 0">0</span>
             </td>
 
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-         <!--   <td th:text="${iStat.index + 1}" class="text-center"></td> -->
+            <!--/* thymeleaf in satir no indeksi ozelligi(sifirdan baslar)*/-->
+         <!--/*   <td th:text="${iStat.index + 1}" class="text-center"></td> */-->
 
 
 
 
-             <!-- predictionDate varsa -->
+             <!--/* predictionDate varsa */-->
             <th:block th:if="${topic.predictionDate != null or !#strings.isEmpty(topic.predictionDate)}">
 
-                <!-- predictionDate dateRange içinde yoksa -->
+                <!--/* predictionDate dateRange içinde yoksa */-->
                 <th:block th:if="${not #lists.contains(pivotData.dateRange, topic.predictionDate)}"
                 >
 
-                    <!-- Eğer topic.predictionDate dateRange'deki en küçük tarihten küçükse -->
+                    <!--/* Eğer topic.predictionDate dateRange'deki en küçük tarihten küçükse */-->
                     <th:block th:if="${topic.predictionDate.isBefore(pivotData.dateRange[0])}">
-                        <!-- Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin -->
+                        <!--/* Örneğin: başlangıç tarihinden önceki durum için buraya içerik ekleyin */-->
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId))
@@ -1219,9 +1219,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         </td>
                     </th:block>
 
-                    <!-- Eğer topic.predictionDate dateRange'deki en büyük tarihten büyükse -->
+                    <!--/* Eğer topic.predictionDate dateRange'deki en büyük tarihten büyükse */-->
                     <th:block th:if="${topic.predictionDate.isAfter(pivotData.dateRange[pivotData.dateRange.size() - 1])}">
-                        <!-- Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin -->
+                        <!--/* Örneğin: bitiş tarihinden sonraki durum için buraya içerik ekleyin */-->
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
@@ -1234,12 +1234,12 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                 </th:block>
 
-                <!-- predictionDate dateRange içinde varsa -->
+                <!--/* predictionDate dateRange içinde varsa */-->
                 <th:block th:if="${#lists.contains(pivotData.dateRange, topic.predictionDate)}"
                 >
-                    <!-- topic.predictionDate today'e eşitse -->
+                    <!--/* topic.predictionDate today'e eşitse */-->
                     <th:block th:if="${topic.predictionDate.equals(today)}">
-                        <!-- Bugünün tarihine denk gelen durum için buraya içerik ekleyin -->
+                        <!--/* Bugünün tarihine denk gelen durum için buraya içerik ekleyin */-->
                         <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
@@ -1250,11 +1250,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                         </td>
                     </th:block>
 
-                    <!-- topic.predictionDate today'e eşit değilse -->
+                    <!--/* topic.predictionDate today'e eşit değilse */-->
                     <th:block th:if="${!topic.predictionDate.equals(today)}">
-                        <!-- DateRange içinde ama bugünden farklı tarih için buraya içerik ekleyin -->
+                        <!--/* DateRange içinde ama bugünden farklı tarih için buraya içerik ekleyin */-->
 
-                        <!-- topic.predictionDate bugün’den küçükse -->
+                        <!--/* topic.predictionDate bugün’den küçükse */-->
                         <th:block th:if="${topic.predictionDate.isBefore(today)}">
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
@@ -1266,7 +1266,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                             </td>
                         </th:block>
 
-                        <!-- topic.predictionDate bugün’den büyükse -->
+                        <!--/* topic.predictionDate bugün’den büyükse */-->
                         <th:block th:if="${topic.predictionDate.isAfter(today)}">
                             <td th:title="${T(java.time.format.DateTimeFormatter)
                                         .ofPattern('yyyy-MM-dd')
@@ -1288,7 +1288,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
 
-            <!-- predictionDate yoksa -->
+            <!--/* predictionDate yoksa */-->
             <th:block th:if="${topic.predictionDate == null or #strings.isEmpty(topic.predictionDate)}"
             >
                 <td title="You can manually add the next date prediction on topic settings."
@@ -1302,7 +1302,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-            <!-- lastPastEntryDate varsa -->
+            <!--/* lastPastEntryDate varsa */-->
             <th:block th:if="${topic.lastPastEntryDate != null or !#strings.isEmpty(topic.lastPastEntryDate)}">
                 <td th:title="${'Last done: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -1315,14 +1315,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     class="right-frozen-last-done last-done"
                     style="text-align: center; background-color: white;">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
                             .DAYS.between(T(java.time.LocalDate).now(zoneId), topic.lastPastEntryDate)}">
                     </span>
                 </td>
             </th:block>
 
-            <!-- lastPastEntryDate yoksa -->
+            <!--/* lastPastEntryDate yoksa */-->
             <th:block th:if="${topic.lastPastEntryDate == null or #strings.isEmpty(topic.lastPastEntryDate)}"
             >
                 <td title="At least one entry with the status 'done(green colored)' closest to the current day in the past is required."
@@ -1334,7 +1334,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-            <!-- firstWarningEntryDate varsa -->
+            <!--/* firstWarningEntryDate varsa */-->
             <th:block th:if="${topic.firstWarningEntryDate != null or !#strings.isEmpty(topic.firstWarningEntryDate)}">
                 <td th:title="${'First warn: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -1347,14 +1347,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     class="right-frozen-first-warn first-warn"
                     style="text-align: center; background-color: white;">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstWarningEntryDate ) }">
                     </span>
                 </td>
             </th:block>
 
-            <!-- firstWarningEntryDate yoksa -->
+            <!--/* firstWarningEntryDate yoksa */-->
             <th:block th:if="${topic.firstWarningEntryDate == null or #strings.isEmpty(topic.firstWarningEntryDate)}"
             >
                 <td title="At least one entry with the status 'warning(red colored)' is required."
@@ -1364,7 +1364,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 </td>
             </th:block>
 
-            <!-- firsFutureNeutralEntryDate varsa -->
+            <!--/* firsFutureNeutralEntryDate varsa */-->
             <th:block th:if="${topic.firstFutureNeutralEntryDate != null or !#strings.isEmpty(topic.firstFutureNeutralEntryDate)}">
                 <td th:title="${'Upcoming in: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -1377,14 +1377,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     class="right-frozen-upcoming upcoming-note"
                     style="text-align: center; background-color: white;">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
                     <span th:text="${T(java.time.temporal.ChronoUnit)
                             .DAYS.between( T(java.time.LocalDate).now(zoneId), topic.firstFutureNeutralEntryDate ) }">
                     </span>
                 </td>
             </th:block>
 
-            <!-- firsFutureNeutralEntryDate yoksa -->
+            <!--/* firsFutureNeutralEntryDate yoksa */-->
             <th:block th:if="${topic.firstFutureNeutralEntryDate == null or #strings.isEmpty(topic.firstFutureNeutralEntryDate)}"
             >
                 <td title="At least one entry with the status 'not marked(gray colored)' in the future is required."
@@ -1426,10 +1426,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         </tbody>
     </table>
 
-    </div> <!-- end of table-wrapper -->
+    </div> <!--/* end of table-wrapper */-->
     </div>
 
-        <!-- Eger hic topic yoksa bilgilendirici mesaj goster-->
+        <!--/* Eger hic topic yoksa bilgilendirici mesaj goster*/-->
         <th:block th:if="${pivotData.topicList == null or #lists.isEmpty(pivotData.topicList)}">
             <br />
             <div class="alert alert-success centered">
@@ -1444,19 +1444,19 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 </div>
 
-<!-- Modal yapısı weekly entry calendar icin -->
+<!--/* Modal yapısı weekly entry calendar icin */-->
 <div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
     <button onclick="document.getElementById('modal').style.display='none'"
             style="background-color:WhiteSmoke;"
     >Close</button>
     <div class="modal-content" id="modal-content">
-        <!-- İçerik buraya yüklenecek -->
+        <!--/* İçerik buraya yüklenecek */-->
     </div>
 </div>
 
 
 
-<!-- Düz liste tablo -->
+<!--/* Düz liste tablo */-->
 
 <div th:if="${entries != null}" class="align-center-horizontal">
     <h2>Results</h2>
@@ -1487,7 +1487,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-<!-- 2) Offcanvas yapısı -->
+<!--/* 2) Offcanvas yapısı */-->
 <div
         class="offcanvas offcanvas-start"
         tabindex="-1"
@@ -1507,7 +1507,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 aria-label="Close"></button>
     </div>
     <div class="offcanvas-body" id="topicsOffcanvasBody">
-        <!-- İlk açılışta isteği işlenene kadar gösterebileceğiniz bir yükleniyor animasyonu -->
+        <!--/* İlk açılışta isteği işlenene kadar gösterebileceğiniz bir yükleniyor animasyonu */-->
         <div class="text-center py-3">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Yükleniyor…</span>
@@ -1519,14 +1519,14 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
 
-<!-- AJAX / JavaScript Kısmı -->
+<!--/* AJAX / JavaScript Kısmı */-->
 
 
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+<!--/* asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
 cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
 WebJars path'leri şu yapıyı izler:
 /webjars/{artifactId}/{version}/{dosya}
--->
+*/-->
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
@@ -1536,14 +1536,14 @@ WebJars path'leri şu yapıyı izler:
 <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 
 <script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
-<!-- online olani: "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js" -->
+<!--/* online olani: "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js" */-->
 
-<!-- chart -->
+<!--/* chart */-->
 <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
 
-<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
+<!--/* <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> */-->
 <script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
-<!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
+<!--/* https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js */-->
 <script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
 
 
@@ -1681,7 +1681,7 @@ function sortPivotTableByColumn(colIndex) {
 
 </script>
 
-<!-- 3️⃣ Filtreleme için JS -->
+<!--/* 3️⃣ Filtreleme için JS */-->
 <script>
     (function(){
       const filterInput = document.getElementById('categoryTextFilter');
@@ -1715,7 +1715,7 @@ function sortPivotTableByColumn(colIndex) {
 </script>
 
 
-<!-- javascript to keep the label in sync -->
+<!--/* javascript to keep the label in sync */-->
 <script>
     function updateThresholdValue() {
       const v = document.getElementById('entriesThreshold').value || 0;
@@ -1741,9 +1741,9 @@ function sortPivotTableByColumn(colIndex) {
 
 
 
-<!-- https://uxsolutions.github.io/bootstrap-datepicker/ -->
-<!-- "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range. -->
-<!-- calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers -->
+<!--/* https://uxsolutions.github.io/bootstrap-datepicker/ */-->
+<!--/* "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range. */-->
+<!--/* calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers */-->
 <script>
 
     $(function() {
@@ -1797,7 +1797,7 @@ $(document).ready(function () {
     });
 </script>
 
-<!-- Modal yapısı weekly entry calendar icin -->
+<!--/* Modal yapısı weekly entry calendar icin */-->
 <script>
     // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
     document.getElementById('modal').addEventListener('click', function (event) {
@@ -1824,7 +1824,8 @@ $(document).ready(function () {
       "right-frozen-edit"
     ];
 
-    let currentIndex = colClassNames.length - 1; // başlangıç: 9. sütun
+       let currentIndex = 2; // 2 yani 3uncu sutun, last done sutunu en once gelir sayfa yuklendiginde.
+
 
     function updateVisibleCol() {
       // önce tüm sütunlardan active-col'u kaldır
@@ -1875,7 +1876,7 @@ $(document).ready(function () {
 
 
 
-<!-- Modal -->
+<!--/* Modal */-->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content text-center p-3">
@@ -1884,7 +1885,7 @@ $(document).ready(function () {
                 <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
                 <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
                 <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
-                <!-- Edit/New Entry butonu -->
+                <!--/* Edit/New Entry butonu */-->
                 <button class="btn edit-btn" style="width:50px;height:50px;">
                     <i class="fa-solid fa-pencil" style="color:#808080;"></i>
                 </button>
