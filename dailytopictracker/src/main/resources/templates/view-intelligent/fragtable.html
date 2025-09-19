@@ -1,8 +1,8 @@
-<!--
+<!--/*
 This file is part of the DailyTopicTracker project.
 Please refer to the project's README.md file for additional details.
 https://github.com/turkerozturk/springtopiccalendar
--->
+*/-->
 <div th:fragment="fragtable(filteredItems, tableId)" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
 
 
@@ -46,7 +46,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
+            <!--/* thymeleaf in satir no indeksi ozelligi(sifirdan baslar)*/-->
             <td th:if="${item.topic.weight < 0}"
                 th:text="${#numbers.formatInteger(iStats.index + 1, 3)}"
                 th:title="'Topic Weight = ' + ${item.topic.weight}"
@@ -66,12 +66,12 @@ https://github.com/turkerozturk/springtopiccalendar
             </td>
 
 
-            <!-- DAYS sutunu. -->
+            <!--/* DAYS sutunu. */-->
             <td th:title=" 'status: ' + ${item.status}"
 
                 style="text-align: center;">
 
-                <!-- firsFutureNeutralEntryDate varsa -->
+                <!--/* firsFutureNeutralEntryDate varsa */-->
                 <th:block th:if="${item.status == 0}">
                 <span th:title="${'Upcoming in: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -84,7 +84,7 @@ https://github.com/turkerozturk/springtopiccalendar
                       class="upcoming-note"
                       style="text-align: center">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
                     <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate) > 0
                    ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate), 3)
                    : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstFutureNeutralEntryDate) < 0
@@ -95,7 +95,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 </span>
                 </th:block>
 
-                <!-- lastPastEntryDate varsa -->
+                <!--/* lastPastEntryDate varsa */-->
                 <th:block th:if="${item.status == 1 && item.topic.lastPastEntryDate!= null}">
                 <span th:title="${'Last done: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -108,7 +108,7 @@ https://github.com/turkerozturk/springtopiccalendar
                       class="last-done"
                       style="text-align: center">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
 
                     <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate) > 0
                    ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.lastPastEntryDate), 3)
@@ -120,7 +120,7 @@ https://github.com/turkerozturk/springtopiccalendar
                 </span>
                 </th:block>
 
-                <!-- firstWarningEntryDate varsa -->
+                <!--/* firstWarningEntryDate varsa */-->
                 <th:block th:if="${item.status == 2}">
                 <span th:title="${'Last done: '
                                         + T(java.time.format.DateTimeFormatter)
@@ -133,7 +133,7 @@ https://github.com/turkerozturk/springtopiccalendar
                       class="first-warn"
                       style="text-align: center">
 
-                    <!-- how many days has past until today -->
+                    <!--/* how many days has past until today */-->
 
                     <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate) > 0
                    ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.firstWarningEntryDate), 3)
@@ -145,11 +145,11 @@ https://github.com/turkerozturk/springtopiccalendar
                 </span>
                 </th:block>
 
-                <!-- predictionDate varsa -->
+                <!--/* predictionDate varsa */-->
                 <th:block th:if="${item.status == 3}">
 
                     <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
-                        <!-- how many days has past until today -->
+                        <!--/* how many days has past until today */-->
                         <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate) > 0
                    ? '+&nbsp;' + #numbers.formatInteger(T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate), 3)
                    : (T(java.time.temporal.ChronoUnit).DAYS.between(T(java.time.LocalDate).now(zoneId), item.topic.predictionDate) < 0
@@ -157,7 +157,7 @@ https://github.com/turkerozturk/springtopiccalendar
                       : '  0') }">
                     </span>
 
-                        <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                        <!--/* 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse */-->
 
 
 
@@ -180,8 +180,8 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <!-- DATE sutunu -->
-            <!-- entry gercekse bu td yi koy-->
+            <!--/* DATE sutunu */-->
+            <!--/* entry gercekse bu td yi koy*/-->
 
             <td>
                 <span
@@ -192,7 +192,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <!-- TOPIC sutunu -->
+            <!--/* TOPIC sutunu */-->
             <td>
                 <span
                    th:text="${#strings.abbreviate(item.topic.name, 27)}"
@@ -205,7 +205,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <!-- Renkli STATUS sutunu-->
+            <!--/* Renkli STATUS sutunu*/-->
             <td th:title=" 'status: ' + ${item.status}"
                 th:class=" 'status-' + ${item.status} "
                 style="text-align: center;">
@@ -213,7 +213,7 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-                <!-- eger gercek entry ise edit linki gosterilir -->
+                <!--/* eger gercek entry ise edit linki gosterilir */-->
                 <th:block th:if="${item.status != 3}">
 
                     <th:block th:if="${categoryGroupId == null}">
@@ -244,11 +244,11 @@ https://github.com/turkerozturk/springtopiccalendar
 
                 </th:block>
 
-                <!-- predictionDate varsa -->
+                <!--/* predictionDate varsa */-->
                 <th:block th:if="${item.status == 3}">
                     <th:block th:if="${categoryGroupId == null}">
                         <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
-                            <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                            <!--/* 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse */-->
                             <a th:href="@{/entries/new(topicId=${item.topic.id},
                                                dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
                                                categoryId=${item.topic.category.id},
@@ -262,7 +262,7 @@ https://github.com/turkerozturk/springtopiccalendar
                     </th:block>
                     <th:block th:if="${categoryGroupId != null}">
                         <th:block th:if="${item.topic.predictionDate != null or !#strings.isEmpty(item.topic.predictionDate)}">
-                            <!-- 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse -->
+                            <!--/* 2b) Eğer o güne yalnızca synthetic entry (status==3) eklenmişse */-->
                             <a th:href="@{/entries/new(topicId=${item.topic.id},
                                                dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
                                                categoryId=${item.topic.category.id},
@@ -286,11 +286,11 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
 
-            <!-- ENTRY NOTE -->
+            <!--/* ENTRY NOTE */-->
             <td>
 
                 <th:block th:if="${item.entry != null && item.entry.note != null}">
-                    <!-- bu htmx in javascripti report-all-statuses.html sayfasinda. bu kodlar entries-list.html'de de var. -->
+                    <!--/* bu htmx in javascripti report-all-statuses.html sayfasinda. bu kodlar entries-list.html'de de var. */-->
                     <span   style="cursor: pointer;"
                             class="note-snippet"
                             th:attr="hx-get=@{/entries/{id}/note-full(id=${item.entry.id})}"
@@ -340,7 +340,7 @@ https://github.com/turkerozturk/springtopiccalendar
     </table>
 
 
-    </div> <!-- end of table-wrapper -->
+    </div> <!--/* end of table-wrapper */-->
 
 
 

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
+    <!--/*
     This file is part of the DailyTopicTracker project.
     Please refer to the project's README.md file for additional details.
     https://github.com/turkerozturk/springtopiccalendar
-    -->
+    */-->
     <meta charset="UTF-8">
 
-    <!-- favicon -->
+    <!--/* favicon */-->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -333,7 +333,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
         <span th:if="${categoryGroupId != null}" style="font-size:14pt;">(Over a Category Group)</span>
     </h1>
 
-    <!-- thymeleaf icin "templates/" dizini root dizindir. HTML relative pathleri oradan itibaren yazmak gerekir. -->
+    <!--/* thymeleaf icin "templates/" dizini root dizindir. HTML relative pathleri oradan itibaren yazmak gerekir. */-->
 
     <h3 title="If topic weight is more than or equal to zero and category is not archived"><span class="fonbg">Items</span>
 
@@ -363,7 +363,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
 </div>
 
-<!-- sayfanın en altına yakın bir yere ekleyin -->
+<!--/* sayfanın en altına yakın bir yere ekleyin */-->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -375,19 +375,19 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
-                <!-- HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor -->
+                <!--/* HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor */-->
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal yapısı weekly entry calendar icin -->
+<!--/* Modal yapısı weekly entry calendar icin */-->
 <div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
     <button onclick="document.getElementById('modal').style.display='none'"
             style="background-color:WhiteSmoke;"
     >Close</button>
     <div class="modal-content" id="modal-content">
-        <!-- İçerik buraya yüklenecek -->
+        <!--/* İçerik buraya yüklenecek */-->
     </div>
 </div>
 
@@ -398,14 +398,14 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
 
-<!-- chart -->
+<!--/* chart */-->
 <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
-<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
+<!--/* <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> */-->
 <script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
-<!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
+<!--/* https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js */-->
 <script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
 
-<!-- Modal yapısı weekly entry calendar icin -->
+<!--/* Modal yapısı weekly entry calendar icin */-->
 <script>
     // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
     document.getElementById('modal').addEventListener('click', function (event) {
@@ -436,8 +436,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
     });
 </script>
 
-<!-- Script that causes all .status-table tables to shift left one column at a time when they are below a certain resolution. -->
-<!-- Two swipe buttons appear, they are used to scroll. -->
+<!--/* Script that causes all .status-table tables to shift left one column at a time when they are below a certain resolution. */-->
+<!--/* Two swipe buttons appear, they are used to scroll. */-->
 <script>
 
     let tables = [];
@@ -502,7 +502,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox=
 
 </script>
 
-<!-- Mobile swipe support - Let's add a touch event so it works with a finger without a button: -->
+<!--/* Mobile swipe support - Let's add a touch event so it works with a finger without a button: */-->
 <script>
 
     let touchStartX = 0;
