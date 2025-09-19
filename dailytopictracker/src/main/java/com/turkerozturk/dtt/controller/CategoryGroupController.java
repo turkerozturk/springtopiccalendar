@@ -74,6 +74,7 @@ public class CategoryGroupController {
 
         // Gruplar ve kategoriler
         groups.forEach(g -> {
+
             List<Category> sorted = g.getCategories().stream()
                     .peek(cat -> {
                         CategoryEntryStatsDto dto = statsMap.get(cat.getId());
@@ -84,11 +85,17 @@ public class CategoryGroupController {
                             cat.setFutureNotMarked(dto.getFutureNotMarked());
                             cat.setTodayDone(dto.getTodayDone());
                             cat.setPredictionCount(dto.getPredictionCount());
+
+                            g.setTotalWarningCount(g.getTotalWarningCount() + dto.getWarningCount());
+                            g.setTotalFutureNotMarked(g.getTotalFutureNotMarked() + dto.getFutureNotMarked());
+                            g.setTotalTodayDone(g.getTotalTodayDone() + dto.getTodayDone());
+                            g.setTotalPredictionCount(g.getTotalPredictionCount() + dto.getPredictionCount());
                         }
                     })
                     .sorted(Comparator.comparing(Category::getName, collator))
                     .collect(Collectors.toList());
             g.setCategories(sorted);
+
         });
 
         model.addAttribute("groups", groups);

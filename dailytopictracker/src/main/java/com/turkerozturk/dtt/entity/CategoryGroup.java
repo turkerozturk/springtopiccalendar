@@ -56,4 +56,15 @@ public class CategoryGroup {
     public CategoryGroup(String name) {
         this.name = name;
     }
+
+    // counters over category group
+    @Transient
+    private long totalWarningCount; // total warnings, status = 2
+    @Transient
+    private long totalFutureNotMarked; // total not markeds, status = 0, between today and future
+    @Transient
+    private long totalTodayDone; // total dones, status = 1, only today
+    @Transient
+    private long totalPredictionCount; // total predictions, between today and past
+
 }
