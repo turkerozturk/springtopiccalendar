@@ -26,6 +26,8 @@ import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.service.EntryService;
 import com.turkerozturk.dtt.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.info.GitProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +38,18 @@ import com.turkerozturk.dtt.repository.TopicRepository;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class IndexController {
+
+    @Autowired(required = false)
+    private BuildProperties buildProperties;
+
+    @Autowired(required = false)
+    private GitProperties gitProperties;
 
     @Autowired
     CategoryGroupRepository categoryGroupRepository;
@@ -63,13 +72,43 @@ public class IndexController {
     @GetMapping
     public String homePage(Model model) {
 
+        ZoneId zoneId = AppTimeZoneProvider.getZone();
+
+        // cok iyi anlatiyor: https://www.baeldung.com/spring-boot-build-properties
+        // target/classes/META-INF/build-info.properties dosyasinda asagidaki degerler yaziyorsa burada kullanilabilir.
+        // bu dosya mvn package komutunu calistirinca olusur.
+        // pom.xml'deki spring-boot-maven-plugin ayarlariyla baglantili.
+        model.addAttribute("buildVersion", buildProperties.getVersion());
+        model.addAttribute("buildName", buildProperties.getName());
+        model.addAttribute("buildDescription", buildProperties.get("description"));
+        model.addAttribute("buildUrl", buildProperties.get("url"));
+        model.addAttribute("buildOwner", buildProperties.get("owner"));
+
+        String buildTime = buildProperties.getTime()
+                .atZone(zoneId)
+                .toLocalDateTime()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        model.addAttribute("buildTime", buildTime);
+
+        if (gitProperties != null) {
+            // target/classes/git.properties dosyasinda asagidaki degerler yaziyorsa burada kullanilabilir.
+            // Bu dosyayi olusturmamasi icin pom.xml'de
+            // https://www.baeldung.com/spring-git-information
+
+            model.addAttribute("commitId", gitProperties.getCommitId());
+            model.addAttribute("commitLink", "https://github.com/turkerozturk/springtopiccalendar/commit/" + gitProperties.getCommitId());
+            model.addAttribute("commitIdShort", gitProperties.getShortCommitId());
+            model.addAttribute("commitIsDirty", gitProperties.get("dirty"));
+            model.addAttribute("commitTime", gitProperties.get("commit.time"));
+            model.addAttribute("commitCount", gitProperties.get("total.commit.count"));
+
+        }
 
         model.addAttribute("categoryGroupsCount", categoryGroupRepository.count());
         model.addAttribute("categoriesCount", categoryRepository.count());
         model.addAttribute("topicsCount", topicRepository.count());
         model.addAttribute("entriesCount", entryRepository.count());
 
-        ZoneId zoneId = AppTimeZoneProvider.getZone();
 
         LocalDate today = LocalDate.now();
         prepareCategoryPieChartForDate(today, zoneId, model, "today");

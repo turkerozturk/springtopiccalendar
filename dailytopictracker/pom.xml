@@ -8,6 +8,38 @@
     <description>Daily Topic Tracker, a Java Spring Boot application with SQLite database.</description>
     <url>https://github.com/turkerozturk/springtopiccalendar</url>
 
+    <!-- https://stackoverflow.com/questions/4156606/how-to-add-developers-list-to-maven-generated-site#4156666 -->
+    <!-- List the core committers -->
+    <developers>
+        <developer>
+            <id>turkero</id>
+            <name>Turker Ozturk</name>
+            <organization>DailyTopicTracker</organization>
+            <organizationUrl>https://www.dailytopictracker.com/</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>3</timezone>
+        </developer>
+    </developers>
+
+
+
+    <!-- Contributors -->
+    <!--
+    <contributors>
+        <contributor>
+            <name>name surname</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>-0</timezone>
+        </contributor>
+    </contributors>
+    -->
+
+
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -22,6 +54,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         -->
+        <project.owner.name>Turker Ozturk</project.owner.name>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -330,9 +363,32 @@
 
         <plugins>
             <!-- Spring Boot Maven Plugin -->
+            <!-- uygulama build bilgisini elde etmek icin -->
+            <!-- Build info -->
+            <!-- https://www.baeldung.com/spring-boot-build-properties -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!--  <layers enabled="false"/> --> <!-- opsiyonel -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <!-- <java.version>${java.version}</java.version> -->
+                                <description>${project.description}</description>
+                                <url>${project.url}</url>
+                               <owner>${project.owner.name}</owner>
+                                <!-- <custom.value>123</custom.value> -->
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -350,7 +406,41 @@
             </plugin>
 
 
-            <!-- Plugin derlendikten sonra release klasörüne kopyala -->
+
+            <!-- Git commit info -->
+            <!-- https://github.com/git-commit-id/git-commit-id-maven-plugin -->
+            <!-- https://dzone.com/articles/maven-git-commit-id-plugin -->
+            <plugin>
+                <!-- https://mvnrepository.com/artifact/io.github.git-commit-id/git-commit-id-maven-plugin/9.0.2 -->
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <!-- <generateGitPropertiesFile>false</generateGitPropertiesFile> -->
+                    <!-- https://www.baeldung.com/spring-git-information -->
+                    <excludeProperties>
+                        <excludeProperty>git.build.user.*</excludeProperty>
+                        <excludeProperty>git.commit.user.*</excludeProperty>
+                        <excludeProperty>git.build.host.*</excludeProperty>
+                    </excludeProperties>
+                <dateFormat>yyyy-MM-dd</dateFormat>
+                <commitIdGenerationMode>short</commitIdGenerationMode>
+                </configuration>
+            </plugin>
+
+
+
+    <!-- Plugin derlendikten sonra release klasörüne kopyala -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>

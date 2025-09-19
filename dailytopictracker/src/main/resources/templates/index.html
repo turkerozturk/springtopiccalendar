@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
+    <!--/*
     This file is part of the DailyTopicTracker project.
     Please refer to the project's README.md file for additional details.
     https://github.com/turkerozturk/springtopiccalendar
-    -->
+    */-->
     <meta charset="UTF-8">
     <title>Daily Topic Tracker</title>
 
-    <!-- favicon -->
+    <!--/* favicon */-->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -64,7 +64,53 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                   background: #a7d6e8;
                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
                }
+
+        a.hover:hover {
+            text-decoration: underline !important;
+        }
     </style>
+
+    <style>
+
+        .build-info {
+          width: 100%;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          padding: 10px;
+        }
+
+        .build-info h3 {
+          text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .info-row {
+          display: grid;
+          grid-template-columns: 30% 70%;
+          padding: 5px 0;
+          border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+          font-weight: bold;
+        }
+
+        .info-value {
+          text-align: left;
+        }
+
+        /* Mobil ekranlarda tek sütun */
+        @media (max-width: 600px) {
+          .info-row {
+            grid-template-columns: 100%;
+          }
+          .info-label {
+            margin-bottom: 4px;
+          }
+        }
+
+    </style>
+
 
 
 </head>
@@ -78,10 +124,12 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 <div class="container my-2" style="max-width: 600px;">
 
 
-    <h1><span class="fonbg" th:text="#{software.name}">Daily Topic Tracker</span></h1>
+    <!--/* <h1><span class="fonbg" th:text="#{software.name}">Daily Topic Tracker</span></h1> */-->
+    <h1><span class="fonbg" th:text="${buildName}">Daily Topic Tracker</span></h1>
 
 
-    <!-- Bağlantılar (List Group) -->
+
+    <!--/* Bağlantılar (List Group) */-->
     <table class="table" style="border: solid 3px; background-color:WhiteSmoke;">
         <tr>
             <th colspan="2">
@@ -97,9 +145,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
         <tr>
             <td>
-                <a th:if="${hasCategoryGroups}" href="/category-groups" class="list-group-item list-group-item-action"
-                   th:text="#{category.groups}">
-                    Category Groups
+                <a th:if="${hasCategoryGroups}" href="/category-groups" class="list-group-item list-group-item-action hover">
+                   ☰ <span th:text="#{category.groups}"></span>
                 </a>
                 <a th:if="${!hasCategoryGroups}" href="/category-groups/new?returnPage=home"
                    class="list-group-item list-group-item-action blink"
@@ -107,7 +154,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
                 </a>
             </td>
-            <td th:text="${categoryGroupsCount}">#</td>
+            <td th:text="${categoryGroupsCount}" style="text-align:right;">#</td>
         </tr>
         <tr>
             <td>
@@ -115,8 +162,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
                     <a th:if="${categoriesCount > 0}" href="/categories"
-                       class="list-group-item list-group-item-action"
-                       th:text="#{categories}">
+                       class="list-group-item list-group-item-action hover">
+                       ☰ <span th:text="#{categories}"></span>
                     </a>
 
                     <a th:if="${categoriesCount == 0}" href="/categories/create?returnPage=home"
@@ -132,7 +179,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
             </span>
             </td>
-            <td th:text="${categoriesCount}">#</td>
+            <td th:text="${categoriesCount}" style="text-align:right;">#</td>
 
         </tr>
         <tr>
@@ -143,8 +190,8 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
                     <a th:if="${topicsCount > 0}" href="/topics"
-                       class="list-group-item list-group-item-action"
-                       th:text="#{topics}">
+                       class="list-group-item list-group-item-action hover">
+                       ☰ <span th:text="#{topics}"></span>
                     </a>
 
                     <a th:if="${topicsCount == 0}" href="/topics/create?returnPage=home"
@@ -160,15 +207,15 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
             </span>
             </td>
-            <td th:text="${topicsCount}">#</td>
+            <td th:text="${topicsCount}" style="text-align:right;">#</td>
 
         </tr>
         <th:block th:if="${hasTopics}">
             <tr>
                 <td>
                     <a th:if="${entriesCount > 0}" href="/entries"
-                       class="list-group-item list-group-item-action"
-                       th:text="#{entries}">
+                       class="list-group-item list-group-item-action hover">
+                       ☰ <span th:text="#{entries}"></span>
                     </a>
 
                     <a th:if="${entriesCount == 0}" href="/entries/new?returnPage=home"
@@ -177,7 +224,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                     </a>
 
                 </td>
-                <td th:text="${entriesCount}">#</td>
+                <td th:text="${entriesCount}" style="text-align:right;">#</td>
 
             </tr>
             <tr th:if="${entriesCount == 0}">
@@ -186,10 +233,10 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
             <tr>
                 <td colspan="2" class="text-center">
                     <a href="/entry-filter/form"
-                       class="list-group-item list-group-item-action link-primary"
+                       class="list-group-item list-group-item-action link-primary hover"
                        th:classappend="${categoryGroupsCount > 0 and categoriesCount > 0 and topicsCount > 0 and entriesCount == 1} ? ' blink' : ''"
                        title="Categorised Pivot Tables">
-                        <span th:text="#{tracker}">Tracker</span>
+                        <i class="fa-solid fa-gear" style="color: #FFD43B;"></i> <span th:text="#{tracker}">Tracker</span>
                         <br />
                         <img th:src="@{/favicon-60x60.png}" />
                     </a>
@@ -197,13 +244,13 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
             </tr>
             <tr>
                 <td colspan="2" class="text-center">
-                    <a href="/reports/all" class="list-group-item list-group-item-action link-primary">
-                        Intelligent Report View
+                    <a href="/reports/all" class="list-group-item list-group-item-action link-primary hover">
+                        <i class="fa-solid fa-table-list" style="color: #ff8000;"></i> Intelligent Report View
                     </a>
                 </td>
             </tr>
 
-            <!-- TODO
+            <!--/* TODO
             <tr>
                 <td colspan="2" class="text-center">
                     <a href="/entries/entry-summary-report" class="list-group-item list-group-item-action link-primary">
@@ -211,7 +258,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                     </a>
                 </td>
             </tr>
-            -->
+            */-->
 
         </th:block>
         <th:block th:if="${!hasTopics}">
@@ -228,25 +275,120 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
         </th:block>
 
         <tr>
-            <!--
+            <!--/*
             <td colspan="2" class="text-center">
                 <a href="/languages" class="list-group-item list-group-item-action link-success"
                    th:text="#{change.language}">
                     Change Language
                 </a>
             </td>
-            -->
+            */-->
 
         </tr>
         <tr>
             <td colspan="2" class="text-center">
-                <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
-                   class="list-group-item list-group-item-action link-secondary"
+                <!--/*
+                <i class="fa-brands fa-github"></i> <a href="https://github.com/turkerozturk/springtopiccalendar" target="_blank"
+                   class="list-group-item list-group-item-action link-secondary hover"
                    th:text="'DailyTopicTracker V1.0.3 - Türker Öztürk'">Website</a>
+                */-->
+
+
+
+
+
+                <!-- Uyarı Mesajı (Collapse ile) -->
+                <div style="background-color: floralwhite;">
+                    <a class="btn btn-link p-0 ms-1" data-bs-toggle="collapse"
+                       href="#aboutDetails" role="button"
+                       style="text-decoration: none;">
+                        <span><i class="fa-solid fa-circle-info"></i> About</span>
+                    </a>
+
+                    <div class="collapse mt-2" id="aboutDetails" style="background-color: whitesmoke; text-align: left;">
+
+                        <div class="build-info">
+                            <h3>Project Build Info</h3>
+                            <div class="info-row">
+                                <div class="info-label">Owner</div>
+                                <div class="info-value" th:text="${buildOwner}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Version</div>
+                                <div class="info-value"><a th:href="${buildUrl}"
+                                                           th:title="${buildDescription}"
+                                                           target="_blank"
+                                                           style="text-decoration: none;">
+                                    <span th:text="${buildVersion}"></span>
+                                </a></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Build Date</div>
+                                <div class="info-value" th:text="${buildTime}"></div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Description</div>
+                                <div class="info-value" th:text="${buildDescription}"></div>
+                            </div>
+
+                            <!--/* https://www.baeldung.com/spring-git-information
+                          https://github.com/git-commit-id/git-commit-id-maven-plugin */-->
+                            <th:block th:if="${commitId != null}">
+
+                                <h3>Source Code Info</h3>
+
+                                <div class="info-row">
+                                    <div class="info-label" title="Some changes were made to the code that are not in the repository.">Is Dirty</div>
+                                    <div class="info-value" th:text="${commitIsDirty}" th:style="${commitIsDirty == 'true' ? 'color: red;' : 'color: green;'}"></div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="info-label">Latest Commit</div>
+                                    <div class="info-value"><a th:href="${commitLink}"
+
+                                                               target="_blank"
+                                                               style="text-decoration: none;">
+                                        <span>Details</span>
+                                    </a></div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="info-label">Commit ID (Short)</div>
+                                    <div class="info-value" th:text="${commitIdShort}"></div>
+                                </div>
+
+
+
+                                <div class="info-row">
+                                    <div class="info-label">Commit Date</div>
+                                    <div class="info-value" th:text="${commitTime}"></div>
+                                </div>
+
+                                <div class="info-row">
+                                    <div class="info-label">Commit Number</div>
+                                    <div class="info-value" th:text="${commitCount}"></div>
+                                </div>
+
+                            </th:block>
+
+
+                        </div>
+
+
+
+                    </div>
+
+                </div>
+
+
+
+
+
+
             </td>
 
         </tr>
-        <!--
+        <!--/*
         <a href="/reports/neutral" class="list-group-item list-group-item-action" >
             Reports - Neutral
         </a>
@@ -265,7 +407,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
         <a href="/reports/prediction" class="list-group-item list-group-item-action" >
             Reports - Prediction
         </a>
--->
+*/-->
 
 
     </table>
@@ -274,16 +416,16 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
 
-    <!-- chart -->
+    <!--/* chart */-->
     <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
 
 
 <div class="row my-2" >
 
-    <!-- https://rgbacolorpicker.com/ -->
+    <!--/* https://rgbacolorpicker.com/ */-->
 
 
-    <!-- chartjs radar two days ago -->
+    <!--/* chartjs radar two days ago */-->
     <div th:if="${not #lists.isEmpty(twoDaysAgoCategoryLabels)}"
          class="col-4"
          style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
@@ -341,7 +483,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
     </div>
 
 
-    <!-- chartjs radar today -->
+    <!--/* chartjs radar today */-->
     <div th:if="${not #lists.isEmpty(todayCategoryLabels)}"
          class="col-4"
          style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
@@ -400,7 +542,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
 
-    <!-- chartjs radar yesterday -->
+    <!--/* chartjs radar yesterday */-->
     <div th:if="${not #lists.isEmpty(yesterdayCategoryLabels)}"
          class="col-4"
          style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
