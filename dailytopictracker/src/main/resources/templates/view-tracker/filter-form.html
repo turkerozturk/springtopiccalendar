@@ -553,6 +553,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
           }
         }
     </style>
+
+    <style>
+        .note-read-btn:disabled {
+            opacity: 0.3;      /* silik görünüm */
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
 
@@ -1887,7 +1894,7 @@ $(document).ready(function () {
                     <i class="fa-solid fa-pencil" style="color:#808080;"></i>
                 </button>
                 <!--/* entry notunu noteModal icinde gosterme butonu */-->
-                <button class="btn note-read-btn" style="width:50px;height:50px;">
+                <button class="btn note-read-btn" style="width:50px;height:50px;" disabled>
                     <i class="fa-brands fa-readme" style="color: blue;"></i>
                 </button>
                 <!--/* status degistirme dugmeleri */-->
@@ -1927,6 +1934,22 @@ $(document).ready(function () {
         // Hücreye tıklanınca modal aç
         $(".pivot-table-entry-cell").on("click", function () {
             currentCell = $(this);
+
+            let entryId = currentCell.data("entry-id");
+            let oldStatus = currentCell.data("old-status");
+
+            // Buton elementini bul
+            let btn = $(".note-read-btn");
+
+            if (entryId && oldStatus !== 3) {
+                // Geçerli entry -> butonu aktif yap
+                btn.prop("disabled", false);
+            } else {
+                // Entry yok ya da status=3 -> butonu pasifleştir
+                btn.prop("disabled", true);
+            }
+
+
             $("#statusModal").modal("show");
         });
 
@@ -1994,6 +2017,10 @@ $(document).ready(function () {
         // Note butonuna tıklayınca
         $(document).on("click", ".note-read-btn", function () {
             if (!currentCell) return;
+
+            if ($(this).prop("disabled")) {
+            return; // pasifse hiçbir şey yapma
+        }
 
             // Hücrede geçerli entry var mı? (status != 3 ve data-entry-id mevcut olmalı)
             let entryId = currentCell.data("entry-id");
