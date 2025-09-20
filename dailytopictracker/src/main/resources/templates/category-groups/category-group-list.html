@@ -226,8 +226,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     </div>
 
     <div th:if="${grp.imageFileName == null or #strings.isEmpty(grp.imageFileName)}" class="cg-left"
-
-         >
+         th:classappend="${grp.totalWarningCount > 0} ? ' blink_me' : ''">
         <!--/* resim yokken collapse olmmamasi icin. Boyle iyi gorunuyor, yoksa css grid ile bu kismi gostermeme cozumu dusunecektim.
         Fakat gostermemek yerine bos gostermek, kullanicinin belirledigi arkaplan renginden dolayi guzel oldu. */-->
     </div>
