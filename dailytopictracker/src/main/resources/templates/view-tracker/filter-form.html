@@ -1876,19 +1876,44 @@ $(document).ready(function () {
 
 
 
-<!--/* Modal */-->
+<!--/* Bu modal tablo hucresi uzerine tiklayinca secenekler gostermek icin kullaniliyor. */-->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content text-center p-3">
             <h6 class="mb-3">Set Status</h6>
             <div class="d-flex justify-content-around">
-                <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
-                <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
-                <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
-                <!--/* Edit/New Entry butonu */-->
+                <!--/* Edit/New Entry formunu yukleme butonu */-->
                 <button class="btn edit-btn" style="width:50px;height:50px;">
                     <i class="fa-solid fa-pencil" style="color:#808080;"></i>
                 </button>
+                <!--/* entry notunu noteModal icinde gosterme butonu */-->
+                <button class="btn note-read-btn" style="width:50px;height:50px;">
+                    <i class="fa-brands fa-readme" style="color: blue;"></i>
+                </button>
+                <!--/* status degistirme dugmeleri */-->
+                <!--/* done dugmesini ortaya koydum mobil cihazda basparmakla erisi kolayligi olmasi icin */-->
+                <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
+                <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
+                <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--/* note modal, entry note icerigini gostermek icin. */-->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
+                &nbsp;
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
+                <!--/* HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor */-->
             </div>
         </div>
     </div>
@@ -1964,6 +1989,65 @@ $(document).ready(function () {
                 }
             }
         });
+
+        // Read Note butonuna tıklayınca noteModal acilsin.
+        // Note butonuna tıklayınca
+        $(document).on("click", ".note-read-btn", function () {
+            if (!currentCell) return;
+
+            // Hücrede geçerli entry var mı? (status != 3 ve data-entry-id mevcut olmalı)
+            let entryId = currentCell.data("entry-id");
+            let oldStatus = currentCell.data("old-status");
+
+            if (entryId && oldStatus !== 3) {
+                // Önce statusModal’i kapat
+                $("#statusModal").modal("hide");
+
+                // HTMX ile içerik yükle
+                let noteUrl = '/entries/' + entryId + '/note-full';
+                // alert(noteUrl);
+
+
+                htmx.ajax('GET',
+                    noteUrl,
+                    {
+                        target: "#noteModal .modal-body",
+                        swap: "innerHTML"
+                    }
+                );
+
+                // burada kod yazabilirdik ama onun yerine asagida htmx:afterSwap olay dinleyici icine yaziyoruz.
+                // Cunku htmx swap komutunu calistirinca afterSwap ile degisikligi yakalamak burada degilse bile
+                // diger sayfalarda modal ustune modal olarak actigimiz orneklerde gerekli oluyor.
+                // Sonuc olarak yukarida henuz goze gorunmeyen modal govdesini degistirdikten sonra asagidaki
+                // htmx olay yakalayici ile bootstrap modali gostermis oluyoruz. ve de text copy dugmesinin metodunu da
+                // halletmis oluyoruz.
+
+
+
+            }
+        });
+
+    });
+</script>
+
+<script>
+    // HTMX olayı: içerik yüklendikten hemen sonra
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+      // Eğer swap hedefi modal-body içindeyse
+      if (evt.detail.target.closest('#noteModal .modal-body')) {
+        // Bootstrap modal’ı göster
+        var modalEl = document.getElementById('noteModal');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Copy butonunu bağla
+        document.getElementById('copyNoteBtn').onclick = function() {
+          var text = modalEl.querySelector('.modal-body').innerText;
+          navigator.clipboard.writeText(text)
+            .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
+        };
+      }
     });
 </script>
 
