@@ -43,12 +43,38 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     </style>
 
     <style>
+
+        /* Kapsayıcı */
+        .category-groups {
+          display: grid;
+          grid-template-columns: 1fr; /* Mobilde tek sütun */
+          gap: 20px;
+        }
+
+        /* Büyük ekranlarda çoklu kolon */
+        @media (min-width: 768px) {
+          .category-groups {
+            grid-template-columns: repeat(2, 1fr); /* 2 sütun */
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .category-groups {
+            grid-template-columns: repeat(3, 1fr); /* 3 sütun */
+          }
+        }
+
+
+
+
+
         .category-group {
   display: grid;
   grid-template-columns: 80px 1fr; /* Sol 80px, sağ esnek */
   gap: 10px;
   padding: 10px;
   border-bottom: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 .cg-left img {
@@ -203,177 +229,179 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div class="category-groups">
 
-<div class="category-group"
-     th:each="grp, jStats : ${groups}"
-     th:attr="data-id=${grp.id}"
-     th:style="${'background-color:' + grp.backgroundColor}"
-     >
+        <div class="category-group"
+             th:each="grp, jStats : ${groups}"
+             th:attr="data-id=${grp.id}"
+             th:style="${'background-color:' + grp.backgroundColor}"
+             >
 
-    <!--/* Sol sütun */-->
-    <div th:if="${grp.imageFileName != null and !#strings.isEmpty(grp.imageFileName)}" class="cg-left"
-         th:classappend="${grp.totalWarningCount > 0} ? ' blink_me' : ''">
-        <img th:src="@{${grp.imageFileName}}"
-             alt="Group Icon"
-             style="width:80px;
-            height:80px;
-            object-fit:cover;   /* boşluk yok, gerekirse kırp */
-            opacity:0.8;
-            border-radius:12px; /* köşeler yuvarlak */
-            box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
+            <!--/* Sol sütun */-->
+            <div th:if="${grp.imageFileName != null and !#strings.isEmpty(grp.imageFileName)}" class="cg-left"
+                 th:classappend="${grp.totalWarningCount > 0} ? ' blink_me' : ''">
+                <img th:src="@{${grp.imageFileName}}"
+                     alt="Group Icon"
+                     style="width:80px;
+                    height:80px;
+                    object-fit:cover;   /* boşluk yok, gerekirse kırp */
+                    opacity:0.8;
+                    border-radius:12px; /* köşeler yuvarlak */
+                    box-shadow:0 2px 6px rgba(0,0,0,0.2);" />
 
 
-    </div>
+            </div>
 
-    <div th:if="${grp.imageFileName == null or #strings.isEmpty(grp.imageFileName)}" class="cg-left"
-         th:classappend="${grp.totalWarningCount > 0} ? ' blink_me' : ''">
-        <!--/* resim yokken collapse olmmamasi icin. Boyle iyi gorunuyor, yoksa css grid ile bu kismi gostermeme cozumu dusunecektim.
-        Fakat gostermemek yerine bos gostermek, kullanicinin belirledigi arkaplan renginden dolayi guzel oldu. */-->
-    </div>
+            <div th:if="${grp.imageFileName == null or #strings.isEmpty(grp.imageFileName)}" class="cg-left"
+                 th:classappend="${grp.totalWarningCount > 0} ? ' blink_me' : ''">
+                <!--/* resim yokken collapse olmmamasi icin. Boyle iyi gorunuyor, yoksa css grid ile bu kismi gostermeme cozumu dusunecektim.
+                Fakat gostermemek yerine bos gostermek, kullanicinin belirledigi arkaplan renginden dolayi guzel oldu. */-->
+            </div>
 
-    <!--/* Sağ sütun */-->
-    <div class="cg-right">
-        <!--/* Üst satır: numara + isim + actions */-->
-        <div class="cg-header">
-            <span class="cg-index" th:text="${jStats.index + 1}">1</span>
-            <span class="cg-name" th:text="${grp.name}">Group Name</span>
-            <div class="cg-actions">
+            <!--/* Sağ sütun */-->
+            <div class="cg-right">
+                <!--/* Üst satır: numara + isim + actions */-->
+                <div class="cg-header">
+                    <span class="cg-index" th:text="${jStats.index + 1}">1</span>
+                    <span class="cg-name" th:text="${grp.name}">Group Name</span>
+                    <div class="cg-actions">
 
-                <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
-                   class=" btn-sm btn-outline-danger"
-                   th:onclick="return confirm('Delete this [[${grp.name}]] group?');"
-                   title="Delete Category Group">🗑️</a>
-                <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
-                   class=" btn-sm btn-outline-secondary" title="Edit Category Group">
-                    <i class="fa-solid fa-pencil" style="color: #808080;"></i>
-                ️</a>
-                <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
-                   title="Add Category">➕</a>
-                <!--/* intelligent report for only one category group */-->
-                <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
-                   th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }">
-                    <i class="fa-solid fa-table-list" style="color: #ff8000;"></i>
-                </a>
+                        <a th:href="@{/category-groups/delete/{id}(id=${grp.id})}"
+                           class=" btn-sm btn-outline-danger"
+                           th:onclick="return confirm('Delete this [[${grp.name}]] group?');"
+                           title="Delete Category Group">🗑️</a>
+                        <a th:href="@{/category-groups/edit/{id}(id=${grp.id})}"
+                           class=" btn-sm btn-outline-secondary" title="Edit Category Group">
+                            <i class="fa-solid fa-pencil" style="color: #808080;"></i>
+                        ️</a>
+                        <a th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
+                           title="Add Category">➕</a>
+                        <!--/* intelligent report for only one category group */-->
+                        <a th:href="@{/reports/cg?categoryGroupId={id}(id=${grp.id})}"
+                           th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }">
+                            <i class="fa-solid fa-table-list" style="color: #ff8000;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!--/* Move buttons */-->
+                <div class="cg-move">
+                    <a href="#" class="move-up" title="Move Up"
+                       style="">⬆️</a>
+                    <a href="#" class="move-down" title="Move Down"
+                       style="">⬇️️</a>
+                    <span style="background-color: rgba(255, 255, 255, 0.50);">
+                        <span  style="color:red;">
+                            ⚠ <span th:text="${grp.totalWarningCount}" style="color:black;"></span>
+                        </span>
+                        <span  style="color:darkgray;">
+                            &#128284;&#xfe0e; <span th:text="${grp.totalFutureNotMarked}" style="color:black;"></span>
+                        </span>
+                        <span  style="color:darkgreen;">
+                            ✅ <span th:text="${grp.totalTodayDone}" style="color:black;"></span>
+                        </span>
+                        <span  style="color:lightskyblue;">
+                            &#9632;&#xfe0e; <span th:text="${grp.totalPredictionCount}" style="color:black;"></span>
+                        </span>
+                    </span>
+                </div>
+
+                <!--/* Categories list */-->
+                <div class="cg-categories">
+                    <a th:if="${grp.categories.size == 0}"
+                       th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
+                       title="Add Category" style="font-family:sans-serif;">Add Category</a>
+
+                    <ul th:each="cat, iStats : ${grp.categories}">
+                        <li>
+
+                                    <a th:if="${!cat.archived}"
+                                       style="display: inline-block; white-space: normal; color: white; background-color: rgba(99, 99, 255, 0.60); box-shadow:0 2px 6px rgba(0,0,0,0.8);"
+                                        th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
+                                        th:text="${cat.name}"></a>
+
+                                    <span th:if="${cat.archived}"
+                                          style="display: inline-block; white-space: normal; text-decoration:line-through dashed; background-color: rgba(128, 128, 128, 0.20)"
+
+                                          title="This category is archived. Some pages appear after removing the archive option from the category settings."
+                                          >
+                                        <span th:text="${cat.name}" style="color: black; "></span>
+                                    </span>
+
+                                <!--/* Sayısal değerler (parantez + semboller) */-->
+                                <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0 || cat.predictionCount > 0}"
+                                      style="background-color: rgba(255, 255, 255, 0.50);">
+                                    (
+
+                                    <span class="blink_me"
+                                          th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
+                                          th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
+                                          hx-target="#warningModal .modal-body"
+                                          hx-trigger="click"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#warningModal">
+                                        ⚠ <span th:text="${cat.warningCount}" style="color:black;"></span>
+                                          <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0 or cat.predictionCount > 0}"
+                                                style="color:black;">, </span>
+                                    </span>
+
+
+                                    <!--/* https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI*/-->
+                                    <!--/* mesela 🔜 mor renkli. Ama renksiz veya farkli renkte kullanmak icin &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  */-->
+                                    <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray; cursor:pointer;"
+                                          th:attr="hx-get=@{/entries/neutrals/category/{id}(id=${cat.id})}"
+                                          hx-target="#neutralModal .modal-body"
+                                          hx-trigger="click"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#neutralModal">
+                                        &#128284;&#xfe0e;
+                                        <span th:text="${cat.futureNotMarked}" style="color:black;"></span>
+                                        <span th:if="${cat.todayDone > 0 or cat.predictionCount >0}" style="color:black;">, </span>
+                                    </span>
+
+
+                                    <span th:if="${cat.todayDone > 0}" style="color:darkgreen; cursor:pointer;"
+                                          th:attr="hx-get=@{/entries/dones/category/{id}(id=${cat.id})}"
+                                          hx-target="#doneModal .modal-body"
+                                          hx-trigger="click"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#doneModal"
+                                    >✅ <span th:text="${cat.todayDone}" style="color:black;"></span>
+                                         <span th:if="${cat.predictionCount > 0}" style="color:black;">, </span>
+                                    </span>
+
+
+                                    <!--/* https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI*/-->
+                                    <!--/* https://www.unicodepedia.com/unicode/geometric-shapes/25a0/black-square/ ■ */-->
+                                    <span th:if="${cat.predictionCount > 0}" style="color:lightskyblue; cursor:pointer;"
+                                          th:attr="hx-get=@{/entries/predictions/category/{id}(id=${cat.id})}"
+                                          hx-target="#predictionModal .modal-body"
+                                          hx-trigger="click"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#predictionModal"
+                                    >&#9632;&#xfe0e; <span th:text="${cat.predictionCount}" style="color:black;"></span>
+                                    </span>
+
+                                    )
+
+
+                                </span>
+
+
+
+
+                                      <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
+                                         th:title="${cat.name} + ' [click to edit this category]' "
+                                      >✎</a>
+
+                        </li>
+                    </ul>
+
+                </div>
             </div>
         </div>
 
-        <!--/* Move buttons */-->
-        <div class="cg-move">
-            <a href="#" class="move-up" title="Move Up"
-               style="">⬆️</a>
-            <a href="#" class="move-down" title="Move Down"
-               style="">⬇️️</a>
-            <span style="background-color: rgba(255, 255, 255, 0.50);">
-                <span  style="color:red;">
-                    ⚠ <span th:text="${grp.totalWarningCount}" style="color:black;"></span>
-                </span>
-                <span  style="color:darkgray;">
-                    &#128284;&#xfe0e; <span th:text="${grp.totalFutureNotMarked}" style="color:black;"></span>
-                </span>
-                <span  style="color:darkgreen;">
-                    ✅ <span th:text="${grp.totalTodayDone}" style="color:black;"></span>
-                </span>
-                <span  style="color:lightskyblue;">
-                    &#9632;&#xfe0e; <span th:text="${grp.totalPredictionCount}" style="color:black;"></span>
-                </span>
-            </span>
-        </div>
-
-        <!--/* Categories list */-->
-        <div class="cg-categories">
-            <a th:if="${grp.categories.size == 0}"
-               th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
-               title="Add Category" style="font-family:sans-serif;">Add Category</a>
-
-            <ul th:each="cat, iStats : ${grp.categories}">
-                <li>
-
-                            <a th:if="${!cat.archived}"
-                               style="display: inline-block; white-space: normal; color: white; background-color: rgba(99, 99, 255, 0.60); box-shadow:0 2px 6px rgba(0,0,0,0.8);"
-                                th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
-                                th:text="${cat.name}"></a>
-
-                            <span th:if="${cat.archived}"
-                                  style="display: inline-block; white-space: normal; text-decoration:line-through dashed; background-color: rgba(128, 128, 128, 0.20)"
-
-                                  title="This category is archived. Some pages appear after removing the archive option from the category settings."
-                                  >
-                                <span th:text="${cat.name}" style="color: black; "></span>
-                            </span>
-
-                        <!--/* Sayısal değerler (parantez + semboller) */-->
-                        <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0 || cat.predictionCount > 0}"
-                              style="background-color: rgba(255, 255, 255, 0.50);">
-                            (
-
-                            <span class="blink_me"
-                                  th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
-                                  hx-target="#warningModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#warningModal">
-                                ⚠ <span th:text="${cat.warningCount}" style="color:black;"></span>
-                                  <span th:if="${cat.futureNotMarked > 0 or cat.todayDone > 0 or cat.predictionCount > 0}"
-                                        style="color:black;">, </span>
-                            </span>
-
-
-                            <!--/* https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI*/-->
-                            <!--/* mesela 🔜 mor renkli. Ama renksiz veya farkli renkte kullanmak icin &#128284; olarak yazdiktan sonra(mor), sagina &#xfe0e; yazarsan renksiz olur ve stil color ile renklendirilebilir. Asagida kullandim.  */-->
-                            <span th:if="${cat.futureNotMarked > 0}" style="color:darkgray; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/neutrals/category/{id}(id=${cat.id})}"
-                                  hx-target="#neutralModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#neutralModal">
-                                &#128284;&#xfe0e;
-                                <span th:text="${cat.futureNotMarked}" style="color:black;"></span>
-                                <span th:if="${cat.todayDone > 0 or cat.predictionCount >0}" style="color:black;">, </span>
-                            </span>
-
-
-                            <span th:if="${cat.todayDone > 0}" style="color:darkgreen; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/dones/category/{id}(id=${cat.id})}"
-                                  hx-target="#doneModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#doneModal"
-                            >✅ <span th:text="${cat.todayDone}" style="color:black;"></span>
-                                 <span th:if="${cat.predictionCount > 0}" style="color:black;">, </span>
-                            </span>
-
-
-                            <!--/* https://stackoverflow.com/questions/42598497/how-to-change-the-color-of-a-unicode-character ONEMLI BILGI*/-->
-                            <!--/* https://www.unicodepedia.com/unicode/geometric-shapes/25a0/black-square/ ■ */-->
-                            <span th:if="${cat.predictionCount > 0}" style="color:lightskyblue; cursor:pointer;"
-                                  th:attr="hx-get=@{/entries/predictions/category/{id}(id=${cat.id})}"
-                                  hx-target="#predictionModal .modal-body"
-                                  hx-trigger="click"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#predictionModal"
-                            >&#9632;&#xfe0e; <span th:text="${cat.predictionCount}" style="color:black;"></span>
-                            </span>
-
-                            )
-
-
-                        </span>
-
-
-
-
-                              <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categorygroups')}"
-                                 th:title="${cat.name} + ' [click to edit this category]' "
-                              >✎</a>
-
-                </li>
-            </ul>
-
-        </div>
     </div>
-</div>
-
 </div>
 
 
