@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.controller;
 
+import com.turkerozturk.dtt.dto.EntryDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import com.turkerozturk.dtt.entity.Entry;
@@ -29,6 +30,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Pivot veri taşıyıcı:
@@ -42,7 +44,8 @@ import java.util.Map;
 public class PivotData {
     private List<LocalDate> dateRange;
     private List<Topic> topicList;  // İsim değişikliği
-    private Map<Long, Map<LocalDate, List<Entry>>> pivotMap;
+    // private Map<Long, Map<LocalDate, List<Entry>>> pivotMap;
+    private Map<Long, Map<LocalDate, List<EntryDto>>> pivotMapDto;
     private Map<Long, Integer> topicEntryCount;
     private Map<Long, Integer> status1Counts;  // Her topic için toplam status=1 sayısı
 
@@ -52,7 +55,8 @@ public class PivotData {
                      Map<Long, Integer> topicEntryCount) {
         this.dateRange = dateRange;
         this.topicList = topicList;
-        this.pivotMap = pivotMap;
+        //this.pivotMap = pivotMap;
+        this.pivotMapDto = getPivotMapDto(pivotMap);
         this.topicEntryCount = topicEntryCount;
         this.status1Counts = calculateStatus1Counts(pivotMap);
     }
@@ -72,6 +76,28 @@ public class PivotData {
         });
 
         return counts;
+    }
+
+    private Map<Long, Map<LocalDate, List<EntryDto>>> getPivotMapDto(Map<Long, Map<LocalDate, List<Entry>>> pivotMap) {
+        Map<Long, Map<LocalDate, List<EntryDto>>> pivotMapDto =
+                pivotMap.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                outerEntry -> outerEntry.getValue().entrySet().stream()
+                                        .collect(Collectors.toMap(
+                                                Map.Entry::getKey,
+                                                innerEntry -> innerEntry.getValue().stream()
+                                                        .map(entry -> new EntryDto(
+                                                                entry.getId(),
+                                                                entry.getStatus(),
+                                                                entry.getNote() != null
+                                                                        && entry.getNote().getContent() != null
+                                                                        && !entry.getNote().getContent().isBlank()
+                                                        ))
+                                                        .collect(Collectors.toList())
+                                        ))
+                        ));
+        return pivotMapDto;
     }
 
     // Getter'lar

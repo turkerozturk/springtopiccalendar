@@ -1119,7 +1119,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!--/* pivotData.dateRange kadar hücre */-->
 
             <th:block th:each="day : ${pivotData.dateRange}"
-                      th:with="entriesForDay=${pivotData.pivotMap[topic.id].get(day)}">
+                      th:with="entriesForDay=${pivotData.pivotMapDto[topic.id].get(day)}">
 
                 <!--/* 1) Var olan (status!=3) entry’leri link şeklinde göster */-->
                 <th:block th:if="${entriesForDay != null}">
@@ -1140,16 +1140,15 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
                         >
 
-                            <th:block th:if="${not #strings.isEmpty(entryItem.note.content)}">
-                    <span th:title="${entryItem.note.content}"
-                          class="entry-with-content">
-                        <i class="fa-brands fa-readme" style="color: blue;"></i>
-                    </span>
+                            <th:block th:if="${entryItem.hasNote}">
+                                <span class="entry-with-content" th:title="${'Entry ID: ' + entryItem.id}">
+                                    <i class="fa-brands fa-readme" style="color: blue;"></i>
+                                </span>
                             </th:block>
-                            <th:block th:if="${#strings.isEmpty(entryItem.note.content)}">
-                    <span th:title="${'Entry ' + entryItem.id}">
-                        &nbsp;
-                    </span>
+                            <th:block th:if="${not entryItem.hasNote}">
+                                <span th:title="${'Entry ID: ' + entryItem.id}">
+                                    &nbsp;
+                                </span>
                             </th:block>
                         </span>
                         <br/>

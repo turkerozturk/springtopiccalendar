@@ -166,7 +166,7 @@ public class EntryFilterController {
 
         model.addAttribute("filterDto", filterDto);
         if(reportType.equals("normal")) {
-            model.addAttribute("entries", filteredEntries);  // Normal tablo
+           // TODO bunun Thymeleaf kodlarini da kaldir model.addAttribute("entries", filteredEntries);  // Normal tablo
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
