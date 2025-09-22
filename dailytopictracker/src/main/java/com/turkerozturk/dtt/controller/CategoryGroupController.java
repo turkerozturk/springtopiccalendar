@@ -231,25 +231,26 @@ public class CategoryGroupController {
     }
 
     // codes below are related with topic images
-    private static final String TOPIC_IMAGES_DIR = "topicimages";
+    @Value("${images.dir:topicimages}")
+    private String imagesDir;
 
     private static final List<String> SUPPORTED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".gif", ".svg");
 
-    public void ensureTopicImagesDirectoryExists() {
-        File dir = new File(TOPIC_IMAGES_DIR);
+    public void ensureImagesDirectoryExists() {
+        File dir = new File(imagesDir);
         if (!dir.exists()) {
             dir.mkdirs();
         }
     }
 
     public List<String> collectImagePaths() {
-        ensureTopicImagesDirectoryExists();
+        ensureImagesDirectoryExists();
 
         List<String> result = new ArrayList<>();
         result.add(""); // default secenek bos olmasi yani resim istemiyorum secenegi.
         //result.add("/images/default.png");
 
-        File baseDir = new File(TOPIC_IMAGES_DIR);
+        File baseDir = new File(imagesDir);
         collectRecursive(baseDir, result, baseDir.getAbsolutePath());
 
         // necessary to remove eduplicates
