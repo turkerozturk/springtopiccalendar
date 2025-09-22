@@ -28,8 +28,10 @@ import com.turkerozturk.dtt.dto.statistics.OverallStatisticsDTO;
 import com.turkerozturk.dtt.dto.statistics.StreaksDTO;
 import com.turkerozturk.dtt.dto.statistics.SuccessStatisticsDTO;
 import com.turkerozturk.dtt.dto.statistics.WeeklyViewDTO;
+import com.turkerozturk.dtt.entity.*;
 import com.turkerozturk.dtt.helper.OccurrenceParser;
 import com.turkerozturk.dtt.helper.SuccessAnalyzer;
+import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -43,10 +45,6 @@ import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.Streak;
 import com.turkerozturk.dtt.dto.TopicDto;
 import com.turkerozturk.dtt.dto.TopicEntrySummaryDTO;
-import com.turkerozturk.dtt.entity.Category;
-import com.turkerozturk.dtt.entity.Entry;
-import com.turkerozturk.dtt.entity.Note;
-import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.DateUtils;
 import com.turkerozturk.dtt.repository.CategoryRepository;
 import com.turkerozturk.dtt.repository.EntryRepository;
@@ -81,6 +79,8 @@ public class EntryController {
     private final TopicService topicService;
 
     private final CategoryRepository categoryRepository;
+    private final CategoryGroupRepository categoryGroupRepository;
+
 
     private final MarkdownService markdownService;
 
@@ -88,7 +88,7 @@ public class EntryController {
     private String startDayOfWeek;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository, MarkdownService markdownService) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository, CategoryGroupRepository categoryGroupRepository, MarkdownService markdownService) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.filterService = entryService;
@@ -96,6 +96,7 @@ public class EntryController {
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.categoryRepository = categoryRepository;
+        this.categoryGroupRepository = categoryGroupRepository;
         this.markdownService = markdownService;
     }
 
@@ -1654,11 +1655,49 @@ public class EntryController {
         return "view-entry-summary/entry-summary";
     }
 
+    @GetMapping("/warnings/category-group/{id}")
+    public String getTotalWarningsByCategoryGroup(@PathVariable("id") Long categoryGroupId, Model model) {
+
+        CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<Entry> warningEntriesTotal = new ArrayList<>();
+        for(Category cat : categoryGroup.getCategories()) {
+
+            List<Entry> warningEntries = entryService.findWarningsByCategory(cat.getId());
+            warningEntriesTotal.addAll(warningEntries);
+        }
+        model.addAttribute("warningEntries", warningEntriesTotal);
+        todo:  return "fragments/fragwarningentries :: fragwarningentries";
+    }
+
     @GetMapping("/warnings/category/{id}")
     public String getWarningEntriesByCategory(@PathVariable("id") Long categoryId, Model model) {
         List<Entry> warningEntries = entryService.findWarningsByCategory(categoryId);
         model.addAttribute("warningEntries", warningEntries);
       todo:  return "fragments/fragwarningentries :: fragwarningentries";
+    }
+
+    @GetMapping("/neutrals/category-group/{id}")
+    public String getNeutralEntriesByCategoryGroup(@PathVariable("id") Long categoryGroupId, Model model) {
+
+        CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<Entry> neutralEntriesTotal = new ArrayList<>();
+        for(Category cat : categoryGroup.getCategories()) {
+            List<Entry> neutralEntries = entryService.findNeutralsByCategory(cat.getId(), dateMillisYmd);
+            neutralEntriesTotal.addAll(neutralEntries);
+
+        }
+        model.addAttribute("neutralEntries", neutralEntriesTotal);
+        todo:  return "fragments/fragneutralentries :: fragneutralentries";
     }
 
 
@@ -1674,6 +1713,25 @@ public class EntryController {
         todo:  return "fragments/fragneutralentries :: fragneutralentries";
     }
 
+    @GetMapping("/dones/category-group/{id}")
+    public String getTotalDoneEntriesByCategoryGroup(@PathVariable("id") Long categoryGroupId, Model model) {
+
+        CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<Entry> doneEntriesTotal = new ArrayList<>();
+        for(Category cat : categoryGroup.getCategories()) {
+            List<Entry> doneEntries = entryService.findDonesByCategory(cat.getId(), dateMillisYmd);
+            doneEntriesTotal.addAll(doneEntries);
+
+        }
+        model.addAttribute("doneEntries", doneEntriesTotal);
+        todo:  return "fragments/fragdoneentries :: fragdoneentries";
+    }
+
     @GetMapping("/dones/category/{id}")
     public String getDoneEntriesByCategory(@PathVariable("id") Long categoryId, Model model) {
         ZoneId zoneId = timeZoneProvider.getZoneId();
@@ -1684,6 +1742,26 @@ public class EntryController {
         List<Entry> doneEntries = entryService.findDonesByCategory(categoryId, dateMillisYmd);
         model.addAttribute("doneEntries", doneEntries);
         todo:  return "fragments/fragdoneentries :: fragdoneentries";
+    }
+
+    @GetMapping("/predictions/category-group/{id}")
+    public String getTotalPredictionsByCategoryGroup(@PathVariable("id") Long categoryGroupId, Model model) {
+
+        CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate today = LocalDate.now(zoneId);
+        long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        List<Topic> predictionTopicsTotal = new ArrayList<>();
+        for(Category cat : categoryGroup.getCategories()) {
+            List<Topic> predictionTopics = topicService.getTopicsWithPredictionDateBeforeOrEqualToday(cat.getId(), dateMillisYmd);
+
+            predictionTopicsTotal.addAll(predictionTopics);
+
+        }
+        model.addAttribute("predictionTopics", predictionTopicsTotal);
+        todo:  return "fragments/fragpredictiontopics :: fragpredictiontopics";
     }
 
     @GetMapping("/predictions/category/{id}")
