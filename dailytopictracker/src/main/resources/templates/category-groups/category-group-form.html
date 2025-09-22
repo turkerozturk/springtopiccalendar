@@ -66,6 +66,11 @@
         <th:block th:if="${imageFilePaths} != null">
 
             <div class="mb-3">
+                <label for="imageFilter" class="form-label">Filtrele:</label>
+                <input type="text" id="imageFilter" class="form-control" placeholder="Resim adı ara...">
+            </div>
+
+            <div class="mb-3">
                 <th:block th:if="${imageFilePaths.size != null && imageFilePaths.size > 0}">
                     <label for="imageFileName" class="form-label">Image File:</label>
                     <select id="imageFileName" th:field="*{imageFileName}" class="form-select" onchange="updatePreview(this)">
@@ -116,6 +121,36 @@
     }
 </script>
 
+
+<script>
+    const filterInput = document.getElementById("imageFilter");
+    const select = document.getElementById("imageFileName");
+
+    // Dil duyarlı collator (Türkçe, İngilizce gibi dilleri doğru işler)
+    const collator = new Intl.Collator('tr', { sensitivity: 'base' });
+
+    filterInput.addEventListener("input", function () {
+        const query = this.value.trim();
+        const regex = new RegExp(query.split("").join(".*"), "i");
+        // "meziyet" → /m.*e.*z.*i.*y.*e.*t/i
+
+        Array.from(select.options).forEach((opt, idx) => {
+            if (idx === 0) return; // "Select Image" sabit kalsın
+
+            const text = opt.textContent || opt.innerText;
+            if (regex.test(text)) {
+                opt.style.display = "block";
+            } else {
+                opt.style.display = "none";
+            }
+        });
+    });
+
+    function updatePreview(sel) {
+        const img = document.getElementById("imagePreview");
+        img.src = sel.value || "";
+    }
+</script>
 
 
 </body>
