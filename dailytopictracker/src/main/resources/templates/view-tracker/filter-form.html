@@ -980,8 +980,10 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <span> &nbsp;[An archived category does not have previous and next category navigation buttons.]</span>
             </th:block>
 
-            <button id="btnScreenshot" title="Take a Screenshot"><i class="fa-solid fa-camera"></i></button>
-            <button id="btnPdf" title="Download As PDF"><i class="fa-regular fa-file-pdf" style="color: black;"></i></button>
+            <button id="btnScreenshot" title="Take a Screenshot as PNG"><i class="fa-solid fa-camera"></i></button>
+            <button id="btnPdf" title="Download Screenshot As PDF"><i class="fa-regular fa-file-pdf" style="color: black;"></i></button>
+            <button id="btnPdfTable" title="Download Table As PDF"><i class="fa-regular fa-file-pdf" style="color: red;"></i></button>
+
 
         </caption>
 
@@ -2144,6 +2146,45 @@ $(document).ready(function () {
         });
     });
 </script>
+
+<script src="/webjars/jspdf-autotable/dist/jspdf.plugin.autotable.js"></script>
+
+
+<script>
+    document.getElementById("btnPdfTable").addEventListener("click", function() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        pdf.text("Pivot Table", 14, 15);
+
+        // pivot-table içeriğini al ve PDF'e dönüştür
+        pdf.autoTable({
+            html: '#pivot-table',   // HTML tablonun id’si
+            startY: 25,             // tabloyu sayfanın biraz aşağısına yerleştir
+            theme: 'grid',          // grid / strip / plain
+            headStyles: { fillColor: [22, 160, 133] },  // başlık rengi
+            styles: { fontSize: 8 }, // yazı boyutu
+            didParseCell: function (data) {
+                if (data.cell.raw) {
+                    const classes = data.cell.raw.classList;
+
+                    if (classes.contains("status-1")) {
+                        data.cell.styles.fillColor = [255, 200, 200]; // açık kırmızı
+                    }
+                    if (classes.contains("status-2")) {
+                        data.cell.styles.fillColor = [200, 255, 200]; // açık yeşil
+                    }
+                    if (classes.contains("status-3")) {
+                        data.cell.styles.fillColor = [200, 200, 255]; // açık mavi
+                    }
+                }
+            }
+        });
+
+        pdf.save("pivot-table-autotable.pdf");
+    });
+</script>
+
 
 
 </body>

@@ -368,6 +368,12 @@
             <artifactId>jspdf</artifactId>
             <version>3.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/jspdf-autotable -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>jspdf-autotable</artifactId>
+            <version>3.8.4</version>
+        </dependency>
 
 
     </dependencies>
