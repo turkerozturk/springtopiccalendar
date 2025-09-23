@@ -361,7 +361,13 @@
             <artifactId>html2canvas</artifactId>
             <version>1.4.1</version>
         </dependency>
-
+        <!-- https://github.com/parallax/jsPDF -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/jspdf -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>jspdf</artifactId>
+            <version>3.0.1</version>
+        </dependency>
 
 
     </dependencies>

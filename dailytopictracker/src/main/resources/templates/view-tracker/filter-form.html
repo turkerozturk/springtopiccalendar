@@ -981,7 +981,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </th:block>
 
             <button id="btnScreenshot" title="Take a Screenshot"><i class="fa-solid fa-camera"></i></button>
-
+            <button id="btnPdf" title="Download As PDF"><i class="fa-regular fa-file-pdf" style="color: black;"></i></button>
 
         </caption>
 
@@ -2117,6 +2117,30 @@ $(document).ready(function () {
             link.href = imgData;
             link.download = "pivot-table.png";
             link.click();
+        });
+    });
+</script>
+
+<!--/* https://github.com/parallax/jsPDF */-->
+<script type="text/javascript" th:src="@{/webjars/jspdf/dist/jspdf.umd.min.js}"></script>
+
+<!--/* <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> */-->
+
+<script>
+    document.getElementById("btnPdf").addEventListener("click", function() {
+        const table = document.getElementById("pivot-table");
+        html2canvas(table).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            // boyut ayarı
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save("pivot-table.pdf");
         });
     });
 </script>
