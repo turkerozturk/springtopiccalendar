@@ -204,8 +204,7 @@ public class TopicWebController {
                 case "topics":
                     //   return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":
-                 //   return "redirect:/entry-filter/return?categoryId=" + categoryId;
-                    return "redirect:/entry-filter/return";
+                    return "redirect:/entry-filter/return?topicId=" + topic.getId();
                 case "entries":
                     return "redirect:/entries?topicId=" + topic.getId();
                 case "reporttable":
@@ -223,7 +222,9 @@ public class TopicWebController {
 
     // Mevcut topic'i düzenleme formu
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id,
+                               @RequestParam(name = "returnPage", required = false) String returnPage,
+                               Model model) {
         Topic topic = topicService
                 .getTopicById(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found!"));
@@ -267,6 +268,7 @@ public class TopicWebController {
         model.addAttribute("imageFilePaths", imageFilePaths);
 
         model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
+        model.addAttribute("returnPage", returnPage);
 
 
         return "topics/topic-form"; // Aynı formu kullanacağız
@@ -275,7 +277,9 @@ public class TopicWebController {
     // Mevcut topic'i güncelleme
     @PostMapping("/update/{id}")
     public String updateTopic(@PathVariable Long id,
-                              @ModelAttribute("topic") Topic topic) {
+                              @RequestParam(name = "returnPage", required = false) String returnPage,
+                              @ModelAttribute("topic") Topic topic,
+                              Model model) {
         // Veritabanından topic bul
         Topic existingTopic = topicService
                 .getTopicById(id)
@@ -308,6 +312,27 @@ public class TopicWebController {
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());
+
+        model.addAttribute("returnPage", returnPage);
+
+        // Hangi sayfadan gelindiğini kontrol ediyoruz.
+        if (returnPage != null) {
+            switch (returnPage) {
+                case "home":
+                    return "redirect:/";
+                case "topics":
+                    //   return "redirect:/topics?categoryId=" + categoryId;
+                case "pivottable":
+                    return "redirect:/entry-filter/return?topicId=" + topic.getId();
+                case "entries":
+                    return "redirect:/entries?topicId=" + topic.getId();
+                case "reporttable":
+                    return "redirect:/reports/all";
+                // Eğer ileride farklı sayfalardan gelme ihtimali varsa
+                default:
+                    //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;
+            }
+        }
 
         return "redirect:/topics?categoryId=" + categoryId;
     }

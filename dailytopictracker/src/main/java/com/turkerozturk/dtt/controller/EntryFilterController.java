@@ -646,14 +646,31 @@ public class EntryFilterController {
     }
 
 
+    /**
+     *
+     * @param session
+     * @param model
+     * @param reportType
+     * @param topicId bu parametre eger yeni bir topic olusturulduysa onu filterDto ya eklemek icin
+     *                sadece. Boylece pivot tabloda yeni eklenen topic aninda gorunebiliyor.
+     * @return
+     */
     @GetMapping("/return")
     public String returnToFilterForm(HttpSession session,
                                      Model model,
-                                     @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
+                                     @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType,
+                                     @RequestParam(value = "topicId", required = false) Long topicId) {
         FilterDto filterDto = (FilterDto) session.getAttribute("currentFilterDto");
         if (filterDto == null) {
             // FilterDto yoksa mecburen sıfırdan sayfa açabilir veya entries'e gidebilirsiniz.
             return "redirect:/entries";
+        } else {
+            if(topicId != null) {
+                List<Long> topicIds = filterDto.getTopicIds();
+                topicIds.add(topicId);
+                filterDto.setTopicIds(topicIds);
+            }
+
         }
 
         // Tekrar filtre sonuçlarını oluşturup sayfaya bas

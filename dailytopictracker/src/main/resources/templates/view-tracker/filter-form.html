@@ -944,6 +944,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
         <caption>
             Pivot Table
+            <!--/* Asagidaki bloklar aslinda uzun yoldan bir cozum. Pivot tablo sadece tek topic icin olmadigi icin
+             ama simdiye kadar tek topic icin kullandigimizdan tablodaki tum topicler tek topice aitseler o zaman
+             topic edit linki olusturabilelim diye yapildi. Bunun yerine veya ek olarak her topic basliginin yanina
+             topic edit linki de koyabiliriz.
+             */-->
 
             <th:block th:if="${selectedCategory != null && !selectedCategory.archived}">
 
@@ -1221,7 +1226,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                       + ' (every ' + topic.someTimeLater + ' days)'}"
                             class="right-frozen-prediction  prevent-select status-3"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
-                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}">🔥🔥️</a>
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}">🔥🔥️</a>
                         </td>
                     </th:block>
 
@@ -1233,7 +1238,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                             class="right-frozen-prediction prevent-select status-3"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
-                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}"
                                style="">💧💧</a>
                         </td>
                     </th:block>
@@ -1251,7 +1256,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                             class="right-frozen-prediction prevent-select status-5"
                             style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
-                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                            <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}"
                                style="">🔔</a>
                         </td>
                     </th:block>
@@ -1267,7 +1272,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="right-frozen-prediction prevent-select status-5"
                                 style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
-                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                                <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}"
                                    style="">🔥</a>
                             </td>
                         </th:block>
@@ -1279,7 +1284,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                                         .format(topic.predictionDate.atStartOfDay(zoneId)) + ' (every ' + topic.someTimeLater + ' days)'}"
                                 class="right-frozen-prediction prevent-select status-5"
                                 style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;">
-                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                                <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}"
                                    style="">💧</a>
                             </td>
                         </th:block>
@@ -1301,7 +1306,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     style="text-align: center; white-space: nowrap; overflow: hidden; background-color: white;"
                     class="right-frozen-prediction prevent-select"
                     >
-                    <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                    <a th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}"
                        style="">ℹ️</a>
                 </td>
             </th:block>
@@ -1423,7 +1428,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             </td>
 
             <td class="right-frozen-edit prevent-select">
-                <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id})}">✎️</a>
+                <a title="Edit Topic" th:href="@{/topics/edit/{id}(id=${topic.id}, returnPage= 'pivottable')}">✎️</a>
             </td>
 
         </tr>
