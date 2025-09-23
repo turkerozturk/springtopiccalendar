@@ -353,6 +353,16 @@
         </dependency>
 
 
+        <!-- https://github.com/niklasvh/html2canvas -->
+        <!-- https://html2canvas.hertzen.com/ -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/html2canvas -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>html2canvas</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+
+
 
     </dependencies>
 

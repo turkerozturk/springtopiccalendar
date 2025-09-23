@@ -980,6 +980,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 <span> &nbsp;[An archived category does not have previous and next category navigation buttons.]</span>
             </th:block>
 
+            <button id="btnScreenshot" title="Take a Screenshot"><i class="fa-solid fa-camera"></i></button>
+
+
         </caption>
 
 
@@ -2099,6 +2102,24 @@ $(document).ready(function () {
     });
 </script>
 
+<script type="text/javascript" th:src="@{/webjars/html2canvas/dist/html2canvas.min.js}"></script>
+
+<!--/* <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script> */-->
+
+<script>
+    document.getElementById("btnScreenshot").addEventListener("click", function() {
+        const table = document.getElementById("pivot-table");
+        html2canvas(table).then(canvas => {
+            const imgData = canvas.toDataURL("image/png");
+
+            // indirme linki oluştur
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = "pivot-table.png";
+            link.click();
+        });
+    });
+</script>
 
 
 </body>
