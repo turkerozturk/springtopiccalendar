@@ -983,6 +983,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <button id="btnScreenshot" title="Take a Screenshot as PNG"><i class="fa-solid fa-camera"></i></button>
             <button id="btnPdf" title="Download Screenshot As PDF"><i class="fa-regular fa-file-pdf" style="color: black;"></i></button>
             <button id="btnPdfTable" title="Download Table As PDF"><i class="fa-regular fa-file-pdf" style="color: red;"></i></button>
+            <button id="btnExcel" title="Download As Spreadsheet"><i class="fa-solid fa-file-excel"></i></button>
 
 
         </caption>
@@ -2182,6 +2183,25 @@ $(document).ready(function () {
         });
 
         pdf.save("pivot-table-autotable.pdf");
+    });
+</script>
+
+<!--/* https://github.com/SheetJS/sheetjs https://docs.sheetjs.com/
+new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
+<script src="/webjars/xlsx/dist/xlsx.full.min.js"></script>
+
+<!--/* <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> */-->
+
+<script>
+    document.getElementById("btnExcel").addEventListener("click", function () {
+        // pivot-table elementini seç
+        var table = document.getElementById("pivot-table");
+
+        // HTML tablodan worksheet oluştur
+        var wb = XLSX.utils.table_to_book(table, { sheet: "PivotTable" });
+
+        // Dosyayı indir
+        XLSX.writeFile(wb, "pivot-table.xlsx");
     });
 </script>
 

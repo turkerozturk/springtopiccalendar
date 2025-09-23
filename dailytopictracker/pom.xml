@@ -374,6 +374,13 @@
             <artifactId>jspdf-autotable</artifactId>
             <version>3.8.4</version>
         </dependency>
+        <!-- https://github.com/SheetJS/sheetjs -->
+        <!-- https://mvnrepository.com/artifact/org.webjars.npm/xlsx -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>xlsx</artifactId>
+            <version>0.18.5</version>
+        </dependency>
 
 
     </dependencies>
