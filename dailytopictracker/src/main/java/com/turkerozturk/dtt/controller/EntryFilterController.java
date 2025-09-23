@@ -131,7 +131,19 @@ public class EntryFilterController {
                 filterDto.setCategoryGroupId(categoryOpt.get().getCategoryGroup().getId());
             }
         } else {
+
             List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+            Locale locale = Locale.forLanguageTag(appLocale);
+            Collator collator = Collator.getInstance(locale);
+            collator.setStrength(Collator.PRIMARY);
+            cats.sort(
+                    Comparator.comparing(
+                                    (Category c) -> c.getCategoryGroup().getPriority(),
+                                    Comparator.reverseOrder() // DESC
+                            )
+                            .thenComparing(Category::getName, collator) // alfabetik
+            );
+
             if (!cats.isEmpty()) {
                 categoryId = cats.get(0).getId();
                 filterDto.setCategoryId(categoryId);
@@ -186,7 +198,18 @@ public class EntryFilterController {
 
         model.addAttribute("allTopics", topicRepository.findAll());
 
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
         if(categoryId != null) {
             model.addAttribute("topicsForSelectedCategory",
                     topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
@@ -268,7 +291,20 @@ public class EntryFilterController {
                                               HttpSession session,
                                               @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+
+            List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+            Locale locale = Locale.forLanguageTag(appLocale);
+            Collator collator = Collator.getInstance(locale);
+            collator.setStrength(Collator.PRIMARY);
+            allCategories.sort(
+                    Comparator.comparing(
+                                    (Category c) -> c.getCategoryGroup().getPriority(),
+                                    Comparator.reverseOrder() // DESC
+                            )
+                            .thenComparing(Category::getName, collator) // alfabetik
+            );
+            model.addAttribute("allCategories", allCategories);
+
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
                     topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
@@ -328,7 +364,19 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
+
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
@@ -399,7 +447,19 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
+
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
@@ -473,7 +533,19 @@ public class EntryFilterController {
         model.addAttribute("allTopics", topicRepository.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
+
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
@@ -705,7 +777,19 @@ public class EntryFilterController {
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
+
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
@@ -777,7 +861,19 @@ public class EntryFilterController {
         model.addAttribute("today", today);
         model.addAttribute("filterDto", filterDto);
 
-        model.addAttribute("allCategories", categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc());
+        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        allCategories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+        model.addAttribute("allCategories", allCategories);
+
         model.addAttribute("topicsForSelectedCategory",
                 topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
         // … gerekirse allTopics vs.
@@ -808,7 +904,19 @@ public class EntryFilterController {
                                    Model model,
                                    HttpSession session,
                                    @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
+
         List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        cats.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+
         int size = cats.size();
 
         // mevcut indexi bul
@@ -842,8 +950,18 @@ public class EntryFilterController {
                                HttpSession session,
                                @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
-
         List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        cats.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+
         int size = cats.size();
 
         Long current = filterDto.getCategoryId();
