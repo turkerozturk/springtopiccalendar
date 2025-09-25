@@ -75,6 +75,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   padding: 10px;
   border-bottom: 1px solid #ccc;
     border-radius: 6px;
+              border: 5px solid black ;
+
 }
 
 .cg-left img {
@@ -102,6 +104,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 .cg-name {
   flex-grow: 1;
   font-size: 1rem;
+  font-family: Arial, sans-serif; /* turkerrr */
 }
 
 .cg-actions a {
@@ -134,7 +137,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
        .cg-right,
        .cg-categories {
-          background-color: rgba(255, 255, 255, 0.30) ;
+          background-color: rgba(255, 255, 0, 0.05) ;
        }
 
 
@@ -184,6 +187,15 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
         opacity: 0;
         }
         }
+
+         .warning_border {
+
+        border-color: black ;
+        border-style: dashed;
+        }
+
+
+
 
    </style>
 
@@ -235,6 +247,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
              th:each="grp, jStats : ${groups}"
              th:attr="data-id=${grp.id}"
              th:style="${'background-color:' + grp.backgroundColor}"
+             th:classappend="${grp.totalWarningCount > 0} ? ' warning_border' : ''"
              >
 
             <!--/* Sol sütun */-->
@@ -294,7 +307,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
 
                         <span
-                              style="color:red; font-weight:bold; cursor:pointer;"
+                              style="color:red; font-weight:normal; cursor:pointer;"
                               th:attr="hx-get=@{/entries/warnings/category-group/{id}(id=${grp.id})}"
                               hx-target="#warningModal .modal-body"
                               hx-trigger="click"
@@ -355,7 +368,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                             >✎</a>
 
                                     <a th:if="${!cat.archived}"
-                                       style="display: inline-block; white-space: normal; color: white; background-color: rgba(99, 99, 255, 0.60); box-shadow:0 2px 6px rgba(0,0,0,0.8);"
+                                  style="display: inline-block; white-space: normal; color: white; background-color: rgba(25, 25, 112, 0.60); box-shadow:0 2px 6px rgba(0,0,0,0.8);"
                                         th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}">
 
                                         <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>
@@ -373,11 +386,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
                                 <!--/* Sayısal değerler (parantez + semboller) */-->
                                 <span th:if="${cat.warningCount > 0 || cat.futureNotMarked > 0 || cat.todayDone > 0 || cat.predictionCount > 0}"
-                                      style="background-color: rgba(255, 255, 255, 0.50);">
+                                      style="background-color: rgba(255, 255, 255, 0.50); border: 1px solid black;">
                                     (
 
-                                    <span class="blink_me"
-                                          th:if="${cat.warningCount > 0}" style="color:red; font-weight:bold; cursor:pointer;"
+                                    <span
+                                          th:if="${cat.warningCount > 0}" style="color:red; font-weight:normal; cursor:pointer;"
                                           th:attr="hx-get=@{/entries/warnings/category/{id}(id=${cat.id})}"
                                           hx-target="#warningModal .modal-body"
                                           hx-trigger="click"
