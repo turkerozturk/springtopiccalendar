@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.controlleradvice;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,6 +31,9 @@ import com.turkerozturk.dtt.repository.TopicRepository;
 
 @ControllerAdvice
 public class GlobalModelAttributes {
+
+    @Value("${html.background.color:linen}")
+    private String htmlBackgroundColor;
 
     private final CategoryGroupRepository categoryGroupRepository;
     private final CategoryRepository categoryRepository;
@@ -52,6 +56,8 @@ public class GlobalModelAttributes {
         model.addAttribute("hasCategories", categoryRepository.count() > 0);
         model.addAttribute("hasTopics", topicRepository.count() > 0);
         model.addAttribute("hasEntries", entryRepository.count() > 0);
+
+        model.addAttribute("htmlBackgroundColor", htmlBackgroundColor);
     }
 }
 
