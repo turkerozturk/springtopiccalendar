@@ -23,6 +23,7 @@ package com.turkerozturk.dtt.controller.web;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
+import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.EntryService;
 import com.turkerozturk.dtt.service.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +140,8 @@ public class IndexController {
 
         int totalCount = 0;
 
+        int totalWeight = 0;
+
         for (Category c : categories) {
             List<Entry> doneEntries = entryService.findDonesByCategory(c.getId(), dateMillisYmd);
 
@@ -155,8 +158,23 @@ public class IndexController {
                 counts.add(weightedEntries.size());
                 ids.add(c.getId());
                 totalCount += weightedEntries.size();
+                for(Entry entry : weightedEntries) {
+
+                    Topic topic = entry.getTopic();
+                    if(topic.getWeight() > 0) {
+                        totalWeight += topic.getWeight();
+
+                      //  System.out.println(topic.getWeight() + "\t" + modelPrefix + "\t" + topic.getName());
+                    }
+                }
+
+
             }
+
         }
+
+        model.addAttribute(modelPrefix + "TotalWeight", totalWeight);
+        //System.out.println(modelPrefix + "TotalWeight: "+ totalWeight);
 
         model.addAttribute(modelPrefix + "CategoryLabels", labels);
         model.addAttribute(modelPrefix + "CategoryCounts", counts);

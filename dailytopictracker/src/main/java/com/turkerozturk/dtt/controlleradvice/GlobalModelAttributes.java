@@ -35,6 +35,9 @@ public class GlobalModelAttributes {
     @Value("${html.background.color:linen}")
     private String htmlBackgroundColor;
 
+    @Value("${daily.goal.score:100}")
+    private int dailyGoalScore;
+
     private final CategoryGroupRepository categoryGroupRepository;
     private final CategoryRepository categoryRepository;
     private final TopicRepository topicRepository;
@@ -58,6 +61,7 @@ public class GlobalModelAttributes {
         model.addAttribute("hasEntries", entryRepository.count() > 0);
 
         model.addAttribute("htmlBackgroundColor", htmlBackgroundColor);
+        model.addAttribute("dailyGoalScore", dailyGoalScore);
     }
 }
 
