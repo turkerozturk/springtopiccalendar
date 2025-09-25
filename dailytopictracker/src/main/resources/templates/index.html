@@ -20,6 +20,11 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
     <style>
 
         body {
@@ -420,7 +425,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
     <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
 
 
-<div class="row my-2" >
+
 
     <!--/* https://rgbacolorpicker.com/ */-->
 
@@ -428,185 +433,34 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
 
-    <!--/* chartjs radar today */-->
-    <div th:if="${not #lists.isEmpty(todayCategoryLabels)}"
-         class="col-4"
-         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
-        You collected <span th:text="${todayTotalWeight}" style="color: darkgreen; font-weight: bold;"></span> points.&nbsp;
-        Remaining points: <span th:text="${dailyGoalScore - todayTotalWeight}" style="color: darkred; font-weight: bold;"></span>.
-        <br>
-        <span th:text="${'Today, ' + todayCategoryTotalCount + ' entries in ' + todayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
-        <div style="background-color:white; width: 300px; height: 300px; margin-left:auto; margin-right:auto;">
-            <canvas id="radarChartToday"></canvas>
+    <!--/* chartjs radar with bootstrap datepicker */-->
+    <div class="container my-2" style="max-width: 600px;">
+        <div class="col-4" style="background-color:white; width: 450px; margin:auto;">
 
-            <script th:inline="javascript">
-                /*<![CDATA[*/
-                var radarLabels = [[${todayCategoryLabels}]];
-                var radarData = [[${todayCategoryCounts}]];
 
-                var ctx = document.getElementById('radarChartToday').getContext('2d');
-                var radarChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: radarLabels,
-                        datasets: [{
-                            /* label: 'Completed Entries by Category', */
-                            data: radarData,
-                            fill: true,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                pointLabels: {
-                                    display: false
-                                },
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                /*]]>*/
-            </script>
-        </div>
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+
+
+            <div id="chartInfo" class="mb-2" style="text-align:center;"></div>
+            <div style="width: 300px; height: 300px; margin:auto;">
+                <canvas id="radarChart"></canvas>
+            </div>
+
+            <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+                The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+            </div>
         </div>
     </div>
 
-
-
-
-    <!--/* chartjs radar yesterday */-->
-    <div th:if="${not #lists.isEmpty(yesterdayCategoryLabels)}"
-         class="col-4"
-         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
-        You collected <span th:text="${yesterdayTotalWeight}" style="color: darkgreen; font-weight: bold;"></span> points.&nbsp;
-        Remaining points: <span th:text="${dailyGoalScore - yesterdayTotalWeight}" style="color: darkred; font-weight: bold;"></span>.
-        <br>
-        <span th:text="${'Yesterday, ' + yesterdayCategoryTotalCount + ' entries in ' + yesterdayCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
-        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
-
-            <canvas id="radarChartYesterday"></canvas>
-
-            <script th:inline="javascript">
-                /*<![CDATA[*/
-                var radarLabels = [[${yesterdayCategoryLabels}]];
-                var radarData = [[${yesterdayCategoryCounts}]];
-
-                var ctx = document.getElementById('radarChartYesterday').getContext('2d');
-                var radarChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: radarLabels,
-                        datasets: [{
-                            label: 'Completed Entries by Category',
-                            data: radarData,
-                            fill: true,
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                            borderColor: 'rgba(0, 0, 0, 1)',
-                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                pointLabels: {
-                                    display: false
-                                },
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                /*]]>*/
-            </script>
-        </div>
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
-        </div>
-    </div>
-
-
-    <!--/* chartjs radar two days ago */-->
-    <div th:if="${not #lists.isEmpty(twoDaysAgoCategoryLabels)}"
-         class="col-4"
-         style="background-color:white; width: 450px; margin-left:auto; margin-right:auto;">
-        You collected <span th:text="${twoDaysAgoTotalWeight}" style="color: darkgreen; font-weight: bold;"></span> points.&nbsp;
-        Remaining points: <span th:text="${dailyGoalScore - twoDaysAgoTotalWeight}" style="color: darkred; font-weight: bold;"></span>.
-        <span th:text="${'Two Days Ago, ' + twoDaysAgoCategoryTotalCount + ' entries in ' + twoDaysAgoCategoryTotalCategories + ' categories are marked as done.'}" style="text-align:center;"></span>
-        <div style="background-color:white; width: 250px; height: 250px; margin-left:auto; margin-right:auto;">
-
-            <canvas id="radarChartTwoDaysAgo"></canvas>
-
-            <script th:inline="javascript">
-                /*<![CDATA[*/
-                var radarLabels = [[${twoDaysAgoCategoryLabels}]];
-                var radarData = [[${twoDaysAgoCategoryCounts}]];
-
-                var ctx = document.getElementById('radarChartTwoDaysAgo').getContext('2d');
-                var radarChart = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: radarLabels,
-                        datasets: [{
-                            label: 'Completed Entries by Category',
-                            data: radarData,
-                            fill: true,
-                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                            borderColor: 'rgba(0, 0, 0, 1)',
-                            pointBackgroundColor: 'rgba(0, 0, 0, 1)'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            r: {
-                                beginAtZero: true,
-                                pointLabels: {
-                                    display: false
-                                },
-                                ticks: {
-                                    stepSize: 1,
-                                    precision: 0
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                /*]]>*/
-            </script>
-        </div>
-        <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
-            The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+    <div class="container mb-5" id="chartDateContainer" style="max-width: 400px; background-color:floralwhite;">
+        <div class="input-group chartDateStyle date">
+            <label for="chartDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
+            <input type="text" id="chartDatePicker"
+                   class="form-control form-control-sm"/>
+            <span class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="far fa-calendar" aria-hidden="true"></i>
+                </button>
+            </span>
         </div>
     </div>
 
@@ -615,10 +469,76 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
 
-</div>
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+
+<script>
+    let radarChart;
+
+    function loadRadarChart(date) {
+        $.getJSON("/api/charts/radar", {date: date}, function (data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+
+            if (radarChart) {
+                radarChart.destroy();
+            }
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: data.categoryLabels,
+                    datasets: [{
+                        data: data.categoryCounts,
+                        fill: true,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            pointLabels: {display: false},
+                            ticks: {stepSize: 1, precision: 0}
+                        }
+                    },
+                    plugins: {legend: {display: false}}
+                }
+            });
+
+            $("#chartInfo").html(
+                "You collected <b style='color:darkgreen'>" + data.totalWeight + " / " + [[${dailyGoalScore}]] + "</b> points."
+                + "<br> Entries: " + data.categoryTotalCount
+                + " | Categories: " + data.categoryTotalCategories
+            );
+        });
+    }
+
+    // sayfa ilk açıldığında bugünün tarihi ile yükle
+    $(function () {
+        const today = new Date().toISOString().slice(0, 10);
+        loadRadarChart(today);
+
+        $('#chartDateContainer .chartDateStyle.date').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            daysOfWeekHighlighted: "0,6",
+            autoclose: true,
+            todayHighlight: true
+        }).on("changeDate", function (e) {
+            loadRadarChart(e.format(0, "yyyy-mm-dd"));
+        });
+    });
+</script>
+
+
 
 </body>
 </html>

@@ -64,11 +64,7 @@ public class IndexController {
     @Autowired
     EntryRepository entryRepository;
 
-    @Autowired
-    TopicService topicService;
 
-    @Autowired
-    EntryService entryService;
 
     @GetMapping
     public String homePage(Model model) {
@@ -111,78 +107,11 @@ public class IndexController {
         model.addAttribute("entriesCount", entryRepository.count());
 
 
-        LocalDate today = LocalDate.now();
-        prepareCategoryPieChartForDate(today, zoneId, model, "today");
 
-        LocalDate yesterday = today.minusDays(1);
-        prepareCategoryPieChartForDate(yesterday, zoneId, model, "yesterday");
 
-        LocalDate twoDaysAgo = today.minusDays(2);
-        prepareCategoryPieChartForDate(twoDaysAgo, zoneId, model, "twoDaysAgo");
 
         return "index";
     }
-
-
-
-    public void prepareCategoryPieChartForDate(
-            LocalDate aDay,
-            ZoneId zoneId,
-            Model model,
-            String modelPrefix
-    ) {
-        long dateMillisYmd = aDay.atStartOfDay(zoneId).toInstant().toEpochMilli();
-
-        List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        List<String> labels = new ArrayList<>();
-        List<Integer> counts = new ArrayList<>();
-        List<Long> ids = new ArrayList<>();
-
-        int totalCount = 0;
-
-        int totalWeight = 0;
-
-        for (Category c : categories) {
-            List<Entry> doneEntries = entryService.findDonesByCategory(c.getId(), dateMillisYmd);
-
-            List<Entry> weightedEntries = new ArrayList<>();
-            for(Entry e : doneEntries) {
-                if(e.getTopic().getWeight() >= 0) {
-                    weightedEntries.add(e);
-                }
-            }
-
-
-            if (!weightedEntries.isEmpty()) {
-                labels.add(c.getName());
-                counts.add(weightedEntries.size());
-                ids.add(c.getId());
-                totalCount += weightedEntries.size();
-                for(Entry entry : weightedEntries) {
-
-                    Topic topic = entry.getTopic();
-                    if(topic.getWeight() > 0) {
-                        totalWeight += topic.getWeight();
-
-                      //  System.out.println(topic.getWeight() + "\t" + modelPrefix + "\t" + topic.getName());
-                    }
-                }
-
-
-            }
-
-        }
-
-        model.addAttribute(modelPrefix + "TotalWeight", totalWeight);
-        //System.out.println(modelPrefix + "TotalWeight: "+ totalWeight);
-
-        model.addAttribute(modelPrefix + "CategoryLabels", labels);
-        model.addAttribute(modelPrefix + "CategoryCounts", counts);
-        model.addAttribute(modelPrefix + "CategoryIds", ids);
-        model.addAttribute(modelPrefix + "CategoryTotalCount", totalCount);
-        model.addAttribute(modelPrefix + "CategoryTotalCategories", labels.size());
-    }
-
 
 
 
