@@ -314,7 +314,6 @@ public class TopicWebController {
         topicService.updateTopicStatus(existingTopic.getId());
 
         model.addAttribute("returnPage", returnPage);
-
         // Hangi sayfadan gelindiğini kontrol ediyoruz.
         if (returnPage != null) {
             switch (returnPage) {
@@ -328,6 +327,9 @@ public class TopicWebController {
                     return "redirect:/entries?topicId=" + topic.getId();
                 case "reporttable":
                     return "redirect:/reports/all";
+                case "index":
+                    // anasayfadaki radar grafigin altindaki topic isimlerine tiklayarak gelmissek oraya donuyoruz.
+                    return "redirect:/";
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;

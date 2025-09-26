@@ -71,7 +71,14 @@ public class ChartRestController {
                     reportForNegativeWeight.append("<div style='text-align: left;'>");
                     reportForNegativeWeight.append(topic.getWeight());
                     reportForNegativeWeight.append("❚");
+
+                    reportForNegativeWeight.append("<a href='/topics/edit/");
+                    reportForNegativeWeight.append(topic.getId());
+                    reportForNegativeWeight.append("?returnPage=index");
+                    reportForNegativeWeight.append("'>");
                     reportForNegativeWeight.append(topic.getName());
+                    reportForNegativeWeight.append("</a>");
+
                     reportForNegativeWeight.append("❚");
                     reportForNegativeWeight.append(topic.getCategory().getName());
                     reportForNegativeWeight.append("</div>");
@@ -96,7 +103,14 @@ public class ChartRestController {
                         reportForPositiveWeight.append("<div style='text-align: left;'>");
                         reportForPositiveWeight.append(topic.getWeight());
                         reportForPositiveWeight.append("❚");
+
+                        reportForPositiveWeight.append("<a href='/topics/edit/");
+                        reportForPositiveWeight.append(topic.getId());
+                        reportForPositiveWeight.append("?returnPage=index");
+                        reportForPositiveWeight.append("'>");
                         reportForPositiveWeight.append(topic.getName());
+                        reportForPositiveWeight.append("</a>");
+
                         reportForPositiveWeight.append("❚");
                         reportForPositiveWeight.append(topic.getCategory().getName());
                         reportForPositiveWeight.append("</div>");
@@ -104,7 +118,14 @@ public class ChartRestController {
                         reportForZeroWeight.append("<div style='text-align: left;'>");
                         reportForZeroWeight.append(topic.getWeight());
                         reportForZeroWeight.append("❚");
+
+                        reportForZeroWeight.append("<a href='/topics/edit/");
+                        reportForZeroWeight.append(topic.getId());
+                        reportForZeroWeight.append("?returnPage=index");
+                        reportForZeroWeight.append("'>");
                         reportForZeroWeight.append(topic.getName());
+                        reportForZeroWeight.append("</a>");
+
                         reportForZeroWeight.append("❚");
                         reportForZeroWeight.append(topic.getCategory().getName());
                         reportForZeroWeight.append("</div>");

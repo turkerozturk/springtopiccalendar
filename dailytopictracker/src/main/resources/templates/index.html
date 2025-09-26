@@ -434,34 +434,30 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
     <!--/* chartjs radar with bootstrap datepicker */-->
-
     <div class="container mb-0" id="chartDateContainer" style="max-width: 400px; background-color:floralwhite;">
         <div class="input-group chartDateStyle date">
             <label for="chartDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
             <input type="text" id="chartDatePicker"
                    class="form-control form-control-sm"/>
             <span class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i class="far fa-calendar" aria-hidden="true"></i>
-                    </button>
-                </span>
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="far fa-calendar" aria-hidden="true"></i>
+                </button>
+            </span>
         </div>
     </div>"
 
     <div class="container mb-3" style="max-width: 600px;">
-        <div class="col-4" style="background-color:white; width: 450px; margin:auto;">
+        <div class="mx-auto" style="background-color:white; max-width: 450px;">
 
-
-
-
-            <div style="width: 300px; height: 300px; margin:auto;">
+            <div style="max-width: 300px; height: 300px; margin:auto;">
                 <canvas id="radarChart"></canvas>
             </div>
 
-            <div id="chartInfo" class="mb-2" style="text-align:center;"></div>
+            <!--/* chartInfo icerisinde javascript ile olusturulmus html icerik var(h5, a, br, div elementleri icinde metinler). */-->
+            <div id="chartInfo" class="mb-2 text-center"></div>
 
-
-            <div style="background-color:white; color:darkgray; text-align:center; margin-left:auto; margin-right:auto;">
+            <div style="background-color:white; color:darkgray; text-align:center; margin: 0 auto;">
                 The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
             </div>
         </div>
@@ -508,9 +504,9 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                         {
                             data: data.categoryWeights,
                             fill: true,
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            pointBackgroundColor: 'rgba(153, 102, 255, 1)'
+                            backgroundColor: 'rgba(0, 102, 0, 0.2)',
+                            borderColor: 'rgba(0, 102, 0, 1)',
+                            pointBackgroundColor: 'rgba(0, 102, 0, 1)'
                         }
                     ]
                 },
@@ -529,7 +525,7 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
             $("#chartInfo").html(
                 "You collected <b style='color:darkgreen'>" + data.totalWeight + " / " + [[${dailyGoalScore}]] + "</b> points."
-                + "<br> Entries: " + data.categoryTotalCount
+                + "<br><span style='color: dodgerblue;'> Entries: <b>" + data.categoryTotalCount + "</b></span>"
                 + " | Categories: " + data.categoryTotalCategories
                 + "<br>"
                 + "<h5>Scoring Details</h5>"
