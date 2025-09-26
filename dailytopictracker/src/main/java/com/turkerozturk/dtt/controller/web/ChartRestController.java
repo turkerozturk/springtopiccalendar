@@ -37,16 +37,22 @@ public class ChartRestController {
     public Map<String, Object> getRadarChartData(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        if (date == null) {
-            date = LocalDate.now();
-        }
 
-        long dateMillisYmd = date.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        long dateMillisYmd;
+        if (date == null) {
+            dateMillisYmd = LocalDate.now().atStartOfDay(zoneId).toInstant().toEpochMilli();
+        } else {
+            dateMillisYmd = date.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        }
 
         List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
         List<String> labels = new ArrayList<>();
         List<Integer> counts = new ArrayList<>();
+        List<Integer> categoryWeights = new ArrayList<>();
         List<Long> ids = new ArrayList<>();
+        StringBuilder reportForPositiveWeight = new StringBuilder();
+        StringBuilder reportForZeroWeight = new StringBuilder();
+        StringBuilder reportForNegativeWeight = new StringBuilder();
 
         int totalCount = 0;
 
@@ -59,9 +65,20 @@ public class ChartRestController {
             for(Entry e : doneEntries) {
                 if(e.getTopic().getWeight() >= 0) {
                     weightedEntries.add(e);
+                } else {
+                    Topic topic = e.getTopic();
+
+                    reportForNegativeWeight.append("<div style='text-align: left;'>");
+                    reportForNegativeWeight.append(topic.getWeight());
+                    reportForNegativeWeight.append("❚");
+                    reportForNegativeWeight.append(topic.getName());
+                    reportForNegativeWeight.append("❚");
+                    reportForNegativeWeight.append(topic.getCategory().getName());
+                    reportForNegativeWeight.append("</div>");
                 }
             }
 
+            int categoryWeight = 0;
 
             if (!weightedEntries.isEmpty()) {
                 labels.add(c.getName());
@@ -73,10 +90,29 @@ public class ChartRestController {
                     Topic topic = entry.getTopic();
                     if(topic.getWeight() > 0) {
                         totalWeight += topic.getWeight();
+                        categoryWeight += topic.getWeight();
 
-                        //  System.out.println(topic.getWeight() + "\t" + modelPrefix + "\t" + topic.getName());
+                          //System.out.println(topic.getWeight() + "\t" +  topic.getName());
+                        reportForPositiveWeight.append("<div style='text-align: left;'>");
+                        reportForPositiveWeight.append(topic.getWeight());
+                        reportForPositiveWeight.append("❚");
+                        reportForPositiveWeight.append(topic.getName());
+                        reportForPositiveWeight.append("❚");
+                        reportForPositiveWeight.append(topic.getCategory().getName());
+                        reportForPositiveWeight.append("</div>");
+                    } else if(topic.getWeight() == 0) {
+                        reportForZeroWeight.append("<div style='text-align: left;'>");
+                        reportForZeroWeight.append(topic.getWeight());
+                        reportForZeroWeight.append("❚");
+                        reportForZeroWeight.append(topic.getName());
+                        reportForZeroWeight.append("❚");
+                        reportForZeroWeight.append(topic.getCategory().getName());
+                        reportForZeroWeight.append("</div>");
+                    } else {
+
                     }
                 }
+                categoryWeights.add(categoryWeight);
 
 
             }
@@ -89,12 +125,17 @@ public class ChartRestController {
 
         // burada senin prepareCategoryPieChartForDate() içindeki hesapları yapıyoruz
         Map<String, Object> result = new HashMap<>();
-        result.put("totalWeight", totalWeight); // örnek
+        result.put("totalWeight", totalWeight);
         result.put("categoryLabels", labels);
         result.put("categoryCounts", counts);
+        result.put("categoryWeights", categoryWeights);
         //result.put("categoryIds", ids);
         result.put("categoryTotalCount", totalCount);
         result.put("categoryTotalCategories", labels.size());
+
+        result.put("reportForPositiveWeight", reportForPositiveWeight.toString());
+        result.put("reportForZeroWeight", reportForZeroWeight.toString());
+        result.put("reportForNegativeWeight", reportForNegativeWeight.toString());
 
         return result;
     }
