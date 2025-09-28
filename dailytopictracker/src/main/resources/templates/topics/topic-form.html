@@ -445,12 +445,76 @@ WebJars path'leri şu yapıyı izler:
 </script>
 
 <script src="/webjars/easymde/2.18.0/dist/easymde.min.js"></script>
+<!--/*
+    easymde'nin toolbar ayarında nelerin görünmesi gerektiğini manuel olarak yazıyoruz
+    (dışarıdan bakıldığında default görünüm),
+    çünkü link ekleme düğmesinin işlevini kendi fonksiyonumuzla değiştirdik. Artık köşeli parantez içine alıyor.
+    Benzer şekilde image ekleme işlevini de değiştirdik. ![](image url) içine alıyor. Online resimler görünür oluyor.
+    Toolbar disindaki metod Paste event yakalar yani clipboarddan yapıştırma yapılırsa aşağıdaki
+    kurala göre işlem yapar metin üzerinde.
+    Fakat onu devredışı bıraktık çünkü image link de ekleyebiliyoruz ve onda zorluk çıkarıyor, yoksa kolaylık idi.
+    Burada yaptırdığımıza şey, yapıştırılan metin https veya http ile başlıyorsa köşe parantez ile çevrelemesi.
+    Böylece markdown link haline gelir.
+*/-->
 <script>
     var easyMDE = new EasyMDE({
         element: document.getElementById("description"),
         spellChecker: false,
-        forceSync: true  // <-- önemli: EasyMDE icerigini textarea ile senkronize eder
+        forceSync: true, // <-- onemli: EasyMDE icerigini textarea ile senkronize eder
+        toolbar: [
+            "bold", "italic", "heading",
+            "|",
+            "quote", "unordered-list", "ordered-list",
+            "|",
+            { // custom actionumuz
+                name: "link",
+                action: function customLink(editor){
+                    var cm = editor.codemirror;
+                    var selection = cm.getSelection();
+                    if (/^https?:\/\//.test(selection)) {
+                        cm.replaceSelection("<" + selection + ">");
+                    } else {
+                        cm.replaceSelection("<https://>");
+                        cm.setCursor(cm.getCursor().line, cm.getCursor().ch - 1);
+                    }
+                },
+                className: "fa fa-link",
+                title: "Insert autolink"
+            },
+            { // custom actionumuz
+                name: "image",
+                action: function customImage(editor){
+                            var cm = editor.codemirror;
+                            var selection = cm.getSelection();
+                            if (/^https?:\/\//.test(selection)) {
+                                cm.replaceSelection("![](" + selection + ")");
+                            } else {
+                                cm.replaceSelection("![](https://)");
+                                cm.setCursor(cm.getCursor().line, cm.getCursor().ch - 1);
+                            }
+                        },
+                className: "fa fa-image",
+                title: "Insert image"
+            },
+            "preview", "fullscreen",
+            "|",
+            "guide"
+        ]
     });
+
+    // Paste event yakalar fakat devredisi biraktim cunku link yerine, image link eklemek istenirse zorluk olmasin.
+    /*
+    easyMDE.codemirror.on("paste", function(cm, event) {
+        let clipboardData = (event.clipboardData || window.clipboardData);
+        let pastedText = clipboardData.getData("text");
+
+        // Eğer sadece URL yapıştırıldıysa
+        if (/^https?:\/\/[^\s]+$/.test(pastedText)) {
+            event.preventDefault();
+            cm.replaceSelection("<" + pastedText + ">");
+        }
+    });
+    */
 </script>
 
 </body>
