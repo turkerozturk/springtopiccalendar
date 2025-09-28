@@ -71,21 +71,25 @@ public class IndexController {
 
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
-        // cok iyi anlatiyor: https://www.baeldung.com/spring-boot-build-properties
-        // target/classes/META-INF/build-info.properties dosyasinda asagidaki degerler yaziyorsa burada kullanilabilir.
-        // bu dosya mvn package komutunu calistirinca olusur.
-        // pom.xml'deki spring-boot-maven-plugin ayarlariyla baglantili.
-        model.addAttribute("buildVersion", buildProperties.getVersion());
-        model.addAttribute("buildName", buildProperties.getName());
-        model.addAttribute("buildDescription", buildProperties.get("description"));
-        model.addAttribute("buildUrl", buildProperties.get("url"));
-        model.addAttribute("buildOwner", buildProperties.get("owner"));
+        if (buildProperties != null) {
 
-        String buildTime = buildProperties.getTime()
-                .atZone(zoneId)
-                .toLocalDateTime()
-                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        model.addAttribute("buildTime", buildTime);
+            // cok iyi anlatiyor: https://www.baeldung.com/spring-boot-build-properties
+            // target/classes/META-INF/build-info.properties dosyasinda asagidaki degerler yaziyorsa burada kullanilabilir.
+            // bu dosya mvn package komutunu calistirinca olusur.
+            // pom.xml'deki spring-boot-maven-plugin ayarlariyla baglantili.
+            model.addAttribute("buildVersion", buildProperties.getVersion());
+            model.addAttribute("buildName", buildProperties.getName());
+            model.addAttribute("buildDescription", buildProperties.get("description"));
+            model.addAttribute("buildUrl", buildProperties.get("url"));
+            model.addAttribute("buildOwner", buildProperties.get("owner"));
+
+            String buildTime = buildProperties.getTime()
+                    .atZone(zoneId)
+                    .toLocalDateTime()
+                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            model.addAttribute("buildTime", buildTime);
+
+        }
 
         if (gitProperties != null) {
             // target/classes/git.properties dosyasinda asagidaki degerler yaziyorsa burada kullanilabilir.

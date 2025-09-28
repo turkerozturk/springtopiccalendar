@@ -313,28 +313,31 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                     <div class="collapse mt-2" id="aboutDetails" style="background-color: whitesmoke; text-align: left;">
 
                         <div class="build-info">
-                            <h3>Project Build Info</h3>
-                            <div class="info-row">
-                                <div class="info-label">Owner</div>
-                                <div class="info-value" th:text="${buildOwner}"></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Version</div>
-                                <div class="info-value"><a th:href="${buildUrl}"
-                                                           th:title="${buildDescription}"
-                                                           target="_blank"
-                                                           style="text-decoration: none;">
-                                    <span th:text="${buildVersion}"></span>
-                                </a></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Build Date</div>
-                                <div class="info-value" th:text="${buildTime}"></div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">Description</div>
-                                <div class="info-value" th:text="${buildDescription}"></div>
-                            </div>
+
+                            <th:block th:if="${buildVersion != null}">
+                                <h3>Project Build Info</h3>
+                                <div class="info-row">
+                                    <div class="info-label">Owner</div>
+                                    <div class="info-value" th:text="${buildOwner}"></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Version</div>
+                                    <div class="info-value"><a th:href="${buildUrl}"
+                                                               th:title="${buildDescription}"
+                                                               target="_blank"
+                                                               style="text-decoration: none;">
+                                        <span th:text="${buildVersion}"></span>
+                                    </a></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Build Date</div>
+                                    <div class="info-value" th:text="${buildTime}"></div>
+                                </div>
+                                <div class="info-row">
+                                    <div class="info-label">Description</div>
+                                    <div class="info-value" th:text="${buildDescription}"></div>
+                                </div>
+                            </th:block>
 
                             <!--/* https://www.baeldung.com/spring-git-information
                           https://github.com/git-commit-id/git-commit-id-maven-plugin */-->
