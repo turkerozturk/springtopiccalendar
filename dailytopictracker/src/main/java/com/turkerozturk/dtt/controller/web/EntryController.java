@@ -446,50 +446,55 @@ public class EntryController {
                 .map(Entry::getDateMillisYmd)
                 .min(Long::compareTo)
                 .orElse(null);
-        // yukarida offset null degilse dedigimiz icin bu da null olmaz, o yuzden kontrol eklemedik.
-        LocalDate firstDoneEntryDate1 = Instant
-                .ofEpochMilli(firstDoneEntryDateMillisYmd1)
-                .atZone(AppTimeZoneProvider.getZone())
-                .toLocalDate();
+        // firstDoneEntryDateMillisYmd1 null olabiliyor, eger status 0(gri) veya 2(kirmizi) entry varsa fakat 1(yesil)
+        // entry yoksa hata vermemesi icin asagidaki kodlari blok icine aliyoruz. Boylece weekly calendar sayfasi
+        // hatasiz gorunuyor, icindeki istatistik sablonlari gorunuyor ama veri olmadan ve hatasiz bos gorunuyor.
+        if(firstDoneEntryDateMillisYmd1 != null) {
+            LocalDate firstDoneEntryDate1 = Instant
+                    .ofEpochMilli(firstDoneEntryDateMillisYmd1)
+                    .atZone(AppTimeZoneProvider.getZone())
+                    .toLocalDate();
 
-        if (topic.getBaseDateMillisYmd() == null) {
-            topicBaseDate = firstDoneEntryDate1;
+            if (topic.getBaseDateMillisYmd() == null) {
+                topicBaseDate = firstDoneEntryDate1;
+            }
+
+
+            StreaksDTO streaksDTO = calculateStreaks(topicBaseDate, matchResults, intervalLength, zoneId);
+            //StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
+            model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
+            model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
+            model.addAttribute("streakCounters", streaksDTO.getStreakCounters());
+            model.addAttribute("streakTotalDays", manualDateRange.size());
+            model.addAttribute("allStreaks", streaksDTO.getAllStreaks());
+
+
+            // BITTI - istatistik - streak
+
+
+            // BASLA simdi de baska istatistikler olusturmaya çalışalım.
+
+            OverallStatisticsDTO overallStatisticsDTO = calculateOverallStatistics(entries, topic, zoneId);
+
+            model.addAttribute("daysSinceFirstDoneEntry", overallStatisticsDTO.getDaysSinceFirstDoneEntry());
+            model.addAttribute("daysSinceFirstDoneEntryToPrediction", overallStatisticsDTO.getDaysSinceFirstDoneEntryToPrediction());
+            model.addAttribute("numberOfDaysToBeConsidered", overallStatisticsDTO.getNumberOfDaysToBeConsidered());
+            model.addAttribute("doneDayCount", overallStatisticsDTO.getDoneDayCount());
+            model.addAttribute("emptyDayCount", overallStatisticsDTO.getEmptyDayCount());
+            model.addAttribute("averageDoneInterval", overallStatisticsDTO.getAverageDoneInterval());
+            model.addAttribute("successRate", overallStatisticsDTO.getSuccessRate());
+            model.addAttribute("realAverage", overallStatisticsDTO.getRealAverage());
+            model.addAttribute("realSuccessRate", overallStatisticsDTO.getRealSuccessRate());
+
+
+            model.addAttribute("intervals", overallStatisticsDTO.getIntervals());
+            model.addAttribute("mean", overallStatisticsDTO.getMean());
+            model.addAttribute("std", overallStatisticsDTO.getStd());
+            model.addAttribute("successRate2", overallStatisticsDTO.getSuccessRate2());
+            model.addAttribute("trendSlope", overallStatisticsDTO.getTrendSlope());
+            model.addAttribute("trendStatus", overallStatisticsDTO.getTrendStatus());
+
         }
-
-        StreaksDTO streaksDTO = calculateStreaks(topicBaseDate, matchResults,intervalLength,zoneId);
-        //StreaksDTO streaksDTO = calculateStreaks ( manualEntryMap,  manualDateRange, manualEntryMap.size());
-        model.addAttribute("newestStreak", streaksDTO.getNewestStreak());
-        model.addAttribute("uniqueTopStreaks", streaksDTO.getUniqueTopStreaks());
-        model.addAttribute("streakCounters", streaksDTO.getStreakCounters());
-        model.addAttribute("streakTotalDays", manualDateRange.size());
-        model.addAttribute("allStreaks", streaksDTO.getAllStreaks());
-
-
-        // BITTI - istatistik - streak
-
-
-        // BASLA simdi de baska istatistikler olusturmaya çalışalım.
-
-        OverallStatisticsDTO overallStatisticsDTO = calculateOverallStatistics(entries, topic, zoneId);
-
-        model.addAttribute("daysSinceFirstDoneEntry", overallStatisticsDTO.getDaysSinceFirstDoneEntry());
-        model.addAttribute("daysSinceFirstDoneEntryToPrediction", overallStatisticsDTO.getDaysSinceFirstDoneEntryToPrediction());
-        model.addAttribute("numberOfDaysToBeConsidered", overallStatisticsDTO.getNumberOfDaysToBeConsidered());
-        model.addAttribute("doneDayCount", overallStatisticsDTO.getDoneDayCount());
-        model.addAttribute("emptyDayCount", overallStatisticsDTO.getEmptyDayCount());
-        model.addAttribute("averageDoneInterval", overallStatisticsDTO.getAverageDoneInterval());
-        model.addAttribute("successRate", overallStatisticsDTO.getSuccessRate());
-        model.addAttribute("realAverage", overallStatisticsDTO.getRealAverage());
-        model.addAttribute("realSuccessRate", overallStatisticsDTO.getRealSuccessRate());
-
-
-        model.addAttribute("intervals", overallStatisticsDTO.getIntervals());
-        model.addAttribute("mean", overallStatisticsDTO.getMean());
-        model.addAttribute("std", overallStatisticsDTO.getStd());
-        model.addAttribute("successRate2", overallStatisticsDTO.getSuccessRate2());
-        model.addAttribute("trendSlope", overallStatisticsDTO.getTrendSlope());
-        model.addAttribute("trendStatus", overallStatisticsDTO.getTrendStatus());
-
         // BITTI simdi de baska istatistikler olusturmaya çalışalım.
 
 
