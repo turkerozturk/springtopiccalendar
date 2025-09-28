@@ -16,15 +16,25 @@ https://github.com/turkerozturk/springtopiccalendar
     <tbody>
     <tr th:each="entry : ${neutralEntries}">
 
-        <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd EEE')
-                              .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
-                              .atZone(T(java.time.ZoneId).systemDefault())
-                              .toLocalDate())}"
-            th:title="${entry.dateMillisYmd}">
+        <td>
+            <a th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd EEE')
+                                  .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
+                                  .atZone(T(java.time.ZoneId).systemDefault())
+                                  .toLocalDate())}"
+               th:href="@{/entries/edit/{id}(id=${entry.id},
+                           categoryId=${entry.topic.category.id},
+                           returnPage=pivottable)}"
+               th:title="${entry.dateMillisYmd}">
+            </a>
         </td>
 
-        <td th:text="${entry.topic.name}"></td>
+        <td>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${entry.topic.category.id})}"
+               th:text="${entry.topic.name}"></a>
+        </td>
+
         <td th:text="${entry.note != null ? entry.note.content : ''}"></td>
+
     </tr>
     </tbody>
 </table>

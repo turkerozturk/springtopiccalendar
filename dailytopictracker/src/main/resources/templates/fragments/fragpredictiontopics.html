@@ -16,14 +16,26 @@ https://github.com/turkerozturk/springtopiccalendar
     <tbody>
     <tr th:each="topic : ${predictionTopics}">
 
-        <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd EEE')
-                              .format(T(java.time.Instant).ofEpochMilli(topic.predictionDateMillisYmd)
-                              .atZone(T(java.time.ZoneId).systemDefault())
-                              .toLocalDate())}"
-            th:title="${topic.predictionDateMillisYmd}">
+        <td>
+            <a th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd EEE')
+                                  .format(T(java.time.Instant).ofEpochMilli(topic.predictionDateMillisYmd)
+                                  .atZone(T(java.time.ZoneId).systemDefault())
+                                  .toLocalDate())}"
+                th:href="@{/entries/new(topicId=${topic.id},
+                           dateYmd=${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
+                                  .format(T(java.time.Instant).ofEpochMilli(topic.predictionDateMillisYmd)
+                                  .atZone(T(java.time.ZoneId).systemDefault())
+                                  .toLocalDate())},
+                           categoryId=${topic.category.id},
+                           returnPage=pivottable)}"
+                th:title="${topic.predictionDateMillisYmd}">
+            </a>
         </td>
 
-        <td th:text="${topic.name}"></td>
+        <td>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${topic.category.id})}"
+               th:text="${topic.name}"></a>
+        </td>
 
     </tr>
     </tbody>
