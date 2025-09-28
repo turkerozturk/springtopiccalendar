@@ -70,17 +70,22 @@ public class ChartRestController {
 
                     reportForNegativeWeight.append("<div style='text-align: left;'>");
                     reportForNegativeWeight.append(topic.getWeight());
-                    reportForNegativeWeight.append("❚");
 
-                    reportForNegativeWeight.append("<a href='/topics/edit/");
+                    reportForNegativeWeight.append("✎");
+                    reportForNegativeWeight.append("<a class='topic-name' href='/topics/edit/");
                     reportForNegativeWeight.append(topic.getId());
                     reportForNegativeWeight.append("?returnPage=index");
                     reportForNegativeWeight.append("'>");
                     reportForNegativeWeight.append(topic.getName());
                     reportForNegativeWeight.append("</a>");
 
-                    reportForNegativeWeight.append("❚");
+                    reportForNegativeWeight.append("⚙");
+                    reportForNegativeWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");
+                    reportForNegativeWeight.append(topic.getCategory().getId());
+                    reportForNegativeWeight.append("'>");
                     reportForNegativeWeight.append(topic.getCategory().getName());
+                    reportForNegativeWeight.append("</a>");
+
                     reportForNegativeWeight.append("</div>");
                 }
             }
@@ -102,35 +107,45 @@ public class ChartRestController {
                           //System.out.println(topic.getWeight() + "\t" +  topic.getName());
                         reportForPositiveWeight.append("<div style='text-align: left;'>");
                         reportForPositiveWeight.append(topic.getWeight());
-                        reportForPositiveWeight.append("❚");
+                        reportForPositiveWeight.append("✎");
 
-                        reportForPositiveWeight.append("<a href='/topics/edit/");
+                        reportForPositiveWeight.append("<a class='topic-name' href='/topics/edit/");
                         reportForPositiveWeight.append(topic.getId());
                         reportForPositiveWeight.append("?returnPage=index");
                         reportForPositiveWeight.append("'>");
                         reportForPositiveWeight.append(topic.getName());
                         reportForPositiveWeight.append("</a>");
 
-                        reportForPositiveWeight.append("❚");
+                        reportForPositiveWeight.append("⚙");
+                        reportForPositiveWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");
+                        reportForPositiveWeight.append(topic.getCategory().getId());
+                        reportForPositiveWeight.append("'>");
                         reportForPositiveWeight.append(topic.getCategory().getName());
+                        reportForPositiveWeight.append("</a>");
+
                         reportForPositiveWeight.append("</div>");
                     } else if(topic.getWeight() == 0) {
                         reportForZeroWeight.append("<div style='text-align: left;'>");
                         reportForZeroWeight.append(topic.getWeight());
-                        reportForZeroWeight.append("❚");
+                        reportForZeroWeight.append("✎");
 
-                        reportForZeroWeight.append("<a href='/topics/edit/");
+                        reportForZeroWeight.append("<a class='topic-name' href='/topics/edit/");
                         reportForZeroWeight.append(topic.getId());
                         reportForZeroWeight.append("?returnPage=index");
                         reportForZeroWeight.append("'>");
                         reportForZeroWeight.append(topic.getName());
                         reportForZeroWeight.append("</a>");
 
-                        reportForZeroWeight.append("❚");
+                        reportForZeroWeight.append("⚙");
+                        reportForZeroWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");
+                        reportForZeroWeight.append(topic.getCategory().getId());
+                        reportForZeroWeight.append("'>");
                         reportForZeroWeight.append(topic.getCategory().getName());
+                        reportForZeroWeight.append("</a>");
+
                         reportForZeroWeight.append("</div>");
                     } else {
-
+                        // reportForNegativeWeight islemlerini burada degil, blok disinda yukarida hallettik zaten.
                     }
                 }
                 categoryWeights.add(categoryWeight);
