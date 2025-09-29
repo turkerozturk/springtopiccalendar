@@ -1,0 +1,399 @@
+<!-- file-manager.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>File Manager</title>
+
+
+    <!-- CSRF tokens for JS -->
+    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+
+    <!-- Bootstrap + FontAwesome (webjars) -->
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style>
+        .file-row:hover { background: #f8f9fa; }
+        .icon-btn { cursor: pointer; margin-right:8px;}
+        .small-muted { font-size: 0.85rem; color: #6c757d; }
+        .wrap-ellipsis { max-width: 240px; display:inline-block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle;}
+    </style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">My App</a>
+        <div>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/}">Return to /</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>File Manager</h4>
+        <div>
+
+            <!-- Bir üst klasör düğmesi -->
+            <button class="btn btn-outline-secondary btn-sm"
+                    th:if="${parentPath != ''}"
+                    th:onclick="|enterDir('${parentPath}')|">
+                <i class="fa-solid fa-arrow-up"></i> Up
+            </button>
+
+            <button id="btnCreateFolder" class="btn btn-sm btn-primary me-2"><i class="fa-solid fa-folder-plus"></i> Create Folder</button>
+
+            <label class="btn btn-sm btn-success mb-0">
+                <i class="fa-solid fa-upload"></i> Upload
+                <input id="uploadInput" type="file" hidden />
+            </label>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-2">
+            <div class="mb-2 small-muted">Current: <span id="currentPath" th:text="${currentPath}">/</span></div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th style="width:40%">Name</th>
+                        <th style="width:18%">Size (KB)</th>
+                        <th style="width:18%">Modified</th>
+                        <th style="width:24%">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="fileList">
+                    <tr th:each="f : ${files}" class="file-row">
+                        <td>
+                                <span th:if="${f.directory}">
+                                    <i class="fa-solid fa-folder"></i>
+                                    <a href="#"
+                                       th:attr="data-path=${f.relativePath}"
+                                       th:text="${f.name}"
+                                       class="ms-2"
+                                       onclick="enterDir(this.getAttribute('data-path'))">
+                                    </a>
+
+                                </span>
+                            <span th:if="${!f.directory}">
+                                    <i class="fa-solid fa-file"></i>
+                                    <span class="ms-2 wrap-ellipsis" th:text="${f.name}"></span>
+                                </span>
+                        </td>
+                        <td th:text="${f.directory ? '-' : f.sizeKbFormatted}">-</td>
+                        <td th:text="${#dates.format(new java.util.Date(f.lastModified),'yyyy-MM-dd HH:mm')}">-</td>
+                        <td>
+                            <div class="d-flex">
+
+                                <i class="fa-solid fa-eye icon-btn text-primary"
+                                   th:if="${!f.directory}"
+                                   th:title="Preview"
+                                   th:attr="data-path=${f.relativePath}"
+                                   onclick="previewFile(this.dataset.path)"></i>
+
+                                <i class="fa-solid fa-download icon-btn text-success"
+                                   th:title="Download"
+                                   th:attr="data-path=${f.relativePath}"
+                                   onclick="downloadFile(this.dataset.path)"></i>
+
+                                <i class="fa-solid fa-trash icon-btn text-danger"
+                                   th:title="Delete"
+                                   th:attr="data-path=${f.relativePath},data-dir=${f.directory}"
+                                   onclick="deleteItem(this.dataset.path, this.dataset.dir)"></i>
+
+                                <i class="fa-solid fa-pen icon-btn text-secondary"
+                                   th:title="Rename"
+                                   th:attr="data-path=${f.relativePath}"
+                                   onclick="renameItem(this.dataset.path)"></i>
+
+                                <i class="fa-solid fa-arrow-right-from-bracket icon-btn text-info"
+                                   th:title="Move"
+                                   th:attr="data-path=${f.relativePath}"
+                                   onclick="moveItem(this.dataset.path)"></i>
+
+
+                                <div style="flex:1"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="previewModal" class="modal" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Preview</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="previewBody">
+                            <!-- preview content injected -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- Scripts -->
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+
+<script>
+    // CSRF
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+    let currentPathEl = document.getElementById('currentPath');
+    let fileListEl = document.getElementById('fileList');
+
+    function showAlert(msg) {
+        alert(msg);
+    }
+
+    async function fetchList(path) {
+        const params = new URLSearchParams();
+        if (path) params.append('path', path);
+        const res = await fetch('/file-manager/list?' + params.toString(), {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) {
+            showAlert('Could not fetch list');
+            return;
+        }
+        const data = await res.json();
+        renderList(data.files, data.currentPath);
+    }
+
+    function renderList(files, curPath) {
+        currentPathEl.textContent = curPath || '';
+        fileListEl.innerHTML = '';
+        files.forEach(f => {
+            const tr = document.createElement('tr');
+            tr.className = 'file-row';
+
+            const tdName = document.createElement('td');
+            if (f.directory) {
+                tdName.innerHTML = `<i class="fa-solid fa-folder"></i> <a href="#" onclick="enterDir('${escapeJs(f.relativePath)}');return false;" class="ms-2">${escapeHtml(f.name)}</a>`;
+            } else {
+                tdName.innerHTML = `<i class="fa-solid fa-file"></i> <span class="ms-2 wrap-ellipsis">${escapeHtml(f.name)}</span>`;
+            }
+
+            const tdSize = document.createElement('td');
+            tdSize.textContent = f.directory ? '-' : f.sizeKbFormatted;
+
+            const tdMod = document.createElement('td');
+            tdMod.textContent = (new Date(f.lastModified)).toLocaleString();
+
+            const tdAct = document.createElement('td');
+            tdAct.innerHTML = buildActionButtons(f);
+
+            tr.appendChild(tdName);
+            tr.appendChild(tdSize);
+            tr.appendChild(tdMod);
+            tr.appendChild(tdAct);
+            fileListEl.appendChild(tr);
+        });
+    }
+
+    function buildActionButtons(f) {
+        let html = '';
+        if (!f.directory) {
+            html += `<i class="fa-solid fa-eye icon-btn text-primary" title="Preview" onclick="previewFile('${escapeJs(f.relativePath)}')"></i>`;
+        }
+        html += `<i class="fa-solid fa-download icon-btn text-success" title="Download" onclick="downloadFile('${escapeJs(f.relativePath)}')"></i>`;
+        html += `<i class="fa-solid fa-trash icon-btn text-danger" title="Delete" onclick="deleteItem('${escapeJs(f.relativePath)}', ${f.directory})"></i>`;
+        html += `<i class="fa-solid fa-pen icon-btn text-secondary" title="Rename" onclick="renameItem('${escapeJs(f.relativePath)}')"></i>`;
+        html += `<i class="fa-solid fa-arrow-right-from-bracket icon-btn text-info" title="Move" onclick="moveItem('${escapeJs(f.relativePath)}')"></i>`;
+        return html;
+    }
+
+    // helpers to escape
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+    function escapeJs(s){ return s.replace(/'/g,"\\'"); }
+
+    // navigation
+    function enterDir(rel) {
+        fetchList(rel);
+        history.pushState({}, '', '/file-manager?path=' + encodeURIComponent(rel));
+    }
+
+    // preview: open bootstrap modal with inline content
+    async function previewFile(path) {
+        const url = '/file-manager/preview?path=' + encodeURIComponent(path);
+        // If image or PDF will be inline displayed by content-type
+        const modalEl = document.getElementById('previewModal');
+        const previewBody = document.getElementById('previewBody');
+        previewBody.innerHTML = '<div class="text-center py-4">Loading...</div>';
+        const res = await fetch(url);
+        if (!res.ok) {
+            previewBody.innerHTML = '<div class="text-danger">Unable to preview</div>';
+        } else {
+            const ct = res.headers.get('content-type') || '';
+            if (ct.startsWith('image/')) {
+                previewBody.innerHTML = `<img src="${url}" class="img-fluid" alt="preview" />`;
+            } else if (ct === 'application/pdf' || ct === 'application/x-pdf') {
+                previewBody.innerHTML = `<iframe src="${url}" style="width:100%;height:80vh;border:0"></iframe>`;
+            } else {
+                // plain/text -> show as text
+                const text = await res.text();
+                previewBody.innerHTML = '<pre style="white-space:pre-wrap;">' + escapeHtml(text) + '</pre>';
+            }
+        }
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+    }
+
+    function downloadFile(path) {
+        window.location = '/file-manager/download?path=' + encodeURIComponent(path);
+    }
+
+    async function deleteItem(path, isDir) {
+        if (!confirm('Are you sure you want to delete ' + path + '?')) return;
+        const form = new URLSearchParams();
+        form.append('path', path);
+        const res = await fetch('/file-manager/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: form.toString()
+        });
+        if (res.ok) {
+            await fetchList(document.getElementById('currentPath').textContent);
+        } else {
+            const err = await res.json();
+            showAlert('Delete failed: ' + (err.error || res.statusText));
+        }
+    }
+
+    async function renameItem(path) {
+        const newName = prompt('Enter new name for ' + path + ':');
+        if (!newName) return;
+        const form = new URLSearchParams();
+        form.append('path', path);
+        form.append('newName', newName);
+        const res = await fetch('/file-manager/rename', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: form.toString()
+        });
+        if (res.ok) {
+            await fetchList(document.getElementById('currentPath').textContent);
+        } else if (res.status === 409) {
+            showAlert('File with same name exists.');
+        } else {
+            const err = await res.json();
+            showAlert('Rename failed: ' + (err.error || res.statusText));
+        }
+    }
+
+    async function moveItem(src) {
+        const dest = prompt('Enter destination folder relative path (leave blank for root):', document.getElementById('currentPath').textContent);
+        if (dest === null) return;
+        const form = new URLSearchParams();
+        form.append('src', src);
+        form.append('destDir', dest || '');
+        const res = await fetch('/file-manager/move', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: form.toString()
+        });
+        if (res.ok) {
+            await fetchList(document.getElementById('currentPath').textContent);
+        } else if (res.status === 409) {
+            showAlert('A file with same name exists in destination.');
+        } else {
+            const err = await res.json();
+            showAlert('Move failed: ' + (err.error || res.statusText));
+        }
+    }
+
+    // create folder
+    document.getElementById('btnCreateFolder').addEventListener('click', async () => {
+        const name = prompt('Folder name:');
+        if (!name) return;
+        const form = new URLSearchParams();
+        form.append('parent', document.getElementById('currentPath').textContent || '');
+        form.append('name', name);
+        const res = await fetch('/file-manager/create-folder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: form.toString()
+        });
+        if (res.ok) {
+            await fetchList(document.getElementById('currentPath').textContent);
+        } else if (res.status === 409) {
+            showAlert('Folder already exists.');
+        } else {
+            const err = await res.json();
+            showAlert('Create folder failed: ' + (err.error || res.statusText));
+        }
+    });
+
+    // upload
+    const uploadInput = document.getElementById('uploadInput');
+    uploadInput.addEventListener('change', async (evt) => {
+        const file = evt.target.files[0];
+        if (!file) return;
+        if (file.size > 300 * 1024) {
+            showAlert('File size cannot be more than 300 KB');
+            uploadInput.value = '';
+            return;
+        }
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('target', document.getElementById('currentPath').textContent || '');
+        const res = await fetch('/file-manager/upload', {
+            method: 'POST',
+            body: fd,
+            headers: { [csrfHeader]: csrfToken }
+        });
+        if (res.ok) {
+            await fetchList(document.getElementById('currentPath').textContent);
+        } else if (res.status === 409) {
+            showAlert('File with same name exists.');
+        } else if (res.status === 413 || res.status === 413) { // payload too large
+            showAlert('File size cannot be more than 300 KB');
+        } else {
+            const err = await res.json().catch(()=>({error: 'unknown'}));
+            showAlert('Upload failed: ' + (err.error || res.statusText));
+        }
+        uploadInput.value = '';
+    });
+
+    // initial load (in case user loaded with no server-rendered list)
+    window.addEventListener('load', () => {
+        // if server provided list that's ok; otherwise fetch current path
+        // We prefer to refresh to guarantee consistency
+        const cur = document.getElementById('currentPath').textContent || '';
+        fetchList(cur);
+    });
+
+    // support back/forward
+    window.onpopstate = () => {
+        const params = new URLSearchParams(location.search);
+        fetchList(params.get('path'));
+    }
+</script>
+</body>
+</html>
