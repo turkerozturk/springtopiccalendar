@@ -2,6 +2,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
     <meta charset="UTF-8" />
     <title>File Manager</title>
 
@@ -24,40 +29,81 @@
         .small-muted { font-size: 0.85rem; color: #6c757d; }
         .wrap-ellipsis { max-width: 240px; display:inline-block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; vertical-align:middle;}
     </style>
+
+    <style>
+        #navigation-panel button, a{
+                  border-radius:10px !important;
+                }
+
+                      #navigation-panel {
+                   max-width: 740px;
+                   margin-top: 10px;
+                   margin-bottom: 5px;
+                   margin-left: auto;
+                   margin-right: auto;
+                   padding: 3px;
+                   border: 2px solid DarKGray;
+                   border-radius: 7px 7px 7px 7px;
+
+                   /* https://cssgradient.io/ */
+
+                   background: #a7d6e8;
+                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+                }
+
+          body {
+
+        background-color: [[${htmlBackgroundColor}]];
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+                 }
+
+                .fonbg {
+                    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+                }
+
+    </style>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-    <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/}">My App</a>
-        <div>
-            <a class="btn btn-outline-secondary btn-sm" th:href="@{/}">Return to /</a>
-        </div>
-    </div>
-</nav>
+<body>
 
-<main class="container py-4">
+<div  id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+
+
+
+    <button id="btnCreateFolder" class="btn btn-secondary btn-sm"><i class="fa-solid fa-folder-plus"></i> Create Folder</button>
+
+    <label class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-upload"></i> Upload
+        <input id="uploadInput" type="file" hidden />
+    </label>
+
+    <!-- Bir üst klasör düğmesi -->
+    <button id="upButton"
+            class="btn btn-secondary btn-sm"
+            th:attr="style=|${parentPath == '' ? 'display:none;' : ''}|, data-path=${parentPath}">
+        <i class="fa-solid fa-arrow-up"></i> Go Up
+    </button>
+
+
+    <button id="workAroundButton"
+            class="btn btn-secondary btn-sm"
+    >
+        <i class="fa-solid fa-arrow-up"></i> Go Up
+    </button>
+
+</div>
+
+<main class="container py-2">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>File Manager</h4>
+
+        <h1><span class="fonbg">File Manager</span></h1>
+
         <div>
 
-            <!-- Bir üst klasör düğmesi -->
-            <button id="upButton"
-                    class="btn btn-outline-secondary btn-sm"
-                    th:attr="style=|${parentPath == '' ? 'display:none;' : ''}|, data-path=${parentPath}">
-                <i class="fa-solid fa-arrow-up"></i> Up
-            </button>
 
 
 
 
-
-
-            <button id="btnCreateFolder" class="btn btn-sm btn-primary me-2"><i class="fa-solid fa-folder-plus"></i> Create Folder</button>
-
-            <label class="btn btn-sm btn-success mb-0">
-                <i class="fa-solid fa-upload"></i> Upload
-                <input id="uploadInput" type="file" hidden />
-            </label>
         </div>
     </div>
 
@@ -133,13 +179,13 @@
             </div>
 
             <div id="previewModal" class="modal" tabindex="-1">
-                <div class="modal-dialog modal-xl">
+                <div class="modal-dialog modal-l">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">Preview</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body" id="previewBody">
+                        <div class="modal-body" id="previewBody" style="text-align: center;">
                             <!-- preview content injected -->
                         </div>
                     </div>
@@ -185,11 +231,18 @@ function renderList(files, curPath, parentPath) {
 
     // Up düğmesini ayarla
     const upBtn = document.getElementById('upButton');
+    const workAroundBtn = document.getElementById('workAroundButton');
+
     if (parentPath && parentPath !== '') {
         upBtn.style.display = 'inline-block';
         upBtn.onclick = () => enterDir(parentPath);
+
+        workAroundBtn.style.display = 'none';
     } else {
         upBtn.style.display = 'none';
+
+        workAroundBtn.style.display = 'inline-block';
+        workAroundBtn.onclick = () => enterDir("");
     }
 
     files.forEach(f => {
@@ -420,6 +473,11 @@ function renderList(files, curPath, parentPath) {
             }
         });
     }
+
+
+
+
+
 });
 
 </script>
