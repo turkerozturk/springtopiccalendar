@@ -34,18 +34,23 @@ public class FileService {
     }
 
     private Path resolveSafe(String relative) {
+        System.out.println("FileService.java içindeki resolveSafe metoduna gelen değer: "+ relative);
+
         if (relative == null || relative.isBlank()) {
+            System.out.println("dönen değer baseDir: " + baseDir);
             return baseDir;
         }
         Path target = baseDir.resolve(relative).normalize();
         if (!target.startsWith(baseDir)) {
             throw new SecurityException("Invalid path");
         }
+        System.out.println("dönen değer target: " + target);
         return target;
     }
 
     public List<FileInfo> list(String relativePath) throws IOException {
         Path dir = resolveSafe(relativePath);
+        if(!Files.exists(dir)) throw new NoSuchFileException("Path '" + dir + "' not exist");
         if (!Files.isDirectory(dir)) throw new NoSuchFileException("Not a directory");
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
@@ -53,7 +58,9 @@ public class FileService {
             for (Path p : stream) {
                 FileInfo fi = new FileInfo();
                 fi.setName(p.getFileName().toString());
-                fi.setRelativePath(baseDir.relativize(p).toString().replace("\\","/"));
+                String fileRelativePath = baseDir.relativize(p).toString().replace("\\","/");
+                //System.out.println("fileRelativePath: " + fileRelativePath);
+                fi.setRelativePath(fileRelativePath);
                 fi.setDirectory(Files.isDirectory(p));
                 fi.setSizeBytes(Files.isDirectory(p) ? 0L : Files.size(p));
                 fi.setSizeKbFormatted(Files.isDirectory(p) ? "-" : String.format("%.1f", Files.size(p)/1024.0));

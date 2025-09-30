@@ -26,44 +26,78 @@ public class FileManagerController {
         this.fileService = fileService;
     }
 
+
     @GetMapping
     public String index(@RequestParam(value="path", required=false) String path, Model model) throws IOException {
-
         Path basePath = fileService.getBaseDir();
-        Path currentPath = basePath.resolve(path).normalize();
+        Path currentPath = (path == null || path.isEmpty())
+                ? basePath
+                : basePath.resolve(path).normalize();
 
-        // Güvenlik: basePath'in dışına çıkmayı engelle
+        // güvenlik
         if (!currentPath.startsWith(basePath)) {
             currentPath = basePath;
             path = "";
         }
 
-
         String safePath = (path == null) ? "" : path;
         List<FileInfo> list = fileService.list(safePath);
 
-        // "Bir üst klasör" için path
+        // parentPath hesapla
         String parentPath = "";
-        if (!currentPath.equals(basePath)) {
-            parentPath = basePath.relativize(currentPath.getParent()).toString().replace("\\", "/");
+        if (!safePath.isEmpty()) {
+            Path parent = currentPath.getParent();
+            if (parent != null && parent.startsWith(basePath)) {
+                parentPath = basePath.relativize(parent).toString().replace("\\", "/");
+            }
         }
 
         model.addAttribute("files", list);
         model.addAttribute("currentPath", safePath.replace("\\","/"));
         model.addAttribute("parentPath", parentPath);
+
         return "file-manager";
     }
+
+
 
     @GetMapping("/list")
     @ResponseBody
     public ResponseEntity<?> listJson(@RequestParam(value="path", required=false) String path) {
         try {
-            List<FileInfo> list = fileService.list(path);
-            return ResponseEntity.ok(Map.of("files", list, "currentPath", path == null ? "" : path));
+            Path basePath = fileService.getBaseDir();
+            Path currentPath = (path == null || path.isEmpty())
+                    ? basePath
+                    : basePath.resolve(path).normalize();
+
+            if (!currentPath.startsWith(basePath)) {
+                currentPath = basePath;
+                path = "";
+            }
+
+            String safePath = (path == null) ? "" : path;
+            List<FileInfo> list = fileService.list(safePath);
+
+            // parentPath hesapla
+            String parentPath = "";
+            if (!safePath.isEmpty()) {
+                Path parent = currentPath.getParent();
+                if (parent != null && parent.startsWith(basePath)) {
+                    parentPath = basePath.relativize(parent).toString().replace("\\", "/");
+                }
+            }
+            System.out.println("FileManagerController listJson metodundaki currentPath: " + currentPath);
+
+            return ResponseEntity.ok(Map.of(
+                    "files", list,
+                    "currentPath", safePath,
+                    "parentPath", parentPath
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
+
 
     @PostMapping("/create-folder")
     @ResponseBody

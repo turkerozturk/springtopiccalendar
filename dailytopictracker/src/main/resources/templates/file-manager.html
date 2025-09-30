@@ -41,11 +41,16 @@
         <div>
 
             <!-- Bir üst klasör düğmesi -->
-            <button class="btn btn-outline-secondary btn-sm"
-                    th:if="${parentPath != ''}"
-                    th:onclick="|enterDir('${parentPath}')|">
+            <button id="upButton"
+                    class="btn btn-outline-secondary btn-sm"
+                    th:attr="style=|${parentPath == '' ? 'display:none;' : ''}|, data-path=${parentPath}">
                 <i class="fa-solid fa-arrow-up"></i> Up
             </button>
+
+
+
+
+
 
             <button id="btnCreateFolder" class="btn btn-sm btn-primary me-2"><i class="fa-solid fa-folder-plus"></i> Create Folder</button>
 
@@ -171,39 +176,49 @@
             return;
         }
         const data = await res.json();
-        renderList(data.files, data.currentPath);
+        renderList(data.files, data.currentPath, data.parentPath);
     }
 
-    function renderList(files, curPath) {
-        currentPathEl.textContent = curPath || '';
-        fileListEl.innerHTML = '';
-        files.forEach(f => {
-            const tr = document.createElement('tr');
-            tr.className = 'file-row';
+function renderList(files, curPath, parentPath) {
+    currentPathEl.textContent = curPath || '';
+    fileListEl.innerHTML = '';
 
-            const tdName = document.createElement('td');
-            if (f.directory) {
-                tdName.innerHTML = `<i class="fa-solid fa-folder"></i> <a href="#" onclick="enterDir('${escapeJs(f.relativePath)}');return false;" class="ms-2">${escapeHtml(f.name)}</a>`;
-            } else {
-                tdName.innerHTML = `<i class="fa-solid fa-file"></i> <span class="ms-2 wrap-ellipsis">${escapeHtml(f.name)}</span>`;
-            }
-
-            const tdSize = document.createElement('td');
-            tdSize.textContent = f.directory ? '-' : f.sizeKbFormatted;
-
-            const tdMod = document.createElement('td');
-            tdMod.textContent = (new Date(f.lastModified)).toLocaleString();
-
-            const tdAct = document.createElement('td');
-            tdAct.innerHTML = buildActionButtons(f);
-
-            tr.appendChild(tdName);
-            tr.appendChild(tdSize);
-            tr.appendChild(tdMod);
-            tr.appendChild(tdAct);
-            fileListEl.appendChild(tr);
-        });
+    // Up düğmesini ayarla
+    const upBtn = document.getElementById('upButton');
+    if (parentPath && parentPath !== '') {
+        upBtn.style.display = 'inline-block';
+        upBtn.onclick = () => enterDir(parentPath);
+    } else {
+        upBtn.style.display = 'none';
     }
+
+    files.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.className = 'file-row';
+
+        const tdName = document.createElement('td');
+        if (f.directory) {
+            tdName.innerHTML = `<i class="fa-solid fa-folder"></i> <a href="#" onclick="enterDir('${escapeJs(f.relativePath)}');return false;" class="ms-2">${escapeHtml(f.name)}</a>`;
+        } else {
+            tdName.innerHTML = `<i class="fa-solid fa-file"></i> <span class="ms-2 wrap-ellipsis">${escapeHtml(f.name)}</span>`;
+        }
+
+        const tdSize = document.createElement('td');
+        tdSize.textContent = f.directory ? '-' : f.sizeKbFormatted;
+
+        const tdMod = document.createElement('td');
+        tdMod.textContent = (new Date(f.lastModified)).toLocaleString();
+
+        const tdAct = document.createElement('td');
+        tdAct.innerHTML = buildActionButtons(f);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdSize);
+        tr.appendChild(tdMod);
+        tr.appendChild(tdAct);
+        fileListEl.appendChild(tr);
+    });
+}
 
     function buildActionButtons(f) {
         let html = '';
@@ -394,6 +409,19 @@
         const params = new URLSearchParams(location.search);
         fetchList(params.get('path'));
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const upBtn = document.getElementById("upButton");
+    if (upBtn) {
+        upBtn.addEventListener("click", () => {
+            const path = upBtn.getAttribute("data-path");
+            if (path) {
+                enterDir(path);
+            }
+        });
+    }
+});
+
 </script>
 </body>
 </html>
