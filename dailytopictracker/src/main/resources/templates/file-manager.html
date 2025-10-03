@@ -10,6 +10,13 @@
     <meta charset="UTF-8" />
     <title>File Manager</title>
 
+    <!--/* favicon */-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSRF tokens for JS -->
     <meta name="_csrf_parameter" th:content="${_csrf.parameterName}" />
@@ -149,10 +156,12 @@
                                    th:attr="data-path=${f.relativePath}"
                                    onclick="previewFile(this.dataset.path)"></i>
 
+                                <th:block th:if="${!f.directory}">
                                 <i class="fa-solid fa-download icon-btn text-success"
                                    th:title="Download"
                                    th:attr="data-path=${f.relativePath}"
                                    onclick="downloadFile(this.dataset.path)"></i>
+                                </th:block>
 
                                 <i class="fa-solid fa-trash icon-btn text-danger"
                                    th:title="Delete"
@@ -277,8 +286,8 @@ function renderList(files, curPath, parentPath) {
         let html = '';
         if (!f.directory) {
             html += `<i class="fa-solid fa-eye icon-btn text-primary" title="Preview" onclick="previewFile('${escapeJs(f.relativePath)}')"></i>`;
+            html += `<i class="fa-solid fa-download icon-btn text-success" title="Download" onclick="downloadFile('${escapeJs(f.relativePath)}')"></i>`;
         }
-        html += `<i class="fa-solid fa-download icon-btn text-success" title="Download" onclick="downloadFile('${escapeJs(f.relativePath)}')"></i>`;
         html += `<i class="fa-solid fa-trash icon-btn text-danger" title="Delete" onclick="deleteItem('${escapeJs(f.relativePath)}', ${f.directory})"></i>`;
         html += `<i class="fa-solid fa-pen icon-btn text-secondary" title="Rename" onclick="renameItem('${escapeJs(f.relativePath)}')"></i>`;
         html += `<i class="fa-solid fa-arrow-right-from-bracket icon-btn text-info" title="Move" onclick="moveItem('${escapeJs(f.relativePath)}')"></i>`;
