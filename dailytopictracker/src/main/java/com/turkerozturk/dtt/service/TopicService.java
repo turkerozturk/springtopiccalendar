@@ -287,4 +287,9 @@ public class TopicService {
     public List<Topic> findAll() {
         return topicRepository.findAll();
     }
+
+    public Optional<Topic> findById(Long id) {
+
+        return topicRepository.findById(id);
+    }
 }

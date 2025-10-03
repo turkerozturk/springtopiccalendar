@@ -193,14 +193,16 @@ https://github.com/turkerozturk/springtopiccalendar
 
 
             <!--/* TOPIC sutunu */-->
-            <td>
-                <span
-                   th:text="${#strings.abbreviate(item.topic.name, 27)}"
-                   th:title="${item.topic.name}"
+            <td
+                th:hx-get="@{/topics/info/{id}(id=${item.topic.id})}"
+                hx-target="#topicInfoContent"
+                hx-trigger="click"
+                data-bs-toggle="modal"
+                data-bs-target="#topicInfoModal"
+                th:text="${#strings.abbreviate(item.topic.name, 27)}"
+                th:title="${item.topic.name}"
 
-                >
-                    Topic
-                </span>
+            >
             </td>
 
 

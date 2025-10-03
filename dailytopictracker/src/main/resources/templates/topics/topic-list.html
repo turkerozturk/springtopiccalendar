@@ -248,8 +248,16 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
                         <!-- Topic Name -->
                         <td>
-                            <span th:text="${topic.name}" class="crop-text">
-                                Sample Topic
+
+
+
+                            <span class="crop-text"
+                                th:hx-get="@{/topics/info/{id}(id=${topic.id})}"
+                                hx-target="#topicInfoContent"
+                                hx-trigger="click"
+                                data-bs-toggle="modal"
+                                data-bs-target="#topicInfoModal"
+                                th:text="${topic.name}">
                             </span>
                             <br/>
 
@@ -435,6 +443,7 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
             }
         </script>
 
+        <div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
 
 
     </body>

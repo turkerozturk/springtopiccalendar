@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div th:fragment="content">
+  <div class="d-flex align-items-center mb-2">
+
+    <img th:if="${topic.imageFileName != null}"
+         th:src="@{${topic.imageFileName}}"
+         style="max-width:80px; max-height:80px; object-fit:cover;"
+         class="me-2 rounded"/>
+
+    <div>
+      <div><strong>Weight:</strong> <span th:text="${topic.weight}">0</span></div>
+      <div th:if="${topic.someTimeLater != null}">
+        <strong>Prediction:</strong> <span th:text="${topic.someTimeLater}"></span>
+      </div>
+      <div th:if="${entryCount != null}">
+        <strong>Entries Count:</strong> <span th:text="${entryCount}"></span>
+      </div>
+      <div><strong>Category:</strong> <span th:text="${topic.category.name}">-</span></div>
+      <div><strong>Category Group:</strong> <span th:text="${topic.category.categoryGroup.name}">-</span></div>
+
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <strong>Description:</strong>
+    <div th:utext="${markdownDescription}"></div>
+  </div>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    document.getElementById("topicInfoName").innerText = /*[[${topic.name}]]*/ "";
+    document.getElementById("topicInfoEditLink").href =
+        /*[[@{/topics/edit/{id}(id=${topic.id}, returnPage='pivottable')}]]*/ "#";
+    document.getElementById("topicInfoAddEntryLink").href =
+        /*[[@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}]]*/ "#";
+    document.getElementById("topicInfoEntriesListLink").href =
+        /*[[@{/entries(topicId=${topic.id})}]]*/ "#";
+    /*]]>*/
+  </script>
+</div>
+
+
+</body>
+</html>

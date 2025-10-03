@@ -1,3 +1,23 @@
+/*
+ * This file is part of the DailyTopicTracker project.
+ * Please refer to the project's README.md file for additional details.
+ * https://github.com/turkerozturk/springtopiccalendar
+ *
+ * Copyright (c) 2025 Turker Ozturk
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
+ */
 package com.turkerozturk.dtt.controller.web;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
@@ -71,13 +91,16 @@ public class ChartRestController {
                     reportForNegativeWeight.append("<div style='text-align: left;'>");
                     reportForNegativeWeight.append(topic.getWeight());
 
-                    reportForNegativeWeight.append("✎");
-                    reportForNegativeWeight.append("<a class='topic-name' href='/topics/edit/");
-                    reportForNegativeWeight.append(topic.getId());
-                    reportForNegativeWeight.append("?returnPage=index");
-                    reportForNegativeWeight.append("'>");
-                    reportForNegativeWeight.append(topic.getName());
-                    reportForNegativeWeight.append("</a>");
+                    reportForNegativeWeight.append("ⓘ");
+                    reportForNegativeWeight.append("<a class='topic-name' ")
+                            .append("hx-get='/topics/info/")
+                            .append(topic.getId())
+                            .append("' hx-target='#topicInfoContent' ")
+                            .append("hx-trigger='click' ")
+                            .append("data-bs-toggle='modal' data-bs-target='#topicInfoModal'>")
+                            .append(topic.getName())
+                            .append("</a>");
+
 
                     reportForNegativeWeight.append("⚙");
                     reportForNegativeWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");
@@ -107,14 +130,16 @@ public class ChartRestController {
                           //System.out.println(topic.getWeight() + "\t" +  topic.getName());
                         reportForPositiveWeight.append("<div style='text-align: left;'>");
                         reportForPositiveWeight.append(topic.getWeight());
-                        reportForPositiveWeight.append("✎");
 
-                        reportForPositiveWeight.append("<a class='topic-name' href='/topics/edit/");
-                        reportForPositiveWeight.append(topic.getId());
-                        reportForPositiveWeight.append("?returnPage=index");
-                        reportForPositiveWeight.append("'>");
-                        reportForPositiveWeight.append(topic.getName());
-                        reportForPositiveWeight.append("</a>");
+                        reportForPositiveWeight.append("ⓘ");
+                        reportForPositiveWeight.append("<a class='topic-name' ")
+                                .append("hx-get='/topics/info/")
+                                .append(topic.getId())
+                                .append("' hx-target='#topicInfoContent' ")
+                                .append("hx-trigger='click' ")
+                                .append("data-bs-toggle='modal' data-bs-target='#topicInfoModal'>")
+                                .append(topic.getName())
+                                .append("</a>");
 
                         reportForPositiveWeight.append("⚙");
                         reportForPositiveWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");
@@ -127,14 +152,16 @@ public class ChartRestController {
                     } else if(topic.getWeight() == 0) {
                         reportForZeroWeight.append("<div style='text-align: left;'>");
                         reportForZeroWeight.append(topic.getWeight());
-                        reportForZeroWeight.append("✎");
 
-                        reportForZeroWeight.append("<a class='topic-name' href='/topics/edit/");
-                        reportForZeroWeight.append(topic.getId());
-                        reportForZeroWeight.append("?returnPage=index");
-                        reportForZeroWeight.append("'>");
-                        reportForZeroWeight.append(topic.getName());
-                        reportForZeroWeight.append("</a>");
+                        reportForZeroWeight.append("ⓘ");
+                        reportForZeroWeight.append("<a class='topic-name' ")
+                                .append("hx-get='/topics/info/")
+                                .append(topic.getId())
+                                .append("' hx-target='#topicInfoContent' ")
+                                .append("hx-trigger='click' ")
+                                .append("data-bs-toggle='modal' data-bs-target='#topicInfoModal'>")
+                                .append(topic.getName())
+                                .append("</a>");
 
                         reportForZeroWeight.append("⚙");
                         reportForZeroWeight.append("<a class='category-name' href='/entry-filter/form?categoryId=");

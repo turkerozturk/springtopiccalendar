@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<!--
+This file is part of the DailyTopicTracker project.
+Please refer to the project's README.md file for additional details.
+https://github.com/turkerozturk/springtopiccalendar
+-->
+<div th:fragment="topicInfoModal" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+
+    <!-- Topic Info Modal -->
+    <div class="modal fade" id="topicInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width:95%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="topicInfoName"></span>
+                        <a href="#" id="topicInfoEditLink" title="Edit Topic">✎️</a>
+                    </h5>
+                    <a href="#" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
+                </div>
+                <div class="modal-body" id="topicInfoContent">
+                    <!-- HTMX ile doldurulacak -->
+                    <div class="text-center">Loading...</div>
+                </div>
+                <div class="modal-footer">
+                    <a id="topicInfoAddEntryLink" class="btn btn-sm btn-outline-primary">+ Add Entry</a>
+                    <a id="topicInfoEntriesListLink" class="btn btn-sm btn-outline-secondary">☰ Entries List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

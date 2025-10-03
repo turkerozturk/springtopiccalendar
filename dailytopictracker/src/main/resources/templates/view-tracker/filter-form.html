@@ -1117,10 +1117,13 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
         <tr th:each="topic, iStat : ${pivotData.topicList}">
 
             <!--/* ilk sütun Topic adı (sütun sırasını değiştirme veya scriptin bozulmaması için orayı güncelle) */-->
-            <td class="left-frozen-topic" id="topic-name" style="width: 100px;">
-                <th:block
-                   th:text="${topic.name}" th:title="${topic.name + (!#strings.isEmpty(topic.description) ? ': ' + topic.description : '')}">
-                </th:block>
+            <td class="left-frozen-topic" id="topic-name" style="width: 100px;"
+                th:hx-get="@{/topics/info/{id}(id=${topic.id})}"
+                hx-target="#topicInfoContent"
+                hx-trigger="click"
+                data-bs-toggle="modal"
+                data-bs-target="#topicInfoModal">
+                <span th:text="${topic.name}">Topic Name</span>
             </td>
 
             <!--/* kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün */-->
@@ -2205,6 +2208,7 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
     });
 </script>
 
+<div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
 
 
 </body>
