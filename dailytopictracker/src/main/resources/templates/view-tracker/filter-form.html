@@ -1050,7 +1050,9 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             <!--/* Tarih sütun başlıkları, uygulama acilisinda application.properties'den okunan iki ayri date format ile birlikte */-->
             <th:block th:each="day : ${pivotData.dateRange}">
                 <td th:if="${day.equals(today)}"
-                class="pivot-table-entry-header prevent-select highlighted-day">
+                    class="pivot-table-entry-header prevent-select highlighted-day"
+                    th:attr="data-day=${#temporals.format(day, 'yyyy-MM-dd')}"
+                >
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
                       class="vertical-text"
@@ -1064,7 +1066,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                     ${#temporals.dayOfWeek(day) >= 1 && #temporals.dayOfWeek(day) <= 7 &&
                      day.isAfter( startOfWeek.minusDays(1) ) &&
                      day.isBefore(startOfWeek.plusDays(7))} ? 'highlighted-week' : ''"
-                    class="pivot-table-entry-header prevent-select">
+                     class="pivot-table-entry-header prevent-select"
+                     th:attr="data-day=${#temporals.format(day, 'yyyy-MM-dd')}">
 
                 <span th:text="${#temporals.format(day, dateFormat)}"
                       class="vertical-text"
@@ -2209,6 +2212,53 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 </script>
 
 <div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+      window._pivotTopicIds = /*[[${filterDto.topicIds}]]*/ [];
+    /*]]>*/
+</script>
+
+<div th:replace="~{fragments/entries-modal :: modalContent}"></div>
+
+<script>
+    // jQuery varsa:
+    $(document).on('click touchstart', 'td.pivot-table-entry-header', function (e) {
+      e.preventDefault();
+      // buradan ilgili günün tarih bilgisini al (span içeriği veya data-day attribute )
+      // ideal: her td'ye data-day atribütü koy: th:attr="data-day=${#temporals.format(day, 'yyyy-MM-dd')}"
+      const $td = $(this);
+      const day = $td.data('day') || $td.find('span').attr('title') || $td.find('span').text();
+      // topicIds listesi nerede? Thymeleaf içinde sayfada zaten ${filterDto.topicIds} varsa
+      // sayfaya bir global JS değişken olarak koyduğunu varsayalım:
+      const topicIds = window._pivotTopicIds || [];
+
+      if(!day || !topicIds.length){
+        console.warn('Gün veya topicIds eksik', day, topicIds);
+        return;
+      }
+
+      // ajax isteği: server tarafında HTML fragment dönecek
+      $.get('/api/entries-modal', { day: day, topicIds: topicIds }, function (html) {
+        // Gelen HTML fragment içinde modal markup bulunuyor. Replace / append modal container.
+        // remove varsa eski modal
+        $('#entriesModal').remove();
+        $('body').append(html);
+        // show bootstrap modal
+        const modalEl = document.getElementById('entriesModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+      }).fail(function (xhr) {
+        console.error('Modal yüklenemedi', xhr);
+        alert('Veri yüklenirken hata oldu.');
+      });
+    });
+
+
+
+</script>
+
 
 
 </body>

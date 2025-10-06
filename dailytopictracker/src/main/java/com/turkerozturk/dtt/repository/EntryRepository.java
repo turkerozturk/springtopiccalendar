@@ -145,5 +145,8 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
             @Param("startDateMillis") long startDateMillis,
             @Param("endDateMillis") long endDateMillis);
 
+    // topic id listesi ve dateMillis aralığı sorgusu
+    List<Entry> findByTopicIdInAndDateMillisYmdBetween(List<Long> topicIds, Long startMillis, Long endMillis);
+
 
 }

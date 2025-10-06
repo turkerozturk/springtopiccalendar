@@ -1,0 +1,109 @@
+
+
+<!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+<div th:fragment="modalContent">
+    <div class="modal fade" id="entriesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span th:text="${#temporals.format(day, dateFormatTitle)}">Gün</span>
+                    </h5>
+                    <div class="ms-2">
+                        <!-- PDF ikonu -->
+                        <!--/*
+                        <a th:href="@{/api/entries-modal/pdf(day=${day}, topicIds=${#urls.arrayJoin(rows.?[topicId],',' )})}"
+                           class="btn btn-outline-secondary btn-sm" title="PDF indir">
+                            <i class="fa-regular fa-file-pdf" style="color: red;"></i> PDF
+                        </a>
+                        */-->
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-2 d-flex justify-content-end">
+                        <button id="copyEntriesBtn" class="btn btn-sm btn-outline-primary">Copy to clipboard</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th scope="col">Topic</th>
+                                <th scope="col">Entry / Note</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="r : ${rows}">
+                                <td th:text="${r.topicName}">Topic name</td>
+                                <td>
+                      <span th:if="${r.entryStatus != null}">
+                        <span th:classappend="'status-box status-' + ${r.entryStatus}"></span>
+                        <span th:text="${r.noteContent}">Not içeriği</span>
+                      </span>
+                                    <span th:if="${r.entryStatus == null}">&nbsp;</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stil: küçük renk kutucukları -->
+    <style>
+        .status-box {
+          display: inline-block;
+          width: 0.9rem;
+          height: 0.9rem;
+          border-radius: 0.15rem;
+          margin-right: 0.5rem;
+          vertical-align: middle;
+        }
+        .status-0 { background: #e9ecef; } /* not marked - gri */
+        .status-1 { background: #198754; } /* done - yeşil */
+        .status-2 { background: #ffc107; } /* warning - sarı */
+        /* Responsive: modal already modal-fullscreen-sm-down */
+    </style>
+
+    <script th:inline="javascript">
+        /* Copy to clipboard: modal içindeki tabloyu düz metin olarak kopyalar */
+        (function(){
+          const copyBtn = document.getElementById('copyEntriesBtn');
+          if(copyBtn){
+            copyBtn.addEventListener('click', function(){
+              const rows = Array.from(document.querySelectorAll('#entriesModal table tbody tr'));
+              const lines = rows.map(tr => {
+                const cols = tr.querySelectorAll('td');
+                const topic = cols[0]?.innerText?.trim() || '';
+                const entry = cols[1]?.innerText?.trim() || '';
+                return topic + '\t' + entry;
+              });
+              const text = lines.join('\n');
+              navigator.clipboard.writeText(text).then(function(){
+                // küçük gösterim bildirimi
+                const orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = 'Kopyalandı';
+                setTimeout(()=> copyBtn.innerHTML = orig, 1000);
+              }).catch(err => {
+                console.error('copy failed', err);
+              });
+            });
+          }
+        })();
+    </script>
+
+</div>
+
+
