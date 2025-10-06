@@ -20,7 +20,21 @@
  */
 package com.turkerozturk.dtt.service;
 
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.*;
+
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+//import com.turkerozturk.dtt.controller.web.HeaderFooterPageEvent;
 import com.turkerozturk.dtt.dto.TopicEntryView;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
@@ -92,10 +106,110 @@ public class EntryModalService {
         return views;
     }
 
-    public byte[] createPdfForDay(List<Long> topicIds, LocalDate day) {
-        // Basit placeholder: boş pdf üretimi (kullanıcı gerçek PDF motoru ekleyebilir).
-        // Örnek: iText veya PDFBox ile render etmek iyi olur. Burada 1 byte döndürmeyelim.
-        // Aşağıda minimal PDF header (geçici). Lütfen yerine gerçek PDF üret.
-        return new byte[]{};
+
+
+
+    private BaseFont loadFont(String resourcePath) throws IOException, DocumentException {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new FileNotFoundException("Font not found: " + resourcePath);
+            }
+            byte[] fontBytes = is.readAllBytes();
+            return BaseFont.createFont(resourcePath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, fontBytes, null);
+        }
     }
+
+    public byte[] createPdfForDay(List<Long> topicIds, LocalDate day) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            Document document = new Document(new Rectangle(PageSize.A4), 36, 36, 54, 54);
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+           //todo bulamiyor: writer.setPageEvent(new HeaderFooterPageEvent()); // eğer sınıf mevcutsa
+            document.open();
+
+            // === FONTLAR ===
+
+
+
+            //String TODO fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
+            String fontPath = "fonts/unifont-16.0.04.ttf";
+
+            String fontPathCourier = "fonts/unifont-16.0.04.ttf";
+
+            BaseFont bf = loadFont(fontPath);
+            Font headerFont = new Font(bf, 14, Font.BOLD);
+            Font cellFont = new Font(bf, 10);
+
+            BaseFont bfCourier = loadFont(fontPathCourier);
+            Font cellFontCourier = new Font(bfCourier, 10);
+
+            // === BAŞLIK ===
+            Paragraph title = new Paragraph("Entries on selected topics for a specific day", headerFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            String dateFormatted = day.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            Paragraph subtitle = new Paragraph("Date: " + dateFormatted + " - Daily Topic Tracker", cellFont);
+            subtitle.setAlignment(Element.ALIGN_CENTER);
+            document.add(subtitle);
+            document.add(Chunk.NEWLINE);
+
+            // === TABLO ===
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{2f, 8f});
+            table.setHeaderRows(1);
+
+            // Sütun başlıkları
+            PdfPCell cell1 = new PdfPCell(new Phrase("Topic", headerFont));
+            PdfPCell cell2 = new PdfPCell(new Phrase("Entry / Note", headerFont));
+            cell1.setBackgroundColor(Color.LIGHT_GRAY);
+            cell2.setBackgroundColor(Color.LIGHT_GRAY);
+            table.addCell(cell1);
+            table.addCell(cell2);
+
+            // === VERİLER ===
+            List<TopicEntryView> rows = getTopicEntriesForDay(topicIds, day);
+
+            for (TopicEntryView row : rows) {
+                // topic adı
+                table.addCell(new Phrase(row.getTopicName(), cellFont));
+
+                // entry içeriği
+                if (row.getEntryStatus() != null) {
+                    Integer status = row.getEntryStatus();
+                   // Note note = row.getEntry().getNote();
+
+                    String symbol;
+                    if (status != null) {
+                        switch (status) {
+                            case 1 -> symbol = "■"; // done
+                            case 2 -> symbol = "▲"; // warning
+                            default -> symbol = "□"; // not marked
+                        }
+                    } else {
+                        symbol = "□";
+                    }
+
+
+                    String content = symbol + " " + (row.getNoteContent() != null ? row.getNoteContent() : "");
+                    Phrase phrase = new Phrase(content, cellFontCourier);
+                    table.addCell(phrase);
+                } else {
+                    table.addCell(""); // boş hücre
+                }
+            }
+
+            document.add(table);
+            document.close();
+
+        } catch (Exception e) {
+            throw new RuntimeException("PDF oluşturulamadı", e);
+        }
+
+        return out.toByteArray();
+    }
+
+
 }

@@ -81,10 +81,8 @@ public class EntriesModalController {
             @RequestParam("day") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day,
             @RequestParam("topicIds") List<Long> topicIds) {
 
-        System.out.println("PDFDAY     : " + day);
-        System.out.println("PDFTOPICIDS: " + topicIds);
 
-        // TODO: Burada gerçek PDF üretimini yap. Aşağıda örnek boş pdf oluşturuluyor.
+
         byte[] pdfBytes = entryModalService.createPdfForDay(topicIds, day); // implement et
 
         HttpHeaders headers = new HttpHeaders();
