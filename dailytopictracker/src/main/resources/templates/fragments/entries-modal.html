@@ -5,7 +5,7 @@
     Please refer to the project's README.md file for additional details.
     https://github.com/turkerozturk/springtopiccalendar
     -->
-<div th:fragment="modalContent">
+<div th:fragment="modalContent(day, rows, topicIds)">
     <div class="modal fade" id="entriesModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
             <div class="modal-content">
@@ -15,12 +15,21 @@
                     </h5>
                     <div class="ms-2">
                         <!-- PDF ikonu -->
-                        <!--/*
-                        <a th:href="@{/api/entries-modal/pdf(day=${day}, topicIds=${#urls.arrayJoin(rows.?[topicId],',' )})}"
+
+
+
+
+                        <a th:if="${not #lists.isEmpty(topicIds)}"
+                           th:href="${'/api/entries-modal/pdf?day=' + day + '&topicIds=' + #strings.listJoin(topicIds, ',')}"
                            class="btn btn-outline-secondary btn-sm" title="PDF indir">
                             <i class="fa-regular fa-file-pdf" style="color: red;"></i> PDF
                         </a>
-                        */-->
+
+
+
+
+
+
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
                 </div>

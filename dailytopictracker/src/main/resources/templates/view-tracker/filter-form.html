@@ -2220,7 +2220,10 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
     /*]]>*/
 </script>
 
-<div th:replace="~{fragments/entries-modal :: modalContent}"></div>
+
+
+<div th:replace="~{fragments/entries-modal :: modalContent(${day}, ${rows}, ${filterDto.topicIds})}"></div>
+
 
 <script>
     // jQuery varsa:

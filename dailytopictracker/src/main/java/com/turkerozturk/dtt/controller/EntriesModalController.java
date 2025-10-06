@@ -67,6 +67,7 @@ public class EntriesModalController {
         // dateFormat ve dateFormatTitle gibi thymeleaf context değişkenleri varsa onları da ekle
         ctx.setVariable("dateFormat", "dd.MM.yyyy");
         ctx.setVariable("dateFormatTitle", "EEEE, dd MMMM yyyy");
+        ctx.setVariable("topicIds", topicIds); // ✅ burası eklendi
 
         // fragments/entries-modal.html dosyasındaki fragment id'sini render et
         String html = templateEngine.process("fragments/entries-modal", ctx);
@@ -79,6 +80,9 @@ public class EntriesModalController {
     public ResponseEntity<byte[]> downloadPdf(
             @RequestParam("day") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate day,
             @RequestParam("topicIds") List<Long> topicIds) {
+
+        System.out.println("PDFDAY     : " + day);
+        System.out.println("PDFTOPICIDS: " + topicIds);
 
         // TODO: Burada gerçek PDF üretimini yap. Aşağıda örnek boş pdf oluşturuluyor.
         byte[] pdfBytes = entryModalService.createPdfForDay(topicIds, day); // implement et
