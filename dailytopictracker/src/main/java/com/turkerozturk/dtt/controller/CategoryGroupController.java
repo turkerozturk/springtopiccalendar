@@ -76,6 +76,7 @@ public class CategoryGroupController {
         groups.forEach(g -> {
 
             List<Category> sorted = g.getCategories().stream()
+                    .filter(cat -> !cat.isArchived()) // ✅ sadece archived=false olanlar
                     .peek(cat -> {
                         CategoryEntryStatsDto dto = statsMap.get(cat.getId());
                         if (dto != null) {

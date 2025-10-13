@@ -47,10 +47,13 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     FROM Category c
     LEFT JOIN c.topics t
     LEFT JOIN t.activities e
+    WHERE (:archived IS NULL OR c.archived = :archived)
     GROUP BY c.id, c.name
     ORDER BY c.name
     """)
-    List<CategoryEntryStatsDto> getCategoryEntryStats(@Param("today") Long todayDateYmd);
+    List<CategoryEntryStatsDto> getCategoryEntryStats(
+            @Param("today") Long todayDateYmd,
+            @Param("archived") Boolean archived);
 
     Optional<Category> findFirstByOrderByIdAsc();
 

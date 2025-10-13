@@ -118,7 +118,7 @@ public class CategoryService {
                 .toInstant()
                 .toEpochMilli();
 
-        List<CategoryEntryStatsDto> statsDtos = categoryRepository.getCategoryEntryStats(todayYmd);
+        List<CategoryEntryStatsDto> statsDtos = categoryRepository.getCategoryEntryStats(todayYmd, false);
 
         return statsDtos;
     }
