@@ -132,8 +132,7 @@ public class EntryModalService {
 
 
 
-            //String TODO fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
-            String fontPath = "fonts/unifont-16.0.04.ttf";
+            String fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
 
             String fontPathCourier = "fonts/unifont-16.0.04.ttf";
 

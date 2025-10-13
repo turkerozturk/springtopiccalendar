@@ -534,8 +534,7 @@ public class TopicReportController {
         document.open();
 
         // src/main/resources/fonts/NotoSans-VariableFont_wdth,wght.ttf
-        // todo fix String fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
-        String fontPath = "fonts/unifont-16.0.04.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
+        String fontPath = "fonts/NotoSans-VariableFont_wdth,wght.ttf"; // https://fonts.google.com/noto/specimen/Noto+Sans
 
         String fontPathCourier = "fonts/unifont-16.0.04.ttf";
         // Normal yazilar icin
