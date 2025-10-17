@@ -56,14 +56,18 @@ public class NoteSearchController {
         int pageSize = 10;
         List<Map<String, Object>> results = searchService.search(searchTerm, exactMatch, page, pageSize);
 
+
         long noteCount = results.size();
+        /*
         long totalMatches = results.stream()
                 .mapToLong(r -> ((String) r.get("html"))
                         .split("(?i)" + Pattern.quote(searchTerm)).length - 1)
                 .sum();
+        */
 
         model.addAttribute("results", results);
         model.addAttribute("query", searchTerm);
+        model.addAttribute("exactMatch", exactMatch);
         //model.addAttribute("noteCount", noteCount);
         //model.addAttribute("totalMatches", totalMatches);
         model.addAttribute("page", page);

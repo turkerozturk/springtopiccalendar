@@ -30,11 +30,12 @@ https://github.com/turkerozturk/springtopiccalendar
     <!-- Sonsuz scroll (HTMX “revealed” trigger) -->
     <div class="text-center mt-3" th:if="${hasMore}">
         <button class="btn btn-outline-secondary"
-                th:hx-get="@{/search/results(q=${query}, page=${page+1})}"
+                th:hx-get="@{/search/results(q=${query}, exactMatch=${exactMatch}, page=${page+1})}"
                 hx-target="#results"
                 hx-swap="beforeend"
                 hx-trigger="revealed">
-            Daha fazla yükle
+          <!--/*  Daha fazla yükle */-->
+            ...
         </button>
     </div>
 </div>

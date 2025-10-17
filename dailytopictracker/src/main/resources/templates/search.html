@@ -18,37 +18,70 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
-    <!-- htmx -->
-    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
 
-    <!-- Opsiyonel: highlight rengi -->
+
+
     <style>
-        mark {
-            background-color: #ffed75;
-            padding: 0 2px;
-            border-radius: 3px;
+
+
+        body {
+
+background-color: [[${htmlBackgroundColor}]];
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+         }
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
         }
-        .note-card {
-            border-radius: 1rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        .loading-spinner.active {
-            display: block;
-        }
+
+         #navigation-panel button, a{
+                  border-radius:10px !important;
+                }
+
+                      #navigation-panel {
+                   max-width: 740px;
+                   margin-top: 10px;
+                   margin-bottom: 5px;
+                   margin-left: auto;
+                   margin-right: auto;
+                   padding: 3px;
+                   border: 2px solid DarKGray;
+                   border-radius: 7px 7px 7px 7px;
+
+                   /* https://cssgradient.io/ */
+
+                   background: #a7d6e8;
+                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+                }
+
+        </style>
+
+
+<!-- Opsiyonel: highlight rengi -->
+<style>
+mark {
+    background-color: #ffed75;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+.note-card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.loading-spinner {
+    display: none;
+    text-align: center;
+    margin: 1rem 0;
+}
+.loading-spinner.active {
+    display: block;
+}
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-<div class="container py-4">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold">📝 Notlarda Arama</h2>
-        <p class="text-muted">Markdown içeriğinde kelime arayın</p>
-    </div>
+<div  id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
 
     <form id="searchForm"
           class="mb-4"
@@ -56,24 +89,42 @@
           hx-target="#results"
           hx-swap="innerHTML"
           hx-indicator="#loadingSpinner">
-        <div class="input-group input-group-lg">
+        <div class="input-group input-group-sm">
             <input type="text" name="q" id="queryInput"
                    class="form-control"
-                   placeholder="Aranacak kelime..."
+                   placeholder="Search word..."
                    required autofocus>
-            <button class="btn btn-primary" type="submit">Ara</button>
+            <button class="btn btn-secondary" type="submit" title="Search in Notes"><i class="fas fa-search"></i></button>
             <label>
-                <input type="checkbox" name="exactMatch" /> Tam eşleşme
+                <input type="checkbox" name="exactMatch" /> Exact Match
             </label>
-            <button class="btn btn-outline-secondary" type="button" onclick="resetSearch()">Temizle</button>
+            <button class="btn btn-secondary" type="button" onclick="resetSearch()">Clear</button>
         </div>
     </form>
+</div>
+
+<div class="container py-4">
+    <!--/*
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">📝 Notlarda Arama</h2>
+        <p class="text-muted">Markdown içeriğinde kelime arayın</p>
+    </div>
+    */-->
+
+    <h1><span class="fonbg">Notes</span></h1>
 
     <div id="loadingSpinner" class="loading-spinner">
         <div class="spinner-border text-secondary" role="status"></div>
     </div>
 
-    <div id="results" class="mt-4"></div>
+    <div id="results" class="mt-4">
+
+        <span th:if="${#strings.isEmpty(query)}">
+            <div class="alert alert-warning">Search results will be listed here.</div>
+        </span>
+
+    </div>
+
 </div>
 
 

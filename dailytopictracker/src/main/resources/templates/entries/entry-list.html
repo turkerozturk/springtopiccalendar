@@ -133,7 +133,15 @@
            class="btn btn-secondary btn-sm"
            style="color:white;">
             <i class="fa-solid fa-circle-plus"></i> New Entry</a>
+
+
+        <a th:href="@{/search}"
+           title="Search in Notes"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            <i class="fas fa-search"></i> Search in Notes</a>
     </div>
+
 
     <div th:if="${topic != null}" class="mb-3">
 
