@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notlarda Arama</title>
+
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+    <!-- htmx -->
+    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
+
+    <!-- Opsiyonel: highlight rengi -->
+    <style>
+        mark {
+            background-color: #ffed75;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .note-card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .loading-spinner.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">📝 Notlarda Arama</h2>
+        <p class="text-muted">Markdown içeriğinde kelime arayın</p>
+    </div>
+
+    <form id="searchForm"
+          class="mb-4"
+          hx-get="/search/results"
+          hx-target="#results"
+          hx-swap="innerHTML"
+          hx-indicator="#loadingSpinner">
+        <div class="input-group input-group-lg">
+            <input type="text" name="q" id="queryInput"
+                   class="form-control"
+                   placeholder="Aranacak kelime..."
+                   required autofocus>
+            <button class="btn btn-primary" type="submit">Ara</button>
+            <label>
+                <input type="checkbox" name="exactMatch" /> Tam eşleşme
+            </label>
+            <button class="btn btn-outline-secondary" type="button" onclick="resetSearch()">Temizle</button>
+        </div>
+    </form>
+
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-secondary" role="status"></div>
+    </div>
+
+    <div id="results" class="mt-4"></div>
+</div>
+
+
+
+<!--/* asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+*/-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+<!--/* online olani: "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js" */-->
+
+<script>
+    function resetSearch() {
+        const input = document.getElementById('queryInput');
+        input.value = '';
+        document.getElementById('results').innerHTML = '';
+    }
+</script>
+
+</body>
+</html>

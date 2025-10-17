@@ -1,0 +1,40 @@
+<!--/*
+This file is part of the DailyTopicTracker project.
+Please refer to the project's README.md file for additional details.
+https://github.com/turkerozturk/springtopiccalendar
+*/-->
+
+<div th:fragment="results">
+    <!--/*
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="mb-0">
+                "<span th:text="${query}"></span>" araması
+            </h5>
+            <small class="text-muted">
+                <span th:text="${noteCount}"></span> notta,
+                toplam <span th:text="${totalMatches}"></span> kez bulundu
+            </small>
+        </div>
+    </div>
+    */-->
+
+    <div th:if="${#lists.isEmpty(results)}">
+        <div class="alert alert-warning">Sonuç bulunamadı.</div>
+    </div>
+
+    <div th:each="note : ${results}" class="card note-card mb-3">
+        <div class="card-body" th:utext="${note.html}"></div>
+    </div>
+
+    <!-- Sonsuz scroll (HTMX “revealed” trigger) -->
+    <div class="text-center mt-3" th:if="${hasMore}">
+        <button class="btn btn-outline-secondary"
+                th:hx-get="@{/search/results(q=${query}, page=${page+1})}"
+                hx-target="#results"
+                hx-swap="beforeend"
+                hx-trigger="revealed">
+            Daha fazla yükle
+        </button>
+    </div>
+</div>

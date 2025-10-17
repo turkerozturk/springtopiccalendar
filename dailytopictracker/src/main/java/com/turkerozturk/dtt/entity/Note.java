@@ -22,16 +22,23 @@ package com.turkerozturk.dtt.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Data
 @Entity
 @Table(name = "notes")
+@Indexed // 🔍 Bu entity indekslenecek
 public class Note {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GenericField(name = "idSort", sortable = Sortable.YES) // ← sortable olarak indeksle. dogrudan "id" yazimini kullanamadigimiz icin boyle bir isim veriyoruz. hibernate search ile ilgili.
     private Long id;
 
+    @FullTextField //(analyzer = "turkish") // Türkçe dil analizoru, kullanmadim simdilik cunku tek dile gore.
     @Column(columnDefinition = "TEXT")
     private String content;
 
