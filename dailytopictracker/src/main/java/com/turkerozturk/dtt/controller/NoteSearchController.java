@@ -20,7 +20,9 @@
  */
 package com.turkerozturk.dtt.controller;
 
+import com.turkerozturk.dtt.dto.NoteSearchResultDTO;
 import com.turkerozturk.dtt.service.NoteSearchService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,11 +35,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/search")
 public class NoteSearchController {
 
     @Autowired
-    private NoteSearchService searchService;
+    private NoteSearchService noteSearchService;
 
     @GetMapping
     public String searchPage() {
@@ -49,13 +52,12 @@ public class NoteSearchController {
     public String searchResults(@RequestParam(name = "q") String searchTerm,
                                 @RequestParam(defaultValue = "false") boolean exactMatch,
                                 @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "10") int pageSize,
                                 Model model) {
 
 
         //System.out.println(exactMatch + ", " + q);
-        int pageSize = 10;
-        List<Map<String, Object>> results = searchService.search(searchTerm, exactMatch, page, pageSize);
-
+        List<NoteSearchResultDTO> results = noteSearchService.search(searchTerm, exactMatch, page, pageSize);
 
         long noteCount = results.size();
         /*

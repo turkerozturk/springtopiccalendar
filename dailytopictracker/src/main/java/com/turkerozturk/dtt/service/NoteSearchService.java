@@ -22,10 +22,12 @@ package com.turkerozturk.dtt.service;
 
 
 import com.turkerozturk.dtt.component.MarkdownService;
+import com.turkerozturk.dtt.dto.NoteSearchResultDTO;
 import com.turkerozturk.dtt.entity.Note;
 import com.turkerozturk.dtt.helper.HtmlHighlighter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,7 @@ import java.util.Map;
  * hibernate search kullanir
  */
 @Service
+@RequiredArgsConstructor
 public class NoteSearchService {
 
 
@@ -46,12 +49,12 @@ public class NoteSearchService {
     @Autowired
     private MarkdownService markdownService;
 
-    public List<Map<String, Object>> search(String term, boolean exactMatch, int page, int size) {
+    public List<NoteSearchResultDTO> search(String term, boolean exactMatch, int page, int size) {
         var searchSession = org.hibernate.search.mapper.orm.Search.session(entityManager);
 
-        var session = searchSession.search(Note.class);
+        var query  = searchSession.search(Note.class);
 
-        var result = session.where(f -> {
+        var result = query .where(f -> {
                     if (exactMatch) {
                         // 🔒 Tam eşleşme modu (örnek: sadece "elma")
                         return f.match()
@@ -70,14 +73,26 @@ public class NoteSearchService {
                         .sort(f -> f.field("idSort").desc()) // burada "idSort" kullan
                         .fetchHits(page * size, size);
 
+
         return result.stream().map(note -> {
+            var entry = note.getEntry();
+            var topic = entry != null ? entry.getTopic() : null;
+            var category = topic != null ? topic.getCategory() : null;
+
             String html = markdownService.render(note.getContent());
             String highlighted = HtmlHighlighter.highlight(html, term);
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", note.getId());
-            map.put("html", highlighted);
-            return map;
+            return new NoteSearchResultDTO(
+                    note.getId(),
+                    highlighted,
+                    entry != null ? entry.getDate() != null ? entry.getDate().toString() : "" : "",
+                    entry != null ? entry.getId() : null,
+                    entry != null ? entry.getStatus() : null,
+                    topic != null ? topic.getId() : null,
+                    topic != null ? topic.getName() : "",
+                    category != null ? category.getId() : null,
+                    category != null ? category.getName() : ""
+            );
         }).toList();
     }
 
