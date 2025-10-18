@@ -27,7 +27,8 @@ https://github.com/turkerozturk/springtopiccalendar
     <div th:each="r : ${results}" class="card note-card mb-3">
 
 
-        <h5><span th:text="${r.status}"></span>
+        <h5>
+            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + r.status}"></i>
             <a th:href="@{/entries(topicId=${r.topicId})}" th:text="${r.topicName}" target="_blank"></a>
         </h5>
 
