@@ -190,6 +190,29 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
     <!-- === INFO === -->
     <div id="reportInfo" class="mt-2 text-center small text-secondary"></div>
 
+    <!-- === TABLO === -->
+    <div class="mt-3">
+        <table id="reportTable" class="table table-sm table-striped table-bordered align-middle text-center">
+            <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Category Group</th>
+                <th>Counter</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot class="table-light">
+            <tr>
+                <th colspan="2">Total</th>
+                <th id="totalCounterCell"></th>
+                <th id="totalScoreCell"></th>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+
 </div>
 
 <!--/* chart */-->
@@ -291,6 +314,33 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
                 <span style='color:dodgerblue'>Total Entry Count: <b>${data.totalCount}</b></span>
                 </div>`
             );
+
+            // basla tabloyla ilgili kisim
+            const tbody = $("#reportTable tbody");
+            tbody.empty();
+
+            if (data.labels.length === 0) {
+                tbody.append("<tr><td colspan='4' class='text-muted'>Bu aralıkta veri bulunamadı.</td></tr>");
+            } else {
+                for (let i = 0; i < data.labels.length; i++) {
+                    tbody.append(`
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${data.labels[i]}</td>
+                            <td>${data.counters[i]}</td>
+                            <td>${data.scores[i]}</td>
+                        </tr>
+                    `);
+                }
+            }
+
+            // toplam hücreleri
+            $("#totalCounterCell").text(data.totalCount);
+            $("#totalScoreCell").text(data.totalScore);
+            // bitti tabloyla ilgili kisim
+
+
+
 
             // "tümü" ve "son7" gibi sabit aralıklarda prev/next devre dışı
             if (["all", "last7", "range"].includes(currentPeriod)) {
