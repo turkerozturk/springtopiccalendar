@@ -118,5 +118,12 @@ public class IndexController {
     }
 
 
+    @GetMapping("/radar-over-cg")
+    public String radarOverCategoryGroups(Model model) {
+
+
+        return "view-radar-cg/radar-over-cg";
+    }
+
 
 }

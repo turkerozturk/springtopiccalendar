@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--/*
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    */-->
+    <meta charset="UTF-8">
+    <title>Radar Report Over Category Groups</title>
+
+    <!--/* favicon */-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+    <style>
+
+        body {
+   background-color: [[${htmlBackgroundColor}]];
+background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox='0 0 84 84' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M84 23c-4.417 0-8-3.584-8-7.998V8h-7.002C64.58 8 61 4.42 61 0H23c0 4.417-3.584 8-7.998 8H8v7.002C8 19.42 4.42 23 0 23v38c4.417 0 8 3.584 8 7.998V76h7.002C19.42 76 23 79.58 23 84h38c0-4.417 3.584-8 7.998-8H76v-7.002C76 64.58 79.58 61 84 61V23zM59.05 83H43V66.95c5.054-.5 9-4.764 9-9.948V52h5.002c5.18 0 9.446-3.947 9.95-9H83v16.05c-5.054.5-9 4.764-9 9.948V74h-5.002c-5.18 0-9.446 3.947-9.95 9zm-34.1 0H41V66.95c-5.053-.502-9-4.768-9-9.948V52h-5.002c-5.184 0-9.447-3.946-9.95-9H1v16.05c5.053.502 9 4.768 9 9.948V74h5.002c5.184 0 9.447 3.946 9.95 9zm0-82H41v16.05c-5.054.5-9 4.764-9 9.948V32h-5.002c-5.18 0-9.446 3.947-9.95 9H1V24.95c5.054-.5 9-4.764 9-9.948V10h5.002c5.18 0 9.446-3.947 9.95-9zm34.1 0H43v16.05c5.053.502 9 4.768 9 9.948V32h5.002c5.184 0 9.447 3.946 9.95 9H83V24.95c-5.053-.502-9-4.768-9-9.948V10h-5.002c-5.184 0-9.447-3.946-9.95-9zM50 50v7.002C50 61.42 46.42 65 42 65c-4.417 0-8-3.584-8-7.998V50h-7.002C22.58 50 19 46.42 19 42c0-4.417 3.584-8 7.998-8H34v-7.002C34 22.58 37.58 19 42 19c4.417 0 8 3.584 8 7.998V34h7.002C61.42 34 65 37.58 65 42c0 4.417-3.584 8-7.998 8H50z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+        }
+
+    .blink {
+          animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+          50% {
+            opacity: 0;
+          }
+        }
+
+
+
+               .fonbg {
+                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+
+               #navigation-panel button, a{
+                 border-radius:10px !important;
+               }
+
+
+               #navigation-panel {
+                  max-width: 740px;
+                  margin-top: 10px;
+                  margin-bottom: 5px;
+                  margin-left: auto;
+                  margin-right: auto;
+                  padding: 3px;
+                  border: 2px solid DarKGray;
+                  border-radius: 7px 7px 7px 7px;
+
+                  /* https://cssgradient.io/ */
+
+                  background: #a7d6e8;
+                  background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+               }
+
+        a.hover:hover {
+            text-decoration: underline !important;
+        }
+
+    </style>
+
+    <style>
+
+        a.category-name:hover {
+            text-decoration: underline !important;
+        }
+
+        a.category-name {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a.topic-name:hover {
+            text-decoration: underline !important;
+        }
+
+        a.topic-name {
+            text-decoration: none;
+            /* color: inherit; */
+        }
+    </style>
+
+    <style>
+
+        .build-info {
+          width: 100%;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          padding: 10px;
+        }
+
+        .build-info h3 {
+          text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .info-row {
+          display: grid;
+          grid-template-columns: 30% 70%;
+          padding: 5px 0;
+          border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+          font-weight: bold;
+        }
+
+        .info-value {
+          text-align: left;
+        }
+
+        /* Mobil ekranlarda tek sütun */
+        @media (max-width: 600px) {
+          .info-row {
+            grid-template-columns: 100%;
+          }
+          .info-label {
+            margin-bottom: 4px;
+          }
+        }
+
+    </style>
+
+
+
+</head>
+<body>
+
+
+<div id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+
+
+</div>
+
+<div class="container mb-3" style="max-width: 600px;">
+
+    <h1><span class="fonbg">Radar Chart of Category Groups</span></h1>
+
+
+    <!-- === ZAMAN SEÇİMİ === -->
+    <div class="d-flex justify-content-between align-items-center mb-2 bg-light p-2 rounded">
+        <div class="input-group" style="max-width: 350px;">
+            <label class="input-group-text" for="periodSelect">Time Period:</label>
+            <select id="periodSelect" class="form-select form-select-sm">
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+                <option value="month" selected>Month</option>
+                <option value="year">Year</option>
+                <option value="last7">Last 7 Days</option>
+                <option value="range">Date Range</option>
+                <option value="all">All</option>
+            </select>
+        </div>
+
+        <div id="rangeInputs" class="d-none">
+            <input type="date" id="startDate" class="form-control form-control-sm" style="width: 150px;">
+            <span class="mx-1">-</span>
+            <input type="date" id="endDate" class="form-control form-control-sm" style="width: 150px;">
+        </div>
+
+        <div>
+            <button id="prevBtn" class="btn btn-outline-secondary btn-sm me-1">&lt; Prev</button>
+            <button id="nextBtn" class="btn btn-outline-secondary btn-sm">Next &gt;</button>
+        </div>
+    </div>
+
+    <!-- === CHART === -->
+    <div class="bg-white p-3 rounded shadow-sm">
+        <canvas id="reportRadarChart"></canvas>
+    </div>
+
+    <!-- === INFO === -->
+    <div id="reportInfo" class="mt-2 text-center small text-secondary"></div>
+
+</div>
+
+<!--/* chart */-->
+<script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+
+
+
+
+<!--/* https://rgbacolorpicker.com/ */-->
+
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+
+<script>
+    let reportChart;
+    let currentRefDate = new Date(); // referans tarih (prev/next için)
+    let currentPeriod = "month";     // varsayılan
+
+    function formatDate(d) {
+        return d.toISOString().split('T')[0];
+    }
+
+    function shiftDate(period, direction) {
+        const d = new Date(currentRefDate);
+        switch (period) {
+            case "day": d.setDate(d.getDate() + direction); break;
+            case "week": d.setDate(d.getDate() + (7 * direction)); break;
+            case "month": d.setMonth(d.getMonth() + direction); break;
+            case "year": d.setFullYear(d.getFullYear() + direction); break;
+        }
+        currentRefDate = d;
+    }
+
+    function loadReportChart() {
+        let params = { periodType: currentPeriod };
+
+        if (["day", "week", "month", "year"].includes(currentPeriod)) {
+            params.refDate = formatDate(currentRefDate);
+        } else if (currentPeriod === "range") {
+            params.startDate = $('#startDate').val();
+            params.endDate = $('#endDate').val();
+        }
+
+        $.getJSON("/api/report/radar", params, function (data) {
+
+            // Chart verilerini al
+            const ctx = document.getElementById("reportRadarChart").getContext("2d");
+
+            if (reportChart) reportChart.destroy();
+
+            reportChart = new Chart(ctx, {
+                type: "radar",
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: "Score",
+                            data: data.scores,
+                            fill: true,
+                            backgroundColor: "rgba(0, 102, 0, 0.2)",
+                            borderColor: "rgba(0, 102, 0, 1)",
+                            pointBackgroundColor: "rgba(0, 102, 0, 1)"
+                        },
+                        {
+                            label: "Counter",
+                            data: data.counters,
+                            fill: true,
+                            backgroundColor: "rgba(54, 162, 235, 0.2)",
+                            borderColor: "rgba(54, 162, 235, 1)",
+                            pointBackgroundColor: "rgba(54, 162, 235, 1)"
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            pointLabels: { color: '#666' }
+                        }
+                    }
+                }
+            });
+
+            // bilgi metni
+            $("#reportInfo").html(
+                `<div style='background-color:whitesmoke;'>
+                <b>${data.periodType.toUpperCase()}</b> period:
+                ${data.startDate} → ${data.endDate}<br>
+                <span style='color:darkgreen'>Total Score: <b>${data.totalScore}</b></span> |
+                <span style='color:dodgerblue'>Total Entry Count: <b>${data.totalCount}</b></span>
+                </div>`
+            );
+
+            // "tümü" ve "son7" gibi sabit aralıklarda prev/next devre dışı
+            if (["all", "last7", "range"].includes(currentPeriod)) {
+                $("#prevBtn, #nextBtn").prop("disabled", true);
+            } else {
+                $("#prevBtn, #nextBtn").prop("disabled", false);
+            }
+        });
+    }
+
+    $(function () {
+        // Sayfa ilk yüklenişte
+        loadReportChart();
+
+        $("#periodSelect").on("change", function () {
+            currentPeriod = $(this).val();
+
+            // Range seçildiyse tarih alanlarını göster
+            if (currentPeriod === "range") {
+                $("#rangeInputs").removeClass("d-none");
+            } else {
+                $("#rangeInputs").addClass("d-none");
+            }
+
+            // Referans tarihi sıfırla
+            currentRefDate = new Date();
+            loadReportChart();
+        });
+
+        $("#prevBtn").on("click", function () {
+            shiftDate(currentPeriod, -1);
+            loadReportChart();
+        });
+
+        $("#nextBtn").on("click", function () {
+            shiftDate(currentPeriod, +1);
+            loadReportChart();
+        });
+
+        $("#startDate, #endDate").on("change", function () {
+            if (currentPeriod === "range") {
+                loadReportChart();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
