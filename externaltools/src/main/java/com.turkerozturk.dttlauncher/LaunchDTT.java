@@ -29,6 +29,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -39,6 +46,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.json.JSONObject;
 
 /**
  * Commands to compile to jar and run:
@@ -74,6 +82,8 @@ public class LaunchDTT extends JFrame {
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
     private int serverPort;
     private String serverUrlScheme;
+    private String dttVersion = "0.0.0";
+    private boolean dttVersionCheck = true;
 
     private static final int DEFAULT_HTTP_PORT = 8080;
     private static final int DEFAULT_HTTPS_PORT = 8443;
@@ -91,6 +101,8 @@ public class LaunchDTT extends JFrame {
             Properties props = new Properties();
             try (FileInputStream in = new FileInputStream(propFile)) {
                 props.load(in);
+
+                dttVersionCheck = Boolean.parseBoolean(props.getProperty("version.check.new"));
 
                 // read app.ssl.enabled
                 String sslEnabledProp = props.getProperty("app.ssl.enabled");
@@ -157,6 +169,74 @@ public class LaunchDTT extends JFrame {
 
         loadServerConfig();
 
+        logPane = new JTextPane();
+        logPane.setEditable(false);
+        logPane.setBackground(Color.BLACK);
+        logPane.setForeground(Color.WHITE);
+        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
+        logPane.setFont(font);
+        ((DefaultCaret) logPane.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+
+        styledDocument = logPane.getStyledDocument();
+
+        JScrollPane scrollPane = new JScrollPane(logPane);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        addContextMenu(logPane); // adds right click context menu.
+
+        try {
+            // Local versiyonu oku
+            String localVersion = getLocalVersion();
+            appendLog("Current version: " + localVersion + "\n");
+
+            if(dttVersionCheck) {
+
+                // Remote versiyon bilgisi al
+                JSONObject remoteInfo = fetchRemoteVersion();
+                String remoteVersion = remoteInfo.getString("version");
+                String notes = remoteInfo.optString("notes", "");
+
+                appendLog("Remote version: " + remoteVersion + "\n");
+
+                if (isNewerVersion(localVersion, remoteVersion)) {
+                    int choice = JOptionPane.showConfirmDialog(null,
+                            "New version found: " + remoteVersion + "\n\nRelease Notes:\n" + notes +
+                                    "\n\nDo you want to update?",
+                            "Update Daily Topic Tracker",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (choice == JOptionPane.YES_OPTION) {
+                        launchUpdater();
+                        System.exit(0); // Kendini kapat
+                    }
+                } else {
+                    appendLog("The application is up to date." + "\n");
+                    // Burada esas uygulamayı başlatabilirsin (daily-topic-tracker.jar)
+                    // ama manuel olarak butona tiklayarak baslatiyoruz. startApp();
+                    // startApplication();
+                }
+
+            } else {
+                appendLog("New version checking is disabled.\n" +
+                        "If version.check.new=true is set in the application.properties file, " +
+                        "it will check for an updated version online and, if approved, " +
+                        "it will be downloaded and replaced with the new version." + "\n");
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Update check failed!\n" + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            // Güncelleme başarısız olsa da uygulamayı yine başlatabilirsin
+           // ama manuel olarak butona tiklayarak baslatiyoruz.
+           // startApplication();
+        }
+
+
+
+
         //serverPort = readServerPort();
 
         // loads *.db filenames into a list box if they exist. If not, you cannot see the list box.
@@ -189,20 +269,7 @@ public class LaunchDTT extends JFrame {
 
 
 
-        logPane = new JTextPane();
-        logPane.setEditable(false);
-        logPane.setBackground(Color.BLACK);
-        logPane.setForeground(Color.WHITE);
-        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-        logPane.setFont(font);
-        ((DefaultCaret) logPane.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-
-        styledDocument = logPane.getStyledDocument();
-
-        JScrollPane scrollPane = new JScrollPane(logPane);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        addContextMenu(logPane); // adds right click context menu.
 
         // Start/Stop butonu
         btnStartStop.setBackground(COLOR_STOPPED);
@@ -713,9 +780,62 @@ public class LaunchDTT extends JFrame {
         };
     }
 
+    // codes below are related with updating the software
+
+
+    private static final String VERSION_URL =
+            "https://raw.githubusercontent.com/turkerozturk/springtopiccalendar/main/version.json";
 
 
 
+    private String getLocalVersion() throws IOException {
+        Path versionFile = Paths.get("version.json");
+        if (Files.exists(versionFile)) {
+            String jsonText = Files.readString(versionFile, StandardCharsets.UTF_8);
+            try {
+                JSONObject localInfo = new JSONObject(jsonText);
+                if (localInfo.has("version")) {
+                    this.dttVersion = localInfo.getString("version");
+                }
+            } catch (Exception e) {
+                appendLog("⚠️ Local version.json file does not exist, could not be read, or invalid JSON: " + e.getMessage());
+            }
+        }
+        return this.dttVersion;
+    }
+
+    private JSONObject fetchRemoteVersion() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(new URI(VERSION_URL))
+                .build();
+        HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+
+        if (resp.statusCode() != 200) {
+            throw new IOException("Could not get " + VERSION_URL + "! HTTP " + resp.statusCode());
+        }
+        return new JSONObject(resp.body());
+    }
+
+    private boolean isNewerVersion(String local, String remote) {
+        String[] lv = local.split("\\.");
+        String[] rv = remote.split("\\.");
+        for (int i = 0; i < Math.max(lv.length, rv.length); i++) {
+            int li = (i < lv.length) ? Integer.parseInt(lv[i]) : 0;
+            int ri = (i < rv.length) ? Integer.parseInt(rv[i]) : 0;
+            if (ri > li) return true;
+            if (ri < li) return false;
+        }
+        return false;
+    }
+
+    private void launchUpdater() throws IOException {
+        // dttupdater.jar aynı klasörde olmalı
+        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "dttupdater.jar");
+        pb.directory(Path.of("").toFile());
+        pb.start();
+        appendLog("The updater has been started." + "\n");
+    }
 
 
 

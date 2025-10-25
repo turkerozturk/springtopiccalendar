@@ -13,6 +13,7 @@
   <modules>
     <module>dailytopictracker</module>
     <module>externaltools</module>
+    <module>dttupdater</module>
   </modules>
 
 
@@ -68,6 +69,8 @@
             </goals>
             <configuration>
               <target>
+                <copy file="version.json"
+                      todir="release/" />
                 <copy file="README.md"
                       todir="release/nonessential/" />
                 <copy file="LICENSE"
