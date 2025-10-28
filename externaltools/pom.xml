@@ -153,6 +153,37 @@
                 </configuration>
             </plugin>
 
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>sign-exe</id>
+                        <phase>package</phase>
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <executable>cmd</executable>
+                            <arguments>
+                                <argument>/c</argument>
+                                <argument>
+                                    <![CDATA[
+                                    where signtool.exe >nul 2>nul && (
+                                      signtool sign /f "${project.basedir}\TurkerOzturkCodeSign.pfx" /p 1234 /tr http://timestamp.sectigo.com /td sha256 /fd sha256 "${project.build.directory}\LaunchDTT.exe"
+                                    ) || (
+                                      echo signtool not found, skipping signing
+                                    )
+                                    ]]>
+                                </argument>
+
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
