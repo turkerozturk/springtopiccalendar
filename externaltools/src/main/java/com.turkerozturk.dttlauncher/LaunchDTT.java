@@ -194,21 +194,30 @@ public class LaunchDTT extends JFrame {
                 // Remote versiyon bilgisi al
                 JSONObject remoteInfo = fetchRemoteVersion();
                 String remoteVersion = remoteInfo.getString("version");
-                String notes = remoteInfo.optString("notes", "");
+                String notes = remoteInfo.optString("notes", "")
+                        .replace("\\r\\n", "\n")  // CRLF kaçışlarını da düzelt
+                        .replace("\\n", "\n")
+                        .replace("\\r", "\n");
+
 
                 appendLog("Remote version: " + remoteVersion + "\n");
 
                 if (isNewerVersion(localVersion, remoteVersion)) {
                     int choice = JOptionPane.showConfirmDialog(null,
-                            "New version found: " + remoteVersion + "\n\nRelease Notes:\n" + notes +
+                            "New version of DailyTopictracker found: " + remoteVersion + "\n\nRelease Notes:\n" + notes +
                                     "\n\nDo you want to update?",
                             "Update Daily Topic Tracker",
                             JOptionPane.YES_NO_OPTION);
 
+
                     if (choice == JOptionPane.YES_OPTION) {
                         launchUpdater();
-                        System.exit(0); // Kendini kapat
+                        try {
+                            Thread.sleep(1000); // 1 saniye updater başlasın diye sonra kendini kapatır.
+                        } catch (InterruptedException ignored) {}
+                        System.exit(0);
                     }
+
                 } else {
                     appendLog("The application is up to date." + "\n");
                     // Burada esas uygulamayı başlatabilirsin (daily-topic-tracker.jar)
@@ -830,12 +839,25 @@ public class LaunchDTT extends JFrame {
     }
 
     private void launchUpdater() throws IOException {
-        // dttupdater.jar aynı klasörde olmalı
-        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "dttupdater.jar");
-        pb.directory(Path.of("").toFile());
+        // Çalışan jar'ın bulunduğu dizini al
+        Path currentDir = Paths.get(System.getProperty("user.dir"));
+        File updaterJar = new File(currentDir.toFile(), "dttupdater.jar");
+
+        if (!updaterJar.exists()) {
+            JOptionPane.showMessageDialog(null,
+                    "Updater file not found: " + updaterJar.getAbsolutePath(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        ProcessBuilder pb = new ProcessBuilder("java", "-jar", updaterJar.getAbsolutePath());
+        pb.directory(currentDir.toFile());
+        pb.inheritIO(); // konsol çıktılarını aynen aktarır (isteğe bağlı)
         pb.start();
-        appendLog("The updater has been started." + "\n");
+
+        appendLog("The updater has been started from: " + updaterJar.getAbsolutePath() + "\n");
     }
+
 
 
 
