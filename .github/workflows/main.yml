@@ -63,11 +63,19 @@ jobs:
 
       - name: Read version.json
         id: read_json
+        shell: pwsh
         run: |
           $json = Get-Content version.json | ConvertFrom-Json
+          
           echo "version=$($json.version)" >> $env:GITHUB_OUTPUT
           echo "date=$($json.date)" >> $env:GITHUB_OUTPUT
-          echo "notes=$($json.notes)" >> $env:GITHUB_OUTPUT
+          
+          # notes degeri cok satirli olabilecegi icin ozel formatla yaz
+          $escapedNotes = $json.notes -replace "`r`n", "\n" -replace "`n", "\n"
+          echo "notes<<EOF" >> $env:GITHUB_OUTPUT
+          echo "$escapedNotes" >> $env:GITHUB_OUTPUT
+          echo "EOF" >> $env:GITHUB_OUTPUT
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
