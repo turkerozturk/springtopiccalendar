@@ -2,5 +2,5 @@
   "version": "1.4.2",
   "date": "2025-10-29",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "Added self-signed certificate and automatic signing to Windows build.\n\nUpdates and backups are performed in a human-friendly manner.\nNo action is taken without user approval.\nIt displays the actions performed and records them in log files.\nUpdate checking is enabled by default."
+  "notes": "\nAdded self-signed certificate and automatic signing to Windows build.\n\nUpdates and backups are performed in a human-friendly manner.\nNo action is taken without user approval.\nIt displays the actions performed and records them in log files.\nUpdate checking is enabled by default."
 }
