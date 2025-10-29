@@ -1,6 +1,6 @@
 {
-  "version": "1.4.1",
-  "date": "2025-10-26",
+  "version": "1.4.2",
+  "date": "2025-10-29",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "Can check updates, download and replace with the existing application files(currently disabled, needs come corrections)\nA radar chart of ratings across category groups for a given date range.\nSSL certificate support(embedded(self signed) + external)\nExport as some pages as pdf, screenshot, spreadsheet files.\nImproved frontend design, made mobile screen friendly.\nMarkdown and search support for the notes.\n Modal pages to display, note, entries, info, statistics.\nReduced web data transfer by caching static pages and by making some user interfaces dynamic reloaded.\n Topics have interval rule, advanced occurance pattern parser, base date, end date, image.\nParserFactory for entries in a topic (GeneralParser, MeasurementParser, EnumerationParser)\nCategory Groups have ordering, color, image.\nCategory Profiles for comfortable tracker navigation and filtering data on the charts.\nLauncher: new buttons, multi colored logs, copy texts\nModularizing the project.\nA lot of other small improvements."
+  "notes": "Added self-signed certificate and automatic signing to Windows build.\n\nUpdates and backups are performed in a human-friendly manner.\nNo action is taken without user approval.\nIt displays the actions performed and records them in log files.\nUpdate checking is enabled by default."
 }

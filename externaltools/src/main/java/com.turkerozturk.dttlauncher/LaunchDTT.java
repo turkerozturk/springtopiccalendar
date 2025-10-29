@@ -162,7 +162,9 @@ public class LaunchDTT extends JFrame {
     }
 
     public LaunchDTT() {
-        super("Daily Topic Tracker Launcher" + " - " + "DailyTopicTracker V1.0.3 - Turker Ozturk");
+
+        super("Daily Topic Tracker Launcher"); // gecici baslik
+
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -188,11 +190,14 @@ public class LaunchDTT extends JFrame {
             // Local versiyonu oku
             String localVersion = getLocalVersion();
             appendLog("Current version: " + localVersion + "\n");
+            this.setTitle("Daily Topic Tracker Launcher - DailyTopicTracker "
+                    + localVersion + " - Turker Ozturk");
 
             if(dttVersionCheck) {
 
                 // Remote versiyon bilgisi al
                 JSONObject remoteInfo = fetchRemoteVersion();
+                String remoteVersionDateAsString = remoteInfo.getString("date");
                 String remoteVersion = remoteInfo.getString("version");
                 String notes = remoteInfo.optString("notes", "")
                         .replace("\\r\\n", "\n")  // CRLF kaçışlarını da düzelt
@@ -203,11 +208,37 @@ public class LaunchDTT extends JFrame {
                 appendLog("Remote version: " + remoteVersion + "\n");
 
                 if (isNewerVersion(localVersion, remoteVersion)) {
-                    int choice = JOptionPane.showConfirmDialog(null,
-                            "New version of DailyTopictracker found: " + remoteVersion + "\n\nRelease Notes:\n" + notes +
-                                    "\n\nDo you want to update?",
+
+                    // Çok satırlı metin alanı oluştur
+                    JTextArea textArea = new JTextArea(10, 40); // 10 satır, 40 sütun
+                    textArea.setText(notes);
+                    textArea.setWrapStyleWord(true);
+                    textArea.setLineWrap(true);
+                    textArea.setEditable(false);
+
+                    // JScrollPane içinde kaydırılabilir hale getir
+                    JScrollPane scrollPane2 = new JScrollPane(textArea);
+                    scrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+                    scrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+                    // Mesaj içeriğini oluştur
+                    Object[] message = {
+                            "New version of DailyTopicTracker found: " + remoteVersion + " (" + remoteVersionDateAsString + ")",
+                            "\nRelease Notes:",
+                            scrollPane2,
+                            "\nDo you want to update?"
+                    };
+
+
+
+
+                    // Evet / Hayır diyalogu göster
+                    int choice = JOptionPane.showConfirmDialog(
+                            null,
+                            message,
                             "Update Daily Topic Tracker",
-                            JOptionPane.YES_NO_OPTION);
+                            JOptionPane.YES_NO_OPTION
+                    );
 
 
                     if (choice == JOptionPane.YES_OPTION) {

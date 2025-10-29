@@ -23,15 +23,14 @@ package com.turkerozturk.dttupdater;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.net.URI;
-import java.net.http.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.*;
+
+
 
 public class Updater {
 
@@ -39,45 +38,13 @@ public class Updater {
     private static final String DOWNLOAD_URL =
             "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip";
 
-    public static void main(String[] args) {
-        try {
-            Path currentDir = Paths.get("").toAbsolutePath();
+    public static String UPDATE_LOG_FILE_NAME = "updatedtt.log";
 
-            //Path currentDir = Paths.get(System.getProperty("user.dir"));
+    public static String BACKUP_LOG_FILE_NAME = "backupdtt.log";
 
 
 
-            System.out.println("Working folder: " + currentDir);
-
-            // 1. Backup al
-            boolean isBackupDisabled = Arrays.asList(args).contains("--nobackup");
-            backupCurrentDir(currentDir, isBackupDisabled);
-
-            // 2. ZIP dosyasını indir
-            Path tempZip = Files.createTempFile("dttupdate", ".zip");
-            downloadFile(DOWNLOAD_URL, tempZip);
-            System.out.println("Zip downloaded: " + tempZip);
-
-            // 3. Geçici klasöre extract et
-            Path tempDir = Files.createTempDirectory("dttunzip");
-            unzip(tempZip, tempDir);
-            System.out.println("Zip extracted: " + tempDir);
-
-            // 4. Yeni dosyaları kopyala
-            copyUpdatedFiles(tempDir, currentDir);
-
-            // 5. LaunchDTT.jar başlat
-            restartLaunchDTT(currentDir);
-
-            System.out.println("✅ Update completed.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("❌ Update failed!");
-        }
-    }
-
-    private static void backupCurrentDir(Path dir, boolean isBackupDisabled) throws IOException {
+    public static void backupCurrentDir(Path dir, boolean isBackupDisabled, java.util.function.Consumer<String> logger) throws IOException {
         // Eğer yedekleme devre dışıysa çık
         if (isBackupDisabled) {
             log(dir, "Backup disabled via argument. Skipping backup.");
@@ -94,7 +61,7 @@ public class Updater {
 
         // Exclude listeleri
         List<String> excludedFolders = List.of("backup", "nonessential", "JRE");
-        List<String> excludedFiles = List.of("update.log");
+        List<String> excludedFiles = List.of(UPDATE_LOG_FILE_NAME);
 
         // ZIP dosyasının adı
         String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
@@ -160,9 +127,9 @@ public class Updater {
         return false;
     }
 
-    private static void log(Path dir, String message) {
+    public  static void log(Path dir, String message) {
         try {
-            Path logFile = dir.resolve("backup").resolve("backupdtt.log");
+            Path logFile = dir.resolve("backup").resolve(BACKUP_LOG_FILE_NAME);
             Files.createDirectories(logFile.getParent());
             String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             Files.writeString(logFile, "[" + timestamp + "] " + message + System.lineSeparator(),
@@ -176,42 +143,16 @@ public class Updater {
 
 
 
-    /*
-    private static void backupCurrentDir(Path dir) throws IOException {
-        String date = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        Path backupZip = dir.resolve("backupdtt-" + date + ".zip");
-        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(backupZip))) {
-            Files.walk(dir)
-                    .filter(Files::isRegularFile)
-                    .forEach(path -> {
-                        try {
-                            String entryName = dir.relativize(path).toString();
-                            zos.putNextEntry(new ZipEntry(entryName));
-                            Files.copy(path, zos);
-                            zos.closeEntry();
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
-                    });
-        }
-        System.out.println("Backup file created: " + backupZip);
-    }
-    */
 
-    /**
-     * GitHub Releases’ta /latest/download/... URL’si HTTP 302 redirect doner,
-     * cunku GitHub seni gercek dosyanin CDN (Amazon S3) adresine yonlendirir.
-     * @param url
-     * @param target
-     * @throws Exception
-     */
-    private static void downloadFile(String url, Path target) throws Exception {
+
+    /*
+    public  static void downloadFile(String url, Path target) throws Exception {
         Downloader downloader = new Downloader();
         downloader.downloadFile(url, target);
 
     }
 
-    private static void unzip(Path zipFile, Path destDir) throws IOException {
+    public  static void unzip(Path zipFile, Path destDir) throws IOException {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
@@ -228,7 +169,9 @@ public class Updater {
         }
     }
 
-    private static void copyUpdatedFiles(Path sourceDir, Path targetDir) throws IOException {
+    */
+
+    public static void copyUpdatedFiles(Path sourceDir, Path targetDir, java.util.function.Consumer<String> logger) throws IOException {
         String[] importantFiles = {"LaunchDTT.jar",
                 "LaunchDTT.exe",
                 "daily-topic-tracker.jar",
@@ -247,10 +190,46 @@ public class Updater {
         }
     }
 
-    private static void restartLaunchDTT(Path dir) throws IOException {
+    public static void restartLaunchDTT(Path dir) throws IOException {
         ProcessBuilder pb = new ProcessBuilder("java", "-jar", "LaunchDTT.jar");
         pb.directory(dir.toFile());
         pb.start();
         System.out.println("LaunchDTT.jar has been restarted.");
     }
+
+    /**
+     * GitHub Releases’ta /latest/download/... URL’si HTTP 302 redirect doner,
+     * cunku GitHub seni gercek dosyanin CDN (Amazon S3) adresine yonlendirir.
+     * @param target
+     * @throws Exception
+     */
+    public static void downloadFileWithLog(Path target, java.util.function.Consumer<String> logger) throws Exception {
+        Downloader downloader = new Downloader();
+        downloader.downloadFile(
+                DOWNLOAD_URL,
+                target,
+                logger
+        );
+    }
+
+    public static void unzipWithLog(Path zipFile, Path destDir, java.util.function.Consumer<String> logger) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                Path newFile = destDir.resolve(entry.getName()).normalize();
+                if (entry.isDirectory()) {
+                    Files.createDirectories(newFile);
+                } else {
+                    Files.createDirectories(newFile.getParent());
+                    try (OutputStream os = Files.newOutputStream(newFile)) {
+                        zis.transferTo(os);
+                    }
+                }
+                logger.accept("Extracted: " + entry.getName());
+            }
+        }
+    }
+
+
+
 }

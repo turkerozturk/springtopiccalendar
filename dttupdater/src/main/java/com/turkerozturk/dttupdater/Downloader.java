@@ -27,7 +27,7 @@ import java.nio.file.*;
 
 public class Downloader {
 
-    public void downloadFile(String url, Path target) throws Exception {
+    public void downloadFile(String url, Path target, java.util.function.Consumer<String> log) throws Exception {
         HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS) // 302 hatasi vermemesi icin
                 .build();
@@ -36,11 +36,13 @@ public class Downloader {
                 .uri(new URI(url))
                 .build();
 
-        System.out.println("📦 Downloading from: " + url);
+        log.accept("📦 Downloading from: " + url);
         HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
         if (response.statusCode() != 200) {
-            throw new IOException("Download failed: " + response.statusCode() + "\nURL: " + url);
+            String exceptionMessage = "Download failed: " + response.statusCode() + "\nURL: " + url;
+            log.accept(exceptionMessage);
+            throw new IOException(exceptionMessage);
         }
 
         long contentLength = response.headers()
@@ -61,15 +63,18 @@ public class Downloader {
 
                 if (contentLength > 0) {
                     int progress = (int) (100 * downloaded / contentLength);
-                    if (progress - lastPrinted >= 2) { // her %2’de bir yaz
-                        System.out.print("\r⬇️  Downloading: " + progress + "%");
+                    if (progress - lastPrinted >= 5) { // her %2’de bir yaz
+                        log.accept("\r⬇️  Downloading: " + progress + "%");
                         lastPrinted = progress;
                     }
                 }
             }
         }
 
-        System.out.println("\r✅ Download complete: " + target.toAbsolutePath());
+        log.accept("\r✅ Download complete: " + target.toAbsolutePath());
     }
+
+
+
 }
 
