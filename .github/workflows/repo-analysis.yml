@@ -1,0 +1,27 @@
+name: Repo Analysis Report
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies for cloc/sloccount (apt)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cloc sloccount
+      - name: Run analysis script
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 generate_repo_report.py
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-analysis-report
+          path: REPO_ANALYSIS_REPORT.md
