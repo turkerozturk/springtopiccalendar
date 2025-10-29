@@ -39,10 +39,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+#      - name: Restore signing certificate
+#        working-directory: externaltools
+#        run: |
+#          echo "${{ secrets.SIGN_CERT_PFX }}" | base64 -d > TurkerOzturkCodeSign.pfx
+
       - name: Restore signing certificate
         working-directory: externaltools
+        shell: pwsh
         run: |
-          echo "${{ secrets.SIGN_CERT_PFX }}" | base64 -d > TurkerOzturkCodeSign.pfx  
+          [IO.File]::WriteAllBytes("TurkerOzturkCodeSign.pfx", [Convert]::FromBase64String("${{ secrets.SIGN_CERT_PFX }}"))
+      
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
