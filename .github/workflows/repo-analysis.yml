@@ -3,7 +3,9 @@ name: Repo Analysis Report
 on:
 #  push:
 #    branches: [ main, master ]
-  workflow_dispatch:
+  workflow_dispatch: # Manuel olarak elle calistirmak icin.
+  schedule: # Otomatik zamanlanmış çalıştırma
+    - cron: "0 3 1 * *"     # Her ayin 1. gunu, 03:00 UTC
 
 jobs:
   analysis:
