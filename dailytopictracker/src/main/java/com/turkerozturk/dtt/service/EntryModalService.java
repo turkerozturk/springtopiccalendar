@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 //import com.turkerozturk.dtt.controller.web.HeaderFooterPageEvent;
+import com.turkerozturk.dtt.component.MarkdownService;
 import com.turkerozturk.dtt.dto.TopicEntryView;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
@@ -55,12 +56,15 @@ import java.util.stream.Collectors;
 @Service
 public class EntryModalService {
 
+    private final MarkdownService markdownService;
+
     private final TopicRepository topicRepository; // mevcut Topic repository
     private final EntryRepository entryRepository; // mevcut Entry repository
     // entryRepository içinde tarih bazlı sorgu ekleyeceğiz
 
-    public EntryModalService(TopicRepository topicRepository,
+    public EntryModalService(MarkdownService markdownService, TopicRepository topicRepository,
                              EntryRepository entryRepository) {
+        this.markdownService = markdownService;
         this.topicRepository = topicRepository;
         this.entryRepository = entryRepository;
     }
@@ -99,7 +103,11 @@ public class EntryModalService {
             v.setTopicName(name);
             if (e != null) {
                 v.setEntryStatus(e.getStatus());
-                if (e.getNote() != null) v.setNoteContent(e.getNote().getContent());
+
+                if (e.getNote() != null) {
+                    String noteHtml = markdownService.render(e.getNote().getContent());
+                    v.setNoteContent(noteHtml);
+                }
             }
             views.add(v);
         }

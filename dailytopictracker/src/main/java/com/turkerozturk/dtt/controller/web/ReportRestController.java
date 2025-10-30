@@ -92,8 +92,16 @@ public class ReportRestController {
                 start = now.minusDays(6);
                 break;
             case "range":
-                start = startDate;
-                end = endDate;
+                if(startDate != null) {
+                    start = startDate;
+                } else {
+                    start = now.minusDays(30);
+                }
+                if(endDate != null) {
+                    end = endDate;
+                } else {
+                    end = now;
+                }
                 break;
             case "all":
             default:

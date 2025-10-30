@@ -53,7 +53,7 @@
                                 <td>
                       <span th:if="${r.entryStatus != null}">
                         <span th:classappend="'status-box status-' + ${r.entryStatus}"></span>
-                        <span th:text="${r.noteContent}">Not içeriği</span>
+                        <span th:utext="${r.noteContent}">Not içeriği</span>
                       </span>
                                     <span th:if="${r.entryStatus == null}">&nbsp;</span>
                                 </td>
