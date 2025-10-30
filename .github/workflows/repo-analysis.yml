@@ -1,8 +1,8 @@
 name: Repo Analysis Report
 
 on:
-  push:
-    branches: [ main, master ]
+#  push:
+#    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
