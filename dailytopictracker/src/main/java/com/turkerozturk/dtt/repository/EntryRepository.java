@@ -38,6 +38,7 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
 
     // topicId filtreli, sayfalı sonuç döndürecek metot
     Page<Entry> findByTopicId(Long topicId, Pageable pageable);
+    long countByTopicId(Long topicId);
 
     Optional<Entry> findByTopicIdAndDateMillisYmd(Long topicId, Long dateMillisYmd);
 

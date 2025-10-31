@@ -1,0 +1,42 @@
+<div th:fragment="results">
+
+    <div th:if="${#lists.isEmpty(results)}">
+        <div class="alert alert-warning">Sonuç bulunamadı.</div>
+    </div>
+
+    <div th:each="r : ${results}" class="card note-card mb-3">
+        <h5>
+            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + r.status}"></i>
+            <a th:href="@{/entries(topicId=${r.topicId})}" th:text="${r.topicName}" target="_blank"></a>
+        </h5>
+
+        <div th:utext="${r.html}"></div>
+
+        <div class="meta mt-2">
+            <p style="text-align:right;">
+                <a th:href="@{/entry-filter/form?categoryId={id}(id=${r.categoryId})}">
+                    <span th:text="${r.categoryName}"></span>
+                </a>
+                <br>
+                <a th:href="@{/entries/edit/{id}(id=${r.entryId},
+                                            categoryId=${r.categoryId},
+                                            topicId=${r.topicId},
+                                            returnPage=entries)}"
+                   target="_blank" rel="noopener noreferrer"
+                   title="Edit Entry">
+                    <span th:text="${r.date}"></span>
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <div class="text-center mt-3" th:if="${hasMore}">
+        <button class="btn btn-outline-secondary"
+                th:hx-get="@{/entry-results(topicId=${topicId}, page=${page+1})}"
+                hx-target="#results"
+                hx-swap="beforeend"
+                hx-trigger="revealed">
+            ...
+        </button>
+    </div>
+</div>

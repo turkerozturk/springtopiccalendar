@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    -->
+    <meta charset="UTF-8"/>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <title>Entries by Topic</title>
+
+
+    <style>
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .htmx-request .loading-spinner {
+            display: block;
+        }
+    </style>
+
+    <style>
+
+
+        body {
+
+background-color: [[${htmlBackgroundColor}]];
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+         }
+
+        .fonbg {
+            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
+
+        #entries-table {
+
+           background-color: WhiteSmoke;
+           border: 3px solid black;
+
+        }
+
+              /* Mevcut link stilleriniz */
+              a {
+                  text-decoration: none;
+                  color: inherit;
+              }
+              a:visited {
+                  color: inherit;
+              }
+              a:hover {
+                  color: blue;
+              }
+
+
+
+              .actions-column {
+                  text-align: center;
+              }
+
+              .status-0 {
+                background-color: gainsboro !important;
+              }
+              .status-1 {
+                background-color: palegreen !important;
+              }
+              .status-2 {
+                background-color: tomato !important;
+              }
+
+              .status-fg-0 {
+                color: gainsboro !important;
+              }
+              .status-fg-1 {
+                color: palegreen !important;
+              }
+              .status-fg-2 {
+                color: tomato !important;
+              }
+
+
+
+
+        #navigation-panel button, a{
+          border-radius:10px !important;
+        }
+
+              #navigation-panel {
+           max-width: 740px;
+           margin-top: 10px;
+           margin-bottom: 5px;
+           margin-left: auto;
+           margin-right: auto;
+           padding: 3px;
+           border: 2px solid DarKGray;
+           border-radius: 7px 7px 7px 7px;
+
+           /* https://cssgradient.io/ */
+
+           background: #a7d6e8;
+           background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
+        }
+
+    </style>
+</head>
+<body>
+
+<div  id="navigation-panel">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+
+    <div th:if="${topic != null}" class="mb-3">
+
+
+        <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='entries', categoryId=${topic.category.id})}"
+           title="Add New Entry"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            <i class="fa-solid fa-circle-plus"></i>&nbsp;<span th:text="${'New Entry (' + topic.name + ')'}"></span></a>
+
+        <a th:href="@{/entries(topicId=${topic.id})}"
+           title="List View"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            ☰&nbsp;List View</a>
+    </div>
+
+</div>
+<div class="container mt-4">
+    <h3>Entries for Topic</h3>
+
+    <div id="results"
+         th:hx-get="@{/entry-results(topicId=${topic.id})}"
+         hx-trigger="load"
+         hx-target="#results"
+         hx-swap="innerHTML">
+    </div>
+
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner-border text-secondary" role="status"></div>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
+cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
+WebJars path'leri şu yapıyı izler:
+/webjars/{artifactId}/{version}/{dosya}
+-->
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.js}"></script>
+
+</body>
+</html>

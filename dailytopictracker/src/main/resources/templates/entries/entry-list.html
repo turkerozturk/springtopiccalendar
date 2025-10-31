@@ -152,6 +152,12 @@
             class="btn btn-secondary btn-sm"
            style="color:white;">
             <i class="fa-solid fa-circle-plus"></i>&nbsp;<span th:text="${'New Entry (' + topic.name + ')'}"></span></a>
+
+        <a th:href="@{/entry-results/page(topicId=${topic.id})}"
+           title="Blog View"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
     </div>
 
 
