@@ -23,6 +23,7 @@ https://github.com/turkerozturk/springtopiccalendar
             <th style="width:20px; min-width:20px; max-width:20px;">📅</th>
             <th style="width:20px; min-width:20px; max-width:20px;"><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></th>
             <th style="width:20px; min-width:20px; max-width:20px;">☰</th>
+            <th style="width:20px; min-width:20px; max-width:20px;">＋</th>
 
 
 
@@ -334,6 +335,19 @@ https://github.com/turkerozturk/springtopiccalendar
                    th:title="${'Click to view ' + item.topic.name + ' entries.'}">
                     ☰
                 </a>
+            </td>
+
+            <td>
+
+
+                <!--/*  'New Entry' link */-->
+                <a th:href="@{/entries/new(topicId=${item.topic.id},
+                                       dateYmd=${#temporals.format(item.dateLocal, 'yyyy-MM-dd')},
+                                       categoryId=${item.topic.category.id},
+                                       returnPage=reporttable)}"
+
+                      title="Add New Entry"
+                      >+</a>
             </td>
 
 
