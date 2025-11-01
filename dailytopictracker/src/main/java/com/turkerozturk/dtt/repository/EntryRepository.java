@@ -150,4 +150,50 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     List<Entry> findByTopicIdInAndDateMillisYmdBetween(List<Long> topicIds, Long startMillis, Long endMillis);
 
 
+
+
+
+
+
+
+/*
+    // category
+    @Query("SELECT e FROM Entry e WHERE e.topic.category.id = :categoryId")
+    Page<Entry> findByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
+    @Query("SELECT COUNT(e) FROM Entry e WHERE e.topic.category.id = :categoryId")
+    long countByCategoryId(@Param("categoryId") Long categoryId);
+
+    // category group
+    @Query("SELECT e FROM Entry e WHERE e.topic.category.categoryGroup.id = :categoryGroupId")
+    Page<Entry> findByCategoryGroupId(@Param("categoryGroupId") Long categoryGroupId, Pageable pageable);
+    @Query("SELECT COUNT(e) FROM Entry e WHERE e.topic.category.categoryGroup.id = :categoryGroupId")
+    long countByCategoryGroupId(@Param("categoryGroupId") Long categoryGroupId);
+
+    // category profile
+    @Query("SELECT e FROM Entry e WHERE e.topic.category.id IN " +
+            "(SELECT c.id FROM CategoryProfile cp JOIN cp.categories c WHERE cp.id = :categoryProfileId)")
+    Page<Entry> findByCategoryProfileId(@Param("categoryProfileId") Long categoryProfileId, Pageable pageable);
+    @Query("SELECT COUNT(e) FROM Entry e WHERE e.topic.category.id IN " +
+            "(SELECT c.id FROM CategoryProfile cp JOIN cp.categories c WHERE cp.id = :categoryProfileId)")
+
+    long countByCategoryProfileId(@Param("categoryProfileId") Long categoryProfileId);
+*/
+
+    // multiple topics
+    Page<Entry> findByTopicIdIn(List<Long> topicIds, Pageable pageable);
+    long countByTopicIdIn(List<Long> topicIds);
+
+    Page<Entry> findByTopic_Category_Id(Long categoryId, Pageable pageable);
+    long countByTopic_Category_Id(Long categoryId);
+
+    Page<Entry> findByTopic_Category_CategoryGroup_Id(Long categoryGroupId, Pageable pageable);
+    long countByTopic_Category_CategoryGroup_Id(Long categoryGroupId);
+
+    Page<Entry> findByTopic_IdIn(List<Long> topicIds, Pageable pageable);
+    long countByTopic_IdIn(List<Long> topicIds);
+
+    Page<Entry> findByTopic_Category_IdIn(List<Long> categoryIds, Pageable pageable);
+    long countByTopic_Category_IdIn(List<Long> categoryIds);
+
+
 }

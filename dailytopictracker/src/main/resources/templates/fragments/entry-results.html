@@ -30,13 +30,34 @@
         </div>
     </div>
 
+
     <div class="text-center mt-3" th:if="${hasMore}">
         <button class="btn btn-outline-secondary"
-                th:hx-get="@{/entry-results(topicId=${topicId}, page=${page+1})}"
+                th:with="
+                tId=${topicId != null ? topicId : 0},
+                cId=${categoryId != null ? categoryId : 0},
+                cgId=${categoryGroupId != null ? categoryGroupId : 0},
+                cpId=${categoryProfileId != null ? categoryProfileId : 0},
+                joinedTopicIds=${topicIds != null ? #strings.arrayJoin(topicIds, ',') : ''}"
+                th:hx-get="@{/entry-results(
+                topicId=${tId},
+                categoryId=${cId},
+                categoryGroupId=${cgId},
+                categoryProfileId=${cpId},
+                topicIds=${joinedTopicIds},
+                page=${page+1}
+            )}"
                 hx-target="#results"
                 hx-swap="beforeend"
                 hx-trigger="revealed">
             ...
         </button>
     </div>
+
+
+
+
+
+
+
 </div>

@@ -294,6 +294,10 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                            th:title="${ 'Open this ' + grp.name + ' category group in intelligent report view.' }">
                             <i class="fa-solid fa-table-list" style="color: #ff8000;"></i>
                         </a>
+                        <a th:href="@{/entry-results/page(categoryGroupId=${grp.id})}"
+                           title="Blog View"
+                           style="color:blue;">
+                            <i class="fa-brands fa-readme" ></i></a>
                     </div>
                 </div>
 

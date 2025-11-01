@@ -121,7 +121,17 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 <div  id="navigation-panel">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
 
-    <div th:if="${topic != null}" class="mb-3">
+    <div th:if="${topic == null}" style="margin-top:4px;">
+
+
+        <a th:href="@{/entries}"
+           title="List View"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            ☰&nbsp;List View</a>
+    </div>
+
+    <div th:if="${topic != null}" style="margin-top:4px;">
 
 
         <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='entries', categoryId=${topic.category.id})}"
@@ -141,8 +151,16 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 <div class="container mt-4">
     <h3>Entries for Topic</h3>
 
+
+
     <div id="results"
-         th:hx-get="@{/entry-results(topicId=${topic.id})}"
+         th:hx-get="@{/entry-results(
+         topicId=${topic?.id},
+         categoryId=${category?.id},
+         categoryGroupId=${categoryGroup?.id},
+         categoryProfileId=${categoryProfile?.id},
+         topicIds=${topicIds}
+     )}"
          hx-trigger="load"
          hx-target="#results"
          hx-swap="innerHTML">

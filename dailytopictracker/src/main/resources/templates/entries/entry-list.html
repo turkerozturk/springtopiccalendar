@@ -134,6 +134,12 @@
            style="color:white;">
             <i class="fa-solid fa-circle-plus"></i> New Entry</a>
 
+        <a th:href="@{/entry-results/page}"
+           title="Blog View"
+           class="btn btn-secondary btn-sm"
+           style="color:white;">
+            <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
+
 
         <a th:href="@{/search}"
            title="Search in Notes"
@@ -143,7 +149,7 @@
     </div>
 
 
-    <div th:if="${topic != null}" class="mb-3">
+    <div th:if="${topic != null}" style="margin-top:4px;">
 
 
 

@@ -22,8 +22,10 @@ package com.turkerozturk.dtt.service;
 
 import com.turkerozturk.dtt.component.MarkdownService;
 import com.turkerozturk.dtt.dto.NoteSearchResultDTO;
+import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.repository.EntryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,17 +33,96 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class EntryResultService {
 
     private final EntryRepository entryRepository;
     private final MarkdownService markdownService;
+    private final CategoryProfileService categoryProfileService;
 
+    // --- Topic ---
     public List<NoteSearchResultDTO> getEntriesByTopic(Long topicId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
-        var entries = entryRepository.findByTopicId(topicId, pageable);
+        Page<Entry> pageResult = entryRepository.findByTopicId(topicId, pageable);
+        return toDTO(pageResult.getContent());
+    }
 
+
+    public boolean hasMoreByTopic(Long topicId, int page, int size) {
+        long total = entryRepository.countByTopicId(topicId);
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- Category ---
+    public List<NoteSearchResultDTO> getEntriesByCategoryId(Long categoryId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> pageResult = entryRepository.findByTopic_Category_Id(categoryId, pageable);
+        return toDTO(pageResult.getContent());
+    }
+
+    public boolean hasMoreByCategory(Long categoryId, int page, int size) {
+        long total = entryRepository.countByTopic_Category_Id(categoryId);
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- CategoryGroup ---
+    public List<NoteSearchResultDTO> getEntriesByCategoryGroupId(Long categoryGroupId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> pageResult = entryRepository.findByTopic_Category_CategoryGroup_Id(categoryGroupId, pageable);
+        return toDTO(pageResult.getContent());
+    }
+
+    public boolean hasMoreByCategoryGroup(Long categoryGroupId, int page, int size) {
+        long total = entryRepository.countByTopic_Category_CategoryGroup_Id(categoryGroupId);
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- CategoryProfile ---
+    public List<NoteSearchResultDTO> getEntriesByCategoryProfileId(Long categoryProfileId, int page, int size) {
+        List<Long> categoryIds = categoryProfileService.getCategoryIdsForProfile(categoryProfileId);
+        if (categoryIds.isEmpty()) return List.of();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> pageResult = entryRepository.findByTopic_Category_IdIn(categoryIds, pageable);
+        return toDTO(pageResult.getContent());
+    }
+
+    public boolean hasMoreByCategoryProfile(Long categoryProfileId, int page, int size) {
+        long total = entryRepository.countByTopic_Category_IdIn(
+                categoryProfileService.getCategoryIdsForProfile(categoryProfileId));
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- Topics listesi ---
+    public List<NoteSearchResultDTO> getEntriesByTopics(List<Long> topicIds, int page, int size) {
+        if (topicIds == null || topicIds.isEmpty()) return List.of();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        Page<Entry> pageResult = entryRepository.findByTopic_IdIn(topicIds, pageable);
+        return toDTO(pageResult.getContent());
+    }
+
+    public boolean hasMoreByTopics(List<Long> topicIds, int page, int size) {
+        long total = entryRepository.countByTopic_IdIn(topicIds);
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- Tümü ---
+    public List<NoteSearchResultDTO> getAllEntries(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
+        var entries = entryRepository.findAll(pageable).getContent();
+        return toDTO(entries);
+    }
+
+    public boolean hasMoreAll(int page, int size) {
+        long total = entryRepository.count();
+        return (long) (page + 1) * size < total;
+    }
+
+    // --- Ortak DTO dönüştürücü ---
+    private List<NoteSearchResultDTO> toDTO(List<Entry> entries) {
         return entries.stream().map(entry -> {
             var note = entry.getNote();
             var topic = entry.getTopic();
@@ -61,10 +142,5 @@ public class EntryResultService {
                     category != null ? category.getName() : ""
             );
         }).toList();
-    }
-
-    public boolean hasMore(Long topicId, int page, int size) {
-        long total = entryRepository.countByTopicId(topicId);
-        return (long) (page + 1) * size < total;
     }
 }
