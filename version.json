@@ -1,6 +1,6 @@
 {
-  "version": "1.4.3",
-  "date": "2025-10-31",
+  "version": "1.4.4",
+  "date": "2025-11-01",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "New in version 1.4.3\n\n• A new blog-style view has been added as an alternative to the classic entries page.\n\n• Markdown notes are now correctly displayed in their respective day columns on the tracker.\n\n• The radar chart for category groups now automatically sets its date range to the last 30 days when opened, preventing empty or invalid values.\n\n• The 'Radar over Category Groups' link now appears only if at least one entry exists.\n\n• Minor interface improvements have been made to the Intelligent Report and Category Info pages.\n\n• An 'Add new entry' column has been added to the Intelligent Report View table.",
+  "notes": "• New: Entry Results page now supports multiple filters (topic, category, category group, or all entries).\n• The infinite scroll now continues correctly based on the selected filter.\n• Backend logic improved for safer parameter handling (0 → null conversion).\n• Category and group views now include working show entries links.\n"
 }
