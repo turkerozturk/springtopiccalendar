@@ -164,6 +164,15 @@
            class="btn btn-secondary btn-sm"
            style="color:white;">
             <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
+
+        <a th:href="@{/entry-filter/form(categoryId=${topic.category.id})}"
+           class="btn btn-secondary btn-sm"
+           style="color:white;"
+            title="Click to open the Tracker gage"
+        ><i class="fa-solid fa-gear" style="color: #FFD43B;"></i> Tracker
+            <span th:text="${' (' + topic.category.name + ')'}"></span>
+        </a>
+
     </div>
 
 
