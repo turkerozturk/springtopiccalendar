@@ -338,7 +338,7 @@
         <!-- dinamik olarak tum kategori profilleri -->
         <div class="col"  th:each="entry, iStat : ${entriesPage.content}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
             <div class="card shadow-sm">
-                <div class="card-body py-1" th:classappend="${'status-' + entry.status}">
+                <div class="card-body py-1">
 
                     <!-- Üst satır: ID, Name (crop), Actions -->
                     <div class="d-flex justify-content-between ">
@@ -351,7 +351,14 @@
                                       .toLocalDate())}"
                                   th:title="${entry.dateMillisYmd}">
                             </span>
+
                             &nbsp;
+                            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + entry.status}"></i>
+
+                            &nbsp;
+
+
+
                             <span class="text-truncate" style="overflow: hidden; white-space: nowrap;"
                                   th:text="${entry.topic.name}"></span>
                         </span>
@@ -367,11 +374,11 @@
                                 ✎
                             </a>
 
-                            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + entry.status}"></i>
+                            &nbsp;
+
 
 
                             <!-- todo fragment yapilabilir cunku neredeyse aynisi intelligent report sayfasinda var. -->
-                            <th:block th:if="${entry.note != null and !#strings.isEmpty(entry.note.content)}">
                                 <span   style="cursor: pointer;"
                                         class="note-snippet"
                                         th:attr="hx-get=@{/entries/{id}/note-full(id=${entry.id})},
@@ -386,15 +393,15 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#noteModal">
 
-                                    <i class="fa-brands fa-readme" style="color: blue;"></i>
+                                        <th:block th:if="${entry.note == null or #strings.isEmpty(entry.note.content)}">
+                                            <i class="fa-brands fa-readme" style="color: lightgray;"></i>
+                                        </th:block>
+                                        <th:block th:if="${entry.note != null and !#strings.isEmpty(entry.note.content)}">
+                                            <i class="fa-brands fa-readme" style="color: blue;"></i>
+                                        </th:block>
                                 </span>
-                            </th:block>
-
-                            <th:block th:if="${entry.note == null or #strings.isEmpty(entry.note.content)}">
 
 
-                                    <i class="fa-brands fa-readme" style="color: lightgray;"></i>
-                            </th:block>
 
 
 
