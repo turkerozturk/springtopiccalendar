@@ -2,7 +2,9 @@ package com.turkerozturk.dtt.controller;
 
 import com.turkerozturk.dtt.dto.CategoryProfileForm;
 import com.turkerozturk.dtt.entity.Category;
+import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.entity.CategoryProfile;
+import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.repository.CategoryProfileRepository;
 import com.turkerozturk.dtt.repository.CategoryRepository;
 import com.turkerozturk.dtt.service.CategoryProfileService;
@@ -24,6 +26,7 @@ public class CategoryProfileMvcController {
     private final CategoryProfileRepository categoryProfileRepository;
     private final CategoryRepository categoryRepository;
     private final CategoryProfileService categoryProfileService;
+    private final CategoryGroupRepository  categoryGroupRepository;
 
     @GetMapping
     public String listProfiles(Model model) {
@@ -65,8 +68,23 @@ public class CategoryProfileMvcController {
         form.setSelectedCategoryIds(profile.getCategories().stream()
                 .map(Category::getId).toList());
 
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        Collator collator = Collator.getInstance(currentLocale);
+
+        // Kategorileri gruplayalım
+        List<CategoryGroup> groups = categoryGroupRepository.findAll();
+        Map<CategoryGroup, List<Category>> groupedCategories = new LinkedHashMap<>();
+
+        groups.sort(Comparator.comparing(CategoryGroup::getName, collator));
+
+        for (CategoryGroup group : groups) {
+            List<Category> cats = new ArrayList<>(group.getCategories());
+            cats.sort(Comparator.comparing(Category::getName, collator));
+            groupedCategories.put(group, cats);
+        }
+
         model.addAttribute("profileForm", form);
-        model.addAttribute("categories", categoryRepository.findAll(Sort.by("name")));
+        model.addAttribute("groupedCategories", groupedCategories);
         return "profiles/form";
     }
 
