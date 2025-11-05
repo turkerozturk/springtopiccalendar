@@ -55,6 +55,11 @@
 
         <div class="mb-3">
             <label for="category" class="form-label">Category:</label>
+
+            <!-- Filtre kutusu -->
+            <input type="text" id="categoryFilter" class="form-control mb-2" placeholder="Filter categories...">
+
+            <!-- Kategori select -->
             <select id="category" th:field="*{category.id}" class="form-select">
                 <option th:each="cat : ${categories}"
                         th:value="${cat.id}"
@@ -164,28 +169,38 @@
             </button>
         </div>
 
+        <th:block th:if="${imageFilePaths} != null">
+
+            <div class="mb-3">
+                <label for="imageFilter" class="form-label">Filter Images:</label>
+                <input type="text" id="imageFilter" class="form-control" placeholder="Contains text...">
+            </div>
+
+            <div class="mb-3">
+                <th:block th:if="${imageFilePaths.size != null && imageFilePaths.size > 0}">
+                <label for="imageFileName" class="form-label">Image File:</label>
+                <select id="imageFileName" th:field="*{imageFileName}" class="form-select" onchange="updatePreview(this)">
+                    <option value="" disabled>Select Image</option>
+                    <option th:each="path : ${imageFilePaths}"
+                            th:value="${path}"
+                            th:text="${path}"
+                            th:selected="${path}">
+                    </option>
+                </select>
+                </th:block>
+            </div>
+
+            <!-- Highlightlı gösterim -->
+            <ul id="highlightList" class="list-group mt-2"></ul>
 
 
-
-        <div class="mb-3">
-            <th:block th:if="${imageFilePaths.size != null && imageFilePaths.size > 0}">
-            <label for="imageFileName" class="form-label">Image File:</label>
-            <select id="imageFileName" th:field="*{imageFileName}" class="form-select" onchange="updatePreview(this)">
-                <option value="" disabled>Select Image</option>
-                <option th:each="path : ${imageFilePaths}"
-                        th:value="${path}"
-                        th:text="${path}"
-                        th:selected="${path}">
-                </option>
-            </select>
-            </th:block>
-        </div>
-
-
-        <div class="mb-3" style="text-align:center;">
+            <div class="mb-3" style="text-align:center;">
             <img id="imagePreview" th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
                  width="135" height="135" alt="Selected Image" style="object-fit: contain; border: 1px solid #ccc;" />
-        </div>
+            </div>
+
+        </th:block>
+
 
         <!-- Checkbox: aktif değilse tarih seçici disable olur -->
         <div class="form-check mb-2">
@@ -516,6 +531,85 @@ WebJars path'leri şu yapıyı izler:
     });
     */
 </script>
+
+
+<!-- Mevcut image filter kodun altına ekle (ayrı çalışır, çakışmaz) -->
+<script>
+    const categoryFilterInput = document.getElementById("categoryFilter");
+    const categorySelect = document.getElementById("category");
+
+    function buildRegex(query) {
+        return new RegExp(query.split("").join(".*"), "i");
+    }
+
+    categoryFilterInput.addEventListener("input", function () {
+        const query = this.value.trim();
+        const regex = buildRegex(query);
+
+        Array.from(categorySelect.options).forEach((opt, idx) => {
+            if (query === "") {
+                opt.style.display = "block";
+                return;
+            }
+            const text = opt.textContent.trim();
+            opt.style.display = regex.test(text) ? "block" : "none";
+        });
+    });
+</script>
+
+
+<script>
+    const filterInput = document.getElementById("imageFilter");
+    const select = document.getElementById("imageFileName");
+    const highlightList = document.getElementById("highlightList");
+
+    function buildRegex(query) {
+        // "meziyet" -> m.*e.*z.*i.*y.*e.*t
+        return new RegExp(query.split("").join(".*"), "i");
+    }
+
+    filterInput.addEventListener("input", function () {
+        const query = this.value.trim();
+        const regex = buildRegex(query);
+        highlightList.innerHTML = ""; // liste temizle
+
+        Array.from(select.options).forEach((opt, idx) => {
+            if (idx === 0) return;
+
+            const fullText = opt.textContent;
+            const imagesDir = /*[[${imagesDir}]]*/ 'topicimages';
+            const visibleText = fullText.replace(new RegExp("^/" + imagesDir + "/"), "");
+
+            if (regex.test(visibleText)) {
+                opt.style.display = "block";
+
+                // highlight: harf harf dolaş
+                let qIndex = 0;
+                let highlighted = "";
+                for (let ch of visibleText) {
+                    if (qIndex < query.length &&
+                        ch.toLocaleLowerCase() === query[qIndex].toLocaleLowerCase()) {
+                        highlighted += `<span style="color:red;font-weight:bold">${ch}</span>`;
+                        qIndex++;
+                    } else {
+                        highlighted += ch;
+                    }
+                }
+
+                const li = document.createElement("li");
+                li.className = "list-group-item";
+                li.innerHTML = highlighted;
+                highlightList.appendChild(li);
+
+            } else {
+                opt.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
+
 
 </body>
 </html>
