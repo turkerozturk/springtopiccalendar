@@ -1,6 +1,6 @@
 {
-  "version": "1.4.4",
-  "date": "2025-11-01",
+  "version": "1.4.5",
+  "date": "2025-11-06",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "• New: Entry Results page now supports multiple filters (topic, category, category group, or all entries).\n• The infinite scroll now continues correctly based on the selected filter.\n• Backend logic improved for safer parameter handling (0 → null conversion).\n• Category and group views now include working show entries links.\n"
+  "notes": "Category profiles: Category selection form now displays categories grouped by their category group with alphabetical sorting.\nTopic form: Add filtering inputs for category and image selection in Topic edit/new form.\nEntries list: If topic id is not empty, show link to tracker page in menu. Minor changes were made to the design.\nImage upload: Large image uploads are now handled smoothly without rejection, improving usability and storage efficiency.\n"
 }
