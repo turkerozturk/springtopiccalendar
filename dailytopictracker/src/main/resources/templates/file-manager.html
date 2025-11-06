@@ -220,6 +220,34 @@
         alert(msg);
     }
 
+
+    let maxImageSizeKb = 300; // default, eğer backend yanıt vermezse
+    let maxFileSizeServerRaw = 10000; // default, eğer backend yanıt vermezse
+
+    async function loadConfig() {
+        try {
+            const res = await fetch('/config');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.maxImageSizeKb) {
+                    maxImageSizeKb = data.maxImageSizeKb;
+                }
+                if (data.maxFileSizeServerRaw) {
+                    maxFileSizeServerRaw = data.maxFileSizeServerRaw;
+                }
+            }
+        } catch (e) {
+            console.warn("Config load failed, using default file and image upload size values(embedded in this html: maxImageSizeKb, maxFileSizeServerRaw)");
+        }
+    }
+    // Sayfa yüklenince çağır
+    document.addEventListener("DOMContentLoaded", async () => {
+        await loadConfig();
+    });
+
+
+
+
     async function fetchList(path) {
         const params = new URLSearchParams();
         if (path) params.append('path', path);
@@ -432,11 +460,20 @@ function renderList(files, curPath, parentPath) {
     uploadInput.addEventListener('change', async (evt) => {
         const file = evt.target.files[0];
         if (!file) return;
-        if (file.size > 300 * 1024) {
-            showAlert('File size cannot be more than 300 KB');
+
+
+        if (file.size > maxFileSizeServerRaw * 1024) {
+            showAlert(`File size cannot be more than ${maxFileSizeServerRaw} KB`);
             uploadInput.value = '';
             return;
+        } else if (file.size > maxImageSizeKb * 1024) {
+            // Artık hata değil, bilgilendirme
+            showAlert(`Image exceeds ${maxImageSizeKb} KB and will be automatically resized before upload.`);
+            // Devam ediyoruz, return yok!
         }
+
+
+
         const fd = new FormData();
         fd.append('file', file);
         fd.append('target', document.getElementById('currentPath').textContent || '');
@@ -450,7 +487,7 @@ function renderList(files, curPath, parentPath) {
         } else if (res.status === 409) {
             showAlert('File with same name exists.');
         } else if (res.status === 413 || res.status === 413) { // payload too large
-            showAlert('File size cannot be more than 300 KB');
+            showAlert(`File size cannot be more than ${maxFileSizeServerRaw} KB`);
         } else {
             const err = await res.json().catch(()=>({error: 'unknown'}));
             showAlert('Upload failed: ' + (err.error || res.statusText));

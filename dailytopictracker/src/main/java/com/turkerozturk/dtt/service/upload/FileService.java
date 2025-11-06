@@ -22,6 +22,7 @@ package com.turkerozturk.dtt.service.upload;
 
 // FileService.java
 import com.turkerozturk.dtt.dto.upload.FileInfo;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -29,7 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.util.*;
@@ -39,6 +45,10 @@ import java.util.stream.Collectors;
 public class FileService {
 
     private final Path baseDir;
+
+    @Value("${filemanager.max-image-size-kb:300}")
+    private long maxImageSizeKb;
+
 
     public Path getBaseDir() {
         return baseDir;
@@ -67,6 +77,75 @@ public class FileService {
         //System.out.println("donen deger target: " + target);
         return target;
     }
+
+    // === IMAGE AUTO-RESIZE ===
+    private InputStream maybeResizeImage(MultipartFile file) throws IOException {
+        long maxBytes = maxImageSizeKb * 1024L;
+
+        if (file.getSize() <= maxBytes) {
+            return file.getInputStream();
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IOException("TOO_LARGE");
+        }
+
+        // Görseli oku
+        BufferedImage img = ImageIO.read(file.getInputStream());
+        if (img == null) {
+            throw new IOException("Invalid image");
+        }
+
+        // 🔸 Format tespit et (örneğin "jpg" veya "png")
+        String originalName = file.getOriginalFilename();
+        String formatName = "jpg";
+        if (originalName != null) {
+            String lower = originalName.toLowerCase(Locale.ROOT);
+            if (lower.endsWith(".png")) formatName = "png";
+            else if (lower.endsWith(".gif")) formatName = "gif";
+            else if (lower.endsWith(".webp")) formatName = "webp";
+            else if (lower.endsWith(".jpeg") || lower.endsWith(".jpg")) formatName = "jpg";
+        }
+
+        double quality = 0.9;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(img)
+                .scale(1.0)
+                .outputFormat(formatName)  // 🔸 Eksik olan satır!
+                .outputQuality(quality);
+
+        builder.toOutputStream(baos);
+
+        // Gerekirse kaliteyi ve boyutu düşürerek tekrar dene
+        while (baos.size() > maxBytes && quality > 0.1) {
+            baos.reset();
+            quality -= 0.1;
+            Thumbnails.of(img)
+                    .scale(1.0)
+                    .outputFormat(formatName)
+                    .outputQuality(quality)
+                    .toOutputStream(baos);
+        }
+
+        int width = img.getWidth();
+        int height = img.getHeight();
+        while (baos.size() > maxBytes && width > 100 && height > 100) {
+            baos.reset();
+            width = (int) (width * 0.9);
+            height = (int) (height * 0.9);
+            Thumbnails.of(img)
+                    .size(width, height)
+                    .outputFormat(formatName)
+                    .outputQuality(quality)
+                    .toOutputStream(baos);
+        }
+
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
+
+
 
     public List<FileInfo> list(String relativePath) throws IOException {
         Path dir = resolveSafe(relativePath);
@@ -137,15 +216,20 @@ public class FileService {
 
     public void store(MultipartFile file, String relativeTargetDir) throws IOException {
         if (file == null || file.isEmpty()) throw new IllegalArgumentException("Empty");
-        long max = 300L * 1024L;
-        if (file.getSize() > max) throw new IOException("TOO_LARGE");
+
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         if (filename.contains("..")) throw new SecurityException("Invalid filename");
+
         Path targetDir = resolveSafe(relativeTargetDir);
         if (!Files.isDirectory(targetDir)) Files.createDirectories(targetDir);
         Path target = targetDir.resolve(filename);
+
         if (Files.exists(target)) throw new FileAlreadyExistsException("Exists");
-        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+        // Resize veya orijinal input stream'i al
+        try (InputStream in = maybeResizeImage(file)) {
+            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     public Resource loadAsResource(String relativePath) throws MalformedURLException {
