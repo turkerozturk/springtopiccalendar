@@ -71,6 +71,7 @@ public class LaunchDTT extends JFrame {
     // Parçalar
     private final JButton btnStartStop = new JButton("Start");
     private final JButton btnOpenApplicationFolder = new JButton("Open App Folder");
+    private final JButton btnOpenPropertiesEditor = new JButton("Edit Properties");
 
     private final JComboBox<String> cmbDatabaseList = new JComboBox<>();
     //private final JLabel lblAppVersion = new JLabel();
@@ -79,6 +80,7 @@ public class LaunchDTT extends JFrame {
     private final JButton btnOpenApplicationWebPage = new JButton("\uD83C\uDF10"); // unicode globe symbol
     private final JButton btnCopy = new JButton("📋"); // Unicode clipboard symbol
     private final JButton btnClear = new JButton("🗑"); // Unicode trash can
+
     // Uygulamanın port'u (application.properties'den okuyabilirsiniz ama burada sabit örnekliyoruz)
     private int serverPort;
     private String serverUrlScheme;
@@ -316,8 +318,10 @@ public class LaunchDTT extends JFrame {
         btnStartStop.addActionListener(e -> {
             if (currentStatus == AppStatus.STOPPED) {
                 startApplication();
+                btnOpenPropertiesEditor.setEnabled(false);
             } else if (currentStatus == AppStatus.RUNNING) {
                 stopApplication();
+                btnOpenPropertiesEditor.setEnabled(true);
             } else {
                 // STARTING veya STOPPING durumunda tıklandıysa
                 appendLog("[INFO] Already in " + currentStatus + " state.\n");
@@ -376,7 +380,14 @@ public class LaunchDTT extends JFrame {
         btnOpenApplicationFolder.addActionListener(e -> {
                 onOpenDirectory(e);
         });
+
+        btnOpenPropertiesEditor.addActionListener(e -> {
+            ApplicationPropertiesEditorDialog dialog = new ApplicationPropertiesEditorDialog(this);
+            dialog.setVisible(true);
+        });
+
         topPanel.add(btnOpenApplicationFolder);
+        topPanel.add(btnOpenPropertiesEditor);
 
         topPanel.add(cmbDatabaseList);
         //topPanel.add(lblAppVersion);
@@ -653,7 +664,12 @@ public class LaunchDTT extends JFrame {
 
     private void loadDbFileNames() {
         File dir = new File(System.getProperty("user.dir")); // Uygulamanın çalıştığı klasör
-        File[] dbFiles = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".db"));
+
+        File[] dbFiles = dir.listFiles((d, name) -> {
+            String lower = name.toLowerCase();
+            return lower.endsWith(".db") || lower.endsWith(".sqlite");
+        });
+
 
         if (dbFiles != null && dbFiles.length > 0) {
             Arrays.sort(dbFiles, Comparator.comparing(File::getName));
