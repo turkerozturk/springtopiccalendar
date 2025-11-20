@@ -94,6 +94,11 @@ jobs:
         working-directory: externaltools
         run: del TurkerOzturkCodeSign.pfx
 
+      - name: Copy topicimages folder into release
+        run: |
+          mkdir -p release/topicimages
+          cp -r topicimages/. release/topicimages/  
+
       - name: Upload release folder for Docker job
         uses: actions/upload-artifact@v4
         with:
