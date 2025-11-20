@@ -146,7 +146,7 @@ jobs:
       - name: Build and push (amd64)
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: release
           file: release/Dockerfile.amd64
           platforms: linux/amd64
           push: true
@@ -157,7 +157,7 @@ jobs:
       - name: Build and push (armv7)
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: release
           file: release/Dockerfile.armv7
           platforms: linux/arm/v7
           push: true
