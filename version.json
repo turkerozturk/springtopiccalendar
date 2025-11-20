@@ -1,6 +1,6 @@
 {
-  "version": "1.4.6",
-  "date": "2025-11-08",
+  "version": "1.4.7",
+  "date": "2025-11-20",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "feature(export): Add CategoryGroup export with related data to SQLite file.\nfeature, LaunchDTT: Application Properties Editor."
+  "notes": "feature(docker): github actions, new job in main.yml: Docker multi-arch build and push (GHCR - Github Container registry)"
 }
