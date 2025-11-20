@@ -131,9 +131,4 @@ jobs:
         run: |
           IMAGE="ghcr.io/${{ github.repository_owner }}/daily-topic-tracker"
 
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7 \
-            -f release/Dockerfile.amd64 \
-            -t $IMAGE:${{ steps.read_json.outputs.version }} \
-            -t $IMAGE:latest \
-            --push .
+          docker buildx build --platform linux/amd64,linux/arm/v7 -f release/Dockerfile.amd64 -t $IMAGE:${{ steps.read_json.outputs.version }} -t $IMAGE:latest --push .
