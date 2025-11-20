@@ -94,16 +94,6 @@ jobs:
         working-directory: externaltools
         run: del TurkerOzturkCodeSign.pfx
 
-      - name: Copy topicimages folder into release
-        run: |
-          if (Test-Path "release/topicimages") {
-            Write-Host "topicimages already exists"
-          } else {
-            New-Item -ItemType Directory -Path "release/topicimages"
-          }
-          Copy-Item -Recurse -Force "topicimages\*" "release/topicimages\"
-        shell: pwsh
-
       - name: Upload release folder for Docker job
         uses: actions/upload-artifact@v4
         with:

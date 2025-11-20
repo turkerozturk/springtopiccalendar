@@ -7,7 +7,7 @@ WORKDIR /app
 # 3️ Gerekli dosyalari container icine kopyala
 COPY daily-topic-tracker.jar .
 COPY application.properties .
-COPY topicimages ./topicimages
+# COPY topicimages ./topicimages
 
 # 4️ Ortam degiskeni (istege bagli)
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
