@@ -1,10 +1,10 @@
 # TARGETPLATFORM ile mimari ayırt edilir
 ARG TARGETPLATFORM
 
-# ARMv7 → Ubuntu Jammy
+# ARMv7 için base image
 FROM eclipse-temurin:17-jdk-jammy AS base_arm
 
-# AMD64 → Alpine
+# AMD64 için base image
 FROM eclipse-temurin:17-jdk-alpine AS base_amd
 
 # ------------------------------------------------
