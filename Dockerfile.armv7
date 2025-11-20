@@ -1,0 +1,19 @@
+# 1️. ARMv7 (32 bit Raspberry Pi 3) icin en uyumlu temel imaj
+FROM eclipse-temurin:17-jdk-jammy
+
+# 2️. Calisma dizini
+WORKDIR /app
+
+# 3️. Gerekli dosyalari kopyala
+COPY daily-topic-tracker.jar .
+COPY application.properties .
+COPY topicimages ./topicimages
+
+# 4️. 1GB RAM icin uygun Java memory ayarlari
+ENV JAVA_OPTS="-XX:+UseSerialGC -Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError"
+
+# 5️. Giris noktasi
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar daily-topic-tracker.jar"]
+
+# 6️. Port bildirimi
+EXPOSE 8443

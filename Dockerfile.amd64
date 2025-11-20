@@ -1,0 +1,19 @@
+# 1️ Temel imaj: Java 17 yuklu resmi Alpine tabanli OpenJDK
+FROM eclipse-temurin:17-jdk-alpine
+
+# 2️ Uygulama dizini olustur
+WORKDIR /app
+
+# 3️ Gerekli dosyalari container icine kopyala
+COPY daily-topic-tracker.jar .
+COPY application.properties .
+COPY topicimages ./topicimages
+
+# 4️ Ortam degiskeni (istege bagli)
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
+
+# 5️ Giris noktasi (application.properties icindeki port kullanilacak)
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar daily-topic-tracker.jar"]
+
+# 6️ İstege bagli port bildirimi
+EXPOSE 8443

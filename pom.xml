@@ -75,6 +75,10 @@
                       todir="release/nonessential/" />
                 <copy file="LICENSE"
                       tofile="release/nonessential/license.txt" />
+                <copy file="Dockerfile.amd64"
+                      todir="release/" />
+                <copy file="Dockerfile.armv7"
+                      todir="release/" />
               </target>
             </configuration>
           </execution>
