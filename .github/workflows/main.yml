@@ -96,8 +96,13 @@ jobs:
 
       - name: Copy topicimages folder into release
         run: |
-          mkdir -p release/topicimages
-          cp -r topicimages/. release/topicimages/  
+          if (Test-Path "release/topicimages") {
+            Write-Host "topicimages already exists"
+          } else {
+            New-Item -ItemType Directory -Path "release/topicimages"
+          }
+          Copy-Item -Recurse -Force "topicimages\*" "release/topicimages\"
+        shell: pwsh
 
       - name: Upload release folder for Docker job
         uses: actions/upload-artifact@v4
