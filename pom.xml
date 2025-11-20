@@ -79,6 +79,8 @@
                       todir="release/" />
                 <copy file="Dockerfile.armv7"
                       todir="release/" />
+                <copy file="Dockerfile"
+                      todir="release/" />
               </target>
             </configuration>
           </execution>

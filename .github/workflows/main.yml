@@ -143,37 +143,17 @@ jobs:
 
 
 
-      - name: Build and push (amd64)
+      - name: Build and push multi-platform image
         uses: docker/build-push-action@v5
         with:
           context: release
-          file: release/Dockerfile.amd64
-          platforms: linux/amd64
+          file: release/Dockerfile
+          platforms: linux/amd64,linux/arm/v7
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:amd64
-            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:latest-amd64
+            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:latest
+            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:${{ steps.read_json.outputs.version }}
 
-      - name: Build and push (armv7)
-        uses: docker/build-push-action@v5
-        with:
-          context: release
-          file: release/Dockerfile.armv7
-          platforms: linux/arm/v7
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:armv7
-            ghcr.io/${{ github.repository_owner }}/daily-topic-tracker:latest-armv7
 
-      - name: Create Multi-Arch Manifest (latest + version)
-        run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/daily-topic-tracker
-          VERSION=${{ steps.read_json.outputs.version }}
 
-          docker manifest create $IMAGE:$VERSION --amend $IMAGE:amd64 --amend $IMAGE:armv7
-
-          docker manifest create $IMAGE:latest --amend $IMAGE:latest-amd64 --amend $IMAGE:latest-armv7
-
-          docker manifest push $IMAGE:$VERSION
-          docker manifest push $IMAGE:latest
           
