@@ -1,29 +1,11 @@
-# TARGETPLATFORM ile mimari ayırt edilir
-ARG TARGETPLATFORM
-
-# ARMv7 için base image
-FROM eclipse-temurin:17-jdk-jammy AS base_arm
-
-# AMD64 için base image
-FROM eclipse-temurin:17-jdk-alpine AS base_amd
-
-# ------------------------------------------------
-# Mimariye göre uygun base image seçilir
-# ------------------------------------------------
-FROM base_${TARGETPLATFORM##*/} AS final
+FROM eclipse-temurin:17-jdk-jammy
 
 WORKDIR /app
 
 COPY daily-topic-tracker.jar .
 COPY application.properties .
 
-# Platforma özel JVM ayarları
-ARG TARGETPLATFORM
-RUN if [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then \
-        echo 'export JAVA_OPTS="-XX:+UseSerialGC -Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError"' >> /etc/profile; \
-    else \
-        echo 'export JAVA_OPTS="-Xms256m -Xmx512m"' >> /etc/profile; \
-    fi
+RUN echo 'export JAVA_OPTS="-XX:+UseSerialGC -Xms128m -Xmx512m -XX:MaxMetaspaceSize=128m -XX:+ExitOnOutOfMemoryError"' >> /etc/profile
 
 ENV JAVA_OPTS=""
 
