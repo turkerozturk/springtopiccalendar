@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--/*
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    */-->
+    <title>Daily Topic Tracker</title>
+    <meta charset="UTF-8">
+
+    <!--/* favicon */-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f5f5f5; }
+        .total { font-weight: bold; background-color: #e8f5e9; }
+    </style>
+</head>
+<body>
+
+<h2>Günlük Kalori Takibi</h2>
+
+<!-- Tarih seçimi -->
+<form method="get" action="/food">
+
+
+    <!--/* bootstrap datepicker */-->
+    <div class="container mb-0" id="calorieDateContainer" style="max-width: 400px; background-color:floralwhite;">
+        <div class="input-group calorieDateStyle date">
+            <label for="calorieDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
+            <input type="text" id="calorieDatePicker"
+                   class="form-control form-control-sm"/>
+            <span class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="far fa-calendar" aria-hidden="true"></i>
+                    </button>
+            </span>
+            <!--
+            <span class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        Getir
+                    </button>
+            </span>
+            -->
+        </div>
+    </div>
+
+</form>
+
+
+<br/>
+
+<table>
+    <thead>
+    <tr>
+        <!-- <th>Tarih</th> -->
+        <th>100g kcal</th>
+        <th>Yemek</th>
+        <!-- <th>Açıklama</th> -->
+
+        <th>Gram</th>
+        <th>Kalori</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="item : ${summary.items}">
+
+        <!-- <td th:text="${item.dateMillis}"></td> -->
+        <td th:text="${#numbers.formatDecimal(item.kcalPer100g,1,2)}"></td>
+        <td th:text="${item.topicName}" style="text-align: left;"></td>
+        <!-- <td th:text="${item.topicDescription}"></td> -->
+
+        <td th:text="${#numbers.formatDecimal(item.gram,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(item.calculatedKcal,1,2)}"></td>
+    </tr>
+    </tbody>
+
+    <tfoot>
+    <tr class="total">
+        <td colspan="3">Toplam</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)}"></td>
+    </tr>
+    </tfoot>
+</table>
+
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<script th:inline="javascript">
+    const ZONE_ID = [[${zoneId}]];
+    const DATE_MILLIS = [[${dateMillis}]];
+</script>
+
+<script>
+    function convertDateToMillis(dateStr) {
+
+        // dateStr = "2026-04-06"
+
+        const parts = dateStr.split("-");
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // JS month 0-based
+        const day = parseInt(parts[2]);
+
+        // Local midnight oluştur
+        const localDate = new Date(year, month, day);
+
+        return localDate.getTime();
+    }
+
+    function loadCalorieData(dateStr) {
+
+        const millis = convertDateToMillis(dateStr);
+
+        const url = `/food?dateMillis=${millis}`;
+
+        // Sayfayı redirect ederek yenile
+        window.location.href = url;
+    }
+
+    function convertMillisToDateStr(millis) {
+
+        const date = new Date(millis);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    $(function () {
+
+
+        let initialDateStr;
+
+        if (DATE_MILLIS) {
+            initialDateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            initialDateStr = new Date().toISOString().slice(0, 10);
+        }
+
+        $('#calorieDatePicker').val(initialDateStr);
+
+        $('#calorieDateContainer .calorieDateStyle.date').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            autoclose: true,
+            todayHighlight: true
+        }).on("changeDate", function (e) {
+            loadCalorieData(e.format(0, "yyyy-mm-dd"));
+        });
+
+    });
+
+
+
+</script>
+
+</body>
+</html>

@@ -195,5 +195,18 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     Page<Entry> findByTopic_Category_IdIn(List<Long> categoryIds, Pageable pageable);
     long countByTopic_Category_IdIn(List<Long> categoryIds);
 
+    @Query("""
+    SELECT e FROM Entry e
+    JOIN FETCH e.topic t
+    JOIN FETCH e.note n
+    WHERE e.dateMillisYmd = :date
+      AND e.status = 1
+      AND t.id IN :topicIds
+    """)
+    List<Entry> findFoodEntriesByDate(
+            @Param("date") Long date,
+            @Param("topicIds") List<Long> topicIds
+    );
+
 
 }
