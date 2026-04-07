@@ -30,6 +30,17 @@ public class FoodEntryDto {
     private Double gram;
     private Double calculatedKcal;
 
+    private Double carbohydrate;
+    private Double fat;
+    private Double protein;
+
+    private Long entryId;
+    private Long topicId;
+    private String categoryName;
+    private Long categoryId;
+
+
+
     // getter/setter
 
 
@@ -79,5 +90,61 @@ public class FoodEntryDto {
 
     public void setCalculatedKcal(Double calculatedKcal) {
         this.calculatedKcal = calculatedKcal;
+    }
+
+    public Double getCarbohydrate() {
+        return carbohydrate;
+    }
+
+    public void setCarbohydrate(Double carbohydrate) {
+        this.carbohydrate = carbohydrate;
+    }
+
+    public Double getFat() {
+        return fat;
+    }
+
+    public void setFat(Double fat) {
+        this.fat = fat;
+    }
+
+    public Double getProtein() {
+        return protein;
+    }
+
+    public void setProtein(Double protein) {
+        this.protein = protein;
+    }
+
+    public Long getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(Long topicId) {
+        this.topicId = topicId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Long getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(Long entryId) {
+        this.entryId = entryId;
     }
 }

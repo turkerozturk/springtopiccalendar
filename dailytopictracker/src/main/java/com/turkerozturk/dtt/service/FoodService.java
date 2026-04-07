@@ -60,10 +60,11 @@ public class FoodService {
             String noteContent = entry.getNote() != null
                     ? entry.getNote().getContent()
                     : null;
+            Topic topic = entry.getTopic();
 
             Double gram = FoodParser.extractGram(noteContent);
             Double kcalPer100g = FoodParser.extractKcalPer100g(
-                    entry.getTopic().getDescription()
+                    topic.getDescription()
             );
 
             if (gram == null || kcalPer100g == null) continue;
@@ -71,12 +72,16 @@ public class FoodService {
             Double kcal = FoodParser.calculateKcal(gram, kcalPer100g);
 
             FoodEntryDto dto = new FoodEntryDto();
+            dto.setEntryId(entry.getId());
             dto.setDateMillis(dateMillis);
-            dto.setTopicName(entry.getTopic().getName());
-            dto.setTopicDescription(entry.getTopic().getDescription());
+            dto.setTopicId(topic.getId());
+            dto.setTopicName(topic.getName());
+            dto.setTopicDescription(topic.getDescription());
             dto.setGram(gram);
             dto.setKcalPer100g(kcalPer100g);
             dto.setCalculatedKcal(kcal);
+            dto.setCategoryId(topic.getCategory().getId());
+
 
             result.add(dto);
 

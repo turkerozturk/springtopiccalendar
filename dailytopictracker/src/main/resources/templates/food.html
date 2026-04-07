@@ -85,10 +85,36 @@
 
         <!-- <td th:text="${item.dateMillis}"></td> -->
         <td th:text="${#numbers.formatDecimal(item.kcalPer100g,1,2)}"></td>
-        <td th:text="${item.topicName}" style="text-align: left;"></td>
+        <td style="text-align: left;">
+            <a th:text="${item.topicName}"
+               th:href="@{/topics/edit/{id}(id=${item.topicId})}"
+               target="_blank" rel="noopener noreferrer"
+               title="Edit Topic">
+                ✎
+            </a>
+        </td>
         <!-- <td th:text="${item.topicDescription}"></td> -->
 
-        <td th:text="${#numbers.formatDecimal(item.gram,1,2)}"></td>
+        <td>
+
+            <a      th:text="${#numbers.formatDecimal(item.gram,1,2)}"
+                    th:href="@{/entries/edit/{id}(id=${item.entryId},
+                                            categoryId=${item.categoryId},
+                                            topicId=${item.topicId},
+                                            returnPage=entries
+                                            )}"
+               target="_blank" rel="noopener noreferrer"
+               title="Edit Entry">
+                gramaj ve edit entry linki
+            </a>
+
+
+
+        </td>
+
+
+
+
         <td th:text="${#numbers.formatDecimal(item.calculatedKcal,1,2)}"></td>
     </tr>
     </tbody>
