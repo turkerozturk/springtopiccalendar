@@ -121,7 +121,8 @@
 
     <tfoot>
     <tr class="total">
-        <td colspan="3">Toplam</td>
+        <td colspan="2">Toplam</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGram,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)}"></td>
     </tr>
     </tfoot>

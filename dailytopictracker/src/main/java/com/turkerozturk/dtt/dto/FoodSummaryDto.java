@@ -25,7 +25,7 @@ import java.util.List;
 public class FoodSummaryDto {
     private List<FoodEntryDto> items;
     private Double totalKcal;
-
+    private Double totalGram;
     // getter/setter
 
 
@@ -43,5 +43,13 @@ public class FoodSummaryDto {
 
     public void setTotalKcal(Double totalKcal) {
         this.totalKcal = totalKcal;
+    }
+
+    public Double getTotalGram() {
+        return totalGram;
+    }
+
+    public void setTotalGram(Double totalGram) {
+        this.totalGram = totalGram;
     }
 }

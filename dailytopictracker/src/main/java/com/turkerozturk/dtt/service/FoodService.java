@@ -54,6 +54,7 @@ public class FoodService {
         List<FoodEntryDto> result = new ArrayList<>();
 
         double totalKcal = 0.0;
+        double totalGram = 0.0;
 
         for (Entry entry : entries) {
 
@@ -86,11 +87,13 @@ public class FoodService {
             result.add(dto);
 
             totalKcal += kcal;
+            totalGram += gram;
         }
 
         FoodSummaryDto summary = new FoodSummaryDto();
         summary.setItems(result);
         summary.setTotalKcal(totalKcal);
+        summary.setTotalGram(totalGram);
 
         return summary;
     }
