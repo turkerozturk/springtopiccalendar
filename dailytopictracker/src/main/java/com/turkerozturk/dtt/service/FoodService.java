@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -91,6 +92,9 @@ public class FoodService {
         }
 
         FoodSummaryDto summary = new FoodSummaryDto();
+        // Ayni listeyi yerinde sirala (IN-PLACE)
+        result.sort(Comparator.comparing(FoodEntryDto::getCalculatedKcal,
+                Comparator.nullsLast(Comparator.reverseOrder())));
         summary.setItems(result);
         summary.setTotalKcal(totalKcal);
         summary.setTotalGram(totalGram);
