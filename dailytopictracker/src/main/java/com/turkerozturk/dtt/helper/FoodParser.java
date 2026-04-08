@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.helper;
 
+
 public class FoodParser {
 
     public static Double extractGram(String noteContent) {
@@ -27,11 +28,7 @@ public class FoodParser {
 
         String firstLine = noteContent.split("\\R")[0].trim();
 
-        if (firstLine.matches("\\d+(\\.\\d+)?")) {
-            return Double.parseDouble(firstLine);
-        }
-
-        return null;
+        return parseFlexibleDouble(firstLine, null);
     }
 
     public static Double extractKcalPer100g(String description) {
@@ -41,19 +38,59 @@ public class FoodParser {
 
         if (lines.length < 2) return null;
 
-        String secondLine = lines[1].trim();
+        return parseFlexibleDouble(lines[1], null);
+    }
 
-        if (secondLine.matches("\\d+(\\.\\d+)?")) {
-            return Double.parseDouble(secondLine);
-        }
+    // --- YENİLER ---
 
-        return null;
+    public static Double extractFat(String description) {
+        return extractLineValue(description, 2);
+    }
+
+    public static Double extractCarbohydrate(String description) {
+        return extractLineValue(description, 3);
+    }
+
+    public static Double extractProtein(String description) {
+        return extractLineValue(description, 4);
+    }
+
+    // --- ORTAK LOGIC ---
+
+    private static Double extractLineValue(String description, int index) {
+        if (description == null) return 0.0;
+
+        String[] lines = description.split("\\R");
+
+        if (lines.length <= index) return 0.0;
+
+        return parseFlexibleDouble(lines[index], 0.0);
+    }
+
+    /**
+     * Virgül ve nokta destekli parse:
+     * "12.5" -> 12.5
+     * "12,5" -> 12.5
+     * "abc"  -> defaultValue
+     */
+    private static Double parseFlexibleDouble(String value, Double defaultValue) {
+        if (value == null) return defaultValue;
+
+        try {
+            String normalized = value.trim()
+                    .replace(",", "."); // virgül destek
+
+            if (normalized.matches("\\d+(\\.\\d+)?")) {
+                return Double.parseDouble(normalized);
+            }
+
+        } catch (Exception ignored) {}
+
+        return defaultValue;
     }
 
     public static Double calculateKcal(Double gram, Double kcalPer100g) {
         if (gram == null || kcalPer100g == null) return null;
         return (gram / 100.0) * kcalPer100g;
     }
-
-
 }

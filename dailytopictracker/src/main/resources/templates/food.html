@@ -73,6 +73,9 @@
         <td colspan="2">Toplam</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGram,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramFat,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrate,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,2)}"></td>
     </tr>
 
     <tr>
@@ -83,6 +86,9 @@
 
         <th>Gram</th>
         <th>Kalori</th>
+        <th>Yağ</th>
+        <th>Karbonhidrat</th>
+        <th>Protein</th>
     </tr>
     </thead>
 
@@ -122,6 +128,10 @@
 
 
         <td th:text="${#numbers.formatDecimal(item.calculatedKcal,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(item.fat,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(item.carbohydrate,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(item.protein,1,2)}"></td>
+
     </tr>
     </tbody>
 
@@ -130,6 +140,10 @@
         <td colspan="2">Toplam</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGram,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramFat,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrate,1,2)}"></td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,2)}"></td>
+
     </tr>
     </tfoot>
 </table>

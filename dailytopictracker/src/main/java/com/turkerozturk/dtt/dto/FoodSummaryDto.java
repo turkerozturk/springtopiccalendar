@@ -26,6 +26,10 @@ public class FoodSummaryDto {
     private List<FoodEntryDto> items;
     private Double totalKcal;
     private Double totalGram;
+    private Double totalGramFat;
+    private Double totalGramCarbohydrate;
+    private Double totalGramProtein;
+
     // getter/setter
 
 
@@ -51,5 +55,29 @@ public class FoodSummaryDto {
 
     public void setTotalGram(Double totalGram) {
         this.totalGram = totalGram;
+    }
+
+    public Double getTotalGramFat() {
+        return totalGramFat;
+    }
+
+    public void setTotalGramFat(Double totalGramFat) {
+        this.totalGramFat = totalGramFat;
+    }
+
+    public Double getTotalGramCarbohydrate() {
+        return totalGramCarbohydrate;
+    }
+
+    public void setTotalGramCarbohydrate(Double totalGramCarbohydrate) {
+        this.totalGramCarbohydrate = totalGramCarbohydrate;
+    }
+
+    public Double getTotalGramProtein() {
+        return totalGramProtein;
+    }
+
+    public void setTotalGramProtein(Double totalGramProtein) {
+        this.totalGramProtein = totalGramProtein;
     }
 }

@@ -56,6 +56,9 @@ public class FoodService {
 
         double totalKcal = 0.0;
         double totalGram = 0.0;
+        double totalGramFat = 0.0;
+        double totalGramCarbonhydrate = 0.0;
+        double totalGramProtein = 0.0;
 
         for (Entry entry : entries) {
 
@@ -63,32 +66,41 @@ public class FoodService {
                     ? entry.getNote().getContent()
                     : null;
             Topic topic = entry.getTopic();
+            String topicDescription = topic.getDescription();
 
             Double gram = FoodParser.extractGram(noteContent);
             Double kcalPer100g = FoodParser.extractKcalPer100g(
-                    topic.getDescription()
+                    topicDescription
             );
 
             if (gram == null || kcalPer100g == null) continue;
 
             Double kcal = FoodParser.calculateKcal(gram, kcalPer100g);
+            Double gramFat = FoodParser.calculateKcal(gram, FoodParser.extractFat(topicDescription));
+            Double gramCarbonhydrate = FoodParser.calculateKcal(gram, FoodParser.extractCarbohydrate(topicDescription));
+            Double gramProtein = FoodParser.calculateKcal(gram, FoodParser.extractProtein(topicDescription));
 
             FoodEntryDto dto = new FoodEntryDto();
             dto.setEntryId(entry.getId());
             dto.setDateMillis(dateMillis);
             dto.setTopicId(topic.getId());
             dto.setTopicName(topic.getName());
-            dto.setTopicDescription(topic.getDescription());
+            dto.setTopicDescription(topicDescription);
             dto.setGram(gram);
             dto.setKcalPer100g(kcalPer100g);
             dto.setCalculatedKcal(kcal);
             dto.setCategoryId(topic.getCategory().getId());
-
+            dto.setFat(gramFat);
+            dto.setCarbohydrate(gramCarbonhydrate);
+            dto.setProtein(gramProtein);
 
             result.add(dto);
 
             totalKcal += kcal;
             totalGram += gram;
+            totalGramFat += dto.getFat();
+            totalGramCarbonhydrate += dto.getCarbohydrate();
+            totalGramProtein += dto.getProtein();
         }
 
         FoodSummaryDto summary = new FoodSummaryDto();
@@ -98,6 +110,9 @@ public class FoodService {
         summary.setItems(result);
         summary.setTotalKcal(totalKcal);
         summary.setTotalGram(totalGram);
+        summary.setTotalGramFat(totalGramFat);
+        summary.setTotalGramCarbohydrate(totalGramCarbonhydrate);
+        summary.setTotalGramProtein(totalGramProtein);
 
         return summary;
     }
