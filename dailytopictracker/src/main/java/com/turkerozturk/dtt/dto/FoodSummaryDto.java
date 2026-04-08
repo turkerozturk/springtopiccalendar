@@ -26,10 +26,23 @@ public class FoodSummaryDto {
     private List<FoodEntryDto> items;
     private Double totalKcal;
     private Double totalGram;
+
     private Double totalGramFat;
     private Double totalGramCarbohydrate;
     private Double totalGramProtein;
 
+    private Double totalGramFatKcal;
+    private Double totalGramCarbohydrateKcal;
+    private Double totalGramProteinKcal;
+
+    private Double totalGramKcalFatCarbProtein;
+
+
+    private Double totalKcalByStatus;
+    private Double totalGramByStatus;
+    private Double totalGramFatByStatus;
+    private Double totalGramCarbohydrateByStatus;
+    private Double totalGramProteinByStatus;
     // getter/setter
 
 
@@ -79,5 +92,77 @@ public class FoodSummaryDto {
 
     public void setTotalGramProtein(Double totalGramProtein) {
         this.totalGramProtein = totalGramProtein;
+    }
+
+    public Double getTotalGramFatKcal() {
+        return totalGramFatKcal;
+    }
+
+    public void setTotalGramFatKcal(Double totalGramFatKcal) {
+        this.totalGramFatKcal = totalGramFatKcal;
+    }
+
+    public Double getTotalGramCarbohydrateKcal() {
+        return totalGramCarbohydrateKcal;
+    }
+
+    public void setTotalGramCarbohydrateKcal(Double totalGramCarbohydrateKcal) {
+        this.totalGramCarbohydrateKcal = totalGramCarbohydrateKcal;
+    }
+
+    public Double getTotalGramProteinKcal() {
+        return totalGramProteinKcal;
+    }
+
+    public void setTotalGramProteinKcal(Double totalGramProteinKcal) {
+        this.totalGramProteinKcal = totalGramProteinKcal;
+    }
+
+    public Double getTotalGramKcalFatCarbProtein() {
+        return totalGramKcalFatCarbProtein;
+    }
+
+    public void setTotalGramKcalFatCarbProtein(Double totalGramKcalFatCarbProtein) {
+        this.totalGramKcalFatCarbProtein = totalGramKcalFatCarbProtein;
+    }
+
+    public Double getTotalKcalByStatus() {
+        return totalKcalByStatus;
+    }
+
+    public void setTotalKcalByStatus(Double totalKcalByStatus) {
+        this.totalKcalByStatus = totalKcalByStatus;
+    }
+
+    public Double getTotalGramByStatus() {
+        return totalGramByStatus;
+    }
+
+    public void setTotalGramByStatus(Double totalGramByStatus) {
+        this.totalGramByStatus = totalGramByStatus;
+    }
+
+    public Double getTotalGramFatByStatus() {
+        return totalGramFatByStatus;
+    }
+
+    public void setTotalGramFatByStatus(Double totalGramFatByStatus) {
+        this.totalGramFatByStatus = totalGramFatByStatus;
+    }
+
+    public Double getTotalGramCarbohydrateByStatus() {
+        return totalGramCarbohydrateByStatus;
+    }
+
+    public void setTotalGramCarbohydrateByStatus(Double totalGramCarbohydrateByStatus) {
+        this.totalGramCarbohydrateByStatus = totalGramCarbohydrateByStatus;
+    }
+
+    public Double getTotalGramProteinByStatus() {
+        return totalGramProteinByStatus;
+    }
+
+    public void setTotalGramProteinByStatus(Double totalGramProteinByStatus) {
+        this.totalGramProteinByStatus = totalGramProteinByStatus;
     }
 }

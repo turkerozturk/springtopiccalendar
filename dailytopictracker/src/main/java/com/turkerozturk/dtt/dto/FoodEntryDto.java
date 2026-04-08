@@ -35,6 +35,7 @@ public class FoodEntryDto {
     private Double protein;
 
     private Long entryId;
+    private int entryStatus;
     private Long topicId;
     private String categoryName;
     private Long categoryId;
@@ -146,5 +147,13 @@ public class FoodEntryDto {
 
     public void setEntryId(Long entryId) {
         this.entryId = entryId;
+    }
+
+    public int getEntryStatus() {
+        return entryStatus;
+    }
+
+    public void setEntryStatus(int entryStatus) {
+        this.entryStatus = entryStatus;
     }
 }

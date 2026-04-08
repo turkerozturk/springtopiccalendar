@@ -60,6 +60,19 @@ public class FoodService {
         double totalGramCarbonhydrate = 0.0;
         double totalGramProtein = 0.0;
 
+        double totalGramFatKcal = 0.0;
+        double totalGramCarbonhydrateKcal = 0.0;
+        double totalGramProteinKcal = 0.0;
+        double totalGramKcalFatCarbProtein = 0.0;
+
+
+        double totalKcalByStatus = 0.0;
+        double totalGramByStatus = 0.0;
+        double totalGramFatByStatus = 0.0;
+        double totalGramCarbohydrateByStatus = 0.0;
+        double totalGramProteinByStatus = 0.0;
+
+
         for (Entry entry : entries) {
 
             String noteContent = entry.getNote() != null
@@ -82,6 +95,7 @@ public class FoodService {
 
             FoodEntryDto dto = new FoodEntryDto();
             dto.setEntryId(entry.getId());
+            dto.setEntryStatus(entry.getStatus());
             dto.setDateMillis(dateMillis);
             dto.setTopicId(topic.getId());
             dto.setTopicName(topic.getName());
@@ -98,9 +112,25 @@ public class FoodService {
 
             totalKcal += kcal;
             totalGram += gram;
+
             totalGramFat += dto.getFat();
             totalGramCarbonhydrate += dto.getCarbohydrate();
             totalGramProtein += dto.getProtein();
+
+            if(entry.getStatus() == 1) {
+                totalKcalByStatus += kcal;
+                totalGramByStatus += gram;
+                totalGramFatByStatus += dto.getFat();
+                totalGramCarbohydrateByStatus += dto.getCarbohydrate();
+                totalGramProteinByStatus += dto.getProtein();
+
+            }
+
+
+            totalGramFatKcal += dto.getFat() * 4;
+            totalGramCarbonhydrateKcal += dto.getCarbohydrate() * 4;
+            totalGramProteinKcal += dto.getProtein() * 9;
+            totalGramKcalFatCarbProtein = totalGramFatKcal + totalGramCarbonhydrateKcal + totalGramProteinKcal;
         }
 
         FoodSummaryDto summary = new FoodSummaryDto();
@@ -110,9 +140,21 @@ public class FoodService {
         summary.setItems(result);
         summary.setTotalKcal(totalKcal);
         summary.setTotalGram(totalGram);
+
         summary.setTotalGramFat(totalGramFat);
         summary.setTotalGramCarbohydrate(totalGramCarbonhydrate);
         summary.setTotalGramProtein(totalGramProtein);
+
+        summary.setTotalGramFatKcal(totalGramFatKcal);
+        summary.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
+        summary.setTotalGramProteinKcal(totalGramProteinKcal);
+        summary.setTotalGramKcalFatCarbProtein(totalGramKcalFatCarbProtein);
+
+        summary.setTotalKcalByStatus(totalKcalByStatus);
+        summary.setTotalGramByStatus(totalGramByStatus);
+        summary.setTotalGramFatByStatus(totalGramFatByStatus);
+        summary.setTotalGramCarbohydrateByStatus(totalGramCarbohydrateByStatus);
+        summary.setTotalGramProteinByStatus(totalGramProteinByStatus);
 
         return summary;
     }

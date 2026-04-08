@@ -200,7 +200,6 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     JOIN FETCH e.topic t
     JOIN FETCH e.note n
     WHERE e.dateMillisYmd = :date
-      AND e.status = 1
       AND t.id IN :topicIds
     """)
     List<Entry> findFoodEntriesByDate(
