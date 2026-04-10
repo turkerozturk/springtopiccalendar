@@ -20,6 +20,7 @@
  */
 package com.turkerozturk.dtt.repository;
 
+import com.turkerozturk.dtt.dto.TopicDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -180,6 +181,15 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     """)
     List<Object[]> getPredictionCountsPerCategory(@Param("todayMillisYmd") Long todayMillisYmd);
     */
+
+    @Query("""
+    SELECT new com.turkerozturk.dtt.dto.TopicDto(t.id, t.name)
+    FROM Topic t
+    WHERE t.description LIKE '#food%'
+      AND LOWER(t.name) LIKE LOWER(CONCAT('%', :q, '%'))
+    ORDER BY t.name
+    """)
+    List<TopicDto> searchFoodTopics(@Param("q") String q);
 
 
 }

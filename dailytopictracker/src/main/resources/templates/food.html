@@ -9,6 +9,10 @@
     <title>Daily Topic Tracker</title>
     <meta charset="UTF-8">
 
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
     <!--/* favicon */-->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -64,6 +68,13 @@
 <h2><!-- Sol tarafta logo veya Home -->
     <a class="navbar-brand" href="/" target="_blank">🏠 Home</a> | Daily Calorie Tracker
 </h2>
+
+<div class="container mb-3" style="max-width: 400px;">
+    <label>Gıda Ekle</label>
+    <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Gıda adı yaz...">
+
+    <ul id="foodSearchResults" class="list-group mt-1"></ul>
+</div>
 
 <!-- Tarih seçimi -->
 <form method="get" action="/food">
@@ -276,6 +287,21 @@
         return `${year}-${month}-${day}`;
     }
 
+    function redirectToNewEntry(topicId) {
+
+        let dateStr;
+
+        if (DATE_MILLIS) {
+            dateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            dateStr = new Date().toISOString().slice(0, 10);
+        }
+
+        const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}`;
+
+        window.open(url, '_blank'); // yeni sekme
+    }
+
     $(function () {
 
 
@@ -297,6 +323,66 @@
         }).on("changeDate", function (e) {
             loadCalorieData(e.format(0, "yyyy-mm-dd"));
         });
+
+
+        // topic arama kodu
+
+        const $input = $('#foodSearchInput');
+        const $results = $('#foodSearchResults');
+
+
+
+        $input.on('input', function () {
+
+            const query = $(this).val();
+
+            if (query.length < 2) {
+                $results.empty();
+                return;
+            }
+
+            //const csrfToken = $('meta[name="_csrf"]').attr('content');
+            //const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+
+            $.ajax({
+                url: '/api/food-topics',
+                data: { q: query },
+                beforeSend: function (xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                },
+                success: function (data) {
+
+                    $results.empty();
+
+                    data.forEach(item => {
+
+                        const li = $(`
+                            <li class="list-group-item list-group-item-action" style="cursor:pointer;">
+                                ${item.name}
+                            </li>
+                        `);
+
+                        li.on('click', function () {
+                            redirectToNewEntry(item.id);
+                        });
+
+                        $results.append(li);
+                    });
+                }
+            });
+        });
+
+
+
+
+
+
+
+
 
     });
 
