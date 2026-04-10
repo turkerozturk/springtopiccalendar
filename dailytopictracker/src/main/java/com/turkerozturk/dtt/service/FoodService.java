@@ -59,6 +59,10 @@ public class FoodService {
         double totalGramFat = 0.0;
         double totalGramCarbonhydrate = 0.0;
         double totalGramProtein = 0.0;
+        double totalGramFiber = 0.0;
+        double totalGramSodium = 0.0;
+        double totalGramFatSaturated = 0.0;
+        double totalGramSugar = 0.0;
 
         double totalGramFatKcal = 0.0;
         double totalGramCarbonhydrateKcal = 0.0;
@@ -71,6 +75,12 @@ public class FoodService {
         double totalGramFatByStatus = 0.0;
         double totalGramCarbohydrateByStatus = 0.0;
         double totalGramProteinByStatus = 0.0;
+
+        double totalGramFiberByStatus = 0.0;
+        double totalGramSodiumByStatus = 0.0;
+        double totalGramFatSaturatedByStatus = 0.0;
+        double totalGramSugarByStatus = 0.0;
+
 
 
         for (Entry entry : entries) {
@@ -92,6 +102,10 @@ public class FoodService {
             Double gramFat = FoodParser.calculateKcal(gram, FoodParser.extractFat(topicDescription));
             Double gramCarbonhydrate = FoodParser.calculateKcal(gram, FoodParser.extractCarbohydrate(topicDescription));
             Double gramProtein = FoodParser.calculateKcal(gram, FoodParser.extractProtein(topicDescription));
+            Double gramFiber = FoodParser.calculateKcal(gram, FoodParser.extractFiber(topicDescription));
+            Double gramSodium = FoodParser.calculateKcal(gram, FoodParser.extractSodium(topicDescription));
+            Double gramFatSaturated = FoodParser.calculateKcal(gram, FoodParser.extractFatSaturated(topicDescription));
+            Double gramSugar = FoodParser.calculateKcal(gram, FoodParser.extractSugar(topicDescription));
 
             FoodEntryDto dto = new FoodEntryDto();
             dto.setEntryId(entry.getId());
@@ -107,6 +121,10 @@ public class FoodService {
             dto.setFat(gramFat);
             dto.setCarbohydrate(gramCarbonhydrate);
             dto.setProtein(gramProtein);
+            dto.setFiber(gramFiber);
+            dto.setSodium(gramSodium);
+            dto.setFatSaturated(gramFatSaturated);
+            dto.setSugar(gramSugar);
 
             result.add(dto);
 
@@ -116,6 +134,10 @@ public class FoodService {
             totalGramFat += dto.getFat();
             totalGramCarbonhydrate += dto.getCarbohydrate();
             totalGramProtein += dto.getProtein();
+            totalGramFiber += dto.getFiber();
+            totalGramSodium += dto.getSodium();
+            totalGramFatSaturated += dto.getFatSaturated();
+            totalGramSugar += dto.getSugar();
 
             if(entry.getStatus() == 1) {
                 totalKcalByStatus += kcal;
@@ -123,6 +145,10 @@ public class FoodService {
                 totalGramFatByStatus += dto.getFat();
                 totalGramCarbohydrateByStatus += dto.getCarbohydrate();
                 totalGramProteinByStatus += dto.getProtein();
+                totalGramFiberByStatus += dto.getFiber();
+                totalGramSodiumByStatus += dto.getSodium();
+                totalGramFatSaturatedByStatus += dto.getFatSaturated();
+                totalGramSugarByStatus += dto.getSugar();
 
             }
 
@@ -144,6 +170,11 @@ public class FoodService {
         summary.setTotalGramFat(totalGramFat);
         summary.setTotalGramCarbohydrate(totalGramCarbonhydrate);
         summary.setTotalGramProtein(totalGramProtein);
+        summary.setTotalGramFiber(totalGramFiber);
+        summary.setTotalGramSodium(totalGramSodium);
+        summary.setTotalGramFatSaturated(totalGramFatSaturated);
+        summary.setTotalGramSugar(totalGramSugar);
+
 
         summary.setTotalGramFatKcal(totalGramFatKcal);
         summary.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
@@ -155,6 +186,10 @@ public class FoodService {
         summary.setTotalGramFatByStatus(totalGramFatByStatus);
         summary.setTotalGramCarbohydrateByStatus(totalGramCarbohydrateByStatus);
         summary.setTotalGramProteinByStatus(totalGramProteinByStatus);
+        summary.setTotalGramFiberByStatus(totalGramFiberByStatus);
+        summary.setTotalGramSodiumByStatus(totalGramSodiumByStatus);
+        summary.setTotalGramFatSaturatedByStatus(totalGramFatSaturatedByStatus);
+        summary.setTotalGramSugarByStatus(totalGramSugarByStatus);
 
         return summary;
     }

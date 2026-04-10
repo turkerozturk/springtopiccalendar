@@ -34,6 +34,14 @@ public class FoodEntryDto {
     private Double fat;
     private Double protein;
 
+    private Double water;
+
+    private Double fiber;
+    private Double sodium;
+    private Double fatSaturated;
+    private Double sugar;
+
+
     private Long entryId;
     private int entryStatus;
     private Long topicId;
@@ -155,5 +163,45 @@ public class FoodEntryDto {
 
     public void setEntryStatus(int entryStatus) {
         this.entryStatus = entryStatus;
+    }
+
+    public Double getWater() {
+        return water;
+    }
+
+    public void setWater(Double water) {
+        this.water = water;
+    }
+
+    public Double getFiber() {
+        return fiber;
+    }
+
+    public void setFiber(Double fiber) {
+        this.fiber = fiber;
+    }
+
+    public Double getSodium() {
+        return sodium;
+    }
+
+    public void setSodium(Double sodium) {
+        this.sodium = sodium;
+    }
+
+    public Double getFatSaturated() {
+        return fatSaturated;
+    }
+
+    public void setFatSaturated(Double fatSaturated) {
+        this.fatSaturated = fatSaturated;
+    }
+
+    public Double getSugar() {
+        return sugar;
+    }
+
+    public void setSugar(Double sugar) {
+        this.sugar = sugar;
     }
 }

@@ -55,6 +55,22 @@ public class FoodParser {
         return extractLineValue(description, 4);
     }
 
+    public static Double extractFiber(String description) {
+        return extractLineValue(description, 5);
+    }
+
+    public static Double extractSodium(String description) {
+        return extractLineValue(description, 6);
+    }
+
+    public static Double extractFatSaturated(String description) {
+        return extractLineValue(description, 7);
+    }
+
+    public static Double extractSugar(String description) {
+        return extractLineValue(description, 8);
+    }
+
     // --- ORTAK LOGIC ---
 
     private static Double extractLineValue(String description, int index) {

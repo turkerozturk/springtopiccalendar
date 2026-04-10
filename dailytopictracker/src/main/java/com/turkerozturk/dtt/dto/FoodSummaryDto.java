@@ -31,6 +31,13 @@ public class FoodSummaryDto {
     private Double totalGramCarbohydrate;
     private Double totalGramProtein;
 
+    private Double totalGramFiber;
+    private Double totalGramSodium;
+    private Double totalGramFatSaturated;
+    private Double totalGramSugar;
+
+    private Double totalGramWater;
+
     private Double totalGramFatKcal;
     private Double totalGramCarbohydrateKcal;
     private Double totalGramProteinKcal;
@@ -43,6 +50,11 @@ public class FoodSummaryDto {
     private Double totalGramFatByStatus;
     private Double totalGramCarbohydrateByStatus;
     private Double totalGramProteinByStatus;
+    private Double totalGramFiberByStatus;
+    private Double totalGramSodiumByStatus;
+    private Double totalGramFatSaturatedByStatus;
+    private Double totalGramSugarByStatus;
+
     // getter/setter
 
 
@@ -164,5 +176,78 @@ public class FoodSummaryDto {
 
     public void setTotalGramProteinByStatus(Double totalGramProteinByStatus) {
         this.totalGramProteinByStatus = totalGramProteinByStatus;
+    }
+
+
+    public Double getTotalGramFiber() {
+        return totalGramFiber;
+    }
+
+    public void setTotalGramFiber(Double totalGramFiber) {
+        this.totalGramFiber = totalGramFiber;
+    }
+
+    public Double getTotalGramWater() {
+        return totalGramWater;
+    }
+
+    public void setTotalGramWater(Double totalGramWater) {
+        this.totalGramWater = totalGramWater;
+    }
+
+    public Double getTotalGramFiberByStatus() {
+        return totalGramFiberByStatus;
+    }
+
+    public void setTotalGramFiberByStatus(Double totalGramFiberByStatus) {
+        this.totalGramFiberByStatus = totalGramFiberByStatus;
+    }
+
+    public Double getTotalGramSodium() {
+        return totalGramSodium;
+    }
+
+    public void setTotalGramSodium(Double totalGramSodium) {
+        this.totalGramSodium = totalGramSodium;
+    }
+
+    public Double getTotalGramSodiumByStatus() {
+        return totalGramSodiumByStatus;
+    }
+
+    public void setTotalGramSodiumByStatus(Double totalGramSodiumByStatus) {
+        this.totalGramSodiumByStatus = totalGramSodiumByStatus;
+    }
+
+    public Double getTotalGramFatSaturated() {
+        return totalGramFatSaturated;
+    }
+
+    public void setTotalGramFatSaturated(Double totalGramFatSaturated) {
+        this.totalGramFatSaturated = totalGramFatSaturated;
+    }
+
+    public Double getTotalGramSugar() {
+        return totalGramSugar;
+    }
+
+    public void setTotalGramSugar(Double totalGramSugar) {
+        this.totalGramSugar = totalGramSugar;
+    }
+
+    public Double getTotalGramFatSaturatedByStatus() {
+        return totalGramFatSaturatedByStatus;
+    }
+
+    public void setTotalGramFatSaturatedByStatus(Double totalGramFatSaturatedByStatus) {
+        this.totalGramFatSaturatedByStatus = totalGramFatSaturatedByStatus;
+    }
+
+    public Double getTotalGramSugarByStatus() {
+        return totalGramSugarByStatus;
+    }
+
+    public void setTotalGramSugarByStatus(Double totalGramSugarByStatus) {
+        this.totalGramSugarByStatus = totalGramSugarByStatus;
     }
 }
