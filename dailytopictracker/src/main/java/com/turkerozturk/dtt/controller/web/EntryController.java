@@ -1242,6 +1242,9 @@ public class EntryController {
         if (topicId != null) {
             Topic topic = topicRepository.findById(topicId).orElse(null);
             entry.setTopic(topic);
+            if (categoryId == null) {
+                categoryId = topic.getCategory().getId();
+            }
         }
         ZoneId zone = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
 
