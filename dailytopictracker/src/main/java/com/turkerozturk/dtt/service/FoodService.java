@@ -98,6 +98,8 @@ public class FoodService {
 
             if (gram == null || kcalPer100g == null) continue;
 
+            // Frontend'de topic description icerisine #food yazdiktan sonra, satirlara asagidaki siralama ile veri girilir:
+            // #food
             Double kcal = FoodParser.calculateKcal(gram, kcalPer100g);
             Double gramFat = FoodParser.calculateKcal(gram, FoodParser.extractFat(topicDescription));
             Double gramCarbonhydrate = FoodParser.calculateKcal(gram, FoodParser.extractCarbohydrate(topicDescription));
@@ -125,6 +127,8 @@ public class FoodService {
             dto.setSodium(gramSodium);
             dto.setFatSaturated(gramFatSaturated);
             dto.setSugar(gramSugar);
+
+            dto.setGramPerKcal(100 / kcalPer100g);
 
             result.add(dto);
 

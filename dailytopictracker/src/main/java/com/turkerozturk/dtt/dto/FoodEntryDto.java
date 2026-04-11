@@ -26,9 +26,12 @@ public class FoodEntryDto {
     private String topicName;
     private String topicDescription;
 
+
     private Double kcalPer100g;
     private Double gram;
     private Double calculatedKcal;
+
+    private Double gramPerKcal;
 
     private Double carbohydrate;
     private Double fat;
@@ -203,5 +206,13 @@ public class FoodEntryDto {
 
     public void setSugar(Double sugar) {
         this.sugar = sugar;
+    }
+
+    public Double getGramPerKcal() {
+        return gramPerKcal;
+    }
+
+    public void setGramPerKcal(Double gramPerKcal) {
+        this.gramPerKcal = gramPerKcal;
     }
 }
