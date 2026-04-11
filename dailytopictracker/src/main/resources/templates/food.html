@@ -41,9 +41,20 @@
 
         .vurgula {
           font-size: 1.875em;
-          background-color: green;
+          background-color: lightgreen;
         }
 
+        .az-vurgula {
+          background-color: #cceecc;
+        }
+
+        .az-vurgula2 {
+          background-color: #c5e7c5;
+        }
+
+        .daha-az-vurgula {
+          background-color: #eeeecc;
+        }
 
       .status-0 {
         background-color: gainsboro !important;
@@ -107,7 +118,7 @@
 </form>
 
 
-<br/>
+
 
 <table id="caloriesTable">
     <thead>
@@ -115,7 +126,7 @@
 
 
     <tr class="total">
-        <td colspan="3">Toplamlar: Makro Gramajlarına Göre Kaba Hesap (4 x fat, 4 x carbonhydrate, 9 x protein)</td>
+        <td colspan="4">Toplamlar: Makro Gramajlarına Göre Kaba Hesap (4 x fat, 4 x carbonhydrate, 9 x protein)</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramKcalFatCarbProtein,1,2)} + ' kcal'"> kcal</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramFatKcal,1,2)} + ' kcal'"> kcal</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrateKcal,1,2)} + ' kcal'"> kcal</td>
@@ -127,22 +138,22 @@
     </tr>
 
     <tr class="total">
-        <td colspan="2">Toplamlar: 100gr Kalori Değerlerine Göre Planlanan (GÜN SONU)</td>
+        <td colspan="3">Toplamlar: 100gr Kalori Değerlerine Göre Planlanan (GÜN SONU)</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGram,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)} + ' kcal'" class="vurgula"> kcal</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramFat,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrate,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramSodium,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramFatSaturated,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,2)} + ' gr'"> gr</td>
+        <td class="vurgula" th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)} + ' kcal'"> kcal</td>
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.totalGramFat,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrate,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.totalGramSodium,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.totalGramFatSaturated,1,2)} + ' gr'"> gr</td>
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,2)} + ' gr'"> gr</td>
     </tr>
 
     <tr class="total">
-        <td colspan="2">Toplamlar: 100gr Kalori Değerlerine Göre Tüketilmiş (<i class="fa-solid fa-square status-fg-1"></i> ŞİMDİLİK)</td>
+        <td colspan="3">Toplamlar: 100gr Kalori Değerlerine Göre Tüketilmiş (<i class="fa-solid fa-square status-fg-1"></i> ŞİMDİLİK)</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramByStatus,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.totalKcalByStatus,1,2)} + ' kcal'"> kcal</td>
+        <td class="daha-az-vurgula" th:text="${#numbers.formatDecimal(summary.totalKcalByStatus,1,2)} + ' kcal'"> kcal</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramFatByStatus,1,2)} + ' gr'"> gr</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrateByStatus,1,2)} + ' gr'"> gr</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramProteinByStatus,1,2)} + ' gr'"> gr</td>
@@ -154,6 +165,7 @@
 
     <tr>
         <!-- <th>Tarih</th> -->
+        <th>gr / kcal</th>
         <th>100g kcal</th>
         <th>Yemek</th>
         <!-- <th>Açıklama</th> -->
@@ -174,6 +186,7 @@
     <tr th:each="item : ${summary.items}">
 
         <!-- <td th:text="${item.dateMillis}"></td> -->
+        <td th:text="${#numbers.formatDecimal(item.gramPerKcal,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(item.kcalPer100g,1,2)}"></td>
         <td style="text-align: left;">
             <a th:text="${item.topicName}"
@@ -206,7 +219,6 @@
 
 
 
-
         <td th:text="${#numbers.formatDecimal(item.calculatedKcal,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(item.fat,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(item.carbohydrate,1,2)}"></td>
@@ -222,7 +234,7 @@
 
     <tfoot>
     <tr class="total">
-        <td colspan="2">Toplam</td>
+        <td colspan="3">Toplam</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGram,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(summary.totalKcal,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramFat,1,2)}"></td>
