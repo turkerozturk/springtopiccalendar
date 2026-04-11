@@ -29,6 +29,9 @@
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
 
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
+
+
     <style>
         body { font-family: Arial; margin: 20px; }
         table { border-collapse: collapse; width: 100%; }
@@ -106,7 +109,7 @@
 
 <br/>
 
-<table>
+<table id="caloriesTable">
     <thead>
 
 
@@ -244,6 +247,27 @@
 <script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
 
 <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
+<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
+<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+
+<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+
+<script>
+    $(document).ready(function () {
+        let table = new DataTable('#caloriesTable', {
+            pageLength: 50
+        });
+        // https://hatchjs.com/datatables-sort-by-date/
+        // TODO asagidaki ayarlar ise yaramadi. Ogrenip tekrar dene.
+        // table.order('Kalori', 'desc');
+        // table.order(3 , 'desc');
+    });
+
+</script>
 
 <script th:inline="javascript">
     const ZONE_ID = [[${zoneId}]];
