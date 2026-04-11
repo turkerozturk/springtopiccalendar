@@ -124,6 +124,9 @@
     <caption>
         <button id="btnExcel" title="Download As Spreadsheet"><i class="fa-solid fa-file-excel"></i></button>
 
+        <button id="btnCopy">Listeyi Panoya Kopyala</button>
+        <span id="copyInfo" style="display:none; margin-left:10px;">Kopyalandı!</span>
+
     </caption>
     <thead>
 
@@ -453,6 +456,54 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 
         // Dosyayı indir
         XLSX.writeFile(wb, "calories-table.xlsx");
+    });
+</script>
+
+
+<script>
+    // COPY THE FOOD LIST TO THE CLIPBOARD
+    document.getElementById("btnCopy").addEventListener("click", function () {
+
+        let initialDateStr;
+
+        if (DATE_MILLIS) {
+            initialDateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            initialDateStr = new Date().toISOString().slice(0, 10);
+        }
+
+
+        let result = [];
+        result.push("Date: " + initialDateStr)
+        result.push("Planned food weight");
+
+
+        $("#caloriesTable tbody tr").each(function () {
+            let col2 = $(this).find("td:eq(1)").text().trim();
+            let col3 = $(this).find("td:eq(2)").text().trim();
+            let col4 = $(this).find("td:eq(3)").text().trim();
+
+
+            if (col2 || col3) {
+                result.push("    " + col4 + " gr " + col3 + " (" + col2/100 + " kcal/1 gr)");
+            }
+        });
+
+        let finalText = result.join("\n");
+
+        // panoya kopyala
+        navigator.clipboard.writeText(finalText).then(function () {
+
+            // mesaj göster
+            $("#copyInfo").fadeIn(200);
+
+            setTimeout(function () {
+                $("#copyInfo").fadeOut(200);
+            }, 1500);
+
+        }).catch(function (err) {
+            console.error("Kopyalama hatası:", err);
+        });
     });
 </script>
 
