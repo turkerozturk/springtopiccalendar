@@ -121,9 +121,17 @@
 
 
 <table id="caloriesTable">
+    <caption>
+        <button id="btnExcel" title="Download As Spreadsheet"><i class="fa-solid fa-file-excel"></i></button>
+
+    </caption>
     <thead>
 
 
+    <tr>
+        <td>Tarih:</td>
+        <td colspan="11" id="caloriesTableDateCell"></td>
+    </tr>
 
     <tr class="total">
         <td colspan="4">Toplamlar: Makro Gramajlarına Göre Kaba Hesap (4 x fat, 4 x carbonhydrate, 9 x protein)</td>
@@ -349,7 +357,10 @@
             initialDateStr = new Date().toISOString().slice(0, 10);
         }
 
-        $('#calorieDatePicker').val(initialDateStr);
+        $('#calorieDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
+
+        $('#caloriesTableDateCell').text(initialDateStr);
+
 
         $('#calorieDateContainer .calorieDateStyle.date').datepicker({
             format: "yyyy-mm-dd",
@@ -424,6 +435,25 @@
 
 
 
+</script>
+
+<!--/* https://github.com/SheetJS/sheetjs https://docs.sheetjs.com/
+new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
+<script src="/webjars/xlsx/dist/xlsx.full.min.js"></script>
+
+<!--/* <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> */-->
+
+<script>
+    document.getElementById("btnExcel").addEventListener("click", function () {
+        // pivot-table elementini seç
+        var table = document.getElementById("caloriesTable");
+
+        // HTML tablodan worksheet oluştur
+        var wb = XLSX.utils.table_to_book(table, { sheet: "CaloriesTable" });
+
+        // Dosyayı indir
+        XLSX.writeFile(wb, "calories-table.xlsx");
+    });
 </script>
 
 </body>
