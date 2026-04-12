@@ -122,6 +122,17 @@
 
 <table id="caloriesTable">
     <caption>
+
+        <label><input type="checkbox" class="status-filter" value="0" checked>
+            &nbsp;<i class="fa-solid fa-square status-fg-0" title="status-fg-0"></i>
+        </label>
+        <label><input type="checkbox" class="status-filter" value="1" checked>
+            &nbsp;<i class="fa-solid fa-square status-fg-1" title="status-fg-1"></i>
+        </label>
+        <label><input type="checkbox" class="status-filter" value="2" checked>
+            &nbsp;<i class="fa-solid fa-square status-fg-2" title="status-fg-2"></i>
+        </label>
+
         <button id="btnExcel" title="Download As Spreadsheet"><i class="fa-solid fa-file-excel"></i></button>
 
         <button id="btnCopy">Listeyi Panoya Kopyala</button>
@@ -194,7 +205,8 @@
     </thead>
 
     <tbody>
-    <tr th:each="item : ${summary.items}">
+    <tr th:each="item : ${summary.items}"
+        th:classappend="${'status-hide-' + item.entryStatus}">
 
         <!-- <td th:text="${item.dateMillis}"></td> -->
         <td th:text="${#numbers.formatDecimal(item.gramPerKcal,1,2)}"></td>
@@ -505,6 +517,42 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
             console.error("Kopyalama hatası:", err);
         });
     });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+    let table = new DataTable('#caloriesTable');
+
+    // Custom filter
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+
+            let row = table.row(dataIndex).node();
+
+            let selectedStatuses = $('.status-filter:checked')
+                .map(function () { return $(this).val(); })
+                .get();
+
+            // satırın class'ından status yakala
+            let rowStatus = null;
+            for (let i = 0; i <= 2; i++) {
+                if ($(row).hasClass('status-hide-' + i)) {
+                    rowStatus = i.toString();
+                    break;
+                }
+            }
+
+            // seçili değilse gösterme
+            return selectedStatuses.includes(rowStatus);
+        });
+
+        // checkbox değişince tabloyu yeniden filtrele
+        $('.status-filter').on('change', function () {
+            table.draw();
+        });
+
+    });
+
 </script>
 
 </body>
