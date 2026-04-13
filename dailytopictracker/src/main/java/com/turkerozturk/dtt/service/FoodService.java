@@ -70,6 +70,11 @@ public class FoodService {
         double totalGramKcalFatCarbProtein = 0.0;
 
 
+        double totalPercentFat = 0.0;
+        double totalPercentCarbohydrate = 0.0;
+        double totalPercentProtein = 0.0;
+
+
         double totalKcalByStatus = 0.0;
         double totalGramByStatus = 0.0;
         double totalGramFatByStatus = 0.0;
@@ -161,6 +166,11 @@ public class FoodService {
             totalGramCarbonhydrateKcal += dto.getCarbohydrate() * 4;
             totalGramProteinKcal += dto.getProtein() * 9;
             totalGramKcalFatCarbProtein = totalGramFatKcal + totalGramCarbonhydrateKcal + totalGramProteinKcal;
+
+            totalPercentFat = (totalGramFatKcal / totalGramKcalFatCarbProtein) * 100;
+            totalPercentCarbohydrate = (totalGramCarbonhydrateKcal / totalGramKcalFatCarbProtein) * 100;
+            totalPercentProtein = (totalGramProteinKcal / totalGramKcalFatCarbProtein) * 100;
+
         }
 
         FoodSummaryDto summary = new FoodSummaryDto();
@@ -184,6 +194,10 @@ public class FoodService {
         summary.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
         summary.setTotalGramProteinKcal(totalGramProteinKcal);
         summary.setTotalGramKcalFatCarbProtein(totalGramKcalFatCarbProtein);
+
+        summary.setTotalPercentFat(totalPercentFat);
+        summary.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
+        summary.setTotalPercentProtein(totalPercentProtein);
 
         summary.setTotalKcalByStatus(totalKcalByStatus);
         summary.setTotalGramByStatus(totalGramByStatus);

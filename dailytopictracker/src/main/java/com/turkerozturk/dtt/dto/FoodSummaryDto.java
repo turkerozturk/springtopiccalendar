@@ -45,6 +45,11 @@ public class FoodSummaryDto {
     private Double totalGramKcalFatCarbProtein;
 
 
+    private Double totalPercentFat;
+    private Double totalPercentCarbohydrate;
+    private Double totalPercentProtein;
+
+
     private Double totalKcalByStatus;
     private Double totalGramByStatus;
     private Double totalGramFatByStatus;
@@ -249,5 +254,29 @@ public class FoodSummaryDto {
 
     public void setTotalGramSugarByStatus(Double totalGramSugarByStatus) {
         this.totalGramSugarByStatus = totalGramSugarByStatus;
+    }
+
+    public Double getTotalPercentFat() {
+        return totalPercentFat;
+    }
+
+    public void setTotalPercentFat(Double totalPercentFat) {
+        this.totalPercentFat = totalPercentFat;
+    }
+
+    public Double getTotalPercentCarbohydrate() {
+        return totalPercentCarbohydrate;
+    }
+
+    public void setTotalPercentCarbohydrate(Double totalPercentCarbohydrate) {
+        this.totalPercentCarbohydrate = totalPercentCarbohydrate;
+    }
+
+    public Double getTotalPercentProtein() {
+        return totalPercentProtein;
+    }
+
+    public void setTotalPercentProtein(Double totalPercentProtein) {
+        this.totalPercentProtein = totalPercentProtein;
     }
 }

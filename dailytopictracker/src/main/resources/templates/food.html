@@ -147,8 +147,21 @@
         <td colspan="11" id="caloriesTableDateCell"></td>
     </tr>
 
+
     <tr class="total">
-        <td colspan="4">Toplamlar: Makro Gramajlarına Göre Kaba Hesap (4 x fat, 4 x carbonhydrate, 9 x protein)</td>
+        <td colspan="4">Toplamlar: Makroların kabaca 4-4-9 kuralına göre birbirlerine göre yüzdeleri</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalGramKcalFatCarbProtein,1,2)} + ' kcal'"> kcal</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalPercentFat,1,2)} + ' %'"> percent</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalPercentCarbohydrate,1,2)} + ' %'"> percentl</td>
+        <td th:text="${#numbers.formatDecimal(summary.totalPercentProtein,1,2)} + ' %'"> percent</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr class="total">
+        <td colspan="4">Toplamlar: Makroların Gramajlarının 4-4-9 kuralına göre kaloriye çevrilmeleri</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramKcalFatCarbProtein,1,2)} + ' kcal'"> kcal</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramFatKcal,1,2)} + ' kcal'"> kcal</td>
         <td th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrateKcal,1,2)} + ' kcal'"> kcal</td>
