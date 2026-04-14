@@ -22,6 +22,7 @@ package com.turkerozturk.dtt.controller;
 
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+import com.turkerozturk.dtt.dto.DateRangeFoodSummaryDto;
 import com.turkerozturk.dtt.dto.FoodSummaryDto;
 import com.turkerozturk.dtt.service.FoodService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -65,4 +67,50 @@ public class FoodController {
 
         return "food";
     }
+
+    @GetMapping("/food-date-range")
+    public String getFoodDateRangePage(
+            @RequestParam(required = false) Long firstDateMillis,
+            @RequestParam(required = false) Long lastDateMillis,
+            Model model
+    ) {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate lastDate;
+        LocalDate firstDate;
+
+        if (lastDateMillis == null) {
+            lastDate = LocalDate.now(zoneId);
+        } else {
+            lastDate = Instant.ofEpochMilli(lastDateMillis)
+                    .atZone(zoneId)
+                    .toLocalDate();
+        }
+
+        if (firstDateMillis == null) {
+            firstDate = lastDate.minusDays(6);
+        } else {
+            firstDate = Instant.ofEpochMilli(firstDateMillis)
+                    .atZone(zoneId)
+                    .toLocalDate();
+        }
+
+        if (lastDate.isBefore(firstDate)) {
+            firstDate = lastDate;
+        }
+
+        long firstMillis = firstDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        long lastMillis = lastDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        DateRangeFoodSummaryDto summary =
+                foodService.getDateRangeSummary(firstMillis, lastMillis);
+
+        model.addAttribute("summary", summary);
+        model.addAttribute("zoneId", zoneId);
+        model.addAttribute("firstDateMillis", firstMillis);
+        model.addAttribute("lastDateMillis", lastMillis);
+
+        return "food-date-range";
+    }
+
 }

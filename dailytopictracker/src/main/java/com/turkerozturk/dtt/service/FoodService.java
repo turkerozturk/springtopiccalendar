@@ -20,6 +20,8 @@
  */
 package com.turkerozturk.dtt.service;
 
+import com.turkerozturk.dtt.dto.DailyFoodSummaryDto;
+import com.turkerozturk.dtt.dto.DateRangeFoodSummaryDto;
 import com.turkerozturk.dtt.dto.FoodEntryDto;
 import com.turkerozturk.dtt.dto.FoodSummaryDto;
 import com.turkerozturk.dtt.entity.Entry;
@@ -178,37 +180,129 @@ public class FoodService {
         result.sort(Comparator.comparing(FoodEntryDto::getCalculatedKcal,
                 Comparator.nullsLast(Comparator.reverseOrder())));
         summary.setItems(result);
-        summary.setTotalKcal(totalKcal);
-        summary.setTotalGram(totalGram);
+        DailyFoodSummaryDto dailyFoodSummaryDto = new DailyFoodSummaryDto();
+        dailyFoodSummaryDto.setTotalKcal(totalKcal);
+        dailyFoodSummaryDto.setTotalGram(totalGram);
 
-        summary.setTotalGramFat(totalGramFat);
-        summary.setTotalGramCarbohydrate(totalGramCarbonhydrate);
-        summary.setTotalGramProtein(totalGramProtein);
-        summary.setTotalGramFiber(totalGramFiber);
-        summary.setTotalGramSodium(totalGramSodium);
-        summary.setTotalGramFatSaturated(totalGramFatSaturated);
-        summary.setTotalGramSugar(totalGramSugar);
+        dailyFoodSummaryDto.setTotalGramFat(totalGramFat);
+        dailyFoodSummaryDto.setTotalGramCarbohydrate(totalGramCarbonhydrate);
+        dailyFoodSummaryDto.setTotalGramProtein(totalGramProtein);
+        dailyFoodSummaryDto.setTotalGramFiber(totalGramFiber);
+        dailyFoodSummaryDto.setTotalGramSodium(totalGramSodium);
+        dailyFoodSummaryDto.setTotalGramFatSaturated(totalGramFatSaturated);
+        dailyFoodSummaryDto.setTotalGramSugar(totalGramSugar);
 
 
-        summary.setTotalGramFatKcal(totalGramFatKcal);
-        summary.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
-        summary.setTotalGramProteinKcal(totalGramProteinKcal);
-        summary.setTotalGramKcalFatCarbProtein(totalGramKcalFatCarbProtein);
+        dailyFoodSummaryDto.setTotalGramFatKcal(totalGramFatKcal);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
+        dailyFoodSummaryDto.setTotalGramProteinKcal(totalGramProteinKcal);
+        dailyFoodSummaryDto.setTotalGramKcalFatCarbProtein(totalGramKcalFatCarbProtein);
 
-        summary.setTotalPercentFat(totalPercentFat);
-        summary.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
-        summary.setTotalPercentProtein(totalPercentProtein);
+        dailyFoodSummaryDto.setTotalPercentFat(totalPercentFat);
+        dailyFoodSummaryDto.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
+        dailyFoodSummaryDto.setTotalPercentProtein(totalPercentProtein);
 
-        summary.setTotalKcalByStatus(totalKcalByStatus);
-        summary.setTotalGramByStatus(totalGramByStatus);
-        summary.setTotalGramFatByStatus(totalGramFatByStatus);
-        summary.setTotalGramCarbohydrateByStatus(totalGramCarbohydrateByStatus);
-        summary.setTotalGramProteinByStatus(totalGramProteinByStatus);
-        summary.setTotalGramFiberByStatus(totalGramFiberByStatus);
-        summary.setTotalGramSodiumByStatus(totalGramSodiumByStatus);
-        summary.setTotalGramFatSaturatedByStatus(totalGramFatSaturatedByStatus);
-        summary.setTotalGramSugarByStatus(totalGramSugarByStatus);
+        dailyFoodSummaryDto.setTotalKcalByStatus(totalKcalByStatus);
+        dailyFoodSummaryDto.setTotalGramByStatus(totalGramByStatus);
+        dailyFoodSummaryDto.setTotalGramFatByStatus(totalGramFatByStatus);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateByStatus(totalGramCarbohydrateByStatus);
+        dailyFoodSummaryDto.setTotalGramProteinByStatus(totalGramProteinByStatus);
+        dailyFoodSummaryDto.setTotalGramFiberByStatus(totalGramFiberByStatus);
+        dailyFoodSummaryDto.setTotalGramSodiumByStatus(totalGramSodiumByStatus);
+        dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus(totalGramFatSaturatedByStatus);
+        dailyFoodSummaryDto.setTotalGramSugarByStatus(totalGramSugarByStatus);
+
+        summary.setFsd(dailyFoodSummaryDto);
 
         return summary;
     }
+
+
+
+
+
+    public DateRangeFoodSummaryDto getDateRangeSummary(Long startDateMillis, Long endDateMillis) {
+
+        List<DailyFoodSummaryDto> dailyList = new ArrayList<>();
+
+        DateRangeFoodSummaryDto rangeDto = new DateRangeFoodSummaryDto();
+
+        // toplamlar
+        double totalKcal = 0.0;
+        double totalGram = 0.0;
+        double totalFat = 0.0;
+        double totalCarb = 0.0;
+        double totalProtein = 0.0;
+        double totalFiber = 0.0;
+        double totalSodium = 0.0;
+        double totalSugar = 0.0;
+        double totalFatSat = 0.0;
+        double totalWater = 0.0;
+
+        // gün gün dolaş
+        long oneDayMillis = 24 * 60 * 60 * 1000;
+
+        for (long date = startDateMillis; date <= endDateMillis; date += oneDayMillis) {
+
+            FoodSummaryDto daily = getDailyFoodSummary(date);
+
+            DailyFoodSummaryDto dto = new DailyFoodSummaryDto();
+
+            dto.setDateMillis(date);
+
+            dto.setTotalKcal(nvl(daily.getFsd().getTotalKcal()));
+            dto.setTotalGram(nvl(daily.getFsd().getTotalGram()));
+
+            dto.setTotalGramFat(nvl(daily.getFsd().getTotalGramFat()));
+            dto.setTotalGramCarbohydrate(nvl(daily.getFsd().getTotalGramCarbohydrate()));
+            dto.setTotalGramProtein(nvl(daily.getFsd().getTotalGramProtein()));
+
+            dto.setTotalGramFiber(nvl(daily.getFsd().getTotalGramFiber()));
+            dto.setTotalGramSodium(nvl(daily.getFsd().getTotalGramSodium()));
+            dto.setTotalGramSugar(nvl(daily.getFsd().getTotalGramSugar()));
+            dto.setTotalGramFatSaturated(nvl(daily.getFsd().getTotalGramFatSaturated()));
+
+            dto.setTotalGramWater(nvl(daily.getFsd().getTotalGramWater()));
+
+            // listeye ekle
+            dailyList.add(dto);
+
+            // toplamları artır
+            totalKcal += dto.getTotalKcal();
+            totalGram += dto.getTotalGram();
+            totalFat += dto.getTotalGramFat();
+            totalCarb += dto.getTotalGramCarbohydrate();
+            totalProtein += dto.getTotalGramProtein();
+            totalFiber += dto.getTotalGramFiber();
+            totalSodium += dto.getTotalGramSodium();
+            totalSugar += dto.getTotalGramSugar();
+            totalFatSat += dto.getTotalGramFatSaturated();
+            totalWater += dto.getTotalGramWater();
+        }
+
+        rangeDto.setDays(dailyList);
+
+        rangeDto.setTotalKcal(totalKcal);
+        rangeDto.setTotalGram(totalGram);
+        rangeDto.setTotalGramFat(totalFat);
+        rangeDto.setTotalGramCarbohydrate(totalCarb);
+        rangeDto.setTotalGramProtein(totalProtein);
+        rangeDto.setTotalGramFiber(totalFiber);
+        rangeDto.setTotalGramSodium(totalSodium);
+        rangeDto.setTotalGramSugar(totalSugar);
+        rangeDto.setTotalGramFatSaturated(totalFatSat);
+        rangeDto.setTotalGramWater(totalWater);
+
+        return rangeDto;
+    }
+
+    /**
+     * null guvenligi helper
+     * @param value
+     * @return
+     */
+    private double nvl(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
 }

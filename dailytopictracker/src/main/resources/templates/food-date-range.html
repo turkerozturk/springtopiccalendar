@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--/*
+    This file is part of the DailyTopicTracker project.
+    Please refer to the project's README.md file for additional details.
+    https://github.com/turkerozturk/springtopiccalendar
+    */-->
+    <title>Daily Topic Tracker</title>
+    <meta charset="UTF-8">
+
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <!--/* favicon */-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
+
+
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f5f5f5; }
+        .total { font-weight: bold; background-color: #e8f5e9; }
+
+        .vurgula {
+          font-size: 1.875em;
+          background-color: lightgreen;
+        }
+
+        .az-vurgula {
+          background-color: #cceecc;
+        }
+
+        .az-vurgula2 {
+          background-color: #c5e7c5;
+        }
+
+        .daha-az-vurgula {
+          background-color: #eeeecc;
+        }
+
+      .status-0 {
+        background-color: gainsboro !important;
+      }
+      .status-1 {
+        background-color: palegreen !important;
+      }
+      .status-2 {
+        background-color: tomato !important;
+      }
+
+      .status-fg-0 {
+        color: gainsboro !important;
+      }
+      .status-fg-1 {
+        color: palegreen !important;
+      }
+      .status-fg-2 {
+        color: tomato !important;
+      }
+    </style>
+</head>
+<body>
+
+<h2><!-- Sol tarafta logo veya Home -->
+    <a class="navbar-brand" href="/" target="_blank">🏠 Home</a> | Daily Calorie Tracker
+</h2>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <input type="text" id="startDate" class="form-control"/>
+    </div>
+    <div class="col-md-3">
+        <input type="text" id="endDate" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-primary" onclick="reloadRange()">Getir</button>
+    </div>
+</div>
+
+<table id="rangeTable" class="table table-striped table-bordered">
+
+    <thead>
+    <tr>
+        <th>Tarih</th>
+        <th>Kcal</th>
+        <th>Gram</th>
+        <th>Yağ</th>
+        <th>Karb</th>
+        <th>Protein</th>
+        <th>Lif</th>
+        <th>Şeker</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="day : ${summary.days}">
+        <td th:text="${#dates.format(day.dateMillis, 'yyyy-MM-dd')}"></td>
+
+        <td th:text="${#numbers.formatDecimal(day.totalKcal,1,0)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalGram,1,0)}"></td>
+
+        <td th:text="${#numbers.formatDecimal(day.totalGramFat,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalGramProtein,1,1)}"></td>
+
+        <td th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
+    </tr>
+    </tbody>
+
+    <tfoot>
+    <tr>
+        <th>TOPLAM</th>
+
+        <th th:text="${#numbers.formatDecimal(summary.totalKcal,1,0)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGram,1,0)}"></th>
+
+        <th th:text="${#numbers.formatDecimal(summary.totalGramFat,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramCarbohydrate,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,1)}"></th>
+
+        <th th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
+    </tr>
+    </tfoot>
+
+</table>
+
+
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
+<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
+<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+
+<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+<script th:inline="javascript">
+    const ZONE_ID = [[${zoneId}]];
+    const FIRST_DATE_MILLIS = [[${firstDateMillis}]];
+    const LAST_DATE_MILLIS = [[${lastDateMillis}]];
+</script>
+
+<script>
+    $(document).ready(function () {
+        let table = new DataTable('#caloriesTable', {
+            pageLength: 50
+        });
+        // https://hatchjs.com/datatables-sort-by-date/
+        // TODO asagidaki ayarlar ise yaramadi. Ogrenip tekrar dene.
+        // table.order('Kalori', 'desc');
+        // table.order(3 , 'desc');
+    });
+
+</script>
+
+
+<script>
+    function convertDateToMillis(dateStr) {
+
+        // dateStr = "2026-04-06"
+
+        const parts = dateStr.split("-");
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // JS month 0-based
+        const day = parseInt(parts[2]);
+
+        // Local midnight oluştur
+        const localDate = new Date(year, month, day);
+
+        return localDate.getTime();
+    }
+
+    function loadCalorieData(dateStr) {
+
+        const millis = convertDateToMillis(dateStr);
+
+        const url = `/food?dateMillis=${millis}`;
+
+        // Sayfayı redirect ederek yenile
+        window.location.href = url;
+    }
+
+    function convertMillisToDateStr(millis) {
+
+        const date = new Date(millis);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    function redirectToNewEntry(topicId) {
+
+        let dateStr;
+
+        if (DATE_MILLIS) {
+            dateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            dateStr = new Date().toISOString().slice(0, 10);
+        }
+
+        const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}`;
+
+        window.open(url, '_blank'); // yeni sekme
+    }
+
+
+
+
+
+
+
+
+
+</script>
+
+<!--/* https://github.com/SheetJS/sheetjs https://docs.sheetjs.com/
+new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
+<script src="/webjars/xlsx/dist/xlsx.full.min.js"></script>
+
+<!--/* <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> */-->
+
+
+
+
+
+<script>
+
+    function convertMillisToDateStr(ms) {
+        return new Date(ms).toISOString().slice(0, 10);
+    }
+
+    function convertDateToMillis(dateStr) {
+        return new Date(dateStr + "T00:00:00").getTime();
+    }
+
+    let startStr = convertMillisToDateStr(FIRST_DATE_MILLIS);
+    let endStr = convertMillisToDateStr(LAST_DATE_MILLIS);
+
+    $('#startDate').val(startStr);
+    $('#endDate').val(endStr);
+
+    $('#startDate, #endDate').datepicker({
+        format: "yyyy-mm-dd",
+        autoclose: true,
+        todayHighlight: true
+    });
+
+    function reloadRange() {
+        const start = $('#startDate').val();
+        const end = $('#endDate').val();
+
+        const startMillis = convertDateToMillis(start);
+        const endMillis = convertDateToMillis(end);
+
+        window.location.href =
+            `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
+    }
+
+</script>
+
+</body>
+</html>
