@@ -77,17 +77,35 @@ public class FoodService {
         double totalPercentProtein = 0.0;
 
 
-        double totalKcalByStatus = 0.0;
-        double totalGramByStatus = 0.0;
-        double totalGramFatByStatus = 0.0;
-        double totalGramCarbohydrateByStatus = 0.0;
-        double totalGramProteinByStatus = 0.0;
+        double totalKcalByStatus0 = 0.0;
+        double totalGramByStatus0 = 0.0;
+        double totalGramFatByStatus0 = 0.0;
+        double totalGramCarbohydrateByStatus0 = 0.0;
+        double totalGramProteinByStatus0 = 0.0;
+        double totalGramFiberByStatus0 = 0.0;
+        double totalGramSodiumByStatus0 = 0.0;
+        double totalGramFatSaturatedByStatus0 = 0.0;
+        double totalGramSugarByStatus0 = 0.0;
 
-        double totalGramFiberByStatus = 0.0;
-        double totalGramSodiumByStatus = 0.0;
-        double totalGramFatSaturatedByStatus = 0.0;
-        double totalGramSugarByStatus = 0.0;
+        double totalKcalByStatus1 = 0.0;
+        double totalGramByStatus1 = 0.0;
+        double totalGramFatByStatus1 = 0.0;
+        double totalGramCarbohydrateByStatus1 = 0.0;
+        double totalGramProteinByStatus1 = 0.0;
+        double totalGramFiberByStatus1 = 0.0;
+        double totalGramSodiumByStatus1 = 0.0;
+        double totalGramFatSaturatedByStatus1 = 0.0;
+        double totalGramSugarByStatus1 = 0.0;
 
+        double totalKcalByStatus2 = 0.0;
+        double totalGramByStatus2 = 0.0;
+        double totalGramFatByStatus2 = 0.0;
+        double totalGramCarbohydrateByStatus2 = 0.0;
+        double totalGramProteinByStatus2 = 0.0;
+        double totalGramFiberByStatus2 = 0.0;
+        double totalGramSodiumByStatus2 = 0.0;
+        double totalGramFatSaturatedByStatus2 = 0.0;
+        double totalGramSugarByStatus2 = 0.0;
 
 
         for (Entry entry : entries) {
@@ -150,16 +168,42 @@ public class FoodService {
             totalGramFatSaturated += dto.getFatSaturated();
             totalGramSugar += dto.getSugar();
 
+            if(entry.getStatus() == 0) {
+                totalKcalByStatus0 += kcal;
+                totalGramByStatus0 += gram;
+                totalGramFatByStatus0 += dto.getFat();
+                totalGramCarbohydrateByStatus0 += dto.getCarbohydrate();
+                totalGramProteinByStatus0 += dto.getProtein();
+                totalGramFiberByStatus0 += dto.getFiber();
+                totalGramSodiumByStatus0 += dto.getSodium();
+                totalGramFatSaturatedByStatus0 += dto.getFatSaturated();
+                totalGramSugarByStatus0 += dto.getSugar();
+
+            }
+
             if(entry.getStatus() == 1) {
-                totalKcalByStatus += kcal;
-                totalGramByStatus += gram;
-                totalGramFatByStatus += dto.getFat();
-                totalGramCarbohydrateByStatus += dto.getCarbohydrate();
-                totalGramProteinByStatus += dto.getProtein();
-                totalGramFiberByStatus += dto.getFiber();
-                totalGramSodiumByStatus += dto.getSodium();
-                totalGramFatSaturatedByStatus += dto.getFatSaturated();
-                totalGramSugarByStatus += dto.getSugar();
+                totalKcalByStatus1 += kcal;
+                totalGramByStatus1 += gram;
+                totalGramFatByStatus1 += dto.getFat();
+                totalGramCarbohydrateByStatus1 += dto.getCarbohydrate();
+                totalGramProteinByStatus1 += dto.getProtein();
+                totalGramFiberByStatus1 += dto.getFiber();
+                totalGramSodiumByStatus1 += dto.getSodium();
+                totalGramFatSaturatedByStatus1 += dto.getFatSaturated();
+                totalGramSugarByStatus1 += dto.getSugar();
+
+            }
+
+            if(entry.getStatus() == 2) {
+                totalKcalByStatus2 += kcal;
+                totalGramByStatus2 += gram;
+                totalGramFatByStatus2 += dto.getFat();
+                totalGramCarbohydrateByStatus2 += dto.getCarbohydrate();
+                totalGramProteinByStatus2 += dto.getProtein();
+                totalGramFiberByStatus2 += dto.getFiber();
+                totalGramSodiumByStatus2 += dto.getSodium();
+                totalGramFatSaturatedByStatus2 += dto.getFatSaturated();
+                totalGramSugarByStatus2 += dto.getSugar();
 
             }
 
@@ -202,15 +246,38 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
         dailyFoodSummaryDto.setTotalPercentProtein(totalPercentProtein);
 
-        dailyFoodSummaryDto.setTotalKcalByStatus(totalKcalByStatus);
-        dailyFoodSummaryDto.setTotalGramByStatus(totalGramByStatus);
-        dailyFoodSummaryDto.setTotalGramFatByStatus(totalGramFatByStatus);
-        dailyFoodSummaryDto.setTotalGramCarbohydrateByStatus(totalGramCarbohydrateByStatus);
-        dailyFoodSummaryDto.setTotalGramProteinByStatus(totalGramProteinByStatus);
-        dailyFoodSummaryDto.setTotalGramFiberByStatus(totalGramFiberByStatus);
-        dailyFoodSummaryDto.setTotalGramSodiumByStatus(totalGramSodiumByStatus);
-        dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus(totalGramFatSaturatedByStatus);
-        dailyFoodSummaryDto.setTotalGramSugarByStatus(totalGramSugarByStatus);
+
+        dailyFoodSummaryDto.setTotalKcalByStatus0(totalKcalByStatus0);
+        dailyFoodSummaryDto.setTotalGramByStatus0(totalGramByStatus0);
+        dailyFoodSummaryDto.setTotalGramFatByStatus0(totalGramFatByStatus0);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateByStatus0(totalGramCarbohydrateByStatus0);
+        dailyFoodSummaryDto.setTotalGramProteinByStatus0(totalGramProteinByStatus0);
+        dailyFoodSummaryDto.setTotalGramFiberByStatus0(totalGramFiberByStatus0);
+        dailyFoodSummaryDto.setTotalGramSodiumByStatus0(totalGramSodiumByStatus0);
+        dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus0(totalGramFatSaturatedByStatus0);
+        dailyFoodSummaryDto.setTotalGramSugarByStatus0(totalGramSugarByStatus0);
+
+        dailyFoodSummaryDto.setTotalKcalByStatus1(totalKcalByStatus1);
+        dailyFoodSummaryDto.setTotalGramByStatus1(totalGramByStatus1);
+        dailyFoodSummaryDto.setTotalGramFatByStatus1(totalGramFatByStatus1);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateByStatus1(totalGramCarbohydrateByStatus1);
+        dailyFoodSummaryDto.setTotalGramProteinByStatus1(totalGramProteinByStatus1);
+        dailyFoodSummaryDto.setTotalGramFiberByStatus1(totalGramFiberByStatus1);
+        dailyFoodSummaryDto.setTotalGramSodiumByStatus1(totalGramSodiumByStatus1);
+        dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus1(totalGramFatSaturatedByStatus1);
+        dailyFoodSummaryDto.setTotalGramSugarByStatus1(totalGramSugarByStatus1);
+
+
+
+        dailyFoodSummaryDto.setTotalKcalByStatus2(totalKcalByStatus2);
+        dailyFoodSummaryDto.setTotalGramByStatus2(totalGramByStatus2);
+        dailyFoodSummaryDto.setTotalGramFatByStatus2(totalGramFatByStatus2);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateByStatus2(totalGramCarbohydrateByStatus2);
+        dailyFoodSummaryDto.setTotalGramProteinByStatus2(totalGramProteinByStatus2);
+        dailyFoodSummaryDto.setTotalGramFiberByStatus2(totalGramFiberByStatus2);
+        dailyFoodSummaryDto.setTotalGramSodiumByStatus2(totalGramSodiumByStatus2);
+        dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus2(totalGramFatSaturatedByStatus2);
+        dailyFoodSummaryDto.setTotalGramSugarByStatus2(totalGramSugarByStatus2);
 
         summary.setFsd(dailyFoodSummaryDto);
 

@@ -1,7 +1,6 @@
 package com.turkerozturk.dtt.dto;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
@@ -34,16 +33,37 @@ public class DailyFoodSummaryDto {
     private Double totalPercentCarbohydrate;
     private Double totalPercentProtein;
 
+    private Double totalKcalByStatus0;
+    private Double totalGramByStatus0;
+    private Double totalGramFatByStatus0;
+    private Double totalGramCarbohydrateByStatus0;
+    private Double totalGramProteinByStatus0;
+    private Double totalGramFiberByStatus0;
+    private Double totalGramSodiumByStatus0;
+    private Double totalGramFatSaturatedByStatus0;
+    private Double totalGramSugarByStatus0;
 
-    private Double totalKcalByStatus;
-    private Double totalGramByStatus;
-    private Double totalGramFatByStatus;
-    private Double totalGramCarbohydrateByStatus;
-    private Double totalGramProteinByStatus;
-    private Double totalGramFiberByStatus;
-    private Double totalGramSodiumByStatus;
-    private Double totalGramFatSaturatedByStatus;
-    private Double totalGramSugarByStatus;
+    private Double totalKcalByStatus1;
+    private Double totalGramByStatus1;
+    private Double totalGramFatByStatus1;
+    private Double totalGramCarbohydrateByStatus1;
+    private Double totalGramProteinByStatus1;
+    private Double totalGramFiberByStatus1;
+    private Double totalGramSodiumByStatus1;
+    private Double totalGramFatSaturatedByStatus1;
+    private Double totalGramSugarByStatus1;
+
+    private Double totalKcalByStatus2;
+    private Double totalGramByStatus2;
+    private Double totalGramFatByStatus2;
+    private Double totalGramCarbohydrateByStatus2;
+    private Double totalGramProteinByStatus2;
+    private Double totalGramFiberByStatus2;
+    private Double totalGramSodiumByStatus2;
+    private Double totalGramFatSaturatedByStatus2;
+    private Double totalGramSugarByStatus2;
+
+
 
 
 }
