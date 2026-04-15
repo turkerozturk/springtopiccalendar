@@ -65,6 +65,12 @@ public class FoodController {
         model.addAttribute("dateMillis", dateMillis);
         model.addAttribute("zoneId", zoneId);
 
+        long prevDayDateMillis = dateMillis - 86400000;
+        model.addAttribute("prevDayDateMillis", prevDayDateMillis);
+        long nextDayDateMillis = dateMillis + 86400000;
+        model.addAttribute("nextDayDateMillis", nextDayDateMillis);
+
+
         return "food";
     }
 
