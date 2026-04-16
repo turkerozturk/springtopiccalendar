@@ -20,10 +20,7 @@
  */
 package com.turkerozturk.dtt.service;
 
-import com.turkerozturk.dtt.dto.DailyFoodSummaryDto;
-import com.turkerozturk.dtt.dto.DateRangeFoodSummaryDto;
-import com.turkerozturk.dtt.dto.FoodEntryDto;
-import com.turkerozturk.dtt.dto.FoodSummaryDto;
+import com.turkerozturk.dtt.dto.*;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.FoodParser;
@@ -32,10 +29,7 @@ import com.turkerozturk.dtt.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 
@@ -110,6 +104,7 @@ public class FoodService {
         double totalGramFatSaturatedByStatus2 = 0.0;
         double totalGramSugarByStatus2 = 0.0;
 
+        Map<Character, MealGroupDto> mealMap = new LinkedHashMap<>();
 
         for (Entry entry : entries) {
 
@@ -117,21 +112,62 @@ public class FoodService {
                     ? entry.getNote().getContent()
                     : null;
             Topic topic = entry.getTopic();
+
             String topicDescription = topic.getDescription();
-
-            // Double gram = FoodParser.extractGram(noteContent);
-            Map<Character, Double> mealGrams = extractMealGrams(noteContent);
-            Double gram = 0.0;
-            for(Character c : mealGrams.keySet()) {
-                gram += mealGrams.get(c);
-            }
-
 
             Double kcalPer100g = FoodParser.extractKcalPer100g(
                     topicDescription
             );
 
             if (kcalPer100g == null) continue;
+
+            // Double gram = FoodParser.extractGram(noteContent); // eski parser
+            Map<Character, Double> mealGrams = extractMealGrams(noteContent); // yeni parser (daha gelismis)
+
+
+            Double gram = 0.0;
+
+            for(Character mealCode : mealGrams.keySet()) {
+                gram += mealGrams.get(mealCode);
+            }
+
+
+            for (Map.Entry<Character, Double> mg : mealGrams.entrySet()) {
+
+                Character mealCode = mg.getKey();
+                Double gramValue = mg.getValue();
+
+                MealGroupDto mealGroup = mealMap.get(mealCode);
+
+                if (mealGroup == null) {
+                    mealGroup = new MealGroupDto();
+                    mealGroup.setMealCode(mealCode);
+                    mealGroup.setItems(new ArrayList<>());
+                    mealGroup.setTotalCalories(0.0);
+
+                    mealMap.put(mealCode, mealGroup);
+                }
+
+                // item ekle
+                MealItemDto itemDto = new MealItemDto();
+                itemDto.setFoodName(entry.getTopic().getName());
+                itemDto.setGram(gramValue);
+
+                mealGroup.getItems().add(itemDto);
+
+                // kalori ekle (oransal!)
+               Double itemCalories = FoodParser.calculateKcal(gramValue, kcalPer100g);
+
+                mealGroup.setTotalCalories(
+                        mealGroup.getTotalCalories() + itemCalories
+                );
+
+            }
+
+
+
+
+
 
             // Frontend'de topic description icerisine #food yazdiktan sonra, satirlara asagidaki siralama ile veri girilir:
             // #food
@@ -164,6 +200,8 @@ public class FoodService {
             dto.setSugar(gramSugar);
 
             dto.setGramPerKcal(100 / kcalPer100g);
+
+            dto.setMealGrams(mealGrams);
 
             result.add(dto);
 
@@ -290,6 +328,14 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalGramSugarByStatus2(totalGramSugarByStatus2);
 
         summary.setFsd(dailyFoodSummaryDto);
+
+        summary.setMeals(new ArrayList<>(mealMap.values()));
+        /*for(MealDto m : meals) {
+            System.out.println(m.getMealCode());
+            for (String f : m.getIngredients().keySet()) {
+                System.out.println("\t" + f + ": " + m.getIngredients().get(f) + " gr");
+            }
+        }*/
 
         return summary;
     }

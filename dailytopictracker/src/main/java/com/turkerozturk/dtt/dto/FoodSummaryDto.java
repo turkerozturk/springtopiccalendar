@@ -30,5 +30,5 @@ import java.util.List;
 public class FoodSummaryDto {
     private List<FoodEntryDto> items;
     DailyFoodSummaryDto fsd;
-
+    private List<MealGroupDto> meals;
 }

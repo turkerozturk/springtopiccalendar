@@ -26,14 +26,6 @@ import java.util.Map;
 
 public class FoodParser {
 
-    public static Double extractGram(String noteContent) {
-        if (noteContent == null || noteContent.isBlank()) return null;
-
-        String firstLine = noteContent.split("\\R")[0].trim();
-
-        return parseFlexibleDouble(firstLine, null);
-    }
-
     public static Double extractKcalPer100g(String description) {
         if (description == null) return null;
 

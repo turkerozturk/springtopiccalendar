@@ -327,6 +327,23 @@
     </tfoot>
 </table>
 
+
+<div th:each="meal : ${summary.meals}">
+
+    <h3>
+        <span th:text="${meal.mealCode}"></span> Öğünü toplam:
+        <span th:text="${meal.totalCalories}"></span> kalori
+    </h3>
+
+    <table class="table-sm" style="max-width: 600px;">
+        <tr th:each="item : ${meal.items}">
+            <td th:text="${item.foodName}"></td>
+            <td th:text="${item.gram} + ' gr'"></td>
+        </tr>
+    </table>
+
+</div>
+
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
 <script type="text/javascript"

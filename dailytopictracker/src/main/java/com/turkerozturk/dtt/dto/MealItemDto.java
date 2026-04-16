@@ -22,45 +22,8 @@ package com.turkerozturk.dtt.dto;
 
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
-public class FoodEntryDto {
-
-    private Map<Character, Double> mealGrams;
-
-    private Long dateMillis;
-    private String topicName;
-    private String topicDescription;
-
-
-    private Double kcalPer100g;
+public class MealItemDto {
+    private String foodName;
     private Double gram;
-    private Double calculatedKcal;
-
-    private Double gramPerKcal;
-
-    private Double carbohydrate;
-    private Double fat;
-    private Double protein;
-
-    private Double water;
-
-    private Double fiber;
-    private Double sodium;
-    private Double fatSaturated;
-    private Double sugar;
-
-
-    private Long entryId;
-    private int entryStatus;
-    private Long topicId;
-    private String categoryName;
-    private Long categoryId;
-
-
-
-    // getter/setter
-
-
 }
