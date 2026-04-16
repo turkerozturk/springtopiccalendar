@@ -35,6 +35,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+
+import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 
 @Service
 @RequiredArgsConstructor
@@ -116,12 +119,19 @@ public class FoodService {
             Topic topic = entry.getTopic();
             String topicDescription = topic.getDescription();
 
-            Double gram = FoodParser.extractGram(noteContent);
+            // Double gram = FoodParser.extractGram(noteContent);
+            Map<Character, Double> mealGrams = extractMealGrams(noteContent);
+            Double gram = 0.0;
+            for(Character c : mealGrams.keySet()) {
+                gram += mealGrams.get(c);
+            }
+
+
             Double kcalPer100g = FoodParser.extractKcalPer100g(
                     topicDescription
             );
 
-            if (gram == null || kcalPer100g == null) continue;
+            if (kcalPer100g == null) continue;
 
             // Frontend'de topic description icerisine #food yazdiktan sonra, satirlara asagidaki siralama ile veri girilir:
             // #food

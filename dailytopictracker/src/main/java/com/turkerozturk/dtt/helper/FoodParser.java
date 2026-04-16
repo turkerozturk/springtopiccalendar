@@ -21,6 +21,9 @@
 package com.turkerozturk.dtt.helper;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FoodParser {
 
     public static Double extractGram(String noteContent) {
@@ -90,15 +93,13 @@ public class FoodParser {
      * "abc"  -> defaultValue
      */
     private static Double parseFlexibleDouble(String value, Double defaultValue) {
-        if (value == null) return defaultValue;
+        if (value == null || value.isBlank()) return defaultValue;
 
         try {
             String normalized = value.trim()
-                    .replace(",", "."); // virgül destek
+                    .replace(",", ".");
 
-            if (normalized.matches("\\d+(\\.\\d+)?")) {
-                return Double.parseDouble(normalized);
-            }
+            return Double.parseDouble(normalized);
 
         } catch (Exception ignored) {}
 
@@ -109,4 +110,72 @@ public class FoodParser {
         if (gram == null || kcalPer100g == null) return null;
         return (gram / 100.0) * kcalPer100g;
     }
+
+    public static Map<Character, Double> extractMealGrams(String noteContent) {
+        Map<Character, Double> result = new HashMap<>();
+
+        if (noteContent == null || noteContent.isBlank()) return result;
+
+        // sadece ilk satır
+        String firstLine = noteContent.split("\\R")[0];
+
+        // boşlukları kaldır
+        firstLine = firstLine.replaceAll("\\s+", "");
+
+        // + ile parçala
+        String[] parts = firstLine.split("\\+");
+
+        for (String part : parts) {
+            if (part == null || part.isBlank()) continue;
+
+            try {
+                char mealCode = 'z';
+                String remaining = part;
+
+                // mealCode kontrolü (ilk karakter a-z mi?)
+                char firstChar = part.charAt(0);
+                if (firstChar >= 'a' && firstChar <= 'z') {
+                    mealCode = firstChar;
+                    remaining = part.substring(1);
+                }
+
+                double gram = 0.0;
+
+                if (remaining.contains("x")) {
+                    String[] multParts = remaining.split("x");
+
+                    if (multParts.length == 2) {
+                        Double val1 = parseFlexibleDouble(multParts[0], null);
+                        Double val2 = parseFlexibleDouble(multParts[1], null);
+
+                        if (val1 != null && val2 != null) {
+                            gram = val1 * val2;
+                        } else {
+                            throw new RuntimeException("Parse error");
+                        }
+                    } else {
+                        throw new RuntimeException("Invalid x format");
+                    }
+
+                } else {
+                    Double val = parseFlexibleDouble(remaining, null);
+                    if (val != null) {
+                        gram = val;
+                    } else {
+                        throw new RuntimeException("Parse error");
+                    }
+                }
+
+                // map'e ekle
+                result.merge(mealCode, gram, Double::sum);
+
+            } catch (Exception e) {
+                // hata varsa z'ye 0.1 ekle
+                result.merge('z', 0.1, Double::sum);
+            }
+        }
+
+        return result;
+    }
+
 }
