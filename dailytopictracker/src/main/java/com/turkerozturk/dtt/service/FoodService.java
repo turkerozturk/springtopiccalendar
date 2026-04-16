@@ -27,8 +27,10 @@ import com.turkerozturk.dtt.helper.FoodParser;
 import com.turkerozturk.dtt.repository.EntryRepository;
 import com.turkerozturk.dtt.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.Collator;
 import java.util.*;
 
 import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
@@ -40,7 +42,13 @@ public class FoodService {
     private final TopicRepository topicRepository;
     private final EntryRepository entryRepository;
 
+    @Value("${app.locale:en}")
+    private String appLocale;
+
     public FoodSummaryDto getDailyFoodSummary(Long dateMillis) {
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY); // case-insensitive
 
         List<Topic> foodTopics = topicRepository.findFoodTopics();
 
@@ -329,13 +337,27 @@ public class FoodService {
 
         summary.setFsd(dailyFoodSummaryDto);
 
-        summary.setMeals(new ArrayList<>(mealMap.values()));
-        /*for(MealDto m : meals) {
-            System.out.println(m.getMealCode());
-            for (String f : m.getIngredients().keySet()) {
-                System.out.println("\t" + f + ": " + m.getIngredients().get(f) + " gr");
-            }
-        }*/
+
+
+
+        // Meal icindeki food’lari sirala
+        for (MealGroupDto meal : mealMap.values()) {
+            meal.getItems().sort((a, b) ->
+                    collator.compare(a.getFoodName(), b.getFoodName())
+            );
+        }
+        // Meal’leri sirala (mealCode’a gore)
+        List<MealGroupDto> sortedMeals = new ArrayList<>(mealMap.values());
+        sortedMeals.sort((a, b) ->
+                collator.compare(
+                        String.valueOf(a.getMealCode()),
+                        String.valueOf(b.getMealCode())
+                )
+        );
+
+        summary.setMeals(sortedMeals); //sorted
+        //summary.setMeals(new ArrayList<>(mealMap.values())); //unsorted
+
 
         return summary;
     }

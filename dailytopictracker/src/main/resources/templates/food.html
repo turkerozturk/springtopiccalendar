@@ -332,13 +332,13 @@
 
     <h3>
         <span th:text="${meal.mealCode}"></span> Öğünü toplam:
-        <span th:text="${meal.totalCalories}"></span> kalori
+        <span th:text="${#numbers.formatDecimal(meal.totalCalories,1,2)}"></span> kalori
     </h3>
 
     <table class="table-sm" style="max-width: 600px;">
         <tr th:each="item : ${meal.items}">
             <td th:text="${item.foodName}"></td>
-            <td th:text="${item.gram} + ' gr'"></td>
+            <td th:text="${#numbers.formatDecimal(item.gram,1,2)} + ' gr'"></td>
         </tr>
     </table>
 
