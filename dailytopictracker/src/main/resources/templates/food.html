@@ -76,6 +76,47 @@
         color: tomato !important;
       }
     </style>
+
+
+    <style>
+        * {
+          box-sizing: border-box;
+        }
+
+        .row {
+          margin-left:-5px;
+          margin-right:-5px;
+        }
+
+        .column {
+          float: left;
+          width: 50%;
+          padding: 5px;
+        }
+
+        /* Clearfix (clear floats) */
+        .row::after {
+          content: "";
+          clear: both;
+          display: table;
+        }
+
+        table {
+          border-collapse: collapse;
+          border-spacing: 0;
+          width: 100%;
+          border: 1px solid #ddd;
+        }
+
+        th, td {
+          text-align: left;
+          padding: 16px;
+        }
+
+        tr:nth-child(even) {
+          background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
 
@@ -328,19 +369,182 @@
 </table>
 
 
-<div th:each="meal : ${summary.meals}">
+<div th:each="meal : ${summary.meals}" class="row">
 
-    <h3>
+    <p>
         <span th:text="${meal.mealCode}"></span> Öğünü toplam:
         <span th:text="${#numbers.formatDecimal(meal.totalCalories,1,2)}"></span> kalori
-    </h3>
 
-    <table class="table-sm" style="max-width: 600px;">
-        <tr th:each="item : ${meal.items}">
-            <td th:text="${item.foodName}"></td>
-            <td th:text="${#numbers.formatDecimal(item.gram,1,2)} + ' gr'"></td>
-        </tr>
-    </table>
+    <!-- https://www.w3schools.com/howto/howto_css_table_side_by_side.asp -->
+
+    <div class="column">
+        <table class="table-sm" style="max-width: 600px;">
+            <tr th:each="item : ${meal.items}">
+                <td th:text="${item.foodName}"></td>
+                <td th:text="${#numbers.formatDecimal(item.gram,1,2)} + ' gr'"></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="column">
+        <table class="table-sm" style="max-width: 600px;">
+
+            <tr><td>Ağırlık</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGram,1,2)}"></cite> gr</td></tr>
+            <tr><td>Yağ</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFat,1,2)}"></cite> gr</td></tr>
+            <tr><td>Karbonhidrat</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramCarbohydrate,1,2)}"></cite> gr</td></tr>
+            <tr><td>Protein</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramProtein,1,2)}"></cite> gr</td></tr>
+            <tr><td>Fiber</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFiber,1,2)}"></cite> gr</td></tr>
+            <tr><td>Sodyum</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramSodium,1,2)}"></cite> gr</td></tr>
+            <tr><td>Doymuş Yağ</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFatSaturated,1,2)}"></cite> gr</td></tr>
+            <tr><td>Şeker</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramSugar,1,2)}"></cite> gr</td></tr>
+
+        </table>
+    </div>
+
+
+
+
+    <!--
+    <td width="255" class="factPanel">
+
+
+
+
+
+        <div class="rdi_perc_container" onclick="window.location.href='/Default.aspx?pa=rdic'" title="Tavsiye Edilen Günlük Alım miktarını ayarlayın" style="width:255px">
+            <div class="inner">
+                <table style="border-collapse:collapse;width:100%" cellpadding="0" cellspacing="0">
+                    <tbody><tr>
+                        <td>
+                            <div class="big">
+                                %13
+                            </div>
+                        </td>
+                        <td>
+                            <div class="medium">TGD*</div>
+                            <div class="small">(255 kal)</div>
+                        </td>
+                        <td width="50">
+                            <div class="image">
+                                <img src="https://m.ftscrt.com/static/images/rdi_perc/13_percent_rdi.gif" alt="13% TGD">
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </div>
+        </div>
+
+
+        <div class="cfp_breakdown_container" style="width:255px">
+            <div class="inner">
+                <table style="border-collapse:collapse;width:100%" cellpadding="0" cellspacing="0">
+                    <tbody><tr>
+                        <td>
+                            <div class="big">
+                                Kalori Dağılımı:
+                            </div>
+                            <div class="small">
+                                <div class="dot carbs_dot">&nbsp;</div>Karbonhidrat (%78)<br>
+                                <div class="dot fat_dot">&nbsp;</div>Yağ (%9)<br>
+                                <div class="dot protein_dot">&nbsp;</div>Protein (%13)
+                            </div>
+                        </td>
+                        <td align="center" valign="middle" width="50" style="position:relative">
+
+                            <div style="width:50px;height:50px">
+                                <canvas id="chart-pie-area" width="66" height="66" style="width: 50px; height: 50px;"></canvas>
+                            </div>
+                            <div class="pie-tooltip"></div>
+
+
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var pieData = [
+            {
+                value:78,
+                color:'#4BB89A',
+                highlight:'#4BB89A',
+                label:'Karbonhidrat: 64,81g'
+            },
+            {
+                value:9,
+                color:'#E4B101',
+                highlight:'#E4B101',
+                label:'Yağ: 3,26g'
+            },
+            {
+                value:13,
+                color:'#BC5F54',
+                highlight:'#BC5F54',
+                label:'Protein: 10,95g'
+            }]
+
+            $(document).ready(function() {
+                var ctx = document.getElementById("chart-pie-area").getContext("2d");
+                window.myPie = new Chart(ctx).Pie(pieData, {
+                    responsive:true,
+                    maintainAspectRatio:false,
+                    animation: false,
+                    tooltipTemplate:'<%if (label){%><%=label%> <%}%>(%<%= value %>)',
+                    customTooltips:function(tooltip) {
+                        var tooltipEl = $('.pie-tooltip');
+
+                        // Hide if no tooltip
+                        if (!tooltip) {
+                            tooltipEl.css({ opacity:0 });
+                            return;
+                        }
+
+                        // Set caret Position
+                        tooltipEl.removeClass('above below');
+                        tooltipEl.addClass(tooltip.yAlign);
+
+                        // Set Text
+                        tooltipEl.html(tooltip.text);
+
+                        // Find Y Location on page
+                        var top;
+                        if (tooltip.yAlign == 'above') {
+                            top = tooltip.y - tooltip.caretHeight - tooltip.caretPadding;
+                        } else {
+                            top = tooltip.y + tooltip.caretHeight + tooltip.caretPadding;
+                        }
+
+                        // Display, position, and set styles for font
+                        tooltipEl.css({
+                            opacity:1,
+                            left:tooltip.chart.canvas.offsetLeft + tooltip.x + 'px',
+                            top:tooltip.chart.canvas.offsetTop + top + 'px',
+                            fontFamily:tooltip.fontFamily,
+                            fontSize:tooltip.fontSize + 'px',
+                            fontStyle:tooltip.fontStyle
+                        });
+                    }
+                });
+            });
+        </script>
+
+        <div style="font-size:77%;margin:5px 0 0 10px">
+            <b>*TGD&nbsp;üzerine&nbsp;kurulmuş&nbsp;2000&nbsp;kalori </b>
+            <div>
+                <a href="">
+                    <b>Benim tavsiye edilen günlük değerim nedir?</b>
+                </a>
+            </div>
+        </div>
+
+    </td>
+
+        -->
+
+
+
+
 
 </div>
 

@@ -152,7 +152,14 @@ public class FoodService {
                     mealGroup.setMealCode(mealCode);
                     mealGroup.setItems(new ArrayList<>());
                     mealGroup.setTotalCalories(0.0);
-
+                    mealGroup.setTotalGramFat(0.0);
+                    mealGroup.setTotalGramProtein(0.0);
+                    mealGroup.setTotalGramCarbohydrate(0.0);
+                    mealGroup.setTotalGramFiber(0.0);
+                    mealGroup.setTotalGramSodium(0.0);
+                    mealGroup.setTotalGramFatSaturated(0.0);
+                    mealGroup.setTotalGramSugar(0.0);
+                    
                     mealMap.put(mealCode, mealGroup);
                 }
 
@@ -164,12 +171,24 @@ public class FoodService {
                 mealGroup.getItems().add(itemDto);
 
                 // kalori ekle (oransal!)
-               Double itemCalories = FoodParser.calculateKcal(gramValue, kcalPer100g);
+                Double kcal = FoodParser.calculateKcal(gramValue, kcalPer100g);
+                Double gramFat = FoodParser.calculateKcal(gramValue, FoodParser.extractFat(topicDescription));
+                Double gramCarbonhydrate = FoodParser.calculateKcal(gramValue, FoodParser.extractCarbohydrate(topicDescription));
+                Double gramProtein = FoodParser.calculateKcal(gramValue, FoodParser.extractProtein(topicDescription));
+                Double gramFiber = FoodParser.calculateKcal(gramValue, FoodParser.extractFiber(topicDescription));
+                Double gramSodium = FoodParser.calculateKcal(gramValue, FoodParser.extractSodium(topicDescription));
+                Double gramFatSaturated = FoodParser.calculateKcal(gramValue, FoodParser.extractFatSaturated(topicDescription));
+                Double gramSugar = FoodParser.calculateKcal(gramValue, FoodParser.extractSugar(topicDescription));
 
-                mealGroup.setTotalCalories(
-                        mealGroup.getTotalCalories() + itemCalories
-                );
 
+                mealGroup.setTotalCalories(mealGroup.getTotalCalories() + kcal);
+                mealGroup.setTotalGramFat(mealGroup.getTotalGramFat() + gramFat);
+                mealGroup.setTotalGramCarbohydrate(mealGroup.getTotalGramCarbohydrate() + gramCarbonhydrate);
+                mealGroup.setTotalGramProtein(mealGroup.getTotalGramProtein() + gramProtein);
+                mealGroup.setTotalGramFiber(mealGroup.getTotalGramFiber() + gramFiber);
+                mealGroup.setTotalGramSodium(mealGroup.getTotalGramSodium() + gramSodium);
+                mealGroup.setTotalGramFatSaturated(mealGroup.getTotalGramFatSaturated() + gramFatSaturated);
+                mealGroup.setTotalGramSugar(mealGroup.getTotalGramSugar() + gramSugar);
             }
 
 

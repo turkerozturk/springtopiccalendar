@@ -26,4 +26,14 @@ import lombok.Data;
 public class MealItemDto {
     private String foodName;
     private Double gram;
+
+    private Double carbohydrate;
+    private Double fat;
+    private Double protein;
+
+    private Double fiber;
+    private Double sodium;
+    private Double fatSaturated;
+    private Double sugar;
+
 }

@@ -30,4 +30,14 @@ public class MealGroupDto {
     private Character mealCode; // a, c, z gibi
     private Double totalCalories;
     private List<MealItemDto> items;
+
+    private Double totalGram;
+    private Double totalGramFat;
+    private Double totalGramCarbohydrate;
+    private Double totalGramProtein;
+
+    private Double totalGramFiber;
+    private Double totalGramSodium;
+    private Double totalGramFatSaturated;
+    private Double totalGramSugar;
 }
