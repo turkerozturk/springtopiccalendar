@@ -22,9 +22,9 @@ package com.turkerozturk.dtt.controller;
 
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
-import com.turkerozturk.dtt.dto.DateRangeFoodSummaryDto;
-import com.turkerozturk.dtt.dto.FoodSummaryDto;
+import com.turkerozturk.dtt.dto.*;
 import com.turkerozturk.dtt.service.FoodService;
+import com.turkerozturk.dtt.service.NutritionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +38,8 @@ import java.time.ZoneId;
 @Controller
 @RequiredArgsConstructor
 public class FoodController {
+
+    private final NutritionService nutritionService;
 
     private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
@@ -69,6 +71,11 @@ public class FoodController {
         model.addAttribute("prevDayDateMillis", prevDayDateMillis);
         long nextDayDateMillis = dateMillis + 86400000;
         model.addAttribute("nextDayDateMillis", nextDayDateMillis);
+
+        NutritionResultDto humanBody = nutritionService.calculate();
+
+        model.addAttribute("humanBody", humanBody);
+
 
 
         return "food";

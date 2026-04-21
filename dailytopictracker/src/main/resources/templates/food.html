@@ -124,6 +124,18 @@
     <a class="navbar-brand" href="/" target="_blank">🏠 Home</a> | Daily Calorie Tracker
 </h2>
 
+<table class="table table-sm" style="max-width: 400px;">
+    <tr><th>bazal metabolizma</th><td th:text="${humanBody.bmr}"></td></tr>
+    <tr><th>günlük kalori ihtiyacı</th><td th:text="${humanBody.tdee}"></td></tr>
+    <tr><th>weightLossCalories</th><td th:text="${humanBody.weightLossCalories}"></td></tr>
+    <tr><th>weightGainCalories</th><td th:text="${humanBody.weightGainCalories}"></td></tr>
+    <tr><th>proteinGrams</th><td th:text="${humanBody.proteinGrams}"></td></tr>
+    <tr><th>fatGrams</th><td th:text="${humanBody.fatGrams}"></td></tr>
+    <tr><th>carbGrams</th><td th:text="${humanBody.carbGrams}"></td></tr>
+    <tr><th>bmi</th><td th:text="${humanBody.bmi}"></td></tr>
+    <tr><th>bmiCategory</th><td th:text="${humanBody.bmiCategory}"></td></tr>
+</table>
+
 <div class="container mb-3" style="max-width: 400px;">
     <label>Gıda Ekle</label>
     <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Gıda adı yaz...">
