@@ -125,15 +125,21 @@
 </h2>
 
 <table class="table table-sm" style="max-width: 400px;">
-    <tr><th>bazal metabolizma</th><td th:text="${humanBody.bmr}"></td></tr>
-    <tr><th>günlük kalori ihtiyacı</th><td th:text="${humanBody.tdee}"></td></tr>
-    <tr><th>weightLossCalories</th><td th:text="${humanBody.weightLossCalories}"></td></tr>
-    <tr><th>weightGainCalories</th><td th:text="${humanBody.weightGainCalories}"></td></tr>
-    <tr><th>proteinGrams</th><td th:text="${humanBody.proteinGrams}"></td></tr>
-    <tr><th>fatGrams</th><td th:text="${humanBody.fatGrams}"></td></tr>
-    <tr><th>carbGrams</th><td th:text="${humanBody.carbGrams}"></td></tr>
+    <thead>
+    <tr><td>Haftada Yarım Kilo Vermek İçin</td><td>Bazal Metabolizma için</td><td>Haftada Yarım Kilo Almak İçin</td><th>&nbsp;</th><th>Günlük kalori ihtiyacı</th><th>Bugünkü Durum</th></tr>
+    </thead>
+    <tbody>
+    <tr><td th:text="${humanBody.weightLossCalories}"></td><td th:text="${humanBody.bmr}"></td><td th:text="${humanBody.weightGainCalories}"></td><th>kcal</th><td th:text="${humanBody.tdee}"></td><td th:text="${#numbers.formatDecimal(summary.fsd.totalKcal,1,2)} + ' gr'"> gr</td></tr>
+    <tr><td th:text="${humanBody.fatGramsForLoss}">&nbsp;</td><td th:text="${humanBody.fatGramsForBMR}">&nbsp;</td><td th:text="${humanBody.fatGramsForGain}">&nbsp;</td><th>Yağ</th><td th:text="${humanBody.fatGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)} + ' gr'"> gr</td></tr>
+    <tr><td th:text="${humanBody.carbGramsForLoss}">&nbsp;</td><td th:text="${humanBody.carbGramsForBMR}">&nbsp;</td><td th:text="${humanBody.carbGramsForGain}">&nbsp;</td><th>Karbonhidrat</th><td th:text="${humanBody.carbGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"> gr</td></tr>
+    <tr><td th:text="${humanBody.proteinGramsForLoss}">&nbsp;</td><td th:text="${humanBody.proteinGramsForBMR}">&nbsp;</td><td th:text="${humanBody.proteinGramsForGain}">&nbsp;</td><th>Protein</th><td th:text="${humanBody.proteinGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)} + ' gr'"> gr</td></tr>
+</table>
+
+<table class="table table-sm" style="max-width: 400px;">
+
     <tr><th>bmi</th><td th:text="${humanBody.bmi}"></td></tr>
     <tr><th>bmiCategory</th><td th:text="${humanBody.bmiCategory}"></td></tr>
+    </tbody>
 </table>
 
 <div class="container mb-3" style="max-width: 400px;">

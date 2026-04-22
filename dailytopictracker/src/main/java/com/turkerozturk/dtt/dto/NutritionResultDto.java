@@ -37,6 +37,18 @@ public class NutritionResultDto {
     private double bmi;
     private String bmiCategory;
 
+    private double proteinGramsForLoss;
+    private double fatGramsForLoss;
+    private double carbGramsForLoss;
+
+    private double proteinGramsForGain;
+    private double fatGramsForGain;
+    private double carbGramsForGain;
+
+    private double proteinGramsForBMR;
+    private double fatGramsForBMR;
+    private double carbGramsForBMR;
+
     public NutritionResultDto(double bmr, double tdee,
                               double weightLossCalories,
                               double weightGainCalories,
@@ -44,7 +56,16 @@ public class NutritionResultDto {
                               double fatGrams,
                               double carbGrams,
                               double bmi,
-                              String bmiCategory) {
+                              String bmiCategory,
+                              double proteinGramsForLoss,
+                              double fatGramsForLoss,
+                              double carbGramsForLoss,
+                              double proteinGramsForGain,
+                              double fatGramsForGain,
+                              double carbGramsForGain,
+                              double proteinGramsForBMR,
+                              double fatGramsForBMR,
+                              double carbGramsForBMR) {
         this.bmr = bmr;
         this.tdee = tdee;
         this.weightLossCalories = weightLossCalories;
@@ -54,6 +75,18 @@ public class NutritionResultDto {
         this.carbGrams = carbGrams;
         this.bmi = bmi;
         this.bmiCategory = bmiCategory;
+
+        this.proteinGramsForLoss = proteinGramsForLoss;
+        this.fatGramsForLoss = fatGramsForLoss;
+        this.carbGramsForLoss = carbGramsForLoss;
+
+        this.proteinGramsForGain = proteinGramsForGain;
+        this.fatGramsForGain = fatGramsForGain;
+        this.carbGramsForGain = carbGramsForGain;
+
+        this.proteinGramsForBMR = proteinGramsForBMR;
+        this.fatGramsForBMR = fatGramsForBMR;
+        this.carbGramsForBMR = carbGramsForBMR;
     }
 
     // getter'lar

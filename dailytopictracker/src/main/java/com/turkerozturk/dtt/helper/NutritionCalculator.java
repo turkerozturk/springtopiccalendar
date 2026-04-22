@@ -45,9 +45,6 @@ public class NutritionCalculator {
         // 2) TDEE (günlük ihtiyaç)
         double tdee = bmr * activityLevel.getMultiplier();
 
-        // 3) Hedef kaloriler
-        double weightLossCalories = tdee - 500; // ~0.5 kg/hafta
-        double weightGainCalories = tdee + 300;
 
         // 4) Makro dağılım (örnek: %25 protein, %30 yağ, %45 karbonhidrat)
         double proteinCalories = tdee * 0.25;
@@ -58,19 +55,47 @@ public class NutritionCalculator {
         double fatGrams = fatCalories / 9;
         double carbGrams = carbCalories / 4;
 
+        double weightLossCalories = tdee - 550; // ~0.5 kg/hafta
+        // 4) Makro dağılım (örnek: %25 protein, %30 yağ, %45 karbonhidrat)
+        double proteinCaloriesForLoss = weightLossCalories * 0.25;
+        double fatCaloriesForLoss = weightLossCalories * 0.30;
+        double carbCaloriesForLoss = weightLossCalories * 0.45;
+
+        double proteinGramsForLoss = proteinCaloriesForLoss / 4;
+        double fatGramsForLoss = fatCaloriesForLoss / 9;
+        double carbGramsForLoss = carbCaloriesForLoss / 4;
+
+        double weightGainCalories = tdee + 550;
+
+        double proteinCaloriesForGain = weightGainCalories * 0.25;
+        double fatCaloriesForGain = weightGainCalories * 0.30;
+        double carbCaloriesForGain = weightGainCalories * 0.45;
+
+        double proteinGramsForGain = proteinCaloriesForGain / 4;
+        double fatGramsForGain = fatCaloriesForGain / 9;
+        double carbGramsForGain = carbCaloriesForGain / 4;
+
+        double proteinCaloriesForBMR = bmr * 0.25;
+        double fatCaloriesForBMR = bmr * 0.30;
+        double carbCaloriesForBMR = bmr * 0.45;
+
+        double proteinGramsForBMR = proteinCaloriesForBMR / 4;
+        double fatGramsForBMR = fatCaloriesForBMR / 9;
+        double carbGramsForBMR = carbCaloriesForBMR / 4;
+
         // 5) BMI
         double heightMeter = heightCm / 100.0;
         double bmi = weightKg / (heightMeter * heightMeter);
 
         String bmiCategory;
         if (bmi < 18.5) {
-            bmiCategory = "Underweight";
+            bmiCategory = "Zayıf";
         } else if (bmi < 25) {
             bmiCategory = "Normal";
         } else if (bmi < 30) {
-            bmiCategory = "Overweight";
+            bmiCategory = "Fazla Kilolu";
         } else {
-            bmiCategory = "Obese";
+            bmiCategory = "Şişman";
         }
 
         return new NutritionResultDto(
@@ -82,7 +107,16 @@ public class NutritionCalculator {
                 round(fatGrams),
                 round(carbGrams),
                 round(bmi),
-                bmiCategory
+                bmiCategory,
+                round(proteinGramsForLoss),
+                round(fatGramsForLoss),
+                round(carbGramsForLoss),
+                round(proteinGramsForGain),
+                round(fatGramsForGain),
+                round(carbGramsForGain),
+                round(proteinGramsForBMR),
+                round(fatGramsForBMR),
+                round(carbGramsForBMR)
         );
     }
 
