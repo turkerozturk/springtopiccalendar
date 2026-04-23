@@ -101,15 +101,15 @@
     <tr>
         <th>Tarih</th>
         <th>Kcal</th>
-        <th>Gram</th>
-        <th>Yağ</th>
-        <th>Karb</th>
-        <th>Protein</th>
-        <th>Lif</th>
-        <th>Şeker</th>
+        <th>Gramaj</th>
+        <th>GR Yağ</th>
+        <th>GR Karb</th>
+        <th>GR Protein</th>
+        <th>GR Lif</th>
+        <th>GR Şeker</th>
         <th>Kcal Fark</th>
         <th>KG Fark</th>
-      <!--  <th>KG Tartı</th> -->
+        <th>KG Tartı</th>
     </tr>
     </thead>
 
@@ -130,6 +130,19 @@
         <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,1)}"></td>
 
 
+        <td>
+            <span th:text="${day.humanBody.weightKg}"></span>&nbsp;
+
+            <span th:if="${!day.humanBody.weightUpdated}"
+                  th:text="'!'"
+                  style="color:red; font-weight:bold; cursor:help;"
+                  title="Bugünkü vücut ağırlığınızı kaydetmediğiniz için, application.properties dosyasında belirtilen ağırlık üzerinden hesaplama yapılmıştır.">
+            !
+            </span>
+        </td>
+
+
+
     </tr>
     </tbody>
 
@@ -148,6 +161,7 @@
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalKcalDiff,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramDiff,1,1)}"></th>
+        <th th:text="${'Ort. ' + #numbers.formatDecimal(summary.averageWeightKg,1,1)}"></th>
 
 
     </tr>

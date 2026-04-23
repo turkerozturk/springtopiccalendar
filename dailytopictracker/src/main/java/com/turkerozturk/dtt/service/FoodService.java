@@ -420,6 +420,7 @@ public class FoodService {
         double totalWater = 0.0;
         double totalKcalDiff = 0.0;
         double totalGramDiff = 0.0;
+        double realBodyWeightSumKg = 0.0;
 
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
@@ -448,6 +449,7 @@ public class FoodService {
 
             dto.setTotalKcalDiff(daily.getFsd().getTotalKcalDiff());
             dto.setTotalGramDiff(daily.getFsd().getTotalGramDiff());
+            dto.setHumanBody(daily.getFsd().getHumanBody());
 
 
             // listeye ekle
@@ -466,6 +468,7 @@ public class FoodService {
             totalWater += dto.getTotalGramWater();
             totalKcalDiff += dto.getTotalKcalDiff();
             totalGramDiff += dto.getTotalGramDiff();
+            realBodyWeightSumKg += dto.getHumanBody().getWeightKg();
 
         }
 
@@ -483,6 +486,7 @@ public class FoodService {
         rangeDto.setTotalGramWater(totalWater);
         rangeDto.setTotalKcalDiff(totalKcalDiff);
         rangeDto.setTotalGramDiff(totalGramDiff);
+        rangeDto.setAverageWeightKg(realBodyWeightSumKg / dailyList.size());
 
 
         return rangeDto;

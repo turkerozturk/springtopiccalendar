@@ -26,4 +26,8 @@ public class DateRangeFoodSummaryDto {
     private Double totalKcalDiff;
     private Double totalGramDiff;
 
+    private Double averageWeightKg;
+    private Double totalBodyWeightDiff;
+
+
 }
