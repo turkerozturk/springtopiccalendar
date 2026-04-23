@@ -22,4 +22,8 @@ public class DateRangeFoodSummaryDto {
     private Double totalGramSugar;
 
     private Double totalGramWater;
+
+    private Double totalKcalDiff;
+    private Double totalGramDiff;
+
 }

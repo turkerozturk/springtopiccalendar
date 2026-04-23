@@ -87,6 +87,9 @@ public class FoodService {
         double totalPercentCarbohydrate = 0.0;
         double totalPercentProtein = 0.0;
 
+        double totalKcalDiff = 0.0;
+        double totalGramDiff = 0.0;
+
 
         double totalKcalByStatus0 = 0.0;
         double totalGramByStatus0 = 0.0;
@@ -297,6 +300,8 @@ public class FoodService {
             totalPercentFat = (totalGramFatKcal / totalGramKcalFatCarbProtein) * 100;
             totalPercentCarbohydrate = (totalGramCarbonhydrateKcal / totalGramKcalFatCarbProtein) * 100;
             totalPercentProtein = (totalGramProteinKcal / totalGramKcalFatCarbProtein) * 100;
+            totalKcalDiff = totalKcal - humanBody.getTdee();
+            totalGramDiff = totalKcalDiff / 7700;
 
         }
 
@@ -326,6 +331,9 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalPercentFat(totalPercentFat);
         dailyFoodSummaryDto.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
         dailyFoodSummaryDto.setTotalPercentProtein(totalPercentProtein);
+
+        dailyFoodSummaryDto.setTotalKcalDiff(totalKcalDiff);
+        dailyFoodSummaryDto.setTotalGramDiff(totalGramDiff);
 
 
         dailyFoodSummaryDto.setTotalKcalByStatus0(totalKcalByStatus0);
@@ -410,6 +418,8 @@ public class FoodService {
         double totalSugar = 0.0;
         double totalFatSat = 0.0;
         double totalWater = 0.0;
+        double totalKcalDiff = 0.0;
+        double totalGramDiff = 0.0;
 
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
@@ -436,6 +446,10 @@ public class FoodService {
 
             dto.setTotalGramWater(nvl(daily.getFsd().getTotalGramWater()));
 
+            dto.setTotalKcalDiff(daily.getFsd().getTotalKcalDiff());
+            dto.setTotalGramDiff(daily.getFsd().getTotalGramDiff());
+
+
             // listeye ekle
             dailyList.add(dto);
 
@@ -450,6 +464,9 @@ public class FoodService {
             totalSugar += dto.getTotalGramSugar();
             totalFatSat += dto.getTotalGramFatSaturated();
             totalWater += dto.getTotalGramWater();
+            totalKcalDiff += dto.getTotalKcalDiff();
+            totalGramDiff += dto.getTotalGramDiff();
+
         }
 
         rangeDto.setDays(dailyList);
@@ -464,6 +481,9 @@ public class FoodService {
         rangeDto.setTotalGramSugar(totalSugar);
         rangeDto.setTotalGramFatSaturated(totalFatSat);
         rangeDto.setTotalGramWater(totalWater);
+        rangeDto.setTotalKcalDiff(totalKcalDiff);
+        rangeDto.setTotalGramDiff(totalGramDiff);
+
 
         return rangeDto;
     }

@@ -65,4 +65,9 @@ public class DailyFoodSummaryDto {
 
     private NutritionResultDto humanBody;
 
+    private Double totalKcalDiff;
+    private Double totalGramDiff;
+
+
+
 }
