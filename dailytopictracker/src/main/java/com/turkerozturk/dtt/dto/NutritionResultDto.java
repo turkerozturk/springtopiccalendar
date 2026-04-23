@@ -49,6 +49,9 @@ public class NutritionResultDto {
     private double fatGramsForBMR;
     private double carbGramsForBMR;
 
+    private double weightKg;
+    private boolean weightUpdated; // Whether the weight info of today comes from a topic entry(true) or from application.properties file(false).
+
     public NutritionResultDto(double bmr, double tdee,
                               double weightLossCalories,
                               double weightGainCalories,
@@ -65,7 +68,9 @@ public class NutritionResultDto {
                               double carbGramsForGain,
                               double proteinGramsForBMR,
                               double fatGramsForBMR,
-                              double carbGramsForBMR) {
+                              double carbGramsForBMR,
+                              double weightKg,
+                              boolean weightUpdated) {
         this.bmr = bmr;
         this.tdee = tdee;
         this.weightLossCalories = weightLossCalories;
@@ -87,6 +92,9 @@ public class NutritionResultDto {
         this.proteinGramsForBMR = proteinGramsForBMR;
         this.fatGramsForBMR = fatGramsForBMR;
         this.carbGramsForBMR = carbGramsForBMR;
+
+        this.weightKg = weightKg;
+        this.weightUpdated = weightUpdated;
     }
 
     // getter'lar

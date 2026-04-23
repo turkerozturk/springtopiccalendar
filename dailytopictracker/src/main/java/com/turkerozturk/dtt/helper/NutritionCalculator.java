@@ -28,6 +28,7 @@ public class NutritionCalculator {
 
     public static NutritionResultDto calculate(
             double weightKg,
+            boolean weightUpdated,
             double heightCm,
             int age,
             Gender gender,
@@ -116,7 +117,9 @@ public class NutritionCalculator {
                 round(carbGramsForGain),
                 round(proteinGramsForBMR),
                 round(fatGramsForBMR),
-                round(carbGramsForBMR)
+                round(carbGramsForBMR),
+                round(weightKg),
+                weightUpdated
         );
     }
 

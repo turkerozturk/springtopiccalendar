@@ -129,16 +129,29 @@
     <tr><td>Haftada Yarım Kilo Vermek İçin</td><td>Bazal Metabolizma için</td><td>Haftada Yarım Kilo Almak İçin</td><th>&nbsp;</th><th>Günlük kalori ihtiyacı</th><th>Bugünkü Durum</th></tr>
     </thead>
     <tbody>
-    <tr><td th:text="${humanBody.weightLossCalories}"></td><td th:text="${humanBody.bmr}"></td><td th:text="${humanBody.weightGainCalories}"></td><th>kcal</th><td th:text="${humanBody.tdee}"></td><td th:text="${#numbers.formatDecimal(summary.fsd.totalKcal,1,2)} + ' gr'"> gr</td></tr>
-    <tr><td th:text="${humanBody.fatGramsForLoss}">&nbsp;</td><td th:text="${humanBody.fatGramsForBMR}">&nbsp;</td><td th:text="${humanBody.fatGramsForGain}">&nbsp;</td><th>Yağ</th><td th:text="${humanBody.fatGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)} + ' gr'"> gr</td></tr>
-    <tr><td th:text="${humanBody.carbGramsForLoss}">&nbsp;</td><td th:text="${humanBody.carbGramsForBMR}">&nbsp;</td><td th:text="${humanBody.carbGramsForGain}">&nbsp;</td><th>Karbonhidrat</th><td th:text="${humanBody.carbGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"> gr</td></tr>
-    <tr><td th:text="${humanBody.proteinGramsForLoss}">&nbsp;</td><td th:text="${humanBody.proteinGramsForBMR}">&nbsp;</td><td th:text="${humanBody.proteinGramsForGain}">&nbsp;</td><th>Protein</th><td th:text="${humanBody.proteinGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)} + ' gr'"> gr</td></tr>
+    <tr><td th:text="${summary.fsd.humanBody.weightLossCalories}"></td><td th:text="${summary.fsd.humanBody.bmr}"></td><td th:text="${summary.fsd.humanBody.weightGainCalories}"></td><th>kcal</th><td th:text="${summary.fsd.humanBody.tdee}"></td><td th:text="${#numbers.formatDecimal(summary.fsd.totalKcal,1,2)}"> kcal</td></tr>
+    <tr><td th:text="${summary.fsd.humanBody.fatGramsForLoss}">&nbsp;</td><td th:text="${summary.fsd.humanBody.fatGramsForBMR}">&nbsp;</td><td th:text="${summary.fsd.humanBody.fatGramsForGain}">&nbsp;</td><th>Yağ</th><td th:text="${summary.fsd.humanBody.fatGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)}"> gr</td></tr>
+    <tr><td th:text="${summary.fsd.humanBody.carbGramsForLoss}">&nbsp;</td><td th:text="${summary.fsd.humanBody.carbGramsForBMR}">&nbsp;</td><td th:text="${summary.fsd.humanBody.carbGramsForGain}">&nbsp;</td><th>Karbonhidrat</th><td th:text="${summary.fsd.humanBody.carbGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)}"> gr</td></tr>
+    <tr><td th:text="${summary.fsd.humanBody.proteinGramsForLoss}">&nbsp;</td><td th:text="${summary.fsd.humanBody.proteinGramsForBMR}">&nbsp;</td><td th:text="${summary.fsd.humanBody.proteinGramsForGain}">&nbsp;</td><th>Protein</th><td th:text="${summary.fsd.humanBody.proteinGrams}"></td><td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)}"> gr</td></tr>
 </table>
 
 <table class="table table-sm" style="max-width: 400px;">
 
-    <tr><th>bmi</th><td th:text="${humanBody.bmi}"></td></tr>
-    <tr><th>bmiCategory</th><td th:text="${humanBody.bmiCategory}"></td></tr>
+    <tr>
+        <th>Bugünkü Vücut Ağırlığı</th>
+        <td>
+            <span th:text="${summary.fsd.humanBody.weightKg + ' kg'}"></span>&nbsp;
+
+            <span th:if="${!summary.fsd.humanBody.weightUpdated}"
+                  th:text="'!'"
+                  style="color:red; font-weight:bold; cursor:help;"
+                  title="Bugünkü vücut ağırlığınızı kaydetmediğiniz için, application.properties dosyasında belirtilen ağırlık üzerinden hesaplama yapılmıştır.">
+            !
+            </span>
+        </td>
+    </tr>
+    <tr><th>BMI (Vücut Kitle İndeksi)</th><td th:text="${summary.fsd.humanBody.bmi}"></td></tr>
+    <tr><th>BMI Kategorisi</th><td th:text="${summary.fsd.humanBody.bmiCategory}"></td></tr>
     </tbody>
 </table>
 

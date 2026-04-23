@@ -39,6 +39,9 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 @RequiredArgsConstructor
 public class FoodService {
 
+    private final NutritionService nutritionService;
+
+
     private final TopicRepository topicRepository;
     private final EntryRepository entryRepository;
 
@@ -49,6 +52,9 @@ public class FoodService {
         Locale locale = Locale.forLanguageTag(appLocale);
         Collator collator = Collator.getInstance(locale);
         collator.setStrength(Collator.PRIMARY); // case-insensitive
+
+        NutritionResultDto humanBody = nutritionService.calculate(dateMillis);
+
 
         List<Topic> foodTopics = topicRepository.findFoodTopics();
 
@@ -353,6 +359,8 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalGramSodiumByStatus2(totalGramSodiumByStatus2);
         dailyFoodSummaryDto.setTotalGramFatSaturatedByStatus2(totalGramFatSaturatedByStatus2);
         dailyFoodSummaryDto.setTotalGramSugarByStatus2(totalGramSugarByStatus2);
+
+        dailyFoodSummaryDto.setHumanBody(humanBody);
 
         summary.setFsd(dailyFoodSummaryDto);
 

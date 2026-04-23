@@ -63,7 +63,6 @@ public class DailyFoodSummaryDto {
     private Double totalGramFatSaturatedByStatus2;
     private Double totalGramSugarByStatus2;
 
-
-
+    private NutritionResultDto humanBody;
 
 }

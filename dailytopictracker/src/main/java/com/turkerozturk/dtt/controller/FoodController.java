@@ -39,8 +39,6 @@ import java.time.ZoneId;
 @RequiredArgsConstructor
 public class FoodController {
 
-    private final NutritionService nutritionService;
-
     private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -71,10 +69,6 @@ public class FoodController {
         model.addAttribute("prevDayDateMillis", prevDayDateMillis);
         long nextDayDateMillis = dateMillis + 86400000;
         model.addAttribute("nextDayDateMillis", nextDayDateMillis);
-
-        NutritionResultDto humanBody = nutritionService.calculate(dateMillis);
-
-        model.addAttribute("humanBody", humanBody);
 
 
 

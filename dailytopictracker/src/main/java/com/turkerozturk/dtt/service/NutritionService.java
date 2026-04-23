@@ -51,6 +51,9 @@ public class NutritionService {
         this.entryRepository = entryRepository;
     }
 
+    boolean weightUpdated = false;
+
+
     public NutritionResultDto calculate(Long dateMillisYmd) {
 
         double weight = humanConfig.getWeight();
@@ -74,17 +77,28 @@ public class NutritionService {
 
                     if (parsedWeight.isPresent()) {
                         weight = parsedWeight.get();
+                        weightUpdated = true;
+                    } else {
+                        weightUpdated = false;
                     }
+                } else {
+                    weightUpdated = false;
                 }
+            } else {
+                weightUpdated = false;
             }
+        } else {
+            weightUpdated = false;
         }
 
         return NutritionCalculator.calculate(
                 weight,
+                weightUpdated,
                 humanConfig.getHeight(),
                 humanConfig.getAge(),
                 Gender.valueOf(humanConfig.getGender()),
                 ActivityLevel.valueOf(humanConfig.getActivityLevel())
         );
+
     }
 }

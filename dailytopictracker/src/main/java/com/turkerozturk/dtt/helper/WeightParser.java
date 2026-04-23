@@ -46,6 +46,6 @@ public class WeightParser {
             } catch (NumberFormatException ignored) {}
         }
 
-        return Optional.empty();
+        return null;// Optional.empty();
     }
 }
