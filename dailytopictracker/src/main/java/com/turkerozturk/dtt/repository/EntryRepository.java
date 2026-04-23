@@ -207,5 +207,18 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
             @Param("topicIds") List<Long> topicIds
     );
 
+    @Query("""
+    SELECT e FROM Entry e
+    JOIN FETCH e.topic t
+    JOIN FETCH e.note n
+    WHERE e.dateMillisYmd = :date
+      AND e.status = 1
+      AND t.id = :topicId
+    """)
+    Optional<Entry> findEntryByTopicAndDate(
+            @Param("date") Long date,
+            @Param("topicId") Long topicId
+    );
+
 
 }

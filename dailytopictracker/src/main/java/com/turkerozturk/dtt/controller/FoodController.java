@@ -72,7 +72,7 @@ public class FoodController {
         long nextDayDateMillis = dateMillis + 86400000;
         model.addAttribute("nextDayDateMillis", nextDayDateMillis);
 
-        NutritionResultDto humanBody = nutritionService.calculate();
+        NutritionResultDto humanBody = nutritionService.calculate(dateMillis);
 
         model.addAttribute("humanBody", humanBody);
 

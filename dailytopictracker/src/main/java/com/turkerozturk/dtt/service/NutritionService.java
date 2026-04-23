@@ -24,22 +24,63 @@ import com.turkerozturk.dtt.component.HumanConfig;
 import com.turkerozturk.dtt.dto.ActivityLevel;
 import com.turkerozturk.dtt.dto.Gender;
 import com.turkerozturk.dtt.dto.NutritionResultDto;
+import com.turkerozturk.dtt.entity.Entry;
+import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.NutritionCalculator;
+import com.turkerozturk.dtt.helper.WeightParser;
+import com.turkerozturk.dtt.repository.EntryRepository;
+import com.turkerozturk.dtt.repository.TopicRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class NutritionService {
 
     private final HumanConfig humanConfig;
+    private final TopicRepository topicRepository;
+    private final EntryRepository entryRepository;
 
-    public NutritionService(HumanConfig humanConfig) {
+    private static final String HUMAN_WEIGHT_TAG = "#human.weight";
+
+    public NutritionService(HumanConfig humanConfig,
+                            TopicRepository topicRepository,
+                            EntryRepository entryRepository) {
         this.humanConfig = humanConfig;
+        this.topicRepository = topicRepository;
+        this.entryRepository = entryRepository;
     }
 
-    public NutritionResultDto calculate() {
+    public NutritionResultDto calculate(Long dateMillisYmd) {
+
+        double weight = humanConfig.getWeight();
+
+        Optional<Topic> weightTopicOpt =
+                topicRepository.findFirstByDescriptionContaining(HUMAN_WEIGHT_TAG);
+
+        if (weightTopicOpt.isPresent()) {
+
+            Topic topic = weightTopicOpt.get();
+
+            Optional<Entry> entryOpt =
+                    entryRepository.findEntryByTopicAndDate(dateMillisYmd, topic.getId());
+
+            if (entryOpt.isPresent()) {
+                Entry entry = entryOpt.get();
+
+                if (entry.getNote() != null) {
+                    Optional<Double> parsedWeight =
+                            WeightParser.extractWeight(entry.getNote().getContent());
+
+                    if (parsedWeight.isPresent()) {
+                        weight = parsedWeight.get();
+                    }
+                }
+            }
+        }
 
         return NutritionCalculator.calculate(
-                humanConfig.getWeight(),
+                weight,
                 humanConfig.getHeight(),
                 humanConfig.getAge(),
                 Gender.valueOf(humanConfig.getGender()),

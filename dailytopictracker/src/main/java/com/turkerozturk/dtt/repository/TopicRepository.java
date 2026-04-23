@@ -28,6 +28,7 @@ import org.springframework.data.repository.query.Param;
 import com.turkerozturk.dtt.entity.Topic;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 
@@ -190,6 +191,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     ORDER BY t.name
     """)
     List<TopicDto> searchFoodTopics(@Param("q") String q);
+
+    Optional<Topic> findFirstByDescriptionContaining(String keyword);
 
 
 }
