@@ -711,8 +711,15 @@
         const $results = $('#foodSearchResults');
 
 
+        // Kullanici yazarken her tusta API cagrisi yapmamak icin bekleme koyar.
+        // bu debounce olmasa da filtreleme calisiyordu.
+        // debounce ile:
+        // kullanici yazmayi birakinca (ornegin 300ms sonra) cagri yapilir.
+        let debounceTimer;
 
         $input.on('input', function () {
+
+            clearTimeout(debounceTimer);
 
             const query = $(this).val();
 
@@ -721,48 +728,56 @@
                 return;
             }
 
-            //const csrfToken = $('meta[name="_csrf"]').attr('content');
-            //const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+            debounceTimer = setTimeout(() => {
+                if (query.length >= 2) {
+                    //const csrfToken = $('meta[name="_csrf"]').attr('content');
+                    //const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 
 
-            $.ajax({
-                url: '/api/food-topics',
-                data: { q: query },
-                beforeSend: function (xhr) {
-                        xhr.setRequestHeader(csrfHeader, csrfToken);
-                },
-                success: function (data) {
+                    $.ajax({
+                        url: '/api/food-topics',
+                        data: { q: query },
+                        beforeSend: function (xhr) {
+                                xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
+                        success: function (data) {
 
-                    currentResults = data;
-                    selectedIndex = -1;
+                            currentResults = data;
+                            selectedIndex = -1;
 
-                    $results.empty();
+                            $results.empty();
 
-                    if (data.length === 0) {
-                        $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
-                    }
+                            if (data.length === 0) {
+                                $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
+                            }
 
-                    data.forEach((item, index) => {
+                            data.forEach((item, index) => {
 
-                        const li = $(`
-                            <li class="list-group-item list-group-item-action" style="cursor:pointer;">
-                                ${item.name}
-                            </li>
-                        `);
+                                const li = $(`
+                                    <li class="list-group-item list-group-item-action" style="cursor:pointer;">
+                                        ${item.name}
+                                    </li>
+                                `);
 
-                        li.on('click', function () {
-                            redirectToNewEntry(item.id);
-                        });
+                                li.on('click', function () {
+                                    redirectToNewEntry(item.id);
+                                });
 
-                        $results.append(li);
+                                $results.append(li);
+                            });
+
+
+                        }
                     });
 
 
                 }
-            });
+            }, 300);
+
+
         });
 
 
