@@ -192,6 +192,12 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     """)
     List<TopicDto> searchFoodTopics(@Param("q") String q);
 
+    @Query("""
+    SELECT t FROM Topic t
+    WHERE t.description LIKE '#food%'
+    """)
+    List<Topic> findFoodTopicsRaw();
+
     Optional<Topic> findFirstByDescriptionContaining(String keyword);
 
 

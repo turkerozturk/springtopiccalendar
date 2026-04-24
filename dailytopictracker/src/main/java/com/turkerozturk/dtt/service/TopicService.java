@@ -22,6 +22,7 @@ package com.turkerozturk.dtt.service;
 
 
 
+import com.turkerozturk.dtt.dto.TopicDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
@@ -32,13 +33,11 @@ import com.turkerozturk.dtt.repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.Collator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 // 1) Controller sınıfınıza ekleyin:
 
 
@@ -50,6 +49,9 @@ public class TopicService {
 
     @Autowired
     private EntryRepository entryRepository;
+
+    @Value("${app.locale:en}")
+    private String appLocale;
 
     public List<Topic> getAllTopics() {
         return topicRepository.findAll();
@@ -292,4 +294,25 @@ public class TopicService {
 
         return topicRepository.findById(id);
     }
+
+    public List<TopicDto> searchFoodTopics(String q) {
+
+        List<Topic> topics = topicRepository.findFoodTopicsRaw();
+
+        Locale locale = Locale.forLanguageTag(appLocale);
+        // 2) Collator: case-insensitive ve aksansız karşılaştırma
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+
+        return topics.stream()
+                .filter(t -> t.getName().toLowerCase(locale).contains(q.toLowerCase(locale)))
+                .sorted(Comparator.comparing(Topic::getName,
+                        collator))
+                .map(t -> new TopicDto(t.getId(), t.getName()))
+                .toList();
+    }
+
+
+
+
 }
