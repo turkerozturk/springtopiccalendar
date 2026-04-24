@@ -26,14 +26,17 @@ import com.turkerozturk.dtt.dto.*;
 import com.turkerozturk.dtt.service.FoodService;
 import com.turkerozturk.dtt.service.NutritionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.text.Collator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
@@ -42,6 +45,8 @@ public class FoodController {
     private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
 
+    @Value("${app.locale:en}")
+    private String appLocale;
 
     @GetMapping("/food")
     public String getFoodPage(
@@ -69,6 +74,12 @@ public class FoodController {
         model.addAttribute("prevDayDateMillis", prevDayDateMillis);
         long nextDayDateMillis = dateMillis + 86400000;
         model.addAttribute("nextDayDateMillis", nextDayDateMillis);
+
+        Locale locale = Locale.forLanguageTag(appLocale);
+        // 2) Collator: case-insensitive ve aksansız karşılaştırma
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+        model.addAttribute("appLocale", appLocale);
 
 
 

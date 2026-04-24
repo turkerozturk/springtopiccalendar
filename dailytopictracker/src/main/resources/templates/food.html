@@ -756,9 +756,11 @@
 
                             data.forEach((item, index) => {
 
+                                const highlighted = highlightMatch(item.name, query);
+
                                 const li = $(`
                                     <li class="list-group-item list-group-item-action" style="cursor:pointer;">
-                                        ${item.name}
+                                        ${highlighted}
                                     </li>
                                 `);
 
@@ -847,6 +849,31 @@ function updateSelection(items) {
     }
 }
 
+// asagidaki kodlar arama kutusuna yazilan harflerin sonuclar icerisinde vurgulu gosterilmeleri icin.
+const appLocale = /*[[${appLocale}]]*/ 'en';
+//const collator = new Intl.Collator(appLocale, { sensitivity: 'base' });
+
+function normalizeText(str) {
+    return str
+        .toLocaleLowerCase(appLocale)
+        .normalize("NFD")                 // karakterleri parçala
+        .replace(/\p{Diacritic}/gu, "");  // aksanları sil
+}
+function highlightMatch(text, query) {
+
+    const normText = normalizeText(text);
+    const normQuery = normalizeText(query);
+
+    const index = normText.indexOf(normQuery);
+
+    if (index === -1) return text;
+
+    const end = index + normQuery.length;
+
+    return text.substring(0, index)
+        + "<strong style=\"background-color: LightPink; color: gray;\">" + text.substring(index, end) + "</strong>"
+        + text.substring(end);
+}
 
 </script>
 
