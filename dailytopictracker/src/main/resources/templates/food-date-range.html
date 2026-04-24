@@ -127,7 +127,7 @@
         <td th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalKcalDiff,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)}"></td>
 
 
         <td>
@@ -160,7 +160,7 @@
         <th th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalKcalDiff,1,1)}"></th>
-        <th th:text="${#numbers.formatDecimal(summary.totalGramDiff,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramDiff,1,2)}"></th>
         <th th:text="${'Ort. ' + #numbers.formatDecimal(summary.averageWeightKg,1,1)}"></th>
 
 

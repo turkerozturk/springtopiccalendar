@@ -725,9 +725,16 @@
                 },
                 success: function (data) {
 
+                    currentResults = data;
+                    selectedIndex = -1;
+
                     $results.empty();
 
-                    data.forEach(item => {
+                    if (data.length === 0) {
+                        $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
+                    }
+
+                    data.forEach((item, index) => {
 
                         const li = $(`
                             <li class="list-group-item list-group-item-action" style="cursor:pointer;">
@@ -741,20 +748,62 @@
 
                         $results.append(li);
                     });
+
+
                 }
             });
         });
 
 
 
+    // ⬇️⬆️ ENTER ESC kontrolü
+    $input.on('keydown', function (e) {
 
+        const items = $results.find('li');
 
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items);
+        }
 
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            updateSelection(items);
+        }
 
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && currentResults[selectedIndex]) {
+                redirectToNewEntry(currentResults[selectedIndex].id);
+            }
+        }
 
-
+        if (e.key === 'Escape') {
+            $results.empty();
+            selectedIndex = -1;
+        }
     });
 
+    // dışarı tıklama
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#foodSearchInput, #foodSearchResults').length) {
+            $results.empty();
+            selectedIndex = -1;
+        }
+    });
+
+
+});
+
+function updateSelection(items) {
+    items.removeClass('active');
+
+    if (selectedIndex >= 0) {
+        $(items[selectedIndex]).addClass('active');
+    }
+}
 
 
 </script>
