@@ -117,6 +117,17 @@
           background-color: #f2f2f2;
         }
     </style>
+
+    <style>
+        /* Liste asagi kaydiriyor → overlay yapalim (CSS FIX) */
+        #foodSearchResults {
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -157,7 +168,7 @@
     </tbody>
 </table>
 
-<div class="container mb-3" style="max-width: 400px;">
+<div class="container mb-3" style="position: relative; max-width: 400px;">
     <label>Gıda Ekle</label>
     <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Gıda adı yaz...">
 
