@@ -827,7 +827,23 @@ function updateSelection(items) {
     items.removeClass('active');
 
     if (selectedIndex >= 0) {
-        $(items[selectedIndex]).addClass('active');
+        const $selected = $(items[selectedIndex]);
+        $selected.addClass('active');
+
+        // 👇 kritik kisim
+        const container = $('#foodSearchResults');
+
+        const itemTop = $selected.position().top;
+        const itemBottom = itemTop + $selected.outerHeight();
+
+        const containerScrollTop = container.scrollTop();
+        const containerHeight = container.height();
+
+        if (itemBottom > containerHeight) {
+            container.scrollTop(containerScrollTop + (itemBottom - containerHeight));
+        } else if (itemTop < 0) {
+            container.scrollTop(containerScrollTop + itemTop);
+        }
     }
 }
 
