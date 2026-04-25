@@ -293,9 +293,9 @@ public class FoodService {
             }
 
 
-            totalGramFatKcal += dto.getFat() * 4;
+            totalGramFatKcal += dto.getFat() * 9;
             totalGramCarbonhydrateKcal += dto.getCarbohydrate() * 4;
-            totalGramProteinKcal += dto.getProtein() * 9;
+            totalGramProteinKcal += dto.getProtein() * 4;
             totalGramKcalFatCarbProtein = totalGramFatKcal + totalGramCarbonhydrateKcal + totalGramProteinKcal;
 
             totalPercentFat = (totalGramFatKcal / totalGramKcalFatCarbProtein) * 100;
