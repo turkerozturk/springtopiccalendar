@@ -202,11 +202,17 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     WHERE e.dateMillisYmd = :date
       AND t.id IN :topicIds
     """)
-    List<Entry> findFoodEntriesByDate(
+    List<Entry> findEntriesByADayForSelectedTopics(
             @Param("date") Long date,
             @Param("topicIds") List<Long> topicIds
     );
 
+    /**
+     * Bunu vucut agirligi olcum sonuclarini tutan tek bir topic'den ibaret olanlar icin kullaniyoruz.
+     * @param date
+     * @param topicId
+     * @return
+     */
     @Query("""
     SELECT e FROM Entry e
     JOIN FETCH e.topic t

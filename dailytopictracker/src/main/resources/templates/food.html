@@ -164,6 +164,7 @@
     <tr><th>BMI (Vücut Kitle İndeksi)</th><td th:text="${summary.fsd.humanBody.bmi}"></td></tr>
     <tr><th>BMI Kategorisi</th><td th:text="${summary.fsd.humanBody.bmiCategory}"></td></tr>
     <tr><th>Günlük İhtiyaç ile Tüketim Arasındaki Kalori Farkı</th><td th:text="${#numbers.formatDecimal(summary.fsd.totalKcalDiff,1,2)} + ' kcal'"></td></tr>
+    <tr><th>Aktivite İle Yakılan Kalori</th><td th:text="${#numbers.formatDecimal(summary.fsd.totalActivityKcal,1,2)} + ' kcal'"></td></tr>
 
     </tbody>
 </table>

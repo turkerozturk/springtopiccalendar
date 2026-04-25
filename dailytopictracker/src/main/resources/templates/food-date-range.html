@@ -107,6 +107,7 @@
         <th>GR Protein</th>
         <th>GR Lif</th>
         <th>GR Şeker</th>
+        <th>Kcal Aktivite</th>
         <th>Kcal Fark</th>
         <th>KG Fark</th>
         <th>KG Tartı</th>
@@ -126,6 +127,7 @@
 
         <td th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
+        <td th:text="${#numbers.formatDecimal(day.totalActivityKcal,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalKcalDiff,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)}"></td>
 
@@ -159,11 +161,10 @@
 
         <th th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalActivityKcal,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalKcalDiff,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramDiff,1,2)}"></th>
         <th th:text="${'Ort. ' + #numbers.formatDecimal(summary.averageWeightKg,1,1)}"></th>
-
-
     </tr>
     </tfoot>
 

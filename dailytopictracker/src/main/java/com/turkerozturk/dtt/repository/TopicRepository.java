@@ -200,5 +200,11 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     Optional<Topic> findFirstByDescriptionContaining(String keyword);
 
+    @Query("""
+    SELECT t FROM Topic t
+    WHERE t.description LIKE '#activity%'
+    """)
+    List<Topic> findActivityTopicsRaw();
+
 
 }

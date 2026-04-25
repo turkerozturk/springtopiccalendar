@@ -40,6 +40,7 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 public class FoodService {
 
     private final NutritionService nutritionService;
+    private final PhysicalActivityService physicalActivityService;
 
 
     private final TopicRepository topicRepository;
@@ -63,7 +64,7 @@ public class FoodService {
                 .toList();
 
         List<Entry> entries = entryRepository
-                .findFoodEntriesByDate(dateMillis, topicIds);
+                .findEntriesByADayForSelectedTopics(dateMillis, topicIds);
 
         List<FoodEntryDto> result = new ArrayList<>();
 
@@ -305,6 +306,20 @@ public class FoodService {
 
         }
 
+        // BASLA bu kisim spor aktiviteleri ile harcanan enerjiyi hesaplar.
+        List<Topic> activityTopics = topicRepository.findActivityTopicsRaw();
+        List<Long> activityTopicIds = activityTopics.stream()
+                .map(Topic::getId)
+                .toList();
+        List<Entry> activityEntries = entryRepository
+                .findEntriesByADayForSelectedTopics(dateMillis, activityTopicIds);
+        double totalActivityKcal = 0.0;
+        for (Entry activityEntry : activityEntries) {
+            totalActivityKcal += physicalActivityService.calculate(activityEntry, humanBody.getWeightKg());
+        }
+        // BITTI bu kisim spor aktiviteleri ile harcanan enerjiyi hesaplar.
+
+
         FoodSummaryDto summary = new FoodSummaryDto();
         // Ayni listeyi yerinde sirala (IN-PLACE)
         result.sort(Comparator.comparing(FoodEntryDto::getCalculatedKcal,
@@ -370,6 +385,8 @@ public class FoodService {
 
         dailyFoodSummaryDto.setHumanBody(humanBody);
 
+        dailyFoodSummaryDto.setTotalActivityKcal(totalActivityKcal);
+
         summary.setFsd(dailyFoodSummaryDto);
 
 
@@ -421,6 +438,7 @@ public class FoodService {
         double totalKcalDiff = 0.0;
         double totalGramDiff = 0.0;
         double realBodyWeightSumKg = 0.0;
+        double totalActivityKcal = 0.0;
 
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
@@ -451,7 +469,7 @@ public class FoodService {
             dto.setTotalGramDiff(daily.getFsd().getTotalGramDiff());
             dto.setHumanBody(daily.getFsd().getHumanBody());
 
-
+            dto.setTotalActivityKcal(daily.getFsd().getTotalActivityKcal());
             // listeye ekle
             dailyList.add(dto);
 
@@ -469,6 +487,7 @@ public class FoodService {
             totalKcalDiff += dto.getTotalKcalDiff();
             totalGramDiff += dto.getTotalGramDiff();
             realBodyWeightSumKg += dto.getHumanBody().getWeightKg();
+            totalActivityKcal += dto.getTotalActivityKcal();
 
         }
 
@@ -487,7 +506,7 @@ public class FoodService {
         rangeDto.setTotalKcalDiff(totalKcalDiff);
         rangeDto.setTotalGramDiff(totalGramDiff);
         rangeDto.setAverageWeightKg(realBodyWeightSumKg / dailyList.size());
-
+        rangeDto.setTotalActivityKcal(totalActivityKcal);
 
         return rangeDto;
     }

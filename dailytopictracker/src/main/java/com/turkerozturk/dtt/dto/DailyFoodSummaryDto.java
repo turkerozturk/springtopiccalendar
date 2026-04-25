@@ -68,6 +68,7 @@ public class DailyFoodSummaryDto {
     private Double totalKcalDiff;
     private Double totalGramDiff;
 
+    private Double totalActivityKcal;
 
 
 }

@@ -24,7 +24,6 @@ package com.turkerozturk.dtt.controller;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.*;
 import com.turkerozturk.dtt.service.FoodService;
-import com.turkerozturk.dtt.service.NutritionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
