@@ -262,6 +262,42 @@
         <th th:text="${#numbers.formatDecimal(summary.averageGramSugar,1,1)}"></th>
 
     </tr>
+
+    <tr>
+        <th th:text="${'4-4-9 KCAL'}"></th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramKcalFatCarbProtein,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramFatKcal,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramCarbonhydrateKcal,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramProteinKcal,1,1)}"></th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+    </tr>
+    <tr>
+        <th th:text="${'4-4-9 YÜZDE'}"></th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>100</th>
+        <th th:text="${#numbers.formatDecimal(summary.averagePercentFat,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averagePercentCarbohydrate,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averagePercentProtein,1,1)}"></th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+    </tr>
+
     </tfoot>
 
 </table>

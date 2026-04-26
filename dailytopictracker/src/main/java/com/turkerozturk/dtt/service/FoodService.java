@@ -453,6 +453,16 @@ public class FoodService {
         double totalKcalDiffWithActivity = 0.0;
         double totalGramDiffWithActivity = 0.0;
 
+        double totalGramFatKcal = 0.0;
+        double totalGramCarbonhydrateKcal = 0.0;
+        double totalGramProteinKcal = 0.0;
+        double totalGramKcalFatCarbProtein = 0.0;
+        double totalPercentFat = 0.0;
+        double totalPercentCarbohydrate = 0.0;
+        double totalPercentProtein = 0.0;
+
+
+
 
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
@@ -489,6 +499,15 @@ public class FoodService {
 
             dto.setTotalKcalDiffWithActivity(daily.getFsd().getTotalKcalDiffWithActivity());
             dto.setTotalGramDiffWithActivity(daily.getFsd().getTotalGramDiffWithActivity());
+
+            dto.setTotalGramFatKcal(daily.getFsd().getTotalGramFatKcal());
+            dto.setTotalGramCarbohydrateKcal(daily.getFsd().getTotalGramCarbohydrateKcal());
+            dto.setTotalGramProteinKcal(daily.getFsd().getTotalGramProteinKcal());
+            dto.setTotalGramKcalFatCarbProtein(daily.getFsd().getTotalGramKcalFatCarbProtein());
+            dto.setTotalPercentFat(daily.getFsd().getTotalPercentFat());
+            dto.setTotalPercentCarbohydrate(daily.getFsd().getTotalPercentCarbohydrate());
+            dto.setTotalPercentProtein(daily.getFsd().getTotalPercentProtein());
+
             // listeye ekle
             dailyList.add(dto);
 
@@ -510,6 +529,14 @@ public class FoodService {
             totalKcalTdee += dto.getHumanBody().getTdee();
             totalKcalDiffWithActivity += dto.getTotalKcalDiffWithActivity();
             totalGramDiffWithActivity += dto.getTotalGramDiffWithActivity();
+
+            totalGramFatKcal += dto.getTotalGramFatKcal();
+            totalGramCarbonhydrateKcal += dto.getTotalGramCarbohydrateKcal();
+            totalGramProteinKcal += dto.getTotalGramProteinKcal();
+            totalGramKcalFatCarbProtein += dto.getTotalGramKcalFatCarbProtein();
+            totalPercentFat += dto.getTotalPercentFat();
+            totalPercentCarbohydrate += dto.getTotalPercentCarbohydrate();
+            totalPercentProtein += dto.getTotalPercentProtein();
         }
 
         rangeDto.setDays(dailyList);
@@ -549,6 +576,14 @@ public class FoodService {
         rangeDto.setAverageKcalTdee(totalKcalTdee / totalDays);
         rangeDto.setAverageKcalDiffWithActivity(totalKcalDiffWithActivity / totalDays);
         rangeDto.setAverageGramDiffWithActivity(totalGramDiffWithActivity / totalDays);
+
+        rangeDto.setAverageGramFatKcal(totalGramFatKcal / totalDays);
+        rangeDto.setAverageGramCarbonhydrateKcal(totalGramCarbonhydrateKcal / totalDays);
+        rangeDto.setAverageGramProteinKcal(totalGramProteinKcal / totalDays);
+        rangeDto.setAverageGramKcalFatCarbProtein(totalGramKcalFatCarbProtein / totalDays);
+        rangeDto.setAveragePercentFat(totalPercentFat / totalDays);
+        rangeDto.setAveragePercentCarbohydrate(totalPercentCarbohydrate / totalDays);
+        rangeDto.setAveragePercentProtein(totalPercentProtein / totalDays);
 
 
 

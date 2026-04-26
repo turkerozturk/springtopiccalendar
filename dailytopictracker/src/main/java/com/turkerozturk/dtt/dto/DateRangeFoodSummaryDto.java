@@ -65,5 +65,13 @@ public class DateRangeFoodSummaryDto {
     private Double averageKcalDiffWithActivity;
     private Double averageGramDiffWithActivity;
 
+    private Double averageGramFatKcal;
+    private Double averageGramCarbonhydrateKcal;
+    private Double averageGramProteinKcal;
+    private Double averageGramKcalFatCarbProtein;
+    private Double averagePercentFat;
+    private Double averagePercentCarbohydrate;
+    private Double averagePercentProtein;
+
 
 }
