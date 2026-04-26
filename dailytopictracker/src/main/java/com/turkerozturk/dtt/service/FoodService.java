@@ -317,6 +317,10 @@ public class FoodService {
         for (Entry activityEntry : activityEntries) {
             totalActivityKcal += physicalActivityService.calculate(activityEntry, humanBody.getWeightKg());
         }
+
+        // gunun sonunda yedigimiz kalorilerden TDEE(gunluk kalori ihtiyacimizi) yi ve harcadigimiz kalorileri cikartiyoruz.
+        double totalKcalDiffWithActivity = totalKcalDiff - totalActivityKcal;
+        double totalGramDiffWithActivity = totalKcalDiffWithActivity / 7700;
         // BITTI bu kisim spor aktiviteleri ile harcanan enerjiyi hesaplar.
 
 
@@ -386,6 +390,8 @@ public class FoodService {
         dailyFoodSummaryDto.setHumanBody(humanBody);
 
         dailyFoodSummaryDto.setTotalActivityKcal(totalActivityKcal);
+        dailyFoodSummaryDto.setTotalKcalDiffWithActivity(totalKcalDiffWithActivity);
+        dailyFoodSummaryDto.setTotalGramDiffWithActivity(totalGramDiffWithActivity);
 
         summary.setFsd(dailyFoodSummaryDto);
 
@@ -415,9 +421,12 @@ public class FoodService {
     }
 
 
-
-
-
+    /**
+     * Belirtilen tarih araligindaki her bir gune ait veriyi ve onlar uzerinden toplamlari ve ortalamalari icerir.
+     * @param startDateMillis
+     * @param endDateMillis
+     * @return
+     */
     public DateRangeFoodSummaryDto getDateRangeSummary(Long startDateMillis, Long endDateMillis) {
 
         List<DailyFoodSummaryDto> dailyList = new ArrayList<>();
@@ -439,11 +448,18 @@ public class FoodService {
         double totalGramDiff = 0.0;
         double realBodyWeightSumKg = 0.0;
         double totalActivityKcal = 0.0;
+        double totalKcalTdee = 0.0;
+        double totalDays = 0.0;
+        double totalKcalDiffWithActivity = 0.0;
+        double totalGramDiffWithActivity = 0.0;
+
 
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
 
         for (long date = startDateMillis; date <= endDateMillis; date += oneDayMillis) {
+
+            totalDays++;
 
             FoodSummaryDto daily = getDailyFoodSummary(date);
 
@@ -470,6 +486,9 @@ public class FoodService {
             dto.setHumanBody(daily.getFsd().getHumanBody());
 
             dto.setTotalActivityKcal(daily.getFsd().getTotalActivityKcal());
+
+            dto.setTotalKcalDiffWithActivity(daily.getFsd().getTotalKcalDiffWithActivity());
+            dto.setTotalGramDiffWithActivity(daily.getFsd().getTotalGramDiffWithActivity());
             // listeye ekle
             dailyList.add(dto);
 
@@ -488,7 +507,9 @@ public class FoodService {
             totalGramDiff += dto.getTotalGramDiff();
             realBodyWeightSumKg += dto.getHumanBody().getWeightKg();
             totalActivityKcal += dto.getTotalActivityKcal();
-
+            totalKcalTdee += dto.getHumanBody().getTdee();
+            totalKcalDiffWithActivity += dto.getTotalKcalDiffWithActivity();
+            totalGramDiffWithActivity += dto.getTotalGramDiffWithActivity();
         }
 
         rangeDto.setDays(dailyList);
@@ -505,8 +526,32 @@ public class FoodService {
         rangeDto.setTotalGramWater(totalWater);
         rangeDto.setTotalKcalDiff(totalKcalDiff);
         rangeDto.setTotalGramDiff(totalGramDiff);
-        rangeDto.setAverageWeightKg(realBodyWeightSumKg / dailyList.size());
         rangeDto.setTotalActivityKcal(totalActivityKcal);
+        rangeDto.setTotalKcalTdee(totalKcalTdee);
+        rangeDto.setTotalDays(totalDays);
+        rangeDto.setTotalKcalDiffWithActivity(totalKcalDiffWithActivity);
+        rangeDto.setTotalGramDiffWithActivity(totalGramDiffWithActivity);
+
+        rangeDto.setAverageKcal(totalKcal / totalDays);
+        rangeDto.setAverageGram(totalGram / totalDays);
+        rangeDto.setAverageGramFat(totalFat / totalDays);
+        rangeDto.setAverageGramCarbohydrate(totalCarb / totalDays);
+        rangeDto.setAverageGramProtein(totalProtein / totalDays);
+        rangeDto.setAverageGramFiber(totalFiber / totalDays);
+        rangeDto.setAverageGramSodium(totalSodium / totalDays);
+        rangeDto.setAverageGramSugar(totalSugar / totalDays);
+        rangeDto.setAverageGramFatSaturated(totalFatSat / totalDays);
+        rangeDto.setAverageGramWater(totalWater / totalDays);
+        rangeDto.setAverageKcalDiff(totalKcalDiff / totalDays);
+        rangeDto.setAverageGramDiff(totalGramDiff / totalDays);
+        rangeDto.setAverageWeightKg(realBodyWeightSumKg / totalDays);
+        rangeDto.setAverageActivityKcal(totalActivityKcal / totalDays);
+        rangeDto.setAverageKcalTdee(totalKcalTdee / totalDays);
+        rangeDto.setAverageKcalDiffWithActivity(totalKcalDiffWithActivity / totalDays);
+        rangeDto.setAverageGramDiffWithActivity(totalGramDiffWithActivity / totalDays);
+
+
+
 
         return rangeDto;
     }
@@ -521,3 +566,5 @@ public class FoodService {
     }
 
 }
+
+

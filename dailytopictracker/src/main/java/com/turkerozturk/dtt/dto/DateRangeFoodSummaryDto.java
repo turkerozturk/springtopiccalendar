@@ -26,10 +26,44 @@ public class DateRangeFoodSummaryDto {
     private Double totalKcalDiff;
     private Double totalGramDiff;
 
-    private Double averageWeightKg;
     private Double totalBodyWeightDiff;
 
     private Double totalActivityKcal;
+    private Double totalKcalTdee;
+
+    private Double totalDays;
+
+    private Double totalKcalDiffWithActivity;
+    private Double totalGramDiffWithActivity;
+
+
+
+
+    private Double averageKcal;
+    private Double averageGram;
+
+    private Double averageGramFat;
+    private Double averageGramCarbohydrate;
+    private Double averageGramProtein;
+
+    private Double averageGramFiber;
+    private Double averageGramSodium;
+    private Double averageGramFatSaturated;
+    private Double averageGramSugar;
+
+    private Double averageGramWater;
+
+    private Double averageKcalDiff;
+    private Double averageGramDiff;
+
+    private Double averageWeightKg;
+    private Double averageBodyWeightDiff;
+
+    private Double averageActivityKcal;
+    private Double averageKcalTdee;
+
+    private Double averageKcalDiffWithActivity;
+    private Double averageGramDiffWithActivity;
 
 
 }
