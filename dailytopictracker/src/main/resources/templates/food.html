@@ -154,7 +154,10 @@
 <table class="table table-sm" style="max-width: 400px;">
 
     <tr>
-        <th>Bugünkü Vücut Ağırlığı</th>
+        <th>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${summary.fsd.humanBody.weightCategoryId})}"
+               target="_blank">Bugünkü Vücut Ağırlığı ✎</a>
+        </th>
         <td>
             <span th:text="${summary.fsd.humanBody.weightKg + ' kg'}"></span>&nbsp;
 

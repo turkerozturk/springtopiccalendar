@@ -51,6 +51,9 @@ public class NutritionResultDto {
 
     private double weightKg;
     private boolean weightUpdated; // Whether the weight info of today comes from a topic entry(true) or from application.properties file(false).
+    private Long weightTopicId; // Frontend'den vucut agirligi set veya edit edebilmek icin topic ID numarasi gerekiyor.
+    private Long weightCategoryId; // Frontend'den vucut agirligi set veya edit edebilmek icin topic ID numarasi gerekiyor.
+
 
     public NutritionResultDto(double bmr, double tdee,
                               double weightLossCalories,
@@ -70,7 +73,9 @@ public class NutritionResultDto {
                               double fatGramsForBMR,
                               double carbGramsForBMR,
                               double weightKg,
-                              boolean weightUpdated) {
+                              boolean weightUpdated,
+                              Long weightTopicId,
+                              Long weightCategoryId) {
         this.bmr = bmr;
         this.tdee = tdee;
         this.weightLossCalories = weightLossCalories;
@@ -95,6 +100,8 @@ public class NutritionResultDto {
 
         this.weightKg = weightKg;
         this.weightUpdated = weightUpdated;
+        this.weightTopicId = weightTopicId;
+        this.weightCategoryId = weightCategoryId;
     }
 
     // getter'lar

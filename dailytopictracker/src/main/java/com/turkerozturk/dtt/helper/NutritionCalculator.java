@@ -32,7 +32,9 @@ public class NutritionCalculator {
             double heightCm,
             int age,
             Gender gender,
-            ActivityLevel activityLevel
+            ActivityLevel activityLevel,
+            Long weightTopicId,
+            Long weightCategoryId
     ) {
 
         // 1) BMR (Mifflin-St Jeor)
@@ -119,7 +121,9 @@ public class NutritionCalculator {
                 round(fatGramsForBMR),
                 round(carbGramsForBMR),
                 round(weightKg),
-                weightUpdated
+                weightUpdated,
+                weightTopicId,
+                weightCategoryId
         );
     }
 
