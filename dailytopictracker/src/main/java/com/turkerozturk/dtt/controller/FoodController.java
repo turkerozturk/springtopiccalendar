@@ -130,4 +130,16 @@ public class FoodController {
         return "food-date-range";
     }
 
+    @Value("${food.db.url:}")
+    private String foodDbUrl;
+
+
+    @GetMapping("/food-parser")
+    public String getFoodDateRangePage(Model model) {
+
+        model.addAttribute("foodDbUrl", foodDbUrl);
+        return "food-parser";
+
+    }
+
 }

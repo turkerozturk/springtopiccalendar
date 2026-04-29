@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Food Parser</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        textarea { width: 300px; height: 600px; margin-bottom: 10px; font-size:1.5em;}
+        button { margin-right: 10px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+
+<h2>Food Parser</h2>
+
+
+<a th:if="${foodDbUrl}" th:href="${foodDbUrl}" target="_blank">Go To Your Favourite Food Data Source URL</a>
+
+
+
+
+
+<table>
+    <tr>
+        <td>
+
+            <button id="toggleLangBtn" onclick="toggleLang()">TR(*) / EN</button>
+            <button onclick="pasteFromClipboard()">Clear &amp; Paste &amp; Parse</button>
+
+        </td>
+        <td>
+            <button onclick="copyOutput()">Copy To Clipboard</button>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+
+            <textarea id="input" placeholder="Veriyi buraya yapıştır..."></textarea>
+        </td>
+        <td>
+
+            <textarea id="output" placeholder="Output burada oluşacak..."></textarea>
+        </td>
+    </tr>
+</table>
+
+
+<script>
+    let isEnglish = false;
+
+    const labelsTR = {
+        fat: "Yağ",
+        carbs: "Karbonhidratlar",
+        protein: "Protein",
+        fiber: "Fiber",
+        sodium: "Sodyum",
+        satFat: "Doymuş Yağ",
+        sugar: "Şeker"
+    };
+
+    const labelsEN = {
+        fat: "Total Fat",
+        carbs: "Total Carbohydrate",
+        protein: "Protein",
+        fiber: "Dietary Fiber",
+        sodium: "Sodium",
+        satFat: "Saturated Fat",
+        sugar: "Sugars"
+    };
+
+    function getLabels() {
+        return isEnglish ? labelsEN : labelsTR;
+    }
+
+    function toggleLang() {
+        isEnglish = !isEnglish;
+        if(isEnglish) {
+            toggleLangBtn.innerHTML="TR / EN(*)";
+        } else {
+            toggleLangBtn.innerHTML="TR(*) / EN";
+        }
+
+
+        //alert("Language: " + (isEnglish ? "EN" : "TR"));
+    }
+
+    function normalizeNumber(value) {
+        return value.replace(",", ".");
+    }
+
+    function extractValue(text, label) {
+        const regex = new RegExp(label + "\\s*([0-9]+[\\.,]?[0-9]*)\\s*(mg|g)?", "i");
+        const match = text.match(regex);
+
+        if (!match) return "0";
+
+        let value = normalizeNumber(match[1]);
+        const unit = match[2];
+
+        let num = parseFloat(value);
+
+        if (unit && unit.toLowerCase() === "mg") {
+            num = num / 1000;
+        }
+
+        return num.toString();
+    }
+
+    function extractKcal(text) {
+        // 1. klasik: "65 kcal" veya "65 calories"
+        let match = text.match(/([0-9]+)\s*(kcal)/i);
+        if (match) return match[1];
+
+        // 2. İngilizce: "Calories" alt satırda değer
+        match = text.match(/Calories\s*[\r\n]+?\s*([0-9]+)/i);
+        if (match) return match[1];
+
+        return "0";
+    }
+
+    function parseData() {
+        const input = document.getElementById("input").value;
+        const L = getLabels();
+
+        const kcal = extractKcal(input);
+        const fat = extractValue(input, L.fat);
+        const carbs = extractValue(input, L.carbs);
+        const protein = extractValue(input, L.protein);
+        const fiber = extractValue(input, L.fiber);
+        const sodium = extractValue(input, L.sodium);
+        const satFat = extractValue(input, L.satFat);
+        const sugar = extractValue(input, L.sugar);
+
+        const result =
+            "#food\n" +
+            [
+                kcal,
+                fat,
+                carbs,
+                protein,
+                fiber,
+                sodium,
+                satFat,
+                sugar
+            ].join("\n") +
+            "\n\n" +
+            input;
+
+        document.getElementById("output").value = result;
+    }
+
+    function copyOutput() {
+        const output = document.getElementById("output");
+        output.select();
+        document.execCommand("copy");
+    }
+
+    // ✅ Clipboard paste (modern + fallback)
+    async function pasteFromClipboard() {
+        try {
+            const output = document.getElementById('output');
+            output.value = ""; // Resets textarea to initial value
+
+            const text = await navigator.clipboard.readText();
+            document.getElementById("input").value = text;
+
+            parseData();
+
+        } catch (err) {
+            alert("Clipboard izni gerekli. Lütfen Ctrl+V ile yapıştır.");
+        }
+    }
+
+
+
+</script>
+
+</body>
+</html>
