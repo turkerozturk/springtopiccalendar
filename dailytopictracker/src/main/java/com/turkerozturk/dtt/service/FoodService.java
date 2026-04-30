@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.service;
 
 import com.turkerozturk.dtt.dto.*;
+import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.FoodParser;
@@ -227,7 +228,9 @@ public class FoodService {
             dto.setGram(gram);
             dto.setKcalPer100g(kcalPer100g);
             dto.setCalculatedKcal(kcal);
-            dto.setCategoryId(topic.getCategory().getId());
+            Category category = topic.getCategory();
+            dto.setCategoryId(category.getId());
+            dto.setCategoryName(category.getName());
             dto.setFat(gramFat);
             dto.setCarbohydrate(gramCarbonhydrate);
             dto.setProtein(gramProtein);

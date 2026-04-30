@@ -164,7 +164,11 @@
 
     <tbody>
     <tr th:each="day : ${summary.days}">
-        <td th:text="${#dates.format(day.dateMillis, 'yyyy-MM-dd')}"></td>
+
+        <td><a th:href="${'/food?dateMillis=' + day.dateMillis}"
+               th:text="${#dates.format(day.dateMillis, 'yyyy-MM-dd')}"
+               target="_blank"></a>
+        </td>
 
         <td th:text="${#numbers.formatDecimal(day.humanBody.tdee,1,0)}"></td>
 

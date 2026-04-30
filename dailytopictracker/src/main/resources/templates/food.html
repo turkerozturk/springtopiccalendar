@@ -136,8 +136,9 @@
 </h2>
 
 <p>
-    <a href="/food-parser" target="_blank">Food Parser</a>
-
+    <a href="/food-parser" target="_blank">Food Parser</a>&nbsp;|&nbsp;
+    <a href="/food-date-range" class="btn btn-secondary btn-sm" style="color:white;">
+        <i class="fa-solid fa-hexagon-nodes"></i>Date Range Calorie Summary</a>
 </p>
 
 <table class="table table-sm" style="max-width: 400px;">
@@ -317,6 +318,21 @@
         <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramSugarByStatus2,1,2)} + ' gr'"> gr</td>
     </tr>
 
+
+
+    <tr class="total">
+        <td colspan="3">Toplamlar: 100gr Kalori Değerlerine Göre Tüketilmiş (<i class="fa-solid fa-square status-fg-1"></i>)</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramByStatus1,1,2)} + ' gr'"> gr</td>
+        <td class="daha-az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalKcalByStatus1,1,2)} + ' kcal'"> kcal</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrateByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramProteinByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFiberByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramSodiumByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatSaturatedByStatus1,1,2)} + ' gr'"> gr</td>
+        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramSugarByStatus1,1,2)} + ' gr'"> gr</td>
+    </tr>
+
     <tr>
         <!-- <th>Tarih</th> -->
         <th>gr / kcal</th>
@@ -335,19 +351,6 @@
         <th>Şeker</th>
     </tr>
 
-    <tr class="total">
-        <td colspan="3">Toplamlar: 100gr Kalori Değerlerine Göre Tüketilmiş (<i class="fa-solid fa-square status-fg-1"></i>)</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramByStatus1,1,2)} + ' gr'"> gr</td>
-        <td class="daha-az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalKcalByStatus1,1,2)} + ' kcal'"> kcal</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrateByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramProteinByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFiberByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramSodiumByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatSaturatedByStatus1,1,2)} + ' gr'"> gr</td>
-        <td th:text="${#numbers.formatDecimal(summary.fsd.totalGramSugarByStatus1,1,2)} + ' gr'"> gr</td>
-    </tr>
-
 
     </thead>
 
@@ -359,6 +362,11 @@
         <td th:text="${#numbers.formatDecimal(item.gramPerKcal,1,2)}"></td>
         <td th:text="${#numbers.formatDecimal(item.kcalPer100g,1,2)}"></td>
         <td style="text-align: left;">
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${item.categoryId})}"
+               target="_blank"
+               th:title="${item.categoryName}">
+                <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>
+            </a>
             <a th:text="${item.topicName}"
                th:href="@{/topics/edit/{id}(id=${item.topicId})}"
                target="_blank" rel="noopener noreferrer"
