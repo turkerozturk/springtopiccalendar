@@ -1,6 +1,6 @@
 {
-  "version": "1.4.7",
-  "date": "2025-11-20",
+  "version": "1.4.8",
+  "date": "2026-05-01",
   "downloadUrl": "https://github.com/turkerozturk/springtopiccalendar/releases/latest/download/daily-topic-tracker.zip",
-  "notes": "feature(docker): github actions, new job in main.yml: Docker multi-arch build and push (GHCR - Github Container registry)"
+  "notes": "Feature: Calorie tracker. How to use it will be explained later. It's functional, but there are some untranslated texts in the interface. To use it, the topic descriptions must be in the following format. The first line should be #food, and the following lines should contain nutritional values per 100 grams in the same order, not text. The gram weight should be written within the entries, and their status should be green:\n\n#food\nkcal\nfat\ncarbohydrate\nprotein\nfiber\nsodium\nsaturated fat\nsugar\nAlso, the following variables in the application.properties file should be based on the person's body values:\n\n# daily calorie tracker\nhuman.weight=81.6\nhuman.height=172\nhuman.age=48\n# MALE, FEMALE\nhuman.gender=MALE\n# DISABLED, SEDENTARY, LIGHT, MODERATE, VERY_ACTIVE\nhuman.activityLevel=LIGHT\n\nfood.db.url=\n\nTo use a dynamically changing variable instead of human.weight=, the first line of the description text of one of the topics should be\n\n#human.weight\n. In this case, the entry content should note the body weight for that day."
 }
