@@ -26,19 +26,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class HumanConfig {
 
-    @Value("${human.weight}")
+    @Value("${human.weight:80}")
     private double weight;
 
-    @Value("${human.height}")
+    @Value("${human.height:170}")
     private double height;
 
-    @Value("${human.age}")
+    @Value("${human.age:30}")
     private int age;
 
-    @Value("${human.gender}")
+    @Value("${human.gender:MALE}")
     private String gender;
 
-    @Value("${human.activityLevel}")
+    @Value("${human.activityLevel:LIGHT}")
     private String activityLevel;
 
     public double getWeight() { return weight; }

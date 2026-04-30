@@ -57,39 +57,28 @@ public class NutritionService {
     public NutritionResultDto calculate(Long dateMillisYmd) {
 
         double weight = humanConfig.getWeight();
+        boolean weightUpdated = false;
 
         Optional<Topic> weightTopicOpt =
                 topicRepository.findFirstByDescriptionContaining(HUMAN_WEIGHT_TAG);
 
-        if (weightTopicOpt.isPresent()) {
+        Optional<Double> parsedWeightOpt = weightTopicOpt
+                .flatMap(topic ->
+                        entryRepository.findEntryByTopicAndDate(dateMillisYmd, topic.getId())
+                )
+                .map(Entry::getNote)
+                .filter(note -> note != null && note.getContent() != null)
+                .flatMap(note -> WeightParser.extractWeight(note.getContent()));
 
-            Topic topic = weightTopicOpt.get();
-
-            Optional<Entry> entryOpt =
-                    entryRepository.findEntryByTopicAndDate(dateMillisYmd, topic.getId());
-
-            if (entryOpt.isPresent()) {
-                Entry entry = entryOpt.get();
-
-                if (entry.getNote() != null) {
-                    Optional<Double> parsedWeight =
-                            WeightParser.extractWeight(entry.getNote().getContent());
-
-                    if (parsedWeight.isPresent()) {
-                        weight = parsedWeight.get();
-                        weightUpdated = true;
-                    } else {
-                        weightUpdated = false;
-                    }
-                } else {
-                    weightUpdated = false;
-                }
-            } else {
-                weightUpdated = false;
-            }
-        } else {
-            weightUpdated = false;
+        if (parsedWeightOpt.isPresent()) {
+            weight = parsedWeightOpt.get();
+            weightUpdated = true;
         }
+
+        Long topicId = weightTopicOpt.map(Topic::getId).orElse(null);
+        Long categoryId = weightTopicOpt
+                .map(t -> t.getCategory().getId())
+                .orElse(null);
 
         return NutritionCalculator.calculate(
                 weight,
@@ -98,9 +87,8 @@ public class NutritionService {
                 humanConfig.getAge(),
                 Gender.valueOf(humanConfig.getGender()),
                 ActivityLevel.valueOf(humanConfig.getActivityLevel()),
-                weightTopicOpt.get().getId(),
-                weightTopicOpt.get().getCategory().getId()
+                topicId,
+                categoryId
         );
-
     }
 }
