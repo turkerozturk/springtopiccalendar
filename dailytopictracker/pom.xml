@@ -156,7 +156,8 @@
 
         <!-- https://www.baeldung.com/spring-rest-openapi-documentation
                 http://localhost:8080/v3/api-docs
-                http://localhost:8080/swagger-ui/index.html -->
+                http://localhost:8080/swagger-ui/index.html
+                https://localhost:8443/swagger-ui/index.html -->
         <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
         <dependency>
             <groupId>org.springdoc</groupId>
