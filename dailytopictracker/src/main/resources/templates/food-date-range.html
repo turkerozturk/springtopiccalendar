@@ -307,6 +307,36 @@
 </table>
 
 
+<div>
+    <label><input type="checkbox" data-dataset="kcalNeed"> Kcal İhtiyaç</label>
+    <label><input type="checkbox" data-dataset="kcalFood"> Kcal Gıda</label>
+    <label><input type="checkbox" data-dataset="kcalDiff"> Kcal Gıda Fark</label>
+    <label><input type="checkbox" data-dataset="kgFoodDiff"> Kg Gıda Fark</label>
+    <label><input type="checkbox" data-dataset="kcalActivity"> Kcal Aktivite</label>
+
+    <label><input type="checkbox" checked data-dataset="kcalTotal"> Kcal Toplam Fark</label>
+
+    <label><input type="checkbox" data-dataset="kgTotalDiff"> KG Toplam Fark</label>
+
+    <label><input type="checkbox" checked data-dataset="weight"> KG Tartı</label>
+
+    <label><input type="checkbox" data-dataset="foodTotal"> Gramaj</label>
+    <label><input type="checkbox" data-dataset="fatTotal"> GR Yağ</label>
+    <label><input type="checkbox" data-dataset="carbTotal"> GR Karb</label>
+    <label><input type="checkbox" data-dataset="proteinTotal"> GR Protein</label>
+    <label><input type="checkbox" data-dataset="fiberTotal"> GR Lif</label>
+    <label><input type="checkbox" data-dataset="sugarTotal"> GR Şeker</label>
+
+
+
+
+</div>
+
+<canvas id="myChart"></canvas>
+
+
+
+
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
 <script type="text/javascript"
@@ -320,6 +350,10 @@
 
 <!-- https://datatables.net/plug-ins/sorting/turkish-string -->
 <script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+<!-- chart -->
+<script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+
 
 
 <!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
@@ -450,5 +484,232 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 
 </script>
 
-</body>
-</html>
+<script>
+    // ilk sayfa yuklenmesinde checkboxlarla uyumlu olarak grafikte gorunmesi ve gorunmemesi gereken verileri halleder.
+    function syncDatasetsWithCheckboxes(chart, datasetsMap) {
+        document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+            const key = cb.dataset.dataset;
+            const datasetIndex = Object.keys(datasetsMap).indexOf(key);
+
+            if (!cb.checked) {
+                chart.data.datasets[datasetIndex].hidden = true;
+            }
+        });
+
+        chart.update();
+    }
+</script>
+
+<script>
+    const table = document.getElementById("rangeTable");
+    const rows = table.querySelectorAll("tbody tr");
+
+    const labels = [];
+    const kcalNeed = [];
+    const kcalFood = [];
+    const kcalDiff = [];
+
+    const kgFoodDiff = [];
+    const kcalActivity = [];
+
+    const kcalTotal = [];
+    const kgTotalDiff = [];
+    const weight = [];
+
+    const foodTotal = [];
+    const fatTotal = [];
+    const carbTotal = [];
+    const proteinTotal = [];
+    const fiberTotal = [];
+    const sugarTotal = [];
+
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+
+        labels.push(cells[0].innerText);
+
+        kcalNeed.push(parseFloat(cells[1].innerText));
+        kcalFood.push(parseFloat(cells[2].innerText));
+        kcalDiff.push(parseFloat(cells[3].innerText));
+
+        kgFoodDiff.push(parseFloat(cells[4].innerText));
+        kcalActivity.push(parseFloat(cells[5].innerText));
+
+
+        kcalTotal.push(parseFloat(cells[6].innerText));
+
+        kgTotalDiff.push(parseFloat(cells[7].innerText));
+
+
+        weight.push(parseFloat(cells[8].innerText));
+
+        foodTotal.push(parseFloat(cells[9].innerText));
+        fatTotal.push(parseFloat(cells[10].innerText));
+        carbTotal.push(parseFloat(cells[11].innerText));
+        proteinTotal.push(parseFloat(cells[12].innerText));
+        fiberTotal.push(parseFloat(cells[13].innerText));
+        sugarTotal.push(parseFloat(cells[14].innerText));
+
+
+
+
+
+    });
+
+    const datasets = {
+        kcalNeed: {
+            label: "Kcal İhtiyaç",
+            data: kcalNeed,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        kcalFood: {
+            label: "Kcal Gıda",
+            data: kcalFood,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        kcalDiff: {
+            label: "Kcal Gıda Fark",
+            data: kcalDiff,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        kgFoodDiff: {
+            label: "Kg Gıda Fark",
+            data: kgFoodDiff,
+            yAxisID: 'y4',
+            borderWidth: 2
+        },
+        kcalActivity: {
+            label: "Kcal Activite",
+            data: kcalActivity,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        kcalTotal: {
+            label: "Kcal Toplam Fark",
+            data: kcalTotal,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        kgTotalDiff: {
+            label: "KG Toplam Fark",
+            data: kgTotalDiff,
+            yAxisID: 'y3',
+            borderWidth: 2
+        },
+        weight: {
+            label: "KG Tartı",
+            data: weight,
+            yAxisID: 'y1',
+            borderWidth: 2
+        },
+        foodTotal: {
+            label: "Gramaj",
+            data: foodTotal,
+            yAxisID: 'y',
+            borderWidth: 2
+        },
+        fatTotal: {
+            label: "GR Yağ",
+            data: fatTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        carbTotal: {
+            label: "GR Karb",
+            data: carbTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        proteinTotal: {
+            label: "GR Protein",
+            data: proteinTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        fiberTotal: {
+            label: "GR Lif",
+            data: fiberTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        sugarTotal: {
+            label: "GR Şeker",
+            data: sugarTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        }
+
+    };
+
+    const chart = new Chart(document.getElementById("myChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: Object.values(datasets)
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: false,   // negatif değerler için önemli
+                    type: 'linear',
+                    position: 'left'
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // grid çakışmasını önler
+                    }
+                },
+                y2: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // grid çakışmasını önler
+                    }
+                },
+                y3: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // grid çakışmasını önler
+                    }
+                },
+                y4: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // grid çakışmasını önler
+                    }
+                }
+
+            }
+        }
+    });
+
+    syncDatasetsWithCheckboxes(chart, datasets);
+
+</script>
+
+<script>
+    // checkboxlari secme veya secmeme durumuna gore grafikte verileri gosterip gizler.
+    document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+        cb.addEventListener("change", function () {
+            const key = this.dataset.dataset;
+            const datasetIndex = Object.keys(datasets).indexOf(key);
+
+            chart.data.datasets[datasetIndex].hidden = !this.checked;
+            chart.update();
+        });
+    });
+</script>
+
+
+
+    </body>
+    </html>
