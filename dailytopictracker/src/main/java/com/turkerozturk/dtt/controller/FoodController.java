@@ -49,29 +49,29 @@ public class FoodController {
 
     @GetMapping("/food")
     public String getFoodPage(
-            @RequestParam(required = false) Long dateMillis,
+            @RequestParam(required = false) Long dateMillisYmd,
             Model model
     ) {
         ZoneId zoneId = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
 
-        if (dateMillis == null) {
+        if (dateMillisYmd == null) {
             // default: bugün (senin formatına göre ayarlarsın)
 
-            dateMillis = LocalDate.now()
+            dateMillisYmd = LocalDate.now()
                     .atStartOfDay(zoneId)
                     .toInstant()
                     .toEpochMilli();
         }
 
-        FoodSummaryDto summary = foodService.getDailyFoodSummary(dateMillis);
+        FoodSummaryDto summary = foodService.getDailyFoodSummary(dateMillisYmd);
 
         model.addAttribute("summary", summary);
-        model.addAttribute("dateMillis", dateMillis);
+        model.addAttribute("dateMillisYmd", dateMillisYmd);
         model.addAttribute("zoneId", zoneId);
 
-        long prevDayDateMillis = dateMillis - 86400000;
+        long prevDayDateMillis = dateMillisYmd - 86400000;
         model.addAttribute("prevDayDateMillis", prevDayDateMillis);
-        long nextDayDateMillis = dateMillis + 86400000;
+        long nextDayDateMillis = dateMillisYmd + 86400000;
         model.addAttribute("nextDayDateMillis", nextDayDateMillis);
 
         Locale locale = Locale.forLanguageTag(appLocale);

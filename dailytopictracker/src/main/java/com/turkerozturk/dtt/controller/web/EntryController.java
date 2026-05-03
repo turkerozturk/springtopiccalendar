@@ -1428,6 +1428,7 @@ public class EntryController {
 
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
+                + (dateMillisYmd != null ? "&dateMillisYmd=" + dateMillisYmd : "")
                 + (categoryId != null ? "&categoryId=" + categoryId : "")
                 + (topicId != null ? "&topicId=" + topicId : "")
                 + (categoryGroupId != null ? "&categoryGroupId=" + categoryGroupId : "");
@@ -1524,6 +1525,7 @@ public class EntryController {
         Long topicId = entry.getTopic().getId();
         Long categoryId = entry.getTopic().getCategory().getId();
         Long categoryGroupId = entry.getTopic().getCategory().getCategoryGroup().getId();
+        Long dateMillisYmd = entry.getDateMillisYmd();
         //System.out.println("cg: " + categoryGroupId + ",c: " + categoryId + ",t: " + topicId + ",e :" + id + ", note: " );
 
         entryService.deleteEntryById(id);
@@ -1536,6 +1538,7 @@ public class EntryController {
 
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
+                + (dateMillisYmd != null ? "&dateMillisYmd=" + dateMillisYmd : "")
                 + (categoryId != null ? "&categoryId=" + categoryId : "")
                 + (topicId != null ? "&topicId=" + topicId : "")
                 + (categoryGroupId != null ? "&categoryGroupId=" + categoryGroupId : "");
@@ -1590,7 +1593,8 @@ public class EntryController {
     public String redirect(@RequestParam(required = false) String returnPage,
                            @RequestParam(required = false) Long categoryId,
                            @RequestParam(required = false) Long topicId,
-                           @RequestParam(required = false) Long categoryGroupId) {
+                           @RequestParam(required = false) Long categoryGroupId,
+                           @RequestParam(required = false) Long dateMillisYmd) {
 
         if (returnPage != null) {
             switch (returnPage) {
@@ -1617,6 +1621,8 @@ public class EntryController {
                     return "redirect:/categories";
                 case "categorygroups":
                     return "redirect:/category-groups";
+                case "calorietracker":
+                    return "redirect:/food?dateMillisYmd=" + dateMillisYmd;
 
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:

@@ -194,7 +194,7 @@
         <div class="input-group calorieDateStyle date">
             <label for="calorieDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
             <span class="input-group-append">
-                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillis=' + prevDayDateMillis}">
+                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + prevDayDateMillis}">
                         &lt;
                     </a>
             </span>
@@ -207,7 +207,7 @@
             </span>
 
             <span class="input-group-append">
-                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillis=' + nextDayDateMillis}">
+                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + nextDayDateMillis}">
                         &gt;
                     </a>
             </span>
@@ -384,9 +384,8 @@
                     th:href="@{/entries/edit/{id}(id=${item.entryId},
                                             categoryId=${item.categoryId},
                                             topicId=${item.topicId},
-                                            returnPage=entries
+                                            returnPage=calorietracker
                                             )}"
-               target="_blank" rel="noopener noreferrer"
                title="Edit Entry">
                 gramaj ve edit entry linki
             </a>
@@ -641,7 +640,7 @@
 
 <script th:inline="javascript">
     const ZONE_ID = [[${zoneId}]];
-    const DATE_MILLIS = [[${dateMillis}]];
+    const DATE_MILLIS = [[${dateMillisYmd}]];
 </script>
 
 <script>
@@ -664,7 +663,7 @@
 
         const millis = convertDateToMillis(dateStr);
 
-        const url = `/food?dateMillis=${millis}`;
+        const url = `/food?dateMillisYmd=${millis}`;
 
         // Sayfayı redirect ederek yenile
         window.location.href = url;
@@ -691,7 +690,7 @@
             dateStr = new Date().toISOString().slice(0, 10);
         }
 
-        const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}`;
+        const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}&returnPage=calorietracker`;
 
         window.open(url, '_blank'); // yeni sekme
     }
