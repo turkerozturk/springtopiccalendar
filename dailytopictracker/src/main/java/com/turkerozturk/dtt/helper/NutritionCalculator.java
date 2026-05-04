@@ -120,7 +120,7 @@ public class NutritionCalculator {
                 round(proteinGramsForBMR),
                 round(fatGramsForBMR),
                 round(carbGramsForBMR),
-                round(weightKg),
+                weightKg,
                 weightUpdated,
                 weightTopicId,
                 weightCategoryId

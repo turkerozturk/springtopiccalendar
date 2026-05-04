@@ -226,8 +226,8 @@
 
 
 
-
-<table id="caloriesTable">
+<!--/* https://datatables.net/extensions/responsive/examples/styling/compact.html */-->
+<table id="caloriesTable" class="compact">
     <caption>
 
         <label><input type="checkbox" class="status-filter" value="0" checked>
@@ -368,8 +368,11 @@
                 <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>
             </a>
             <a th:text="${item.topicName}"
-               th:href="@{/topics/edit/{id}(id=${item.topicId})}"
-               target="_blank" rel="noopener noreferrer"
+               th:href="@{/topics/edit/{id}(id=${item.topicId},
+                                        returnPage=calorietracker,
+                                        dateMillisYmd=${dateMillisYmd}
+                                        )}"
+               target="_self" rel="noopener noreferrer"
                title="Edit Topic">
                 ✎
             </a>
@@ -692,7 +695,7 @@
 
         const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}&returnPage=calorietracker`;
 
-        window.open(url, '_blank'); // yeni sekme
+        window.open(url, '_self'); // yeni sekme
     }
 
     $(function () {

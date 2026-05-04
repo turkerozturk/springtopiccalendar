@@ -179,7 +179,8 @@ public class TopicWebController {
     // Yeni topic kaydetme
     @PostMapping
     public String saveTopic(@ModelAttribute("topic") Topic topic,
-                            @RequestParam(name="returnPage", required=false) String returnPage
+                            @RequestParam(name="returnPage", required=false) String returnPage,
+                            @RequestParam(required = false) Long dateMillisYmd
                             ) {
         // Seçilen category'yi veritabanından bul
         var categoryId = topic.getCategory().getId();
@@ -209,6 +210,8 @@ public class TopicWebController {
                     return "redirect:/entries?topicId=" + topic.getId();
                 case "reporttable":
                     return "redirect:/reports/all";
+                case "calorietracker":
+                    return "redirect:/food?dateMillisYmd=" + dateMillisYmd;
                     // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;
@@ -224,6 +227,7 @@ public class TopicWebController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id,
                                @RequestParam(name = "returnPage", required = false) String returnPage,
+                               @RequestParam(name = "dateMillisYmd", required = false) Long dateMillisYmd,
                                Model model) {
         Topic topic = topicService
                 .getTopicById(id)
@@ -270,7 +274,8 @@ public class TopicWebController {
         model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
         model.addAttribute("returnPage", returnPage);
 
-
+        model.addAttribute("dateMillisYmd", dateMillisYmd);
+        //System.out.println("edit ********* " + dateMillisYmd);
         return "topics/topic-form"; // Aynı formu kullanacağız
     }
 
@@ -279,7 +284,8 @@ public class TopicWebController {
     public String updateTopic(@PathVariable Long id,
                               @RequestParam(name = "returnPage", required = false) String returnPage,
                               @ModelAttribute("topic") Topic topic,
-                              Model model) {
+                              Model model,
+                              @RequestParam(required = false) Long dateMillisYmd) {
         // Veritabanından topic bul
         Topic existingTopic = topicService
                 .getTopicById(id)
@@ -314,6 +320,8 @@ public class TopicWebController {
         topicService.updateTopicStatus(existingTopic.getId());
 
         model.addAttribute("returnPage", returnPage);
+        model.addAttribute("dateMillisYmd", dateMillisYmd);
+
         // Hangi sayfadan gelindiğini kontrol ediyoruz.
         if (returnPage != null) {
             switch (returnPage) {
@@ -330,6 +338,8 @@ public class TopicWebController {
                 case "index":
                     // anasayfadaki radar grafigin altindaki topic isimlerine tiklayarak gelmissek oraya donuyoruz.
                     return "redirect:/";
+                case "calorietracker":
+                    return "redirect:/food?dateMillisYmd=" + dateMillisYmd;
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:
                     //   return "redirect:/" + returnPage + "?categoryId=" + categoryId;

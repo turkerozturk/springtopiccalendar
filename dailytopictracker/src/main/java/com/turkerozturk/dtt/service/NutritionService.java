@@ -51,7 +51,7 @@ public class NutritionService {
         this.entryRepository = entryRepository;
     }
 
-    boolean weightUpdated = false;
+
 
 
     public NutritionResultDto calculate(Long dateMillisYmd) {

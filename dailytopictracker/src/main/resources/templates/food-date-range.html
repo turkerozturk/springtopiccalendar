@@ -167,7 +167,7 @@
 
         <td><a th:href="${'/food?dateMillisYmd=' + day.dateMillis}"
                th:text="${#dates.format(day.dateMillis, 'yyyy-MM-dd')}"
-               target="_blank"></a>
+               ></a>
         </td>
 
         <td th:text="${#numbers.formatDecimal(day.humanBody.tdee,1,0)}"></td>
@@ -184,7 +184,7 @@
 
 
         <td>
-            <span th:text="${day.humanBody.weightKg}"></span>&nbsp;
+            <span th:text="${#numbers.formatDecimal(day.humanBody.weightKg,1,2)}"></span>&nbsp;
 
             <span th:if="${!day.humanBody.weightUpdated}"
                   th:text="'!'"

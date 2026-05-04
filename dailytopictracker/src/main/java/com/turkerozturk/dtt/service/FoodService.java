@@ -239,7 +239,11 @@ public class FoodService {
             dto.setFatSaturated(gramFatSaturated);
             dto.setSugar(gramSugar);
 
-            dto.setGramPerKcal(100 / kcalPer100g);
+            double gramPerKcal = 0.0;
+            if(kcalPer100g > 0) {
+                gramPerKcal = 100 / kcalPer100g;
+            }
+            dto.setGramPerKcal(gramPerKcal);
 
             dto.setMealGrams(mealGrams);
 

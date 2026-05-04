@@ -53,6 +53,9 @@
         <!-- preserve returnPage -->
         <input type="hidden" name="returnPage" th:value="${returnPage}"/>
 
+        <!--/* dateMillisYmd yi bu topic formda sadece food.html kalori takip sayfasinda dogru gune geri donmek icin kullaniyoruz */-->
+        <input type="hidden" id="dateMillisYmd" name="dateMillisYmd" th:value="${dateMillisYmd}" />
+
         <div class="mb-3">
             <label for="category" class="form-label">Category:</label>
 

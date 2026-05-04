@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.Collator;
@@ -47,7 +49,7 @@ public class FoodController {
     @Value("${app.locale:en}")
     private String appLocale;
 
-    @GetMapping("/food")
+    @RequestMapping(value = "/food", method = {RequestMethod.GET, RequestMethod.POST})
     public String getFoodPage(
             @RequestParam(required = false) Long dateMillisYmd,
             Model model
