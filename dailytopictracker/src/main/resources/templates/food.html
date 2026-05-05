@@ -128,6 +128,15 @@
             overflow-y: auto;
         }
     </style>
+
+    <style>
+        .high-value {
+            background-color: red;
+            color: white;
+        }
+        .low-value { background-color: #2196f3; color: #fff; }
+    </style>
+
 </head>
 <body>
 
@@ -283,11 +292,49 @@
         <td colspan="3">Toplamlar: 100gr Kalori Değerlerine Göre Planlanan (GÜN SONU)</td>
         <td th:text="${#numbers.formatDecimal(summary.fsd.totalGram,1,2)} + ' gr'"> gr</td>
         <td class="vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalKcal,1,2)} + ' kcal'"> kcal</td>
-        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)} + ' gr'"> gr</td>
-        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"> gr</td>
-        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)} + ' gr'"> gr</td>
-        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFiber,1,2)} + ' gr'"> gr</td>
-        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramSodium,1,2)} + ' gr'"> gr</td>
+
+
+        <!--/* alt ve ust limit degerlerini yapay zeka soyledi. Simdilik daha iyisini bulana kadar boyle biraktim. */-->
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)} + ' gr'"
+            title="20 ≤ fat ≤ 35 %"
+            th:classappend="
+        ${summary.fsd.totalPercentFat > 35} ? 'high-value' :
+        (${summary.fsd.totalPercentFat < 20} ? 'low-value' : '')
+        "> gr
+        </td>
+
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"
+            title="45 ≤ carbonhydrate ≤ 65 %"
+            th:classappend="
+        ${summary.fsd.totalPercentCarbohydrate > 65} ? 'high-value' :
+        (${summary.fsd.totalPercentCarbohydrate < 45} ? 'low-value' : '')
+        "> gr
+        </td>
+
+        <td class="az-vurgula" th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)} + ' gr'"
+            title="10 ≤ protein ≤ 35 %"
+            th:classappend="
+        ${summary.fsd.totalPercentProtein > 35} ? 'high-value' :
+        (${summary.fsd.totalPercentProtein < 10} ? 'low-value' : '')
+        "> gr
+        </td>
+
+
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFiber,1,2)} + ' gr'"
+            title="25 ≤ fiber ≤ 38 gr"
+            th:classappend="
+        ${summary.fsd.totalGramFiber > 38} ? 'high-value' :
+        (${summary.fsd.totalGramFiber < 25} ? 'low-value' : '')
+        "> gr
+        </td>
+
+        <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramSodium,1,2)} + ' gr'"
+            title="1.5 ≤ sodium ≤ 2.3 gr"
+            th:classappend="${summary.fsd.totalGramSodium > 2.3} ? 'high-value' :
+        (${summary.fsd.totalGramSodium < 1.5} ? 'low-value' : '')">
+        </td>
+
+
         <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatSaturated,1,2)} + ' gr'"> gr</td>
         <td class="az-vurgula2" th:text="${#numbers.formatDecimal(summary.fsd.totalGramSugar,1,2)} + ' gr'"> gr</td>
     </tr>
