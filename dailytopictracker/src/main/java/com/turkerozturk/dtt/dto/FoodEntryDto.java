@@ -58,6 +58,8 @@ public class FoodEntryDto {
     private String categoryName;
     private Long categoryId;
 
+    private String mealCodes;
+
 
 
     // getter/setter

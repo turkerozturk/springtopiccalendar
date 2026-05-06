@@ -88,6 +88,9 @@ public class FoodService {
         double totalPercentFat = 0.0;
         double totalPercentCarbohydrate = 0.0;
         double totalPercentProtein = 0.0;
+        //double totalPercentSugar = 0.0;
+        //double totalPercentFatSaturatedUpperLimit = 0.0;
+        //double totalPercentSugarUpperLimit = 0.0;
 
         double totalKcalDiff = 0.0;
         double totalGramDiff = 0.0;
@@ -141,6 +144,7 @@ public class FoodService {
             if (kcalPer100g == null) continue;
 
             // Double gram = FoodParser.extractGram(noteContent); // eski parser
+            // Bir not iceriginde toplam ve carpim biciminde birden cok gramaj ve mealCode olabilir:
             Map<Character, Double> mealGrams = extractMealGrams(noteContent); // yeni parser (daha gelismis)
 
 
@@ -238,6 +242,18 @@ public class FoodService {
             dto.setSodium(gramSodium);
             dto.setFatSaturated(gramFatSaturated);
             dto.setSugar(gramSugar);
+            StringBuilder mealCodesAsString = new StringBuilder();
+            if(!mealGrams.isEmpty()) {
+                for (Character c : mealGrams.keySet()) {
+                    mealCodesAsString.append(c.toString());
+                    //mealCodesAsString.append(mealGrams.get(c));
+                    mealCodesAsString.append(", ");
+                }
+                //sondaki ", " karakterlerini kaldiriyoruz:
+                mealCodesAsString.deleteCharAt(mealCodesAsString.length() - 1);
+                mealCodesAsString.deleteCharAt(mealCodesAsString.length() - 1);
+            }
+            dto.setMealCodes(mealCodesAsString.toString());
 
             double gramPerKcal = 0.0;
             if(kcalPer100g > 0) {
@@ -311,6 +327,11 @@ public class FoodService {
             totalKcalDiff = totalKcal - humanBody.getTdee();
             totalGramDiff = totalKcalDiff / 7700;
 
+            //totalPercentFatSaturatedUpperLimit = totalPercentFat * 0.33; //TODO bunlari tekrar arastir.
+            //totalPercentSugarUpperLimit = totalPercentCarbohydrate * 0.24; // 0.24 GEVSEK, 0.12 SIKI
+
+
+
         }
 
         // BASLA bu kisim spor aktiviteleri ile harcanan enerjiyi hesaplar.
@@ -357,6 +378,8 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalPercentFat(totalPercentFat);
         dailyFoodSummaryDto.setTotalPercentCarbohydrate(totalPercentCarbohydrate);
         dailyFoodSummaryDto.setTotalPercentProtein(totalPercentProtein);
+        //dailyFoodSummaryDto.setTotalPercentFatSaturatedUpperLimit(totalPercentFatSaturatedUpperLimit);
+        //dailyFoodSummaryDto.setTotalPercentSugarUpperLimit(totalPercentSugarUpperLimit);
 
         dailyFoodSummaryDto.setTotalKcalDiff(totalKcalDiff);
         dailyFoodSummaryDto.setTotalGramDiff(totalGramDiff);
@@ -467,6 +490,8 @@ public class FoodService {
         double totalPercentFat = 0.0;
         double totalPercentCarbohydrate = 0.0;
         double totalPercentProtein = 0.0;
+        double totalPercentFatSaturatedUpperLimit = 0.0;
+        double totalPercentSugarUpperLimit = 0.0;
 
 
 
@@ -514,6 +539,7 @@ public class FoodService {
             dto.setTotalPercentFat(daily.getFsd().getTotalPercentFat());
             dto.setTotalPercentCarbohydrate(daily.getFsd().getTotalPercentCarbohydrate());
             dto.setTotalPercentProtein(daily.getFsd().getTotalPercentProtein());
+            //dto.setTotalPercentSugarUpperLimit(daily.);
 
             // listeye ekle
             dailyList.add(dto);

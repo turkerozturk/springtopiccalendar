@@ -33,6 +33,10 @@ public class DailyFoodSummaryDto {
     private Double totalPercentCarbohydrate;
     private Double totalPercentProtein;
 
+    //private Double totalPercentFatSaturatedUpperLimit;
+    //private Double totalPercentSugarUpperLimit;
+
+
     private Double totalKcalByStatus0;
     private Double totalGramByStatus0;
     private Double totalGramFatByStatus0;
