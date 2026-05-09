@@ -77,4 +77,6 @@ public class DailyFoodSummaryDto {
     private Double totalKcalDiffWithActivity;
     private Double totalGramDiffWithActivity;
 
+    private SleepDurationDto sleepDurationDto;
+
 }

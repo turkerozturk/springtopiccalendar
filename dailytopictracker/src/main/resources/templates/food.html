@@ -163,6 +163,8 @@
 
 <table class="table table-sm" style="max-width: 400px;">
 
+    <tr><th>Bugünkü Uyku Süresi</th><td th:text="${sleepDurationDto.sleepDurationSeconds}"></td></tr>
+
     <tr>
         <th>
             <a th:href="@{/entry-filter/form?categoryId={id}(id=${summary.fsd.humanBody.weightCategoryId})}"

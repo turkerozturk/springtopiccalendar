@@ -40,6 +40,7 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 @RequiredArgsConstructor
 public class FoodService {
 
+    private final SleepService sleepService;
     private final NutritionService nutritionService;
     private final PhysicalActivityService physicalActivityService;
 
@@ -56,6 +57,7 @@ public class FoodService {
         collator.setStrength(Collator.PRIMARY); // case-insensitive
 
         NutritionResultDto humanBody = nutritionService.calculate(dateMillis);
+        SleepDurationDto sleepDurationDto = sleepService.calculate(dateMillis);
 
 
         List<Topic> foodTopics = topicRepository.findFoodTopics();
@@ -423,6 +425,8 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalKcalDiffWithActivity(totalKcalDiffWithActivity);
         dailyFoodSummaryDto.setTotalGramDiffWithActivity(totalGramDiffWithActivity);
 
+        dailyFoodSummaryDto.setSleepDurationDto(sleepDurationDto);
+
         summary.setFsd(dailyFoodSummaryDto);
 
 
@@ -499,6 +503,7 @@ public class FoodService {
 
 
 
+
         // gün gün dolaş
         long oneDayMillis = 24 * 60 * 60 * 1000;
 
@@ -550,6 +555,8 @@ public class FoodService {
             dto.setTotalPercentCarbohydrate(daily.getFsd().getTotalPercentCarbohydrate());
             dto.setTotalPercentProtein(daily.getFsd().getTotalPercentProtein());
             //dto.setTotalPercentSugarUpperLimit(daily.);
+
+            dto.setSleepDurationDto(daily.getFsd().getSleepDurationDto());
 
             // listeye ekle
             dailyList.add(dto);

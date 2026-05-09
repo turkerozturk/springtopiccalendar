@@ -132,9 +132,7 @@
         <col class="gr">
         <col class="gr">
         <col class="gr">
-
-
-
+        <col class="seconds">
     </colgroup>
 
     <thead>
@@ -158,6 +156,8 @@
         <th>GR Protein</th>
         <th>GR Lif</th>
         <th>GR Şeker</th>
+        <th>SN Uyku</th>
+
 
     </tr>
     </thead>
@@ -203,6 +203,7 @@
         <td th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)}"></td>
         <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
 
+        <td th:text="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,1)}"></td>
 
 
 
@@ -238,6 +239,8 @@
 
         <th th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
+        <th>&nbsp;-&nbsp;</th>
+
 
     </tr>
     <tr>
@@ -266,6 +269,7 @@
 
         <th th:text="${#numbers.formatDecimal(summary.averageGramFiber,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramSugar,1,1)}"></th>
+        <th>&nbsp;-&nbsp;</th>
 
     </tr>
 
@@ -285,6 +289,7 @@
         <th th:text="${#numbers.formatDecimal(summary.averageGramProteinKcal,1,1)}"></th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
     </tr>
     <tr>
         <th th:text="${'4-4-9 YÜZDE'}"></th>
@@ -300,6 +305,7 @@
         <th th:text="${#numbers.formatDecimal(summary.averagePercentFat,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averagePercentCarbohydrate,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averagePercentProtein,1,1)}"></th>
+        <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
     </tr>
@@ -328,6 +334,7 @@
     <label><input type="checkbox" data-dataset="proteinTotal"> GR Protein</label>
     <label><input type="checkbox" data-dataset="fiberTotal"> GR Lif</label>
     <label><input type="checkbox" data-dataset="sugarTotal"> GR Şeker</label>
+    <label><input type="checkbox" data-dataset="sleepDurationTotal"> SN Uyku</label>
 
 
 
@@ -525,6 +532,8 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
     const fiberTotal = [];
     const sugarTotal = [];
 
+    const sleepDurationTotal = [];
+
 
     rows.forEach(row => {
         const cells = row.querySelectorAll("td");
@@ -552,6 +561,8 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
         proteinTotal.push(parseFloat(cells[12].innerText));
         fiberTotal.push(parseFloat(cells[13].innerText));
         sugarTotal.push(parseFloat(cells[14].innerText));
+
+        sleepDurationTotal.push(parseFloat(cells[15].innerText));
 
 
 
@@ -643,6 +654,12 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
             data: sugarTotal,
             yAxisID: 'y2',
             borderWidth: 2
+        },
+        sleepDurationTotal: {
+            label: "SN Uyku",
+            data: sleepDurationTotal,
+            yAxisID: 'y5',
+            borderWidth: 2
         }
 
     };
@@ -683,6 +700,13 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
                     }
                 },
                 y4: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // grid çakışmasını önler
+                    }
+                },
+                y5: {
                     type: 'linear',
                     position: 'right',
                     grid: {

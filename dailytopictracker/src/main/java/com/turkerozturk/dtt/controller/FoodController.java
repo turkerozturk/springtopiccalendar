@@ -24,6 +24,7 @@ package com.turkerozturk.dtt.controller;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.*;
 import com.turkerozturk.dtt.service.FoodService;
+import com.turkerozturk.dtt.service.SleepService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class FoodController {
 
+    private final SleepService sleepService;
     private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
 
@@ -81,6 +83,9 @@ public class FoodController {
         Collator collator = Collator.getInstance(locale);
         collator.setStrength(Collator.PRIMARY);
         model.addAttribute("appLocale", appLocale);
+
+        SleepDurationDto sleepDurationDto = sleepService.calculate(dateMillisYmd);
+        model.addAttribute("sleepDurationDto", sleepDurationDto);
 
 
 
