@@ -73,5 +73,7 @@ public class DateRangeFoodSummaryDto {
     private Double averagePercentCarbohydrate;
     private Double averagePercentProtein;
 
+    private Double realWeightDifference;
+
 
 }

@@ -493,6 +493,9 @@ public class FoodService {
         double totalPercentFatSaturatedUpperLimit = 0.0;
         double totalPercentSugarUpperLimit = 0.0;
 
+        // tarih araligindaki tartim sonuclarinin ilk ve sonuncusu arasindaki "realWeightDifference" degerini hesaplamak icin.
+        double rangeStartDayWeight = 0.0;
+        double rangeEndDayWeight = 0.0;
 
 
 
@@ -526,6 +529,13 @@ public class FoodService {
             dto.setTotalKcalDiff(daily.getFsd().getTotalKcalDiff());
             dto.setTotalGramDiff(daily.getFsd().getTotalGramDiff());
             dto.setHumanBody(daily.getFsd().getHumanBody());
+
+            if(date == startDateMillis) {
+                rangeStartDayWeight = dto.getHumanBody().getWeightKg();
+            }
+            if(date == endDateMillis) {
+                rangeEndDayWeight = dto.getHumanBody().getWeightKg();
+            }
 
             dto.setTotalActivityKcal(daily.getFsd().getTotalActivityKcal());
 
@@ -617,6 +627,9 @@ public class FoodService {
         rangeDto.setAveragePercentFat(totalPercentFat / totalDays);
         rangeDto.setAveragePercentCarbohydrate(totalPercentCarbohydrate / totalDays);
         rangeDto.setAveragePercentProtein(totalPercentProtein / totalDays);
+
+        // gercekte ilk ve son tarih arasinda kac kilo alinip verildigini gosterir.
+        rangeDto.setRealWeightDifference(rangeEndDayWeight - rangeStartDayWeight);
 
 
 

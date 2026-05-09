@@ -225,7 +225,9 @@
         <th th:text="${#numbers.formatDecimal(summary.totalKcalDiffWithActivity,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramDiffWithActivity,1,2)}"></th>
 
-        <th>&nbsp;-&nbsp;</th>
+        <th th:text="${#numbers.formatDecimal(summary.realWeightDifference,1,2)}"></th>
+
+
 
 
         <th th:text="${#numbers.formatDecimal(summary.totalGram,1,0)}"></th>
