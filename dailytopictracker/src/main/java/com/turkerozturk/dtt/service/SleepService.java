@@ -37,7 +37,7 @@ public class SleepService {
         Optional<Topic> sleepDurationTopicOpt =
                 topicRepository.findFirstByDescriptionContaining(SLEEP_DURATION_TAG);
 
-        Optional<Long> parsedSleepDurationOpt = sleepDurationTopicOpt
+        Optional<long[]> parsedSleepDurationsOpt = sleepDurationTopicOpt
                 .flatMap(topic ->
                         entryRepository.findEntryByTopicAndDate(dateMillisYmd, topic.getId())
                 )
@@ -45,8 +45,20 @@ public class SleepService {
                 .filter(note -> note != null && note.getContent() != null)
                 .flatMap(note -> SleepParser.extractSleepSeconds(note.getContent()));
 
-        if (parsedSleepDurationOpt.isPresent()) {
-            sleepDuration = parsedSleepDurationOpt.get();
+        if (parsedSleepDurationsOpt.isPresent()) {
+
+            long[] sleepDurations = parsedSleepDurationsOpt.get();
+
+            // örnek:
+            // toplam uyku süresi gerekiyorsa
+            long totalSleepDuration = 0;
+
+            for (long duration : sleepDurations) {
+                totalSleepDuration += duration;
+            }
+
+            sleepDuration = totalSleepDuration;
+
             durationUpdated = true;
         }
 
