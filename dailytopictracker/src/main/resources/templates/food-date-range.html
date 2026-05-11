@@ -95,6 +95,14 @@
         }
 
     </style>
+
+    <style>
+        .high-value {
+            background-color: red;
+            color: white;
+        }
+        .low-value { background-color: #2196f3; color: #fff; }
+    </style>
 </head>
 <body>
 
@@ -196,11 +204,46 @@
 
         <td th:text="${#numbers.formatDecimal(day.totalGram,1,0)}"></td>
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramFat,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalGramProtein,1,1)}"></td>
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)}"></td>
+
+        <!--/* alt ve ust limit degerlerini yapay zeka soyledi. Simdilik daha iyisini bulana kadar boyle biraktim. */-->
+        <td class="az-vurgula"
+            th:classappend="${day.totalPercentFat > 35} ? 'high-value' : (${day.totalPercentFat < 20} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGramFat,1,2)} + ' gr'"></span>
+
+        </td>
+
+        <td class="az-vurgula"
+            th:classappend="
+        ${day.totalPercentCarbohydrate > 65} ? 'high-value' :
+        (${day.totalPercentCarbohydrate < 45} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,2)} + ' gr'"></span>
+        </td>
+
+        <td class="az-vurgula"
+            th:classappend="
+        ${day.totalPercentProtein > 35} ? 'high-value' :
+        (${day.totalPercentProtein < 10} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(day.totalGramProtein,1,2)} + ' gr'"></span>
+        </td>
+
+
+        <td class="az-vurgula"
+            th:classappend="
+        ${day.totalGramFiber > 38} ? 'high-value' :
+        (${day.totalGramFiber < 25} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(day.totalGramFiber,1,2)} + ' gr'"></span>
+        </td>
+
+
+        
+
+
+
         <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
 
         <td th:text="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,1)}"></td>

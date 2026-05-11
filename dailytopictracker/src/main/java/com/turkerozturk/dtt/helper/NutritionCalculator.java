@@ -29,7 +29,7 @@ public class NutritionCalculator {
     public static NutritionResultDto calculate(
             double weightKg,
             boolean weightUpdated,
-            double heightCm,
+            double height,
             int age,
             Gender gender,
             ActivityLevel activityLevel,
@@ -40,9 +40,9 @@ public class NutritionCalculator {
         // 1) BMR (Mifflin-St Jeor)
         double bmr;
         if (gender == Gender.MALE) {
-            bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+            bmr = 10 * weightKg + 6.25 * height - 5 * age + 5;
         } else {
-            bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+            bmr = 10 * weightKg + 6.25 * height - 5 * age - 161;
         }
 
         // 2) TDEE (günlük ihtiyaç)
@@ -87,7 +87,7 @@ public class NutritionCalculator {
         double carbGramsForBMR = carbCaloriesForBMR / 4;
 
         // 5) BMI
-        double heightMeter = heightCm / 100.0;
+        double heightMeter = height / 100.0;
         double bmi = weightKg / (heightMeter * heightMeter);
 
         String bmiCategory;
@@ -123,7 +123,11 @@ public class NutritionCalculator {
                 weightKg,
                 weightUpdated,
                 weightTopicId,
-                weightCategoryId
+                weightCategoryId,
+                age,
+                height,
+                gender,
+                activityLevel
         );
     }
 

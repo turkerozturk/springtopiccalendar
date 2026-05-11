@@ -54,6 +54,11 @@ public class NutritionResultDto {
     private Long weightTopicId; // Frontend'den vucut agirligi set veya edit edebilmek icin topic ID numarasi gerekiyor.
     private Long weightCategoryId; // Frontend'den vucut agirligi set veya edit edebilmek icin topic ID numarasi gerekiyor.
 
+    private double age;
+    private double height;
+    private Gender gender;
+    private ActivityLevel activityLevel;
+
 
     public NutritionResultDto(double bmr, double tdee,
                               double weightLossCalories,
@@ -75,7 +80,11 @@ public class NutritionResultDto {
                               double weightKg,
                               boolean weightUpdated,
                               Long weightTopicId,
-                              Long weightCategoryId) {
+                              Long weightCategoryId,
+                              double age,
+                              double height,
+                              Gender gender,
+                              ActivityLevel activityLevel) {
         this.bmr = bmr;
         this.tdee = tdee;
         this.weightLossCalories = weightLossCalories;
@@ -102,6 +111,11 @@ public class NutritionResultDto {
         this.weightUpdated = weightUpdated;
         this.weightTopicId = weightTopicId;
         this.weightCategoryId = weightCategoryId;
+
+        this.age = age;
+        this.height = height;
+        this.gender = gender;
+        this.activityLevel = activityLevel;
     }
 
     // getter'lar
