@@ -229,10 +229,24 @@
     <tr>
         <th>Tarih:<br/><span id="caloriesTableDateCell"></span></th>
 
-        <th th:title="${sleepDurationDto.sleepDurationSeconds}">Uyku<br/>
-            <span th:text="${sleepDurationDto.sleepDurationAsString}"></span>
-        </th>
 
+
+        <th th:title="${sleepDurationDto.sleepDurationSeconds}">
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${sleepDurationDto.sleepDurationCategoryId})}"
+               target="_blank">Uyku</a>
+            <br/>
+
+
+            <span th:text="${sleepDurationDto.sleepDurationAsString}"></span>
+
+
+            <span th:if="${!sleepDurationDto.sleepDurationUpdated}"
+                  th:text="'!'"
+                  style="color:red; font-weight:bold; cursor:help;"
+                  title="Bugünkü uyku sürenizi kaydetmediğiniz için, süre sıfır olarak ünlem işaretli görünmektedir.">
+            !
+            </span>
+        </th>
 
 
 

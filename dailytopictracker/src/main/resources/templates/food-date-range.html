@@ -345,9 +345,30 @@
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
         <th>100</th>
-        <th th:text="${#numbers.formatDecimal(summary.averagePercentFat,1,1)}"></th>
-        <th th:text="${#numbers.formatDecimal(summary.averagePercentCarbohydrate,1,1)}"></th>
-        <th th:text="${#numbers.formatDecimal(summary.averagePercentProtein,1,1)}"></th>
+
+
+        <td class="az-vurgula"
+            th:classappend="${summary.averagePercentFat > 35} ? 'high-value' : (${summary.averagePercentFat < 20} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(summary.averagePercentFat,1,2)} + ' %'"></span>
+
+        </td>
+
+        <td class="az-vurgula"
+            th:classappend="${summary.averagePercentCarbohydrate > 65} ? 'high-value' : (${summary.averagePercentCarbohydrate < 45} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(summary.averagePercentCarbohydrate,1,2)} + ' %'"></span>
+
+        </td>
+
+        <td class="az-vurgula"
+            th:classappend="${summary.averagePercentProtein > 35} ? 'high-value' : (${summary.averagePercentProtein < 10} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(summary.averagePercentProtein,1,2)} + ' %'"></span>
+
+        </td>
+
+
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
