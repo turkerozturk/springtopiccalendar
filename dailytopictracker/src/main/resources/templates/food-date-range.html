@@ -112,6 +112,11 @@
 
 <div class="row mb-3">
     <div class="col-md-1">
+        <button class="btn btn-secondary w-100" onclick="shiftOneDay(-1)">
+            &lt;&lt;
+        </button>
+    </div>
+    <div class="col-md-1">
         <button class="btn btn-secondary w-100" onclick="shiftRange(-1)">
             &lt;
         </button>
@@ -130,6 +135,12 @@
             &gt;
         </button>
     </div>
+    <div class="col-md-1">
+        <button class="btn btn-secondary w-100" onclick="shiftOneDay(1)">
+            &gt;&gt;
+        </button>
+    </div>
+
 </div>
 
 <table id="rangeTable" class="table-sm">
@@ -623,6 +634,10 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
             `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
     }
 
+    function formatDate(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
     function shiftRange(direction) {
 
         const start = $('#startDate').val();
@@ -641,14 +656,30 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
         startDate.setDate(startDate.getDate() + (diffDays * direction));
         endDate.setDate(endDate.getDate() + (diffDays * direction));
 
-        const newStart =
-            `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
 
-        const newEnd =
-            `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
 
-        const startMillis = convertDateToMillis(newStart);
-        const endMillis = convertDateToMillis(newEnd);
+
+
+        const startMillis = convertDateToMillis(formatDate(startDate));
+        const endMillis = convertDateToMillis(formatDate(endDate));
+
+        window.location.href =
+            `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
+    }
+
+    function shiftOneDay(direction) {
+
+        const start = $('#startDate').val();
+        const end = $('#endDate').val();
+
+        const startDate = new Date(convertDateToMillis(start));
+        const endDate = new Date(convertDateToMillis(end));
+
+        startDate.setDate(startDate.getDate() + direction);
+        endDate.setDate(endDate.getDate() + direction);
+
+        const startMillis = convertDateToMillis(formatDate(startDate));
+        const endMillis = convertDateToMillis(formatDate(endDate));
 
         window.location.href =
             `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
