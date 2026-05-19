@@ -529,7 +529,13 @@
         if (DATE_MILLIS) {
             dateStr = convertMillisToDateStr(DATE_MILLIS);
         } else {
-            dateStr = new Date().toISOString().slice(0, 10);
+            const d = new Date(ms);
+
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
         }
 
         const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}`;
@@ -559,12 +565,22 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 
 <script>
 
+
+
     function convertMillisToDateStr(ms) {
-        return new Date(ms).toISOString().slice(0, 10);
+        const d = new Date(ms);
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
     }
 
     function convertDateToMillis(dateStr) {
-        return new Date(dateStr + "T00:00:00").getTime();
+        const [year, month, day] = dateStr.split('-').map(Number);
+
+        return new Date(year, month - 1, day).getTime();
     }
 
     let startStr = convertMillisToDateStr(FIRST_DATE_MILLIS);
