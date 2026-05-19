@@ -166,9 +166,9 @@
 
         <th>Kcal Aktivite</th>
         <th>Kcal Toplam Fark</th>
-        <th>KG Toplam Fark</th>
+        <th>KG Teorik Fark</th>
 
-        <th>KG Tartı</th>
+        <th>KG Gerçek Tartı</th>
 
         <th>Gramaj</th>
         <th>GR Yağ</th>
@@ -283,6 +283,13 @@
     </tbody>
 
     <tfoot>
+    <tr>
+        <td colspan="7" style="text-align: right;"
+            th:text="${ summary.activityCorrectionFactor + ' olan Aktivite Düzeltme Katsayısı ile çarpılırsa ve son kalori çıkarılırsa -&gt;'}"></td>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramDiffWithActivityAndFactor,1,2)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.realWeightDifference,1,2)}"></th>
+        <td colspan="9"></td>
+    </tr>
     <tr>
         <th th:text="${'TOPLAM ' + #numbers.formatDecimal(summary.totalDays,1,0) + ' gün'}"></th>
 

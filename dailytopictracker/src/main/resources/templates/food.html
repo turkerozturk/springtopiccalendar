@@ -134,12 +134,15 @@
             color: red;
         }
         .low-value-1 { color: blue; }
+        .good-value-1 { color:green; }
 
         .high-value-2 {
             background-color: red;
             color: white;
         }
-        .low-value-2 { background-color: #2196f3; color: #fff; }
+        .low-value-2 { background-color: #2196f3; color: white; }
+       /* .good-value-2 { color:darkgreen; color: white; } */
+
     </style>
 
 </head>
@@ -350,18 +353,18 @@
         <th>%</th>
         <td style="white-space: nowrap;">
             20&nbsp;≤&nbsp;
-            <span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentFat,1,2)}"
-                                 th:classappend="${summary.fsd.totalPercentFat > 35} ? 'high-value-1' : (${summary.fsd.totalPercentFat < 20} ? 'low-value-1' : '')"
+            <span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentFat,1,2) + '%'}"
+                                 th:classappend="${summary.fsd.totalPercentFat > 35} ? 'high-value-1' : (${summary.fsd.totalPercentFat < 20} ? 'low-value-1' : 'good-value-1')"
             ></span>&nbsp;≤&nbsp;35
         </td>
         <td style="white-space: nowrap;">
-            45&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentCarbohydrate,1,2)}"
-                                 th:classappend="${summary.fsd.totalPercentCarbohydrate > 65} ? 'high-value-1' : (${summary.fsd.totalPercentCarbohydrate < 45} ? 'low-value-1' : '')"
+            45&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentCarbohydrate,1,2) + '%'}"
+                                 th:classappend="${summary.fsd.totalPercentCarbohydrate > 65} ? 'high-value-1' : (${summary.fsd.totalPercentCarbohydrate < 45} ? 'low-value-1' : 'good-value-1')"
             ></span>&nbsp;≤&nbsp;65
         </td>
         <td style="white-space: nowrap;">
-            10&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentProtein,1,2)}"
-                                 th:classappend="${summary.fsd.totalPercentProtein > 35} ? 'high-value-1' : (${summary.fsd.totalPercentProtein < 10} ? 'low-value-1' : '')"
+            10&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentProtein,1,2) + '%'}"
+                                 th:classappend="${summary.fsd.totalPercentProtein > 35} ? 'high-value-1' : (${summary.fsd.totalPercentProtein < 10} ? 'low-value-1' : 'good-value-1')"
         ></span>&nbsp;≤&nbsp;35
         </td>
         <td colspan="4"></td>

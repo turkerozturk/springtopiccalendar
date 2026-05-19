@@ -486,6 +486,7 @@ public class FoodService {
         double totalDays = 0.0;
         double totalKcalDiffWithActivity = 0.0;
         double totalGramDiffWithActivity = 0.0;
+        double totalGramDiffWithActivityAndFactor = 0.0;
 
         double totalGramFatKcal = 0.0;
         double totalGramCarbonhydrateKcal = 0.0;
@@ -535,7 +536,7 @@ public class FoodService {
             dto.setTotalGramDiff(daily.getFsd().getTotalGramDiff());
             dto.setHumanBody(daily.getFsd().getHumanBody());
 
-            if(date == startDateMillis) {
+            if(date == startDateMillis + 86400 * 1000) {
                 rangeStartDayWeight = dto.getHumanBody().getWeightKg();
             }
             if(date == endDateMillis) {
@@ -589,6 +590,12 @@ public class FoodService {
             totalPercentProtein += dto.getTotalPercentProtein();
         }
 
+        FoodSummaryDto beginDay = getDailyFoodSummary(startDateMillis);
+        FoodSummaryDto endDay = getDailyFoodSummary(startDateMillis);
+
+        double activityCorrectionFactor = 1.4;
+        totalGramDiffWithActivityAndFactor = totalGramDiffWithActivity - endDay.getFsd().getTotalGramDiffWithActivity();
+        totalGramDiffWithActivityAndFactor = totalGramDiffWithActivityAndFactor * activityCorrectionFactor;
         rangeDto.setDays(dailyList);
 
         rangeDto.setTotalKcal(totalKcal);
@@ -608,6 +615,9 @@ public class FoodService {
         rangeDto.setTotalDays(totalDays);
         rangeDto.setTotalKcalDiffWithActivity(totalKcalDiffWithActivity);
         rangeDto.setTotalGramDiffWithActivity(totalGramDiffWithActivity);
+        rangeDto.setTotalGramDiffWithActivityAndFactor(totalGramDiffWithActivityAndFactor);
+        rangeDto.setActivityCorrectionFactor(activityCorrectionFactor);
+
 
         rangeDto.setAverageKcal(totalKcal / totalDays);
         rangeDto.setAverageGram(totalGram / totalDays);

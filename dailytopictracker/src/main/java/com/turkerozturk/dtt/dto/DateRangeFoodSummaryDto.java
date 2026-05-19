@@ -35,7 +35,8 @@ public class DateRangeFoodSummaryDto {
 
     private Double totalKcalDiffWithActivity;
     private Double totalGramDiffWithActivity;
-
+    private Double totalGramDiffWithActivityAndFactor;
+    private Double activityCorrectionFactor;
 
 
 
