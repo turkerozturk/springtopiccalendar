@@ -111,6 +111,11 @@
 </h2>
 
 <div class="row mb-3">
+    <div class="col-md-1">
+        <button class="btn btn-secondary w-100" onclick="shiftRange(-1)">
+            &lt;
+        </button>
+    </div>
     <div class="col-md-3">
         <input type="text" id="startDate" class="form-control"/>
     </div>
@@ -119,6 +124,11 @@
     </div>
     <div class="col-md-2">
         <button class="btn btn-primary" onclick="reloadRange()">Getir</button>
+    </div>
+    <div class="col-md-1">
+        <button class="btn btn-secondary w-100" onclick="shiftRange(1)">
+            &gt;
+        </button>
     </div>
 </div>
 
@@ -601,6 +611,37 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 
         const startMillis = convertDateToMillis(start);
         const endMillis = convertDateToMillis(end);
+
+        window.location.href =
+            `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
+    }
+
+    function shiftRange(direction) {
+
+        const start = $('#startDate').val();
+        const end = $('#endDate').val();
+
+        const startDate = new Date(convertDateToMillis(start));
+        const endDate = new Date(convertDateToMillis(end));
+
+        // İki tarih arasındaki gün farkı (inclusive)
+        const diffDays =
+            Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        // direction:
+        // -1 => geri
+        //  1 => ileri
+        startDate.setDate(startDate.getDate() + (diffDays * direction));
+        endDate.setDate(endDate.getDate() + (diffDays * direction));
+
+        const newStart =
+            `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+
+        const newEnd =
+            `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
+        const startMillis = convertDateToMillis(newStart);
+        const endMillis = convertDateToMillis(newEnd);
 
         window.location.href =
             `/food-date-range?firstDateMillis=${startMillis}&lastDateMillis=${endMillis}`;
