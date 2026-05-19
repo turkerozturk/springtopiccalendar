@@ -122,7 +122,7 @@
     </div>
 </div>
 
-<table id="rangeTable" class="">
+<table id="rangeTable" class="table-sm">
 
     <colgroup>
         <col class="result">
@@ -134,6 +134,8 @@
         <col class="result">
         <col class="kg">
         <col class="kg">
+        <col class="gr">
+        <col class="gr">
         <col class="gr">
         <col class="gr">
         <col class="gr">
@@ -163,6 +165,8 @@
         <th>GR Karb</th>
         <th>GR Protein</th>
         <th>GR Lif</th>
+        <th>GR Sodyum</th>
+        <th>Doymuş Yağ</th>
         <th>GR Şeker</th>
         <th>SN Uyku</th>
 
@@ -239,15 +243,30 @@
             <span th:text="${#numbers.formatDecimal(day.totalGramFiber,1,2)} + ' gr'"></span>
         </td>
 
+        <td class="az-vurgula"
+            th:classappend="
+        ${day.totalGramSodium > 2.3} ? 'high-value' :
+        (${day.totalGramSodium < 1.5} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(day.totalGramSodium,1,2)} + ' gr'"></span>
+        </td>
 
-        
+
+
+        <td th:text="${#numbers.formatDecimal(day.totalGramFatSaturated,1,2)}"></td>
+
+
+        <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,2)}"></td>
 
 
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)}"></td>
-
-        <td th:text="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,1)}"></td>
-
+        <td class="az-vurgula"
+            th:classappend="
+        ${day.sleepDurationDto.sleepDurationSeconds > 8 * 60 * 60} ? 'high-value' :
+        (${day.sleepDurationDto.sleepDurationSeconds < 6 * 60 * 60} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,0)}"></span>
+        </td>
 
 
     </tr>
@@ -281,7 +300,11 @@
         <th th:text="${#numbers.formatDecimal(summary.totalGramProtein,1,1)}"></th>
 
         <th th:text="${#numbers.formatDecimal(summary.totalGramFiber,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.totalGramSodium,1,1)}"></th>
+
+        <th th:text="${#numbers.formatDecimal(summary.totalGramFatSaturated,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
+
         <th>&nbsp;-&nbsp;</th>
 
 
@@ -311,6 +334,9 @@
         <th th:text="${#numbers.formatDecimal(summary.averageGramProtein,1,1)}"></th>
 
         <th th:text="${#numbers.formatDecimal(summary.averageGramFiber,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramSodium,1,1)}"></th>
+
+        <th th:text="${#numbers.formatDecimal(summary.averageGramFatSaturated,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramSugar,1,1)}"></th>
         <th>&nbsp;-&nbsp;</th>
 
@@ -333,6 +359,9 @@
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+
     </tr>
     <tr>
         <th th:text="${'4-4-9 YÜZDE'}"></th>
@@ -372,6 +401,10 @@
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+        <th>&nbsp;-&nbsp;</th>
+
+
     </tr>
 
     </tfoot>
@@ -380,7 +413,7 @@
 
 
 <div>
-    <label><input type="checkbox" data-dataset="kcalNeed"> Kcal İhtiyaç</label>
+    <label><input type="checkbox" checked data-dataset="kcalNeed"> Kcal İhtiyaç</label>
     <label><input type="checkbox" data-dataset="kcalFood"> Kcal Gıda</label>
     <label><input type="checkbox" data-dataset="kcalDiff"> Kcal Gıda Fark</label>
     <label><input type="checkbox" data-dataset="kgFoodDiff"> Kg Gıda Fark</label>
@@ -397,6 +430,8 @@
     <label><input type="checkbox" data-dataset="carbTotal"> GR Karb</label>
     <label><input type="checkbox" data-dataset="proteinTotal"> GR Protein</label>
     <label><input type="checkbox" data-dataset="fiberTotal"> GR Lif</label>
+    <label><input type="checkbox" data-dataset="sodiumTotal"> GR Sodyum</label>
+    <label><input type="checkbox" data-dataset="fatSaturatedTotal"> GR Doymuş Yağ</label>
     <label><input type="checkbox" data-dataset="sugarTotal"> GR Şeker</label>
     <label><input type="checkbox" data-dataset="sleepDurationTotal"> SN Uyku</label>
 
@@ -594,6 +629,8 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
     const carbTotal = [];
     const proteinTotal = [];
     const fiberTotal = [];
+    const sodiumTotal = [];
+    const fatSaturatedTotal = [];
     const sugarTotal = [];
 
     const sleepDurationTotal = [];
@@ -624,9 +661,11 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
         carbTotal.push(parseFloat(cells[11].innerText));
         proteinTotal.push(parseFloat(cells[12].innerText));
         fiberTotal.push(parseFloat(cells[13].innerText));
-        sugarTotal.push(parseFloat(cells[14].innerText));
+        sodiumTotal.push(parseFloat(cells[14].innerText));
+        fatSaturatedTotal.push(parseFloat(cells[15].innerText));
+        sugarTotal.push(parseFloat(cells[16].innerText));
 
-        sleepDurationTotal.push(parseFloat(cells[15].innerText));
+        sleepDurationTotal.push(parseFloat(cells[17].innerText));
 
 
 
@@ -710,6 +749,18 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
         fiberTotal: {
             label: "GR Lif",
             data: fiberTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        sodiumTotal: {
+            label: "GR Sodyum",
+            data: fiberTotal,
+            yAxisID: 'y2',
+            borderWidth: 2
+        },
+        fatSaturatedTotal: {
+            label: "GR Doymuş Yağ",
+            data: fatSaturatedTotal,
             yAxisID: 'y2',
             borderWidth: 2
         },
