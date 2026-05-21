@@ -18,11 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
-package com.turkerozturk.dtt.dto;
+package com.turkerozturk.dtt.helper.usda;
 
-public enum Gender {
-    MALE,
-    FEMALE,
-    CHILD
+public record NutrientLimit(
 
+        NutrientType nutrientType,
+
+        Double minValue,
+        Double maxValue,
+
+        String unit,
+
+        String sourceType // RDA, AMDR vb.
+) {
 }

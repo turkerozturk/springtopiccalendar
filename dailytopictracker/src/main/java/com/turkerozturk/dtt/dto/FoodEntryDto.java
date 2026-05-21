@@ -60,7 +60,7 @@ public class FoodEntryDto {
 
     private String mealCodes;
 
-
+    //private Double fiberRequirementGram;
 
     // getter/setter
 

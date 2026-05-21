@@ -352,20 +352,27 @@
         <td colspan="6">Makroların birbirlerine göre yüzdeleri(4-4-9 kuralı üzerinden)</td>
         <th>%</th>
         <td style="white-space: nowrap;">
-            20&nbsp;≤&nbsp;
+            <span th:text="${#numbers.formatDecimal(summary.fsd.fatRequirementMinPercent,1,0)} + ''"></span>
+            &nbsp;≤&nbsp;
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentFat,1,2) + '%'}"
                                  th:classappend="${summary.fsd.totalPercentFat > 35} ? 'high-value-1' : (${summary.fsd.totalPercentFat < 20} ? 'low-value-1' : 'good-value-1')"
-            ></span>&nbsp;≤&nbsp;35
+            ></span>&nbsp;≤&nbsp;
+            <span th:text="${#numbers.formatDecimal(summary.fsd.fatRequirementMaxPercent,1,0)} + ''"></span>
         </td>
         <td style="white-space: nowrap;">
-            45&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentCarbohydrate,1,2) + '%'}"
-                                 th:classappend="${summary.fsd.totalPercentCarbohydrate > 65} ? 'high-value-1' : (${summary.fsd.totalPercentCarbohydrate < 45} ? 'low-value-1' : 'good-value-1')"
-            ></span>&nbsp;≤&nbsp;65
+            <span th:text="${#numbers.formatDecimal(summary.fsd.carbohydrateRequirementMinPercent,1,0)} + ''"></span>
+            &nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentCarbohydrate,1,2) + '%'}"
+                                 th:classappend="${summary.fsd.totalPercentCarbohydrate > summary.fsd.carbohydrateRequirementMaxPercent} ? 'high-value-1' : (${summary.fsd.totalPercentCarbohydrate < summary.fsd.carbohydrateRequirementMinPercent} ? 'low-value-1' : 'good-value-1')"
+            ></span>
+            &nbsp;≤&nbsp;
+            <span th:text="${#numbers.formatDecimal(summary.fsd.carbohydrateRequirementMaxPercent,1,0)} + ''"></span>
         </td>
         <td style="white-space: nowrap;">
-            10&nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentProtein,1,2) + '%'}"
-                                 th:classappend="${summary.fsd.totalPercentProtein > 35} ? 'high-value-1' : (${summary.fsd.totalPercentProtein < 10} ? 'low-value-1' : 'good-value-1')"
-        ></span>&nbsp;≤&nbsp;35
+            <span th:text="${#numbers.formatDecimal(summary.fsd.proteinRequirementMinPercent,1,0)} + ''"></span>
+            &nbsp;≤&nbsp;<span th:text="${#numbers.formatDecimal(summary.fsd.totalPercentProtein,1,2) + '%'}"
+                                 th:classappend="${summary.fsd.totalPercentProtein > summary.fsd.proteinRequirementMaxPercent} ? 'high-value-1' : (${summary.fsd.totalPercentProtein < summary.fsd.proteinRequirementMinPercent} ? 'low-value-1' : 'good-value-1')"
+        ></span>&nbsp;≤&nbsp;
+            <span th:text="${#numbers.formatDecimal(summary.fsd.proteinRequirementMaxPercent,1,0)} + ''"></span>
         </td>
         <td colspan="4"></td>
     </tr>
@@ -382,44 +389,73 @@
 
         <!--/* alt ve ust limit degerlerini yapay zeka soyledi. Simdilik daha iyisini bulana kadar boyle biraktim. */-->
         <td class="az-vurgula" style="white-space: nowrap;"
-            th:classappend="${summary.fsd.totalPercentFat > 35} ? 'high-value-2' : (${summary.fsd.totalPercentFat < 20} ? 'low-value-2' : '')"
+            th:classappend="${summary.fsd.totalPercentFat > summary.fsd.fatRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalPercentFat < summary.fsd.fatRequirementMinPercent} ? 'low-value-2' : '')"
         >
             <span  th:text="${#numbers.formatDecimal(summary.fsd.totalGramFat,1,2)} + ' gr'"></span>
 
         </td>
 
         <td class="az-vurgula"  style="white-space: nowrap;"
-            th:classappend="${summary.fsd.totalPercentCarbohydrate > 65} ? 'high-value-2' : (${summary.fsd.totalPercentCarbohydrate < 45} ? 'low-value-2' : '')
+            th:classappend="${summary.fsd.totalPercentCarbohydrate > summary.fsd.carbohydrateRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalPercentCarbohydrate < summary.fsd.carbohydrateRequirementMinPercent} ? 'low-value-2' : '')
         ">
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"></span>
+            <br/>
+            Tavsiye: <span  th:text="${#numbers.formatDecimal(summary.fsd.carbonhydrateRequirementGram,1,2)}"
+            th:classappend="${summary.fsd.totalPercentCarbohydrate > summary.fsd.carbohydrateRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalGramCarbohydrate < summary.fsd.carbonhydrateRequirementGram} ? 'low-value-2' : '')"
+            ></span> gr
         </td>
 
         <td class="az-vurgula"  style="white-space: nowrap;"
-            th:classappend="${summary.fsd.totalPercentProtein > 35} ? 'high-value-2' : (${summary.fsd.totalPercentProtein < 10} ? 'low-value-2' : '')"
+            th:classappend="${summary.fsd.totalPercentProtein > summary.fsd.ProteinRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalPercentProtein < summary.fsd.ProteinRequirementMinPercent} ? 'low-value-2' : '')"
         >
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramProtein,1,2)} + ' gr'"></span>
+            <br/>
+            Tavsiye: <span  th:text="${#numbers.formatDecimal(summary.fsd.proteinRequirementGram,1,2)}"
+                            th:classappend="${summary.fsd.totalPercentProtein > summary.fsd.proteinRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalGramProtein < summary.fsd.proteinRequirementGram} ? 'low-value-2' : '')"
+        ></span> gr
         </td>
 
 
         <td class="az-vurgula"  style="white-space: nowrap;"
+            th:title="${'Tavsiye Edilen Gramaj: ' + #numbers.formatDecimal(summary.fsd.fiberRequirementGram,1,2)}"
             th:classappend="
-        ${summary.fsd.totalGramFiber > 38} ? 'high-value-1' :
-        (${summary.fsd.totalGramFiber < 25} ? 'low-value-1' : '')
+        ${summary.fsd.totalGramFiber > summary.fsd.fiberRequirementGram + 11} ? 'high-value-1' :
+        (${summary.fsd.totalGramFiber < summary.fsd.fiberRequirementGram - 11} ? 'low-value-1' : '')
         ">
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramFiber,1,2)} + ' gr'"></span>
-            <br/><span style="background-color:lightgray;">25gr≤ x ≤38gr</span>
+            <br/>
+            <span  th:text="${#numbers.formatDecimal(summary.fsd.fiberRequirementGram - 11,1,2)}" style="background-color:lightgray;"></span>
+            gr≤ x ≤
+            <span  th:text="${#numbers.formatDecimal(summary.fsd.fiberRequirementGram + 11,1,2)}" style="background-color:lightgray;"></span> gr
+            <br/>
+            Tavsiye: <span  th:text="${#numbers.formatDecimal(summary.fsd.fiberRequirementGram,1,2)}" style="background-color:lightgray;"></span> gr
         </td>
 
         <td class="az-vurgula"  style="white-space: nowrap;"
-            th:classappend="${summary.fsd.totalGramSodium > 2.3} ? 'high-value-1' :
-        (${summary.fsd.totalGramSodium < 1.5} ? 'low-value-1' : '')">
+            th:classappend="${summary.fsd.totalGramSodium > summary.fsd.sodiumRequirementGram} ? 'high-value-1' :
+        (${summary.fsd.totalGramSodium < summary.fsd.sodiumRequirementGram - 0.8} ? 'low-value-1' : '')">
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramSodium,1,2)} + ' gr'"></span>
-            <br/><span style="background-color:lightgray;">1.5gr≤ x ≤2.3gr</span>
+            <br/>
+            <span  th:text="${#numbers.formatDecimal(summary.fsd.sodiumRequirementGram - 0.8,1,2)}" style="background-color:lightgray;"></span>
+            gr≤ x ≤
+            <span  th:text="${#numbers.formatDecimal(summary.fsd.sodiumRequirementGram + 0,1,2)}" style="background-color:lightgray;"></span>
+            <br/>
+            Tavsiye: <span  th:text="${#numbers.formatDecimal(summary.fsd.sodiumRequirementGram,1,2)}" style="background-color:lightgray;"></span>
         </td>
 
 
-        <td class="az-vurgula2"  style="white-space: nowrap;"
-            th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatSaturated,1,2)} + ' gr'"> gr</td>
+
+        <td class="az-vurgula"  style="white-space: nowrap;"
+            th:classappend="${summary.fsd.totalPercentFat * 0.10 > summary.fsd.fatSaturatedRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalPercentFat * 0.10 < summary.fsd.fatSaturatedRequirementMinPercent} ? 'low-value-2' : '')"
+        >
+            <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramFatSaturated,1,2)} + ' gr'"></span>
+            <br/>
+            Tavsiye: <span  th:text="${#numbers.formatDecimal(summary.fsd.fatSaturatedRequirementGram,1,2)}"
+                            th:classappend="${summary.fsd.totalPercentFat * 0.10 > summary.fsd.fatSaturatedRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalPercentFat * 0.10 < summary.fsd.fatSaturatedRequirementMinPercent} ? 'low-value-2' : '')"
+        ></span> gr
+        </td>
+
+
         <td class="az-vurgula2"  style="white-space: nowrap;"
             th:text="${#numbers.formatDecimal(summary.fsd.totalGramSugar,1,2)} + ' gr'"> gr</td>
 

@@ -18,11 +18,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
-package com.turkerozturk.dtt.dto;
+package com.turkerozturk.dtt.helper.usda;
 
-public enum Gender {
-    MALE,
-    FEMALE,
-    CHILD
+public enum NutrientType {
 
+    PROTEIN_GRAM,
+    PROTEIN_PERCENT,
+
+    FAT_PERCENT,
+    CARBOHYDRATE_PERCENT,
+
+    FIBER_GRAM,
+    SODIUM_MG,
+    POTASSIUM_MG,
+
+    SATURATED_FAT_PERCENT,
+    FAT_GRAM, CARBOHYDRATE_GRAM, ADDED_SUGAR_PERCENT
 }

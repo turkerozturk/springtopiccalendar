@@ -18,11 +18,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
-package com.turkerozturk.dtt.dto;
+package com.turkerozturk.dtt.helper.usda;
 
-public enum Gender {
-    MALE,
-    FEMALE,
-    CHILD
+public record AgeRange(
+        int minAge,
+        int maxAge
+) {
 
+    public boolean contains(int age) {
+        return age >= minAge && age <= maxAge;
+    }
 }

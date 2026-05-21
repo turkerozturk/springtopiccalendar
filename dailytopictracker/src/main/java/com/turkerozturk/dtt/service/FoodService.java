@@ -25,6 +25,8 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.FoodParser;
+import com.turkerozturk.dtt.helper.usda.NutrientLimit;
+import com.turkerozturk.dtt.helper.usda.NutrientRequirementService;
 import com.turkerozturk.dtt.repository.EntryRepository;
 import com.turkerozturk.dtt.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +42,17 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 @RequiredArgsConstructor
 public class FoodService {
 
+    private final NutrientRequirementService nutrientRequirementService;
     private final SleepService sleepService;
     private final NutritionService nutritionService;
     private final PhysicalActivityService physicalActivityService;
+
+    private static final int THOUSAND_KCAL = 1000;
+    private static final int THOUSAND = 1000;
+
+
+    private static final double FIBER_REQ_PER_KCAL = (double) 14 / THOUSAND_KCAL;
+    private static final double SATURATED_FAT_REQUIREMENT_PERCENT = 0.10;
 
 
     private final TopicRepository topicRepository;
@@ -50,6 +60,12 @@ public class FoodService {
 
     @Value("${app.locale:en}")
     private String appLocale;
+
+    @Value("${human.gender}")
+    private Gender gender;
+
+    @Value("${human.age}")
+    private int age;;
 
     public FoodSummaryDto getDailyFoodSummary(Long dateMillis) {
         Locale locale = Locale.forLanguageTag(appLocale);
@@ -224,7 +240,7 @@ public class FoodService {
             Double gramFatSaturated = FoodParser.calculateKcal(gram, FoodParser.extractFatSaturated(topicDescription));
             Double gramSugar = FoodParser.calculateKcal(gram, FoodParser.extractSugar(topicDescription));
 
-            FoodEntryDto dto = new FoodEntryDto();
+                    FoodEntryDto dto = new FoodEntryDto();
             dto.setEntryId(entry.getId());
             dto.setEntryStatus(entry.getStatus());
             dto.setDateMillis(dateMillis);
@@ -361,6 +377,68 @@ public class FoodService {
         summary.setItems(result);
         DailyFoodSummaryDto dailyFoodSummaryDto = new DailyFoodSummaryDto();
         dailyFoodSummaryDto.setTotalKcal(totalKcal);
+
+
+        double usdaSodium = 0.0;
+        double usdaProteinGram = 0.0;
+        double usdaCarbonhydrateGram = 0.0;
+        double usdaFatRequirementMinPercent = 0.0;
+        double usdaFatRequirementMaxPercent = 0.0;
+        double usdaCarbonhydrateRequirementMinPercent = 0.0;
+        double usdaCarbonhydrateRequirementMaxPercent = 0.0;
+        double usdaProteinRequirementMinPercent = 0.0;
+        double usdaProteinRequirementMaxPercent = 0.0;
+        List<NutrientLimit> nutrientLimits = nutrientRequirementService.getLimits(age, gender);
+
+        for(NutrientLimit n : nutrientLimits) {
+            switch (n.nutrientType()) {
+                case SODIUM_MG -> usdaSodium = n.maxValue() / THOUSAND;
+                case FAT_PERCENT -> {
+                    usdaFatRequirementMinPercent = n.minValue();
+                    usdaFatRequirementMaxPercent = n.maxValue();
+                }
+                case CARBOHYDRATE_GRAM -> usdaCarbonhydrateGram = n.maxValue();
+                case CARBOHYDRATE_PERCENT -> {
+                    usdaCarbonhydrateRequirementMinPercent = n.minValue();
+                    usdaCarbonhydrateRequirementMaxPercent = n.maxValue();
+                }
+                case PROTEIN_GRAM -> usdaProteinGram = n.maxValue();
+                case PROTEIN_PERCENT -> {
+                    usdaProteinRequirementMinPercent = n.minValue();
+                    usdaProteinRequirementMaxPercent = n.maxValue();
+                }
+
+            }
+
+
+        }
+
+        dailyFoodSummaryDto.setSodiumRequirementGram(usdaSodium);
+
+        dailyFoodSummaryDto.setFatRequirementMinPercent(usdaFatRequirementMinPercent);
+        dailyFoodSummaryDto.setFatRequirementMaxPercent(usdaFatRequirementMaxPercent);
+
+        dailyFoodSummaryDto.setCarbonhydrateRequirementGram(usdaCarbonhydrateGram);
+        dailyFoodSummaryDto.setCarbohydrateRequirementMinPercent(usdaCarbonhydrateRequirementMinPercent);
+        dailyFoodSummaryDto.setCarbohydrateRequirementMaxPercent(usdaCarbonhydrateRequirementMaxPercent);
+
+        dailyFoodSummaryDto.setProteinRequirementGram(usdaProteinGram);
+        dailyFoodSummaryDto.setProteinRequirementMinPercent(usdaProteinRequirementMinPercent);
+        dailyFoodSummaryDto.setProteinRequirementMaxPercent(usdaProteinRequirementMaxPercent);
+
+        dailyFoodSummaryDto.setFiberRequirementGram( FIBER_REQ_PER_KCAL * totalKcal);
+
+        double totalPercentFatSaturated = (totalGramFatSaturated / totalGramKcalFatCarbProtein) * 100;
+
+        dailyFoodSummaryDto.setFatSaturatedRequirementGram(totalPercentFatSaturated);
+        dailyFoodSummaryDto.setFatSaturatedRequirementMinPercent(totalPercentFatSaturated + totalPercentFatSaturated - SATURATED_FAT_REQUIREMENT_PERCENT);
+        dailyFoodSummaryDto.setFatSaturatedRequirementMaxPercent(totalPercentFatSaturated + totalPercentFatSaturated * SATURATED_FAT_REQUIREMENT_PERCENT );
+        //System.out.println("+++++ " + totalGramKcalFatCarbProtein + " totalGramKcalFatCarbProtein");
+
+        //System.out.println("***** " + totalPercentFatSaturated +" totalPercentFatSaturated");
+        //System.out.println("-----" + totalGramFatSaturated + " " + "totalGramFatSaturated");
+
+
         dailyFoodSummaryDto.setTotalGram(totalGram);
 
         dailyFoodSummaryDto.setTotalGramFat(totalGramFat);
