@@ -21,6 +21,8 @@
 package com.turkerozturk.dtt.controller;
 
 import com.turkerozturk.dtt.entity.CategoryGroup;
+import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.TopicService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,9 +36,6 @@ import com.turkerozturk.dtt.dto.TopicDto;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
-import com.turkerozturk.dtt.repository.CategoryRepository;
-import com.turkerozturk.dtt.repository.EntryRepository;
-import com.turkerozturk.dtt.repository.TopicRepository;
 import com.turkerozturk.dtt.service.FilterService;
 
 import java.text.Collator;
@@ -64,20 +63,18 @@ public class EntryFilterController {
 
     private final AppTimeZoneProvider timeZoneProvider;
 
-    private final EntryRepository entryRepository;
-    private final TopicRepository topicRepository;
+    private final TopicService topicService;
     private final FilterService filterService;
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
-    public EntryFilterController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository,
-                                 TopicRepository topicRepository,
-                                 FilterService filterService, CategoryRepository categoryRepository) {
+    public EntryFilterController(AppTimeZoneProvider timeZoneProvider,
+                                 TopicService topicService,
+                                 FilterService filterService, CategoryService categoryService) {
         this.timeZoneProvider = timeZoneProvider;
-        this.entryRepository = entryRepository;
-        this.topicRepository = topicRepository;
+        this.topicService = topicService;
         this.filterService = filterService;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
     @Value("${week.start.day:MONDAY}")
@@ -126,23 +123,13 @@ public class EntryFilterController {
         List<Entry> filteredEntries;
         if(categoryId!=null) {
             filterDto.setCategoryId(categoryId);
-            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+            Optional<Category> categoryOpt = categoryService.findById(categoryId);
             if(categoryOpt.isPresent()) {
                 filterDto.setCategoryGroupId(categoryOpt.get().getCategoryGroup().getId());
             }
         } else {
 
-            List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-            Locale locale = Locale.forLanguageTag(appLocale);
-            Collator collator = Collator.getInstance(locale);
-            collator.setStrength(Collator.PRIMARY);
-            cats.sort(
-                    Comparator.comparing(
-                                    (Category c) -> c.getCategoryGroup().getPriority(),
-                                    Comparator.reverseOrder() // DESC
-                            )
-                            .thenComparing(Category::getName, collator) // alfabetik
-            );
+            List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
 
             if (!cats.isEmpty()) {
                 categoryId = cats.get(0).getId();
@@ -151,7 +138,7 @@ public class EntryFilterController {
                 filterDto.setCategoryGroupId(categoryGroup.getId());
             }
         }
-        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
+        List<Topic> topicsOfTheCategory = topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
 
         List<Long> topicIds = new ArrayList<>();
         for (Topic topic : topicsOfTheCategory) {
@@ -182,7 +169,7 @@ public class EntryFilterController {
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
-            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+            List<Topic> selectedTopics = topicService.findAllById(filterDto.getTopicIds());
 
             // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
             PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics,
@@ -196,23 +183,14 @@ public class EntryFilterController {
 
         model.addAttribute("today", today);
 
-        model.addAttribute("allTopics", topicRepository.findAll());
+        model.addAttribute("allTopics", topicService.findAll());
 
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
         model.addAttribute("allCategories", allCategories);
         if(categoryId != null) {
             model.addAttribute("topicsForSelectedCategory",
-                    topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                    topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
         } else {
             model.addAttribute("topicsForSelectedCategory", List.of()); // bu satiri birakmamin sebebi,
             // mevcut kodlarda hala tracker tablosu aslinda sadece bir kategori icin degil, topicIdler icin yapilmis
@@ -224,7 +202,7 @@ public class EntryFilterController {
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        Category selectedCategory = categoryService.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
         return "view-tracker/filter-form";
@@ -249,7 +227,7 @@ public class EntryFilterController {
         if (categoryId == null) {
             return List.of();
         }
-        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
+        List<Topic> topics = topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
 
         // Entity -> DTO dönüştürme
         return topics.stream()
@@ -271,7 +249,7 @@ public class EntryFilterController {
     public String topicsByCategory(
             @RequestParam Long categoryId,
             Model model) {
-        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
+        List<Topic> topics = topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
         model.addAttribute("topics", topics);
         model.addAttribute("categoryId", categoryId);
         return "entries/fragments/_topics-by-category :: topicList";
@@ -292,22 +270,13 @@ public class EntryFilterController {
                                               @RequestParam(value = "reportType", required = false, defaultValue = "pivot") String reportType) {
         if (bindingResult.hasErrors()) {
 
-            List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-            Locale locale = Locale.forLanguageTag(appLocale);
-            Collator collator = Collator.getInstance(locale);
-            collator.setStrength(Collator.PRIMARY);
-            allCategories.sort(
-                    Comparator.comparing(
-                                    (Category c) -> c.getCategoryGroup().getPriority(),
-                                    Comparator.reverseOrder() // DESC
-                            )
-                            .thenComparing(Category::getName, collator) // alfabetik
-            );
+            List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
             model.addAttribute("allCategories", allCategories);
 
             // Eğer isterseniz tekrar topics çekebilirsiniz (seçili kategoriye göre)
             model.addAttribute("topicsForSelectedCategory",
-                    topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                    topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
             return "view-tracker/filter-form";
         }
         /*
@@ -340,7 +309,7 @@ public class EntryFilterController {
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
-            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+            List<Topic> selectedTopics = topicService.findAllById(filterDto.getTopicIds());
 
             // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
             PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics,
@@ -361,31 +330,22 @@ public class EntryFilterController {
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
-        model.addAttribute("allTopics", topicRepository.findAll());
+        model.addAttribute("allTopics", topicService.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
         model.addAttribute("allCategories", allCategories);
 
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
 
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
         if(filterDto.getCategoryId() != null) {
-            Optional<Category> selectedCategoryOpt = categoryRepository.findById(filterDto.getCategoryId());
+            Optional<Category> selectedCategoryOpt = categoryService.findById(filterDto.getCategoryId());
             selectedCategoryOpt.ifPresent(category -> model.addAttribute("selectedCategory", category));
         }
         return "view-tracker/filter-form";
@@ -423,7 +383,7 @@ public class EntryFilterController {
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
-            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+            List<Topic> selectedTopics = topicService.findAllById(filterDto.getTopicIds());
 
             // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
             PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics,
@@ -443,30 +403,21 @@ public class EntryFilterController {
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
-        model.addAttribute("allTopics", topicRepository.findAll());
+        model.addAttribute("allTopics", topicService.findAll());
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
         model.addAttribute("allCategories", allCategories);
 
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        Category selectedCategory = categoryService.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
         CategoryGroup categoryGroup = selectedCategory.getCategoryGroup();
@@ -509,7 +460,7 @@ public class EntryFilterController {
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
-            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+            List<Topic> selectedTopics = topicService.findAllById(filterDto.getTopicIds());
 
             // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
             PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics,
@@ -530,29 +481,19 @@ public class EntryFilterController {
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
-        model.addAttribute("allTopics", topicRepository.findAll());
+        model.addAttribute("allTopics", topicService.findAll());
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
         model.addAttribute("allCategories", allCategories);
 
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        Category selectedCategory = categoryService.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
         CategoryGroup categoryGroup = selectedCategory.getCategoryGroup();
@@ -753,7 +694,7 @@ public class EntryFilterController {
         } else if(reportType.equals("pivot")){
             // 3) Pivot Data hazırla
             // seçili tüm topicId’leri DB’den entity olarak yükleyelim
-            List<Topic> selectedTopics = topicRepository.findAllById(filterDto.getTopicIds());
+            List<Topic> selectedTopics = topicService.findAllById(filterDto.getTopicIds());
 
             // PivotData’yı oluştururken selectedTopics’u da geçiyoruz
             PivotData pivotData = buildPivotData(filteredEntries, dateRange, selectedTopics,
@@ -773,30 +714,21 @@ public class EntryFilterController {
         model.addAttribute("today", today);
 
         model.addAttribute("filterDto", filterDto);
-        model.addAttribute("allTopics", topicRepository.findAll());
+        model.addAttribute("allTopics", topicService.findAll());
 
 
         // Tekrar form gösterirseniz, seçili kategori vs. kaybolmasın
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
         model.addAttribute("allCategories", allCategories);
 
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
 
         model.addAttribute("zoneId", zoneId);
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        Category selectedCategory = categoryService.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
         return "view-tracker/filter-form";
@@ -821,7 +753,7 @@ public class EntryFilterController {
                                                String reportType) {
 
         // start. We need to get topic ID's and set to filterDto. Because this method is for category shift.
-        List<Topic> topicsOfTheCategory = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
+        List<Topic> topicsOfTheCategory = topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId());
         List<Long> topicIds = new ArrayList<>();
         for(Topic topic : topicsOfTheCategory) {
             topicIds.add(topic.getId());
@@ -861,21 +793,12 @@ public class EntryFilterController {
         model.addAttribute("today", today);
         model.addAttribute("filterDto", filterDto);
 
-        List<Category> allCategories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        allCategories.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> allCategories = categoryService.findAllByArchivedIsFalseNameAsc();
+
         model.addAttribute("allCategories", allCategories);
 
         model.addAttribute("topicsForSelectedCategory",
-                topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
+                topicService.findByCategoryIdOrderByPinnedDescNameAsc(filterDto.getCategoryId()));
         // … gerekirse allTopics vs.
 
         ZoneId zoneId = timeZoneProvider.getZoneId();  // Hazır metodunuz
@@ -884,7 +807,7 @@ public class EntryFilterController {
 
 
         // we need this to get the "archived" value
-        Category selectedCategory = categoryRepository.findById(filterDto.getCategoryId()).get();
+        Category selectedCategory = categoryService.findById(filterDto.getCategoryId()).get();
         model.addAttribute("selectedCategory", selectedCategory);
 
         return "redirect:/entry-filter/return"; // To prevent document expired error https://en.wikipedia.org/wiki/Post/Redirect/Get
@@ -905,17 +828,7 @@ public class EntryFilterController {
                                    HttpSession session,
                                    @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
-        List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        cats.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
 
         int size = cats.size();
 
@@ -950,17 +863,7 @@ public class EntryFilterController {
                                HttpSession session,
                                @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
-        List<Category> cats = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
-        Locale locale = Locale.forLanguageTag(appLocale);
-        Collator collator = Collator.getInstance(locale);
-        collator.setStrength(Collator.PRIMARY);
-        cats.sort(
-                Comparator.comparing(
-                                (Category c) -> c.getCategoryGroup().getPriority(),
-                                Comparator.reverseOrder() // DESC
-                        )
-                        .thenComparing(Category::getName, collator) // alfabetik
-        );
+        List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
 
         int size = cats.size();
 

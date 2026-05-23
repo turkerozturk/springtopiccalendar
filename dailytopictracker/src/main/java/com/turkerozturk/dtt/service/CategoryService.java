@@ -37,6 +37,7 @@ import com.turkerozturk.dtt.repository.TopicRepository;
 import java.text.Collator;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -131,4 +132,52 @@ public class CategoryService {
     public Optional<Category> findById(Long categoryId) {
         return categoryRepository.findById(categoryId);
     }
+
+    public List<Category> findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc() {
+        List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+
+        for (Category c : categories) {
+            System.out.println(String.format("",c.isArchived(), c.getCategoryGroup().getId(), c.getName()));
+        }
+
+        // Mevcut locale'i session'dan alıyoruz.
+        Locale currentLocale = LocaleContextHolder.getLocale();
+
+        // Locale'e uygun bir Collator örneği oluşturuyoruz.
+        Collator collator = Collator.getInstance(currentLocale);
+        collator.setStrength(Collator.PRIMARY);
+
+        categories.sort(
+                Comparator.comparing(
+                                (Category c) -> c.getCategoryGroup().getPriority(),
+                                Comparator.reverseOrder() // DESC
+                        )
+                        .thenComparing(Category::getName, collator) // alfabetik
+        );
+
+        return categories;
+    }
+
+    public List<Category> findAllByArchivedIsFalseNameAsc() {
+        List<Category> categories = categoryRepository.findAllByArchivedIsFalse();
+
+        for (Category c : categories) {
+            System.out.println(String.format("",c.isArchived(), c.getCategoryGroup().getId(), c.getName()));
+        }
+
+        // Mevcut locale'i session'dan alıyoruz.
+        Locale currentLocale = LocaleContextHolder.getLocale();
+
+        // Locale'e uygun bir Collator örneği oluşturuyoruz.
+        Collator collator = Collator.getInstance(currentLocale);
+        collator.setStrength(Collator.PRIMARY);
+
+        // Category.getName() metodu ile kategori adını alarak sıralama yapıyoruz.
+        categories.sort((c1, c2) -> collator.compare(c1.getName(), c2.getName()));
+
+
+        return categories;
+    }
+
+
 }

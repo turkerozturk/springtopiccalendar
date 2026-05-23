@@ -57,4 +57,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findFirstByOrderByIdAsc();
 
+    List<Category> findAllByArchivedIsFalse();
 }

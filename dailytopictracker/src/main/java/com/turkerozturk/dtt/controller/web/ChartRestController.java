@@ -24,7 +24,7 @@ import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
-import com.turkerozturk.dtt.repository.CategoryRepository;
+import com.turkerozturk.dtt.service.CategoryService;
 import com.turkerozturk.dtt.service.EntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,7 +48,7 @@ public class ChartRestController {
     private EntryService entryService;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     ZoneId zoneId = AppTimeZoneProvider.getZone();
 
@@ -65,7 +65,7 @@ public class ChartRestController {
             dateMillisYmd = date.atStartOfDay(zoneId).toInstant().toEpochMilli();
         }
 
-        List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
+        List<Category> categories = categoryService.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
         List<String> labels = new ArrayList<>();
         List<Integer> counts = new ArrayList<>();
         List<Integer> categoryWeights = new ArrayList<>();

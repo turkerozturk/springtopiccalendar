@@ -32,6 +32,7 @@ import com.turkerozturk.dtt.entity.*;
 import com.turkerozturk.dtt.helper.OccurrenceParser;
 import com.turkerozturk.dtt.helper.SuccessAnalyzer;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
+import com.turkerozturk.dtt.service.CategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,6 @@ import com.turkerozturk.dtt.dto.TopicEntrySummaryDTO;
 import com.turkerozturk.dtt.helper.DateUtils;
 import com.turkerozturk.dtt.repository.CategoryRepository;
 import com.turkerozturk.dtt.repository.EntryRepository;
-import com.turkerozturk.dtt.repository.TopicRepository;
 import com.turkerozturk.dtt.service.EntryService;
 import com.turkerozturk.dtt.service.FilterService;
 import com.turkerozturk.dtt.service.TopicService;
@@ -74,12 +74,13 @@ public class EntryController {
     private final FilterService filterService;
 
     private final EntryService entryService;
-    private final TopicRepository topicRepository;
 
     private final TopicService topicService;
 
     private final CategoryRepository categoryRepository;
     private final CategoryGroupRepository categoryGroupRepository;
+
+    private final CategoryService categoryService;
 
 
     private final MarkdownService markdownService;
@@ -88,15 +89,15 @@ public class EntryController {
     private String startDayOfWeek;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicRepository topicRepository, TopicService topicService, CategoryRepository categoryRepository, CategoryGroupRepository categoryGroupRepository, MarkdownService markdownService) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicService topicService, CategoryRepository categoryRepository, CategoryGroupRepository categoryGroupRepository, CategoryService categoryService, MarkdownService markdownService) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.filterService = entryService;
         this.entryService = entryService1;
-        this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.categoryRepository = categoryRepository;
         this.categoryGroupRepository = categoryGroupRepository;
+        this.categoryService = categoryService;
         this.markdownService = markdownService;
     }
 
@@ -131,7 +132,7 @@ public class EntryController {
 
         if (topicId != null) {
             entriesPage = entryRepository.findByTopicIdOrderByDateMillisYmdDescIdDesc(topicId, pageable);
-            Topic topic = topicRepository.findById(topicId).orElseThrow();
+            Topic topic = topicService.getById(topicId);
             model.addAttribute("topic", topic);
             String topicDescriptionAsHtml = convertUrlsToLinksSafe(topic.getDescription());
             model.addAttribute("topicDescriptionAsHtml", topicDescriptionAsHtml);
@@ -282,7 +283,7 @@ public class EntryController {
         model.addAttribute("weeklyMaps", weeklyMaps);
 
 
-        Topic topic = topicRepository.findById(topicId).get();
+        Topic topic = topicService.getById(topicId);
         String descriptionHtml = markdownService.render(topic.getDescription());
         topic.setDescriptionAsHtml(descriptionHtml);
         model.addAttribute("topic", topic);
@@ -1120,7 +1121,7 @@ public class EntryController {
 
         if (topicId != null) {
             entriesPage = entryRepository.findByTopicId(topicId, pageable);
-            model.addAttribute("topic", topicRepository.findById(topicId).orElseThrow());
+            model.addAttribute("topic", topicService.getById(topicId));
         } else {
             entriesPage = entryRepository.findAll(pageable);
         }
@@ -1240,9 +1241,11 @@ public class EntryController {
 
         // Topic set
         if (topicId != null) {
-            Topic topic = topicRepository.findById(topicId).orElse(null);
+            Topic topic = topicService.getByIdOrNull(topicId);
+
             entry.setTopic(topic);
-            if (categoryId == null) {
+
+            if (topic != null && categoryId == null) {
                 categoryId = topic.getCategory().getId();
             }
         }
@@ -1263,12 +1266,12 @@ public class EntryController {
         }
 
         // to make topic selection easier from gui, we are sending categories to selection box:
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
 // categoryId doluysa sadece o kategoriye ait topicleri çekelim:
         List<Topic> topics = (categoryId != null)
-                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
-                : topicRepository.findAll();
+                ? topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
+                : topicService.getAllTopics();
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
         //System.out.println("return page: " + returnPage);
@@ -1294,7 +1297,7 @@ public class EntryController {
         if (categoryId == null) {
             return List.of();
         }
-        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
+        List<Topic> topics = topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
 
 
 
@@ -1311,7 +1314,7 @@ public class EntryController {
                             HttpServletRequest request) {
 
         String returnPage = request.getParameter("returnPage");
-        List<Category> categories = categoryRepository.findAll(); // ayni tarihte cakisma varsa lazim oluyor formu tekrar gosterirken.
+        List<Category> categories = categoryService.getAllCategories(); // ayni tarihte cakisma varsa lazim oluyor formu tekrar gosterirken.
 
         // start **** category id nin elde edilmesi (ugly code)
         // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
@@ -1352,7 +1355,7 @@ public class EntryController {
                 // Kayıt varsa formu tekrar göster ve hata mesajı ver
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
-                model.addAttribute("topics", topicRepository.findAll());
+                model.addAttribute("topics", topicService.getAllTopics());
                 model.addAttribute("categories", categories);
                 model.addAttribute("returnPage", returnPage);
                 model.addAttribute("categoryId", categoryId);
@@ -1385,7 +1388,7 @@ public class EntryController {
                 // Yine hata mesajını modele ekleyip formu gösteriyoruz
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
-                model.addAttribute("topics", topicRepository.findAll());
+                model.addAttribute("topics", topicService.getAllTopics());
                 model.addAttribute("categories", categories);
                 model.addAttribute("returnPage", returnPage);
                 model.addAttribute("categoryId", categoryId);
@@ -1456,11 +1459,11 @@ public class EntryController {
         }
 
         // to make topic selection easier from gui, we are sending categories to selection box:
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         List<Topic> topics = (categoryId != null)
-                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
-                : topicRepository.findAll();
+                ? topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
+                : topicService.getAllTopics();
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);
@@ -1499,11 +1502,11 @@ public class EntryController {
         Long categoryGroupId = entry.getTopic().getCategory().getCategoryGroup().getId();
 
         // to make topic selection easier from gui, we are sending categories to selection box:
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryService.getAllCategories();
         model.addAttribute("categories", categories);
         List<Topic> topics = (categoryId != null)
-                ? topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
-                : topicRepository.findAll();
+                ? topicService.findByCategoryIdOrderByPinnedDescNameAsc(categoryId)
+                : topicService.getAllTopics();
         model.addAttribute("entry", entry);
         model.addAttribute("topics", topics);
         model.addAttribute("returnPage", returnPage);

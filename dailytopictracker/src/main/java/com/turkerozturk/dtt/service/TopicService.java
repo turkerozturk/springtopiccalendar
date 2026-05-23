@@ -24,6 +24,7 @@ package com.turkerozturk.dtt.service;
 
 import com.turkerozturk.dtt.dto.TopicDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.entity.Entry;
@@ -54,7 +55,42 @@ public class TopicService {
     private String appLocale;
 
     public List<Topic> getAllTopics() {
-        return topicRepository.findAll();
+
+
+        // Veritabanından tümünü çekiyoruz.
+        List<Topic> topics = topicRepository.findAll();
+
+        // Mevcut locale'i session'dan alıyoruz.
+        Locale currentLocale = LocaleContextHolder.getLocale();
+
+        // Locale'e uygun bir Collator örneği oluşturuyoruz.
+        Collator collator = Collator.getInstance(currentLocale);
+
+        // Category.getName() metodu ile kategori adını alarak sıralama yapıyoruz.
+        topics.sort((c1, c2) -> collator.compare(c1.getName(), c2.getName()));
+
+        return topics;
+
+    }
+
+    public List<Topic> findAllById(List<Long> topicIds) {
+
+
+        // Veritabanından tümünü çekiyoruz.
+        List<Topic> topics = topicRepository.findAllById(topicIds);
+
+        // Mevcut locale'i session'dan alıyoruz.
+        Locale currentLocale = LocaleContextHolder.getLocale();
+
+        // Locale'e uygun bir Collator örneği oluşturuyoruz.
+        Collator collator = Collator.getInstance(currentLocale);
+
+        // Category.getName() metodu ile kategori adını alarak sıralama yapıyoruz.
+        topics.sort((c1, c2) -> collator.compare(c1.getName(), c2.getName()));
+
+
+        return topics;
+
     }
 
     public List<Topic> getTopicsByCategoryId(Long categoryId) {
@@ -327,6 +363,36 @@ public class TopicService {
                         collator))
                 .map(t -> new TopicDto(t.getId(), t.getName()))
                 .toList();
+    }
+
+
+    public List<Topic> findByCategoryIdOrderByPinnedDescNameAsc(Long categoryId) {
+
+        // Veritabanından tümünü çekiyoruz.
+        List<Topic> topics = topicRepository.findByCategoryIdOrderByPinnedDescNameAsc(categoryId);
+
+        // Mevcut locale'i session'dan alıyoruz.
+        Locale currentLocale = LocaleContextHolder.getLocale();
+
+        // Locale'e uygun bir Collator örneği oluşturuyoruz.
+        Collator collator = Collator.getInstance(currentLocale);
+
+        // Category.getName() metodu ile kategori adını alarak sıralama yapıyoruz.
+        topics.sort((c1, c2) -> collator.compare(c1.getName(), c2.getName()));
+
+        return topics;
+
+    }
+
+
+    public Topic getById(Long topicId) {
+        return topicRepository.findById(topicId)
+                .orElseThrow(() -> new RuntimeException("Topic not found: " + topicId));
+    }
+
+    public Topic getByIdOrNull(Long topicId) {
+        return topicRepository.findById(topicId)
+                .orElse(null);
     }
 
 
