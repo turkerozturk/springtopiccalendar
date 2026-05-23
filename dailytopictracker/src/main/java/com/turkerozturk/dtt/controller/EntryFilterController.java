@@ -129,7 +129,7 @@ public class EntryFilterController {
             }
         } else {
 
-            List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
+            List<Category> cats = categoryService.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
 
             if (!cats.isEmpty()) {
                 categoryId = cats.get(0).getId();
@@ -828,7 +828,7 @@ public class EntryFilterController {
                                    HttpSession session,
                                    @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
-        List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
+        List<Category> cats = categoryService.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
 
         int size = cats.size();
 
@@ -863,7 +863,7 @@ public class EntryFilterController {
                                HttpSession session,
                                @RequestParam(value = "reportType", defaultValue = "pivot") String reportType) {
 
-        List<Category> cats = categoryService.findAllByArchivedIsFalseNameAsc();
+        List<Category> cats = categoryService.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
 
         int size = cats.size();
 
