@@ -135,14 +135,17 @@
         const result =
             "#food\n" +
             [
-                kcal,
-                fat,
-                carbs,
-                protein,
-                fiber,
-                sodium,
-                satFat,
-                sugar
+                "kcal " + kcal,
+                "fat " + fat,
+                "carbonhydrate " + carbs,
+                "protein " + protein,
+                "fiber " + fiber,
+                "sodium " + sodium,
+                "fat-saturated " + satFat,
+                "sugar " + sugar,
+                "default " + "0",
+                "price " + "0",
+                "price-date " + "0000-00-00",
             ].join("\n") +
             "\n\n" +
             input;

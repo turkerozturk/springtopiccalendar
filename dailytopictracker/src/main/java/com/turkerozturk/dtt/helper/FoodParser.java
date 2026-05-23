@@ -26,45 +26,50 @@ import java.util.Map;
 
 public class FoodParser {
 
+    private static final Map<String, Integer> LEGACY_INDEX_MAP = Map.of(
+            "kcal", 1,
+            "fat", 2,
+            "carbohydrate", 3,
+            "protein", 4,
+            "fiber", 5,
+            "sodium", 6,
+            "fat_saturated", 7,
+            "sugar", 8
+    );
+
     public static Double extractKcalPer100g(String description) {
-        if (description == null) return null;
-
-        String[] lines = description.split("\\R");
-
-        if (lines.length < 2) return null;
-
-        return parseFlexibleDouble(lines[1], null);
+        return extractValue(description, "kcal");
     }
 
-    // --- YENİLER ---
-
     public static Double extractFat(String description) {
-        return extractLineValue(description, 2);
+        return extractValue(description, "fat");
     }
 
     public static Double extractCarbohydrate(String description) {
-        return extractLineValue(description, 3);
+        return extractValue(description, "carbohydrate");
     }
 
     public static Double extractProtein(String description) {
-        return extractLineValue(description, 4);
+        return extractValue(description, "protein");
     }
 
     public static Double extractFiber(String description) {
-        return extractLineValue(description, 5);
+        return extractValue(description, "fiber");
     }
 
     public static Double extractSodium(String description) {
-        return extractLineValue(description, 6);
+        return extractValue(description, "sodium");
     }
 
     public static Double extractFatSaturated(String description) {
-        return extractLineValue(description, 7);
+        return extractValue(description, "fat_saturated");
     }
 
     public static Double extractSugar(String description) {
-        return extractLineValue(description, 8);
+        return extractValue(description, "sugar");
     }
+
+    // =========================================================
 
     // --- ORTAK LOGIC ---
 
@@ -168,6 +173,71 @@ public class FoodParser {
         }
 
         return result;
+    }
+
+    private static Double extractValue(String description, String key) {
+
+        if (description == null) {
+            return 0.0;
+        }
+
+        String[] lines = description.split("\\R");
+
+        // Önce yeni etiketli formatı dene
+        Map<String, String> labeledMap = extractLabeledValues(lines);
+
+        if (labeledMap.containsKey(key)) {
+            return parseFlexibleDouble(labeledMap.get(key), 0.0);
+        }
+
+        // Yoksa eski sisteme fallback
+        Integer legacyIndex = LEGACY_INDEX_MAP.get(key);
+
+        if (legacyIndex == null || lines.length <= legacyIndex) {
+            return 0.0;
+        }
+
+        return parseFlexibleDouble(lines[legacyIndex], 0.0);
+    }
+
+    private static Map<String, String> extractLabeledValues(String[] lines) {
+
+        Map<String, String> map = new HashMap<>();
+
+        // 0. satır #food
+        // İlk boş satıra kadar parse et
+
+        for (int i = 1; i < lines.length; i++) {
+
+            String line = lines[i].trim();
+
+            // boş satır -> metadata bitti
+            if (line.isBlank()) {
+                break;
+            }
+
+            // örnek:
+            // protein 15
+            // fat: 3.5
+            // sugar=20
+
+            String[] parts = line.split("[:=\\s]+", 2);
+
+            if (parts.length < 2) {
+                continue;
+            }
+
+            String key = parts[0]
+                    .trim()
+                    .toLowerCase();
+
+            String value = parts[1]
+                    .trim();
+
+            map.put(key, value);
+        }
+
+        return map;
     }
 
 }
