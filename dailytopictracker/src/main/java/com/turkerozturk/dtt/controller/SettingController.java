@@ -22,6 +22,8 @@ package com.turkerozturk.dtt.controller;
 
 
 
+import com.turkerozturk.dtt.dto.ActivityLevel;
+import com.turkerozturk.dtt.dto.Gender;
 import com.turkerozturk.dtt.entity.Setting;
 import com.turkerozturk.dtt.service.SettingService;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,51 @@ public class SettingController {
     public String page(Model model) {
 
         model.addAttribute("settings", settingService.findAll());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<br/>");
+        sb.append("Programdaki bazı değişkenler bu sayfadan ayarlanırsa, onlar için application.properties dosyası veya kodlar içine gömülmüş varsayılan değerler yerine, buradaki değerler geçerli olacaktır. Örnekler:");
+        sb.append("<br/>");
+        sb.append("");
+        sb.append("<br/>");
+        sb.append("Kalori Hesaplamasında Kullanılanlar");
+        sb.append("<dl>");
+
+        sb.append("<dt>");
+        sb.append("human.age");
+        sb.append("<dd/>");
+        sb.append("Yaş");
+
+
+        sb.append("<dt>");
+        sb.append("human.gender");
+        sb.append("<dd/>");
+        for (Gender g : Gender.values()) {
+            sb.append(g.toString());
+            sb.append("&nbsp;");
+        }
+        sb.append("<dt>");
+        sb.append("human.height");
+        sb.append("<dd/>");
+        sb.append("Boy");
+
+        sb.append("<dt>");
+        sb.append("human.ActivityLevel");
+        sb.append("<dd>");
+
+        for (ActivityLevel a :ActivityLevel.values()) {
+            sb.append(a.toString());
+            sb.append("&nbsp;");
+        }
+        sb.append("");
+        sb.append("<br/>");
+        sb.append("");
+        sb.append("<br/>");
+        sb.append("");
+
+        String helpText = sb.toString();
+
+        model.addAttribute("helpText", helpText);
 
         return "settings/index";
     }
