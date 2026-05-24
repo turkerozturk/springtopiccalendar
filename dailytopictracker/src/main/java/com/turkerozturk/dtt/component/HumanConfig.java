@@ -20,30 +20,58 @@
  */
 package com.turkerozturk.dtt.component;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.turkerozturk.dtt.dto.ActivityLevel;
+import com.turkerozturk.dtt.dto.Gender;
+import com.turkerozturk.dtt.helper.SettingHelper;
 import org.springframework.stereotype.Component;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class HumanConfig {
 
-    @Value("${human.weight:80}")
-    private double weight;
+    private final SettingHelper settingHelper;
 
-    @Value("${human.height:170}")
-    private double height;
+    public double getWeight() {
 
-    @Value("${human.age:30}")
-    private int age;
+        return settingHelper.getDouble(
+                "human.weight",
+                80.0
+        );
+    }
 
-    @Value("${human.gender:MALE}")
-    private String gender;
+    public double getHeight() {
 
-    @Value("${human.activityLevel:LIGHT}")
-    private String activityLevel;
+        return settingHelper.getDouble(
+                "human.height",
+                170.0
+        );
+    }
 
-    public double getWeight() { return weight; }
-    public double getHeight() { return height; }
-    public int getAge() { return age; }
-    public String getGender() { return gender; }
-    public String getActivityLevel() { return activityLevel; }
+    public int getAge() {
+
+        return settingHelper.getInt(
+                "human.age",
+                30
+        );
+    }
+
+    public Gender getGender() {
+
+        return settingHelper.getEnum(
+                "human.gender",
+                Gender.class,
+                Gender.MALE
+        );
+    }
+
+    public ActivityLevel getActivityLevel() {
+
+        return settingHelper.getEnum(
+                "human.activityLevel",
+                ActivityLevel.class,
+                ActivityLevel.LIGHT
+        );
+    }
 }

@@ -25,6 +25,7 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.FoodParser;
+import com.turkerozturk.dtt.helper.SettingHelper;
 import com.turkerozturk.dtt.helper.usda.NutrientLimit;
 import com.turkerozturk.dtt.helper.usda.NutrientRequirementService;
 import com.turkerozturk.dtt.repository.EntryRepository;
@@ -42,6 +43,7 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 @RequiredArgsConstructor
 public class FoodService {
 
+    private final SettingHelper settingHelper;
     private final NutrientRequirementService nutrientRequirementService;
     private final SleepService sleepService;
     private final NutritionService nutritionService;
@@ -62,10 +64,11 @@ public class FoodService {
     private String appLocale;
 
     @Value("${human.gender}")
-    private Gender gender;
+    private String genderProp;
+    //private Gender genderProp;
 
     @Value("${human.age}")
-    private int age;;
+    private int ageProp;;
 
     public FoodSummaryDto getDailyFoodSummary(Long dateMillis) {
         Locale locale = Locale.forLanguageTag(appLocale);
@@ -388,6 +391,14 @@ public class FoodService {
         double usdaCarbonhydrateRequirementMaxPercent = 0.0;
         double usdaProteinRequirementMinPercent = 0.0;
         double usdaProteinRequirementMaxPercent = 0.0;
+
+
+        Integer age = settingHelper.getInt("human.age", ageProp);
+        Gender gender = settingHelper.getEnum("human.gender", Gender.class, Gender.MALE);
+        //String genderAsString = settingHelper.get("human.gender", genderProp);
+        //Gender gender = Gender.valueOf(genderAsString);
+        //System.out.println("**** age: " + age + ", gender: " + gender);
+
         List<NutrientLimit> nutrientLimits = nutrientRequirementService.getLimits(age, gender);
 
         for(NutrientLimit n : nutrientLimits) {

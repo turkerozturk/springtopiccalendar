@@ -85,8 +85,8 @@ public class NutritionService {
                 weightUpdated,
                 humanConfig.getHeight(),
                 humanConfig.getAge(),
-                Gender.valueOf(humanConfig.getGender()),
-                ActivityLevel.valueOf(humanConfig.getActivityLevel()),
+                humanConfig.getGender(),
+                humanConfig.getActivityLevel(),
                 topicId,
                 categoryId
         );
