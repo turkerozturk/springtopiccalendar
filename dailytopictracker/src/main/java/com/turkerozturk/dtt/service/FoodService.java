@@ -637,6 +637,22 @@ public class FoodService {
 
             dto.setSleepDurationDto(daily.getFsd().getSleepDurationDto());
 
+            dto.setFatRequirementMaxPercent(daily.getFsd().getFatRequirementMaxPercent());
+            dto.setFatRequirementMinPercent(daily.getFsd().getFatRequirementMinPercent());
+            dto.setFatRequirementGram(daily.getFsd().getFatRequirementGram());
+
+            dto.setCarbohydrateRequirementMaxPercent(daily.getFsd().getCarbohydrateRequirementMaxPercent());
+            dto.setCarbohydrateRequirementMinPercent(daily.getFsd().getCarbohydrateRequirementMinPercent());
+            dto.setCarbonhydrateRequirementGram(daily.getFsd().getCarbonhydrateRequirementGram());
+
+
+            dto.setProteinRequirementMaxPercent(daily.getFsd().getProteinRequirementMaxPercent());
+            dto.setProteinRequirementMinPercent(daily.getFsd().getProteinRequirementMinPercent());
+            dto.setProteinRequirementGram(daily.getFsd().getProteinRequirementGram());
+
+            dto.setFiberRequirementGram(daily.getFsd().getFiberRequirementGram());
+            dto.setSodiumRequirementGram(daily.getFsd().getSodiumRequirementGram());
+
             // listeye ekle
             dailyList.add(dto);
 

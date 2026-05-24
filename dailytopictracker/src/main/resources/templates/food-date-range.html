@@ -233,7 +233,7 @@
 
         <!--/* alt ve ust limit degerlerini yapay zeka soyledi. Simdilik daha iyisini bulana kadar boyle biraktim. */-->
         <td class="az-vurgula"
-            th:classappend="${day.totalPercentFat > 35} ? 'high-value' : (${day.totalPercentFat < 20} ? 'low-value' : '')"
+            th:classappend="${day.totalPercentFat > day.fatRequirementMaxPercent} ? 'high-value' : (${day.totalPercentFat < day.fatRequirementMinPercent} ? 'low-value' : '')"
         >
             <span  th:text="${#numbers.formatDecimal(day.totalGramFat,1,2)} + ' gr'"></span>
 
@@ -241,16 +241,16 @@
 
         <td class="az-vurgula"
             th:classappend="
-        ${day.totalPercentCarbohydrate > 65} ? 'high-value' :
-        (${day.totalPercentCarbohydrate < 45} ? 'low-value' : '')
+        ${day.totalPercentCarbohydrate > day.carbohydrateRequirementMaxPercent} ? 'high-value' :
+        (${day.totalPercentCarbohydrate < day.carbohydrateRequirementMinPercent} ? 'low-value' : '')
         ">
             <span th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,2)} + ' gr'"></span>
         </td>
 
         <td class="az-vurgula"
             th:classappend="
-        ${day.totalPercentProtein > 35} ? 'high-value' :
-        (${day.totalPercentProtein < 10} ? 'low-value' : '')
+        ${day.totalPercentProtein > day.ProteinRequirementMaxPercent} ? 'high-value' :
+        (${day.totalPercentProtein < day.ProteinRequirementMinPercent} ? 'low-value' : '')
         ">
             <span th:text="${#numbers.formatDecimal(day.totalGramProtein,1,2)} + ' gr'"></span>
         </td>
@@ -258,16 +258,16 @@
 
         <td class="az-vurgula"
             th:classappend="
-        ${day.totalGramFiber > 38} ? 'high-value' :
-        (${day.totalGramFiber < 25} ? 'low-value' : '')
+        ${day.totalGramFiber > day.fiberRequirementGram + 11} ? 'high-value' :
+        (${day.totalGramFiber < day.fiberRequirementGram - 11} ? 'low-value' : '')
         ">
             <span th:text="${#numbers.formatDecimal(day.totalGramFiber,1,2)} + ' gr'"></span>
         </td>
 
         <td class="az-vurgula"
             th:classappend="
-        ${day.totalGramSodium > 2.3} ? 'high-value' :
-        (${day.totalGramSodium < 1.5} ? 'low-value' : '')
+        ${day.totalGramSodium > day.sodiumRequirementGram} ? 'high-value' :
+        (${day.totalGramSodium < day.sodiumRequirementGram - 0.8} ? 'low-value' : '')
         ">
             <span th:text="${#numbers.formatDecimal(day.totalGramSodium,1,2)} + ' gr'"></span>
         </td>
