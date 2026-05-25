@@ -78,6 +78,8 @@ public class SettingController {
         for (ActivityLevel a :ActivityLevel.values()) {
             sb.append(a.toString());
             sb.append("&nbsp;");
+            sb.append(a.getMultiplier());
+            sb.append("<br/>");
         }
         sb.append("");
         sb.append("<br/>");

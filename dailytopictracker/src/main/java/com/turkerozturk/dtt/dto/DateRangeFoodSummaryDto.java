@@ -67,7 +67,7 @@ public class DateRangeFoodSummaryDto {
     private Double averageGramDiffWithActivity;
 
     private Double averageGramFatKcal;
-    private Double averageGramCarbonhydrateKcal;
+    private Double averageGramCarbohydrateKcal;
     private Double averageGramProteinKcal;
     private Double averageGramKcalFatCarbProtein;
     private Double averagePercentFat;
@@ -75,6 +75,29 @@ public class DateRangeFoodSummaryDto {
     private Double averagePercentProtein;
 
     private Double realWeightDifference;
+
+    private Double fiberRequirementGram;
+    private Double sodiumRequirementGram;
+
+
+    private Double fatRequirementGram;
+    private Double fatRequirementMinPercent;
+    private Double fatRequirementMaxPercent;
+
+    private Double carbohydrateRequirementGram;
+    private Double carbohydrateRequirementMinPercent;
+    private Double carbohydrateRequirementMaxPercent;
+
+    private Double proteinRequirementGram;
+    private Double proteinRequirementMinPercent;
+    private Double proteinRequirementMaxPercent;
+
+    private Double fatSaturatedRequirementGram;
+    private Double fatSaturatedRequirementMinPercent;
+    private Double fatSaturatedRequirementMaxPercent;
+
+    private SleepDurationDto totalSleepDurationDto;
+    private SleepDurationDto averageSleepDurationDto;
 
 
 }

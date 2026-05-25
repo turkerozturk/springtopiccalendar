@@ -401,8 +401,8 @@
         ">
             <span th:text="${#numbers.formatDecimal(summary.fsd.totalGramCarbohydrate,1,2)} + ' gr'"></span>
             <br/>
-            USDA: <span  th:text="${#numbers.formatDecimal(summary.fsd.carbonhydrateRequirementGram,1,2)}"
-            th:classappend="${summary.fsd.totalPercentCarbohydrate > summary.fsd.carbohydrateRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalGramCarbohydrate < summary.fsd.carbonhydrateRequirementGram} ? 'low-value-2' : '')"
+            USDA: <span  th:text="${#numbers.formatDecimal(summary.fsd.carbohydrateRequirementGram,1,2)}"
+            th:classappend="${summary.fsd.totalPercentCarbohydrate > summary.fsd.carbohydrateRequirementMaxPercent} ? 'high-value-2' : (${summary.fsd.totalGramCarbohydrate < summary.fsd.carbohydrateRequirementGram} ? 'low-value-2' : '')"
             ></span> gr
         </td>
 

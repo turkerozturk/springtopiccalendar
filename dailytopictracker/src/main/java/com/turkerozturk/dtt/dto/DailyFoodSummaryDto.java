@@ -107,7 +107,7 @@ public class DailyFoodSummaryDto {
     private Double fatRequirementMinPercent;
     private Double fatRequirementMaxPercent;
 
-    private Double carbonhydrateRequirementGram;
+    private Double carbohydrateRequirementGram;
     private Double carbohydrateRequirementMinPercent;
     private Double carbohydrateRequirementMaxPercent;
 

@@ -12,12 +12,26 @@ public class SleepDurationDto {
     private String sleepDurationAsString;
 
 
+
     public SleepDurationDto(Double sleepDurationSeconds, boolean sleepDurationUpdated, Long sleepDurationTopicId, Long sleepDurationCategoryId) {
         this.sleepDurationSeconds = sleepDurationSeconds;
         this.sleepDurationUpdated = sleepDurationUpdated;
         this.sleepDurationTopicId = sleepDurationTopicId;
         this.sleepDurationCategoryId = sleepDurationCategoryId;
 
+        this.sleepDurationAsString = convertSecondsToHHMMSS(sleepDurationSeconds);
+
+    }
+
+    public SleepDurationDto() {
+        // bos constructor da kullaniyorum.
+    }
+    public void setSleepDurationSeconds(Double sleepDurationSeconds) {
+        this.sleepDurationSeconds = sleepDurationSeconds;
+        this.sleepDurationAsString = convertSecondsToHHMMSS(sleepDurationSeconds);
+    }
+
+    public String convertSecondsToHHMMSS(Double sleepDurationSeconds) {
         if (sleepDurationSeconds != null) {
 
             long totalSeconds = sleepDurationSeconds.longValue();
@@ -26,12 +40,11 @@ public class SleepDurationDto {
             long minutes = (totalSeconds % 3600) / 60;
             long seconds = totalSeconds % 60;
 
-            this.sleepDurationAsString =
-                    String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
 
         } else {
-            this.sleepDurationAsString = "00:00:00";
+            return "00:00:00";
         }
-
     }
+
 }

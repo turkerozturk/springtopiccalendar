@@ -286,9 +286,9 @@
         ${day.sleepDurationDto.sleepDurationSeconds > 8 * 60 * 60} ? 'high-value' :
         (${day.sleepDurationDto.sleepDurationSeconds < 6 * 60 * 60} ? 'low-value' : '')
         ">
-            <span th:text="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,0)}"></span>
+            <span th:title="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,0)}"
+                  th:text="${day.sleepDurationDto.sleepDurationAsString}"></span>
         </td>
-
 
     </tr>
     </tbody>
@@ -333,7 +333,11 @@
         <th th:text="${#numbers.formatDecimal(summary.totalGramFatSaturated,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.totalGramSugar,1,1)}"></th>
 
-        <th>&nbsp;-&nbsp;</th>
+        <th th:text="${summary.totalSleepDurationDto.sleepDurationAsString}"
+            th:title="${#numbers.formatDecimal(summary.totalSleepDurationDto.sleepDurationSeconds,1,0)}"></th>
+
+
+
 
 
     </tr>
@@ -361,12 +365,38 @@
         <th th:text="${#numbers.formatDecimal(summary.averageGramCarbohydrate,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramProtein,1,1)}"></th>
 
-        <th th:text="${#numbers.formatDecimal(summary.averageGramFiber,1,1)}"></th>
-        <th th:text="${#numbers.formatDecimal(summary.averageGramSodium,1,1)}"></th>
+
+        <th class="az-vurgula"
+            th:classappend="
+        ${summary.averageGramFiber > summary.fiberRequirementGram + 11} ? 'high-value' :
+        (${summary.averageGramFiber < summary.fiberRequirementGram - 11} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(summary.averageGramFiber,1,2)} + ' gr'"></span>
+        </th>
+
+
+        <th class="az-vurgula"
+            th:classappend="
+        ${summary.averageGramSodium > summary.sodiumRequirementGram - 0.8} ? 'high-value' :
+        (${summary.averageGramSodium < summary.sodiumRequirementGram} ? 'low-value' : '')
+        ">
+            <span th:text="${#numbers.formatDecimal(summary.averageGramSodium,1,2)} + ' gr'"></span>
+        </th>
+
+
 
         <th th:text="${#numbers.formatDecimal(summary.averageGramFatSaturated,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramSugar,1,1)}"></th>
-        <th>&nbsp;-&nbsp;</th>
+
+
+        <th class="az-vurgula"
+            th:classappend="
+        ${summary.averageSleepDurationDto.sleepDurationSeconds > 8 * 60 * 60} ? 'high-value' :
+        (${summary.averageSleepDurationDto.sleepDurationSeconds < 6 * 60 * 60} ? 'low-value' : '')
+        ">
+            <span th:title="${#numbers.formatDecimal(summary.averageSleepDurationDto.sleepDurationSeconds,1,0)}"
+                  th:text="${summary.averageSleepDurationDto.sleepDurationAsString}"></span>
+        </th>
 
     </tr>
 
@@ -382,7 +412,7 @@
         <th>&nbsp;-&nbsp;</th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramKcalFatCarbProtein,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramFatKcal,1,1)}"></th>
-        <th th:text="${#numbers.formatDecimal(summary.averageGramCarbonhydrateKcal,1,1)}"></th>
+        <th th:text="${#numbers.formatDecimal(summary.averageGramCarbohydrateKcal,1,1)}"></th>
         <th th:text="${#numbers.formatDecimal(summary.averageGramProteinKcal,1,1)}"></th>
         <th>&nbsp;-&nbsp;</th>
         <th>&nbsp;-&nbsp;</th>
@@ -405,21 +435,21 @@
 
 
         <td class="az-vurgula"
-            th:classappend="${summary.averagePercentFat > 35} ? 'high-value' : (${summary.averagePercentFat < 20} ? 'low-value' : '')"
+            th:classappend="${summary.averagePercentFat > summary.fatRequirementMaxPercent} ? 'high-value' : (${summary.averagePercentFat < summary.fatRequirementMinPercent} ? 'low-value' : '')"
         >
             <span  th:text="${#numbers.formatDecimal(summary.averagePercentFat,1,2)} + ' %'"></span>
 
         </td>
 
         <td class="az-vurgula"
-            th:classappend="${summary.averagePercentCarbohydrate > 65} ? 'high-value' : (${summary.averagePercentCarbohydrate < 45} ? 'low-value' : '')"
+            th:classappend="${summary.averagePercentCarbohydrate > summary.carbohydrateRequirementMaxPercent} ? 'high-value' : (${summary.averagePercentCarbohydrate < summary.carbohydrateRequirementMinPercent} ? 'low-value' : '')"
         >
             <span  th:text="${#numbers.formatDecimal(summary.averagePercentCarbohydrate,1,2)} + ' %'"></span>
 
         </td>
 
         <td class="az-vurgula"
-            th:classappend="${summary.averagePercentProtein > 35} ? 'high-value' : (${summary.averagePercentProtein < 10} ? 'low-value' : '')"
+            th:classappend="${summary.averagePercentProtein > summary.proteinRequirementMaxPercent} ? 'high-value' : (${summary.averagePercentProtein < summary.proteinRequirementMinPercent} ? 'low-value' : '')"
         >
             <span  th:text="${#numbers.formatDecimal(summary.averagePercentProtein,1,2)} + ' %'"></span>
 

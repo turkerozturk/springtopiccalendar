@@ -93,7 +93,7 @@ public class FoodService {
         double totalKcal = 0.0;
         double totalGram = 0.0;
         double totalGramFat = 0.0;
-        double totalGramCarbonhydrate = 0.0;
+        double totalGramCarbohydrate = 0.0;
         double totalGramProtein = 0.0;
         double totalGramFiber = 0.0;
         double totalGramSodium = 0.0;
@@ -101,7 +101,7 @@ public class FoodService {
         double totalGramSugar = 0.0;
 
         double totalGramFatKcal = 0.0;
-        double totalGramCarbonhydrateKcal = 0.0;
+        double totalGramCarbohydrateKcal = 0.0;
         double totalGramProteinKcal = 0.0;
         double totalGramKcalFatCarbProtein = 0.0;
 
@@ -209,7 +209,7 @@ public class FoodService {
                 // kalori ekle (oransal!)
                 Double kcal = FoodParser.calculateKcal(gramValue, kcalPer100g);
                 Double gramFat = FoodParser.calculateKcal(gramValue, FoodParser.extractFat(topicDescription));
-                Double gramCarbonhydrate = FoodParser.calculateKcal(gramValue, FoodParser.extractCarbohydrate(topicDescription));
+                Double gramCarbohydrate = FoodParser.calculateKcal(gramValue, FoodParser.extractCarbohydrate(topicDescription));
                 Double gramProtein = FoodParser.calculateKcal(gramValue, FoodParser.extractProtein(topicDescription));
                 Double gramFiber = FoodParser.calculateKcal(gramValue, FoodParser.extractFiber(topicDescription));
                 Double gramSodium = FoodParser.calculateKcal(gramValue, FoodParser.extractSodium(topicDescription));
@@ -219,7 +219,7 @@ public class FoodService {
 
                 mealGroup.setTotalCalories(mealGroup.getTotalCalories() + kcal);
                 mealGroup.setTotalGramFat(mealGroup.getTotalGramFat() + gramFat);
-                mealGroup.setTotalGramCarbohydrate(mealGroup.getTotalGramCarbohydrate() + gramCarbonhydrate);
+                mealGroup.setTotalGramCarbohydrate(mealGroup.getTotalGramCarbohydrate() + gramCarbohydrate);
                 mealGroup.setTotalGramProtein(mealGroup.getTotalGramProtein() + gramProtein);
                 mealGroup.setTotalGramFiber(mealGroup.getTotalGramFiber() + gramFiber);
                 mealGroup.setTotalGramSodium(mealGroup.getTotalGramSodium() + gramSodium);
@@ -236,7 +236,7 @@ public class FoodService {
             // #food
             Double kcal = FoodParser.calculateKcal(gram, kcalPer100g);
             Double gramFat = FoodParser.calculateKcal(gram, FoodParser.extractFat(topicDescription));
-            Double gramCarbonhydrate = FoodParser.calculateKcal(gram, FoodParser.extractCarbohydrate(topicDescription));
+            Double gramCarbohydrate = FoodParser.calculateKcal(gram, FoodParser.extractCarbohydrate(topicDescription));
             Double gramProtein = FoodParser.calculateKcal(gram, FoodParser.extractProtein(topicDescription));
             Double gramFiber = FoodParser.calculateKcal(gram, FoodParser.extractFiber(topicDescription));
             Double gramSodium = FoodParser.calculateKcal(gram, FoodParser.extractSodium(topicDescription));
@@ -257,7 +257,7 @@ public class FoodService {
             dto.setCategoryId(category.getId());
             dto.setCategoryName(category.getName());
             dto.setFat(gramFat);
-            dto.setCarbohydrate(gramCarbonhydrate);
+            dto.setCarbohydrate(gramCarbohydrate);
             dto.setProtein(gramProtein);
             dto.setFiber(gramFiber);
             dto.setSodium(gramSodium);
@@ -290,7 +290,7 @@ public class FoodService {
             totalGram += gram;
 
             totalGramFat += dto.getFat();
-            totalGramCarbonhydrate += dto.getCarbohydrate();
+            totalGramCarbohydrate += dto.getCarbohydrate();
             totalGramProtein += dto.getProtein();
             totalGramFiber += dto.getFiber();
             totalGramSodium += dto.getSodium();
@@ -338,12 +338,12 @@ public class FoodService {
 
 
             totalGramFatKcal += dto.getFat() * 9;
-            totalGramCarbonhydrateKcal += dto.getCarbohydrate() * 4;
+            totalGramCarbohydrateKcal += dto.getCarbohydrate() * 4;
             totalGramProteinKcal += dto.getProtein() * 4;
-            totalGramKcalFatCarbProtein = totalGramFatKcal + totalGramCarbonhydrateKcal + totalGramProteinKcal;
+            totalGramKcalFatCarbProtein = totalGramFatKcal + totalGramCarbohydrateKcal + totalGramProteinKcal;
 
             totalPercentFat = (totalGramFatKcal / totalGramKcalFatCarbProtein) * 100;
-            totalPercentCarbohydrate = (totalGramCarbonhydrateKcal / totalGramKcalFatCarbProtein) * 100;
+            totalPercentCarbohydrate = (totalGramCarbohydrateKcal / totalGramKcalFatCarbProtein) * 100;
             totalPercentProtein = (totalGramProteinKcal / totalGramKcalFatCarbProtein) * 100;
             totalKcalDiff = totalKcal - humanBody.getTdee();
             totalGramDiff = totalKcalDiff / 7700;
@@ -384,11 +384,11 @@ public class FoodService {
 
         double usdaSodium = 0.0;
         double usdaProteinGram = 0.0;
-        double usdaCarbonhydrateGram = 0.0;
+        double usdaCarbohydrateGram = 0.0;
         double usdaFatRequirementMinPercent = 0.0;
         double usdaFatRequirementMaxPercent = 0.0;
-        double usdaCarbonhydrateRequirementMinPercent = 0.0;
-        double usdaCarbonhydrateRequirementMaxPercent = 0.0;
+        double usdaCarbohydrateRequirementMinPercent = 0.0;
+        double usdaCarbohydrateRequirementMaxPercent = 0.0;
         double usdaProteinRequirementMinPercent = 0.0;
         double usdaProteinRequirementMaxPercent = 0.0;
 
@@ -400,7 +400,6 @@ public class FoodService {
         //System.out.println("**** age: " + age + ", gender: " + gender);
 
         List<NutrientLimit> nutrientLimits = nutrientRequirementService.getLimits(age, gender);
-
         for(NutrientLimit n : nutrientLimits) {
             switch (n.nutrientType()) {
                 case SODIUM_MG -> usdaSodium = n.maxValue() / THOUSAND;
@@ -408,20 +407,17 @@ public class FoodService {
                     usdaFatRequirementMinPercent = n.minValue();
                     usdaFatRequirementMaxPercent = n.maxValue();
                 }
-                case CARBOHYDRATE_GRAM -> usdaCarbonhydrateGram = n.maxValue();
+                case CARBOHYDRATE_GRAM -> usdaCarbohydrateGram = n.maxValue();
                 case CARBOHYDRATE_PERCENT -> {
-                    usdaCarbonhydrateRequirementMinPercent = n.minValue();
-                    usdaCarbonhydrateRequirementMaxPercent = n.maxValue();
+                    usdaCarbohydrateRequirementMinPercent = n.minValue();
+                    usdaCarbohydrateRequirementMaxPercent = n.maxValue();
                 }
                 case PROTEIN_GRAM -> usdaProteinGram = n.maxValue();
                 case PROTEIN_PERCENT -> {
                     usdaProteinRequirementMinPercent = n.minValue();
                     usdaProteinRequirementMaxPercent = n.maxValue();
                 }
-
             }
-
-
         }
 
         dailyFoodSummaryDto.setSodiumRequirementGram(usdaSodium);
@@ -429,9 +425,9 @@ public class FoodService {
         dailyFoodSummaryDto.setFatRequirementMinPercent(usdaFatRequirementMinPercent);
         dailyFoodSummaryDto.setFatRequirementMaxPercent(usdaFatRequirementMaxPercent);
 
-        dailyFoodSummaryDto.setCarbonhydrateRequirementGram(usdaCarbonhydrateGram);
-        dailyFoodSummaryDto.setCarbohydrateRequirementMinPercent(usdaCarbonhydrateRequirementMinPercent);
-        dailyFoodSummaryDto.setCarbohydrateRequirementMaxPercent(usdaCarbonhydrateRequirementMaxPercent);
+        dailyFoodSummaryDto.setCarbohydrateRequirementGram(usdaCarbohydrateGram);
+        dailyFoodSummaryDto.setCarbohydrateRequirementMinPercent(usdaCarbohydrateRequirementMinPercent);
+        dailyFoodSummaryDto.setCarbohydrateRequirementMaxPercent(usdaCarbohydrateRequirementMaxPercent);
 
         dailyFoodSummaryDto.setProteinRequirementGram(usdaProteinGram);
         dailyFoodSummaryDto.setProteinRequirementMinPercent(usdaProteinRequirementMinPercent);
@@ -453,7 +449,7 @@ public class FoodService {
         dailyFoodSummaryDto.setTotalGram(totalGram);
 
         dailyFoodSummaryDto.setTotalGramFat(totalGramFat);
-        dailyFoodSummaryDto.setTotalGramCarbohydrate(totalGramCarbonhydrate);
+        dailyFoodSummaryDto.setTotalGramCarbohydrate(totalGramCarbohydrate);
         dailyFoodSummaryDto.setTotalGramProtein(totalGramProtein);
         dailyFoodSummaryDto.setTotalGramFiber(totalGramFiber);
         dailyFoodSummaryDto.setTotalGramSodium(totalGramSodium);
@@ -462,7 +458,7 @@ public class FoodService {
 
 
         dailyFoodSummaryDto.setTotalGramFatKcal(totalGramFatKcal);
-        dailyFoodSummaryDto.setTotalGramCarbohydrateKcal(totalGramCarbonhydrateKcal);
+        dailyFoodSummaryDto.setTotalGramCarbohydrateKcal(totalGramCarbohydrateKcal);
         dailyFoodSummaryDto.setTotalGramProteinKcal(totalGramProteinKcal);
         dailyFoodSummaryDto.setTotalGramKcalFatCarbProtein(totalGramKcalFatCarbProtein);
 
@@ -578,7 +574,7 @@ public class FoodService {
         double totalGramDiffWithActivityAndFactor = 0.0;
 
         double totalGramFatKcal = 0.0;
-        double totalGramCarbonhydrateKcal = 0.0;
+        double totalGramCarbohydrateKcal = 0.0;
         double totalGramProteinKcal = 0.0;
         double totalGramKcalFatCarbProtein = 0.0;
         double totalPercentFat = 0.0;
@@ -586,6 +582,13 @@ public class FoodService {
         double totalPercentProtein = 0.0;
         double totalPercentFatSaturatedUpperLimit = 0.0;
         double totalPercentSugarUpperLimit = 0.0;
+
+        double totalSleepDuration = 0.0;
+        SleepDurationDto totalSleepDurationDto = new SleepDurationDto();
+        double averageSleepDurationSeconds = 0.0;
+        SleepDurationDto averageSleepDurationDto = new SleepDurationDto();
+
+
 
         // tarih araligindaki tartim sonuclarinin ilk ve sonuncusu arasindaki "realWeightDifference" degerini hesaplamak icin.
         double rangeStartDayWeight = 0.0;
@@ -654,7 +657,7 @@ public class FoodService {
 
             dto.setCarbohydrateRequirementMaxPercent(daily.getFsd().getCarbohydrateRequirementMaxPercent());
             dto.setCarbohydrateRequirementMinPercent(daily.getFsd().getCarbohydrateRequirementMinPercent());
-            dto.setCarbonhydrateRequirementGram(daily.getFsd().getCarbonhydrateRequirementGram());
+            dto.setCarbohydrateRequirementGram(daily.getFsd().getCarbohydrateRequirementGram());
 
 
             dto.setProteinRequirementMaxPercent(daily.getFsd().getProteinRequirementMaxPercent());
@@ -687,18 +690,21 @@ public class FoodService {
             totalGramDiffWithActivity += dto.getTotalGramDiffWithActivity();
 
             totalGramFatKcal += dto.getTotalGramFatKcal();
-            totalGramCarbonhydrateKcal += dto.getTotalGramCarbohydrateKcal();
+            totalGramCarbohydrateKcal += dto.getTotalGramCarbohydrateKcal();
             totalGramProteinKcal += dto.getTotalGramProteinKcal();
             totalGramKcalFatCarbProtein += dto.getTotalGramKcalFatCarbProtein();
             totalPercentFat += dto.getTotalPercentFat();
             totalPercentCarbohydrate += dto.getTotalPercentCarbohydrate();
             totalPercentProtein += dto.getTotalPercentProtein();
+
+            totalSleepDuration += dto.getSleepDurationDto().getSleepDurationSeconds();
         }
 
         FoodSummaryDto beginDay = getDailyFoodSummary(startDateMillis);
         FoodSummaryDto endDay = getDailyFoodSummary(startDateMillis);
 
-        double activityCorrectionFactor = 1.4;
+        double activityCorrectionFactor = settingHelper.getDouble("human.activityCorrectionFactor", 1.0);
+
         totalGramDiffWithActivityAndFactor = totalGramDiffWithActivity - endDay.getFsd().getTotalGramDiffWithActivity();
         totalGramDiffWithActivityAndFactor = totalGramDiffWithActivityAndFactor * activityCorrectionFactor;
         rangeDto.setDays(dailyList);
@@ -743,7 +749,7 @@ public class FoodService {
         rangeDto.setAverageGramDiffWithActivity(totalGramDiffWithActivity / totalDays);
 
         rangeDto.setAverageGramFatKcal(totalGramFatKcal / totalDays);
-        rangeDto.setAverageGramCarbonhydrateKcal(totalGramCarbonhydrateKcal / totalDays);
+        rangeDto.setAverageGramCarbohydrateKcal(totalGramCarbohydrateKcal / totalDays);
         rangeDto.setAverageGramProteinKcal(totalGramProteinKcal / totalDays);
         rangeDto.setAverageGramKcalFatCarbProtein(totalGramKcalFatCarbProtein / totalDays);
         rangeDto.setAveragePercentFat(totalPercentFat / totalDays);
@@ -753,7 +759,60 @@ public class FoodService {
         // gercekte ilk ve son tarih arasinda kac kilo alinip verildigini gosterir.
         rangeDto.setRealWeightDifference(rangeEndDayWeight - rangeStartDayWeight);
 
+        double usdaSodium = 0.0;
+        double usdaProteinGram = 0.0;
+        double usdaCarbohydrateGram = 0.0;
+        double usdaFatRequirementMinPercent = 0.0;
+        double usdaFatRequirementMaxPercent = 0.0;
+        double usdaCarbohydrateRequirementMinPercent = 0.0;
+        double usdaCarbohydrateRequirementMaxPercent = 0.0;
+        double usdaProteinRequirementMinPercent = 0.0;
+        double usdaProteinRequirementMaxPercent = 0.0;
+        Integer age = settingHelper.getInt("human.age", ageProp);
+        Gender gender = settingHelper.getEnum("human.gender", Gender.class, Gender.MALE);
+        List<NutrientLimit> nutrientLimits = nutrientRequirementService.getLimits(age, gender);
+        for(NutrientLimit n : nutrientLimits) {
+            switch (n.nutrientType()) {
+                case SODIUM_MG -> usdaSodium = n.maxValue() / THOUSAND;
+                case FAT_PERCENT -> {
+                    usdaFatRequirementMinPercent = n.minValue();
+                    usdaFatRequirementMaxPercent = n.maxValue();
+                }
+                case CARBOHYDRATE_GRAM -> usdaCarbohydrateGram = n.maxValue();
+                case CARBOHYDRATE_PERCENT -> {
+                    usdaCarbohydrateRequirementMinPercent = n.minValue();
+                    usdaCarbohydrateRequirementMaxPercent = n.maxValue();
+                }
+                case PROTEIN_GRAM -> usdaProteinGram = n.maxValue();
+                case PROTEIN_PERCENT -> {
+                    usdaProteinRequirementMinPercent = n.minValue();
+                    usdaProteinRequirementMaxPercent = n.maxValue();
+                }
+            }
+        }
 
+        rangeDto.setFatRequirementMaxPercent(usdaFatRequirementMaxPercent);
+        rangeDto.setFatRequirementMinPercent(usdaFatRequirementMinPercent);
+        //rangeDto.setFatRequirementGram(uf);
+
+        rangeDto.setCarbohydrateRequirementMaxPercent(usdaCarbohydrateRequirementMaxPercent);
+        rangeDto.setCarbohydrateRequirementMinPercent(usdaCarbohydrateRequirementMinPercent);
+        rangeDto.setCarbohydrateRequirementGram(usdaCarbohydrateGram);
+
+
+        rangeDto.setProteinRequirementMaxPercent(usdaProteinRequirementMaxPercent);
+        rangeDto.setProteinRequirementMinPercent(usdaProteinRequirementMinPercent);
+        rangeDto.setProteinRequirementGram(usdaProteinGram);
+
+        rangeDto.setFiberRequirementGram( FIBER_REQ_PER_KCAL * rangeDto.getAverageKcal());
+
+        rangeDto.setSodiumRequirementGram(usdaSodium);
+
+        totalSleepDurationDto.setSleepDurationSeconds(totalSleepDuration);
+        rangeDto.setTotalSleepDurationDto(totalSleepDurationDto);
+        averageSleepDurationSeconds = totalSleepDuration / totalDays;
+        averageSleepDurationDto.setSleepDurationSeconds(averageSleepDurationSeconds);
+        rangeDto.setAverageSleepDurationDto(averageSleepDurationDto);
 
 
         return rangeDto;

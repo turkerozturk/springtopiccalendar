@@ -88,7 +88,6 @@ public class FoodController {
         model.addAttribute("sleepDurationDto", sleepDurationDto);
 
 
-
         return "food";
     }
 
