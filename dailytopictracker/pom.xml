@@ -283,6 +283,25 @@
             <version>4.5.0</version>
         </dependency>
 
+        <!-- css column ozelligi ile pinterest gibi sutunlu gorunum oluyor ama siralama dikey oluyor.
+             css grid ozelligi ile yatay sirada oluyordu ama pinterest gibi farkli yuksekliklerde olmuyorlardi.
+             Masonry js kutuphanesi sayesinde pinterest gibi sutunlu, yatay sirali ve farkli yuksekliklerde
+             bitisik olabiliyorlar. -->
+        <!-- https://mvnrepository.com/artifact/org.webjars/masonry -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>masonry-layout</artifactId>
+            <version>4.2.2</version>
+        </dependency>
+
+        <!--
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>imagesloaded</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        -->
+
         <!-- chartjs'de ortalama cizgisi gibi annotationlar gostermek icin gerekli -->
         <!-- https://mvnrepository.com/artifact/org.webjars.npm/github-com-chartjs-chartjs-plugin-annotation -->
         <!-- https://mvnrepository.com/artifact/org.webjars.bowergithub.chartjs/chartjs-plugin-annotation -->
