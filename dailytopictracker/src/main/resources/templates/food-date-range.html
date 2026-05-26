@@ -103,6 +103,14 @@
         }
         .low-value { background-color: #2196f3; color: #fff; }
     </style>
+
+    <style>
+        .high-avg {
+            background-color: cyan;
+            color: white;
+        }
+        .low-avg { background-color: orange; color: #fff; }
+    </style>
 </head>
 <body>
 
@@ -203,21 +211,65 @@
                ></a>
         </td>
 
-        <td th:text="${#numbers.formatDecimal(day.humanBody.tdee,1,0)}"></td>
-
-        <td th:text="${#numbers.formatDecimal(day.totalKcal,1,0)}"></td>
-
-        <td th:text="${#numbers.formatDecimal(day.totalKcalDiff,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)}"></td>
-
-        <td th:text="${#numbers.formatDecimal(day.totalActivityKcal,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalKcalDiffWithActivity,1,1)}"></td>
-        <td th:text="${#numbers.formatDecimal(day.totalGramDiffWithActivity,1,2)}"></td>
 
 
+        <td class="az-vurgula"
+            th:classappend="${day.humanBody.tdee > summary.averageKcalTdee} ? 'high-avg' : (${day.humanBody.tdee < summary.averageKcalTdee} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.humanBody.tdee,1,2)} + ' kcal'"></span>
 
-        <td>
-            <span th:text="${#numbers.formatDecimal(day.humanBody.weightKg,1,2)}"></span>&nbsp;
+        </td>
+
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalKcal > day.humanBody.tdee} ? 'high-value' : (${day.totalKcal < day.humanBody.tdee} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalKcal,1,2)} + ' kcal'"></span>
+
+        </td>
+
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalKcalDiff > summary.averageKcalDiff} ? 'high-avg' : (${day.totalKcalDiff < summary.averageKcalDiff} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiff,1,2)} + ' kcal'"></span>
+
+        </td>
+
+
+        <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)} + ' kg'"></td>
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalActivityKcal > summary.averageActivityKcal} ? 'high-avg' : (${day.totalActivityKcal < summary.averageActivityKcal} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalActivityKcal,1,2)} + ' kcal'"></span>
+
+        </td>
+
+
+
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalKcalDiffWithActivity > summary.averageKcalDiffWithActivity} ? 'high-avg' : (${day.totalKcalDiffWithActivity < summary.averageKcalDiffWithActivity} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiffWithActivity,1,2)} + ' kcal'"></span>
+
+        </td>
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalGramDiffWithActivity > 0} ? 'high-value' : (${day.totalGramDiffWithActivity < 0} ? 'low-value' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGramDiffWithActivity,1,2)} + ' kg'"></span>
+
+        </td>
+
+
+
+
+        <td class="az-vurgula"
+            th:classappend="${day.humanBody.weightKg > summary.averageWeightKg} ? 'high-avg' : (${day.humanBody.weightKg < summary.averageWeightKg} ? 'low-avg' : '')"
+        >
+            <span th:text="${#numbers.formatDecimal(day.humanBody.weightKg,1,2)} + ' kg'"></span>&nbsp;
 
             <span th:if="${!day.humanBody.weightUpdated}"
                   th:text="'!'"
@@ -225,10 +277,19 @@
                   title="Bugünkü vücut ağırlığınızı kaydetmediğiniz için, application.properties dosyasında belirtilen ağırlık üzerinden hesaplama yapılmıştır.">
             !
             </span>
+
         </td>
 
-        <td th:text="${#numbers.formatDecimal(day.totalGram,1,0)}"></td>
 
+
+
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalGram > summary.averageGram} ? 'high-avg' : (${day.totalGram < summary.averageGram} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGram,1,2)} + ' gr'"></span>
+
+        </td>
 
 
         <!--/* alt ve ust limit degerlerini yapay zeka soyledi. Simdilik daha iyisini bulana kadar boyle biraktim. */-->
@@ -274,10 +335,21 @@
 
 
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramFatSaturated,1,2)}"></td>
+
+        <td class="az-vurgula"
+            th:classappend="${day.totalGramFatSaturated > summary.averageGramFatSaturated} ? 'high-avg' : (${day.totalGramFatSaturated < summary.averageGramFatSaturated} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGramFatSaturated,1,2)} + ' gr'"></span>
+
+        </td>
 
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramSugar,1,2)}"></td>
+        <td class="az-vurgula"
+            th:classappend="${day.totalGramSugar > summary.averageGramSugar} ? 'high-avg' : (${day.totalGramSugar < summary.averageGramSugar} ? 'low-avg' : '')"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGramSugar,1,2)} + ' gr'"></span>
+
+        </td>
 
 
 
