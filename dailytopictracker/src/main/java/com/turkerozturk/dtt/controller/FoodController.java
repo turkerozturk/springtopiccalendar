@@ -87,6 +87,14 @@ public class FoodController {
         SleepDurationDto sleepDurationDto = sleepService.calculate(dateMillisYmd);
         model.addAttribute("sleepDurationDto", sleepDurationDto);
 
+        // Amac food sayfasindan yeni br topic olusturmak icin link vermek.
+        // En azindan diger food larla ayni kategoride olabilmesi icin yani gida ile alakali topic olmasi icin
+        // varsa listedeki ilk topic in kategorisinde olusturmak.
+        Long categoryIdForANewFoodTopic = null;
+        if(!summary.getItems().isEmpty()) {
+            categoryIdForANewFoodTopic = summary.getItems().get(0).getCategoryId();
+        }
+        model.addAttribute("categoryIdForANewFoodTopic", categoryIdForANewFoodTopic);
 
         return "food";
     }

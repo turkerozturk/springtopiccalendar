@@ -165,6 +165,12 @@
     <a href="/food-parser" target="_blank">Food Parser</a>&nbsp;|&nbsp;
     <a href="/food-date-range" >
         Date Range Calorie Summary</a>
+
+    <th:block th:if="${categoryIdForANewFoodTopic != null}">&nbsp;|&nbsp;
+        <a th:href="@{/topics/create(categoryId=${categoryIdForANewFoodTopic},returnPage=pivottable)}"
+           target="_blank">Create A New Food Topic</a>
+    </th:block>
+
 </p>
 
 <div class="container mb-3" style="position: relative; max-width: 400px;">

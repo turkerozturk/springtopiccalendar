@@ -271,33 +271,51 @@ WebJars path'leri şu yapıyı izler:
      * Kategori seçimi veya arama metni değiştiğinde
      * selectbox içindeki 'option'ları filtrele
      */
+
+let allTopics = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const topicSelect = document.getElementById('topicSelect');
+
+    // İlk optionları hafızaya al
+    allTopics = Array.from(topicSelect.options).map(option => ({
+        value: option.value,
+        text: option.textContent
+    }));
+});
+
     function filterTopics() {
-        const searchText = document.getElementById('topicSearch').value.toLowerCase();
-        //const selectedCategory = document.getElementById('categoryFilter').value;
-        const topicSelect = document.getElementById('topicSelect');
 
-        // Tüm <option> elemanlarını dolaş
-        const options = topicSelect.querySelectorAll('option');
-        options.forEach(option => {
-            // Option yazısı
-            const optionText = option.textContent.toLowerCase();
-            // Option'ın data-category değeri
-            //const optionCategory = option.getAttribute('data-category');
+        const searchText =
+            document.getElementById('topicSearch')
+                .value
+                .toLowerCase();
 
-            // Arama metnine uyuyor mu?
-            const matchesText = !searchText || optionText.includes(searchText);
-            // Kategori seçimine uyuyor mu? (Boş ise tüm kategorileri göster)
-            //const matchesCategory = !selectedCategory || optionCategory === selectedCategory;
+        const topicSelect =
+            document.getElementById('topicSelect');
 
-            // İkisi de uyuyorsa göster, yoksa gizle
-            if (matchesText) {
-                option.style.display = '';
-            } else {
-                option.style.display = 'none';
+        // Select içini temizle
+        topicSelect.innerHTML = '';
+
+        // Filtrelenmiş optionları tekrar ekle
+        allTopics.forEach(topic => {
+
+            const matches =
+                !searchText ||
+                topic.text.toLowerCase().includes(searchText);
+
+            if (matches) {
+
+                const option = document.createElement('option');
+
+                option.value = topic.value;
+                option.textContent = topic.text;
+
+                topicSelect.appendChild(option);
             }
         });
     }
-
 
     async function loadTopicsByCategory(categoryId) {
         // Kategori seçimi boşaldıysa topic listesini temizleyebilir veya tüm topicleri tekrar çağırabilirsiniz.
@@ -307,16 +325,30 @@ WebJars path'leri şu yapıyı izler:
         }
 
         try {
-            const response = await fetch('/entries/api/topicsByCategory?categoryId=' + categoryId);
-            if (!response.ok) throw new Error('Topic listesi çekilemedi.');
+
+            const response =
+                await fetch('/entries/api/topicsByCategory?categoryId=' + categoryId);
+
+            if (!response.ok)
+                throw new Error('Topic listesi çekilemedi.');
 
             const data = await response.json(); // JSON array of topics
 
             populateTopicSelect(data);
+
+            // Yeni listeyi hafızaya al
+            const topicSelect = document.getElementById('topicSelect');
+
+            allTopics = Array.from(topicSelect.options).map(option => ({
+                value: option.value,
+                text: option.textContent
+            }));
+
+            filterTopics(); // kategori degistigi icin arama kutusu filtresini yeni topiclere gore tekrar calistiriyoruz.
+
         } catch (err) {
             console.error(err);
         }
-        filterTopics(); // kategori degistigi icin arama kutusu filtresini yeni topiclere gore tekrar calistiriyoruz.
     }
 
     // topicSelect'i temizle
