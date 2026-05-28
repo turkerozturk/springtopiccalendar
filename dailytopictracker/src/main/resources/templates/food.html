@@ -167,7 +167,7 @@
         Date Range Calorie Summary</a>
 
     <th:block th:if="${categoryIdForANewFoodTopic != null}">&nbsp;|&nbsp;
-        <a th:href="@{/topics/create(categoryId=${categoryIdForANewFoodTopic},returnPage=pivottable)}"
+        <a th:href="@{/topics/create(categoryId=${categoryIdForANewFoodTopic},returnPage=calorietracker,dateMillisYmd=${dateMillisYmd})}"
            target="_blank">Create A New Food Topic</a>
     </th:block>
 
@@ -649,7 +649,18 @@
     </tfoot>
 </table>
 
+<spa>Aktivitelere giden kısayollar</spa>
+<div th:each="activityTopicDto : ${activityTopicDtos}" class="row">
 
+    <br/>
+    <a th:href="@{/entry-filter/form?categoryId={id}(id=${activityTopicDto.categoryId})}"
+       target="_blank"
+       th:title="${activityTopicDto.name}">
+        <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>&nbsp;
+        <span th:text="${activityTopicDto.name}"></span>
+    </a>
+</div>
+<br/>
 
 
 <table class="table table-sm" style="max-width: 400px;">
@@ -692,6 +703,7 @@
 
     </tbody>
 </table>
+
 
 
 

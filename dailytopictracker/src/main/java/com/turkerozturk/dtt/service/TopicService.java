@@ -365,6 +365,11 @@ public class TopicService {
                 .toList();
     }
 
+    public List<Topic> getActivityTopics() {
+        List<Topic> topics = topicRepository.findActivityTopicsRaw();
+        return topics;
+    }
+
 
     public List<Topic> findByCategoryIdOrderByPinnedDescNameAsc(Long categoryId) {
 

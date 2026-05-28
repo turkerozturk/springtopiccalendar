@@ -23,8 +23,11 @@ package com.turkerozturk.dtt.controller;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.*;
+import com.turkerozturk.dtt.entity.Entry;
+import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.FoodService;
 import com.turkerozturk.dtt.service.SleepService;
+import com.turkerozturk.dtt.service.TopicService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -38,12 +41,15 @@ import java.text.Collator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
 public class FoodController {
 
+    private final TopicService topicService;
     private final SleepService sleepService;
     private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
@@ -95,6 +101,21 @@ public class FoodController {
             categoryIdForANewFoodTopic = summary.getItems().get(0).getCategoryId();
         }
         model.addAttribute("categoryIdForANewFoodTopic", categoryIdForANewFoodTopic);
+
+        List<Topic> activityTopics = topicService.getActivityTopics();
+        // BASLA bu kisim spor aktiviteleri ile harcanan enerjiyi hesaplar.
+
+
+        ArrayList<TopicDto2> activityTopicDtos = new ArrayList<>();
+        for(Topic t :activityTopics) {
+
+            TopicDto2 topicDto2 = new TopicDto2(t.getId(), t.getName(), t.getCategory().getId());
+            activityTopicDtos.add(topicDto2);
+        }
+
+        model.addAttribute("activityTopicDtos", activityTopicDtos);
+
+
 
         return "food";
     }

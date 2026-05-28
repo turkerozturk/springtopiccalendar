@@ -114,6 +114,7 @@ public class TopicWebController {
     public String showCreateForm(HttpSession session,
                                  @RequestParam(name="categoryId", required=false) Long categoryId,
                                  @RequestParam(name="returnPage", required=false) String returnPage,
+                                 @RequestParam(name = "dateMillisYmd", required = false) Long dateMillisYmd,
                                  Model model) {
 
 
@@ -167,6 +168,7 @@ public class TopicWebController {
 
         // pass returnPage back into the template
         model.addAttribute("returnPage", returnPage);
+        model.addAttribute("dateMillisYmd", dateMillisYmd);
 
         List<String> imageFilePaths = collectImagePaths();
         model.addAttribute("imageFilePaths", imageFilePaths);
