@@ -11,6 +11,18 @@
 <p class="text-muted">Select one or more Category Groups to export as a SQLite file.</p>
 
 <form th:action="@{/export/category-groups}" method="post" id="exportForm">
+
+    <div class="form-check mb-3">
+        <input class="form-check-input"
+               type="checkbox"
+               id="includeEntries"
+               name="includeEntries"
+               checked>
+        <label class="form-check-label" for="includeEntries">
+            Include Entries
+        </label>
+    </div>
+
     <table class="table table-striped table-bordered align-middle">
         <thead>
         <tr>

@@ -137,7 +137,7 @@ public class CategoryService {
         List<Category> categories = categoryRepository.findAllByArchivedIsFalseOrderByCategoryGroup_PriorityDescNameAsc();
 
         for (Category c : categories) {
-            System.out.println(String.format("",c.isArchived(), c.getCategoryGroup().getId(), c.getName()));
+          //  System.out.println(String.format("",c.isArchived(), c.getCategoryGroup().getId(), c.getName()));
         }
 
         // Mevcut locale'i session'dan alıyoruz.

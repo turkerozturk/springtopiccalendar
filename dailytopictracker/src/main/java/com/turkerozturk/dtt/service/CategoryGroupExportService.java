@@ -27,7 +27,7 @@ public class CategoryGroupExportService {
   //  private final Flyway flyway;
     private final CategoryGroupRepository categoryGroupRepository;
 
-    public Path exportCategoryGroups(List<Long> categoryGroupIds) throws Exception {
+    public Path exportCategoryGroups(List<Long> categoryGroupIds, boolean includeEntries) throws Exception {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
         String fileName = "dtt-cg-" + timestamp + ".sqlite";
         Path exportPath = Paths.get(System.getProperty("java.io.tmpdir"), fileName);
@@ -45,7 +45,7 @@ public class CategoryGroupExportService {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + exportPath.toAbsolutePath())) {
             conn.setAutoCommit(false);
             try {
-                insertData(conn, groups);
+                insertData(conn, groups, includeEntries);
                 conn.commit();
             } catch (Exception e) {
                 conn.rollback();
@@ -95,17 +95,19 @@ public class CategoryGroupExportService {
         }
     }
 
-    private void insertData(Connection conn, List<CategoryGroup> groups) throws SQLException {
+    private void insertData(Connection conn, List<CategoryGroup> groups, boolean includeEntries) throws SQLException {
         for (CategoryGroup cg : groups) {
             insertCategoryGroup(conn, cg);
             for (Category cat : cg.getCategories()) {
                 insertCategory(conn, cat, cg.getId());
                 for (Topic topic : cat.getTopics()) {
                     insertTopic(conn, topic, cat.getId());
-                    for (Entry entry : topic.getActivities()) {
-                        insertEntry(conn, entry, topic.getId());
-                        if (entry.getNote() != null) {
-                            insertNote(conn, entry.getNote(), entry.getId());
+                    if(includeEntries) {
+                        for (Entry entry : topic.getActivities()) {
+                            insertEntry(conn, entry, topic.getId());
+                            if (entry.getNote() != null) {
+                                insertNote(conn, entry.getNote(), entry.getId());
+                            }
                         }
                     }
                 }

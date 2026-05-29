@@ -24,8 +24,11 @@ public class ExportController {
     private final CategoryGroupExportService exportService;
 
     @PostMapping("/category-groups")
-    public ResponseEntity<Resource> exportCategoryGroups(@RequestParam List<Long> ids) throws Exception {
-        Path filePath = exportService.exportCategoryGroups(ids);
+    public ResponseEntity<Resource> exportCategoryGroups(
+            @RequestParam List<Long> ids,
+            @RequestParam(defaultValue = "false") boolean includeEntries) throws Exception {
+
+        Path filePath = exportService.exportCategoryGroups(ids, includeEntries);
         Resource resource = new FileSystemResource(filePath);
 
         return ResponseEntity.ok()
@@ -34,6 +37,7 @@ public class ExportController {
                 .body(resource);
     }
 
+    /*
     @GetMapping("/test")
     public ResponseEntity<Resource> testExport() throws Exception {
         Path filePath = exportService.createEmptyExportDatabase();
@@ -44,6 +48,7 @@ public class ExportController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
+    */
 
 }
 
