@@ -312,7 +312,8 @@
 <!-- Parser class bolumu -->
 <div th:fragment="customParserBox(topic, parserReport)">
 
-    <div style="width: 99%; max-width: 400px; margin: 0 auto;background-color:FloralWhite;"
+    <div id="measurementChartContainer"
+         style="width:99%; max-width:400px; margin:0 auto; background-color:FloralWhite;"
          th:if="${topic.dataClassName == 'MeasurementParser'}">
         <canvas id="measurementChart"></canvas>
     </div>

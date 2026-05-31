@@ -114,6 +114,30 @@
         }
 
     </style>
+
+    <style>
+
+        .chart-fullscreen {
+            position: fixed !important;
+            inset: 0 !important;
+
+            width: 100vw !important;
+            height: 100vh !important;
+
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 20px;
+
+            background: white;
+            z-index: 999999;
+        }
+
+        .chart-fullscreen canvas {
+            width: 100% !important;
+            height: calc(100vh - 40px) !important;
+        }
+
+    </style>
 </head>
 
 <body>
@@ -823,8 +847,27 @@
                         legend: {
                             display: false
                         },
+                        //https://www.chartjs.org/chartjs-plugin-annotation/latest/guide/types/label.html
+                        //https://deepwiki.com/chartjs/chartjs-plugin-annotation/4.1-line-annotations
                         annotation: {
                             annotations: {
+                                label1: {
+                                    type: 'label',
+                                    //xValue: 25, // buna ne deger verilmeli ki etiketi yatayda istedigimiz yere koyalim bilemedim.
+                                    yValue: parsed.average, // metnin yuksekligi average y degerinde olur.
+                                    xAdjust: 0, // herhangi bir kaydirma yapmadik metinde.
+                                    yAdjust: -8, // metin cizginin tam ustune gelmesin diye. Font yuksekliginin yarisi kadar kaydirdik.
+                                    backgroundColor: 'rgba(245,245,245)',
+                                    content: ['avg ' + ' ' +  parsed.average.toFixed(2) + ' ' + parsed.unit], // virgulle ayirarak diziye string eklersek her biri bir satirda gorunur.
+                                    textAlign: 'start',
+                                    font: {
+                                        size: 14
+                                    },
+                                    callout: {
+                                    display: true,
+                                        // side: 8
+                                    }
+                                },
                                 averageLine: {
                                     type: 'line',
                                     yMin: parsed.average,
@@ -832,6 +875,7 @@
                                     borderColor: 'blue',
                                     borderWidth: 1,
                                     borderDash: [6, 6] // kesikli cizgi
+                                    // lable tanimlamasini buraya degil, ayri annotation olarak yaptim cunku buradaki tanim ekranda goruntulenmedi, hata da vermemisti.
 
                                 }
                             }
@@ -848,6 +892,28 @@
 
     </script>
 
+<script>
+    // entry verilerinden olusan fragmentteki kucuk grafige tiklaninca tam ekran buyumesini ve tekrar tiklaninca eski haline gelmesini saglar.
+    var chartContainer = document.getElementById("measurementChartContainer");
+
+    chartContainer.addEventListener("click", async function () {
+
+      try {
+
+          if (!document.fullscreenElement) {
+              await chartContainer.requestFullscreen();
+          } else {
+              await document.exitFullscreen();
+          }
+
+          setTimeout(() => myChart.resize(), 300);
+
+      } catch (err) {
+          console.log(err);
+      }
+
+    });
+</script>
 
 
     <script>
