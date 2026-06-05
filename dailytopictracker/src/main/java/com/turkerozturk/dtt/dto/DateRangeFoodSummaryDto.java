@@ -107,7 +107,7 @@ public class DateRangeFoodSummaryDto {
 
     private TrendSummaryDto kgDiffTrendsSummary;
     private TrendSummaryDto kcalActivityTrendsSummary;
-    private TrendSummaryDto kcalVirtualWeightTrendsSummary; // TODO 0 0 0 cikiyor
+    private TrendSummaryDto kcalVirtualWeightTrendsSummary;
 
     private TrendSummaryDto kgVirtualWeightTrendsSummary;
     private TrendSummaryDto kgBodyWeightTrendsSummary;
@@ -123,5 +123,29 @@ public class DateRangeFoodSummaryDto {
     private TrendSummaryDto fatSaturatedWeightTrendsSummary;
     private TrendSummaryDto sugarWeightTrendsSummary;
     private TrendSummaryDto sleepDurationTrendsSummary;
+
+    // Average Trend Summarries
+    private TrendSummaryDto avgTdeeTrendsSummary;
+    private TrendSummaryDto avgKcalTrendsSummary;
+    private TrendSummaryDto avgKcalDiffTrendsSummary;
+
+    private TrendSummaryDto avgKgDiffTrendsSummary;
+    private TrendSummaryDto avgKcalActivityTrendsSummary;
+    private TrendSummaryDto avgKcalVirtualWeightTrendsSummary;
+
+    private TrendSummaryDto avgKgVirtualWeightTrendsSummary;
+    private TrendSummaryDto avgKgBodyWeightTrendsSummary;
+
+    private TrendSummaryDto avgFoodWeightTrendsSummary;
+    private TrendSummaryDto avgFatWeightTrendsSummary;
+    private TrendSummaryDto avgCarbohydrateWeightTrendsSummary;
+
+    private TrendSummaryDto avgProteinWeightTrendsSummary;
+    private TrendSummaryDto avgFiberWeightTrendsSummary;
+    private TrendSummaryDto avgSodiumWeightTrendsSummary;
+
+    private TrendSummaryDto avgFatSaturatedWeightTrendsSummary;
+    private TrendSummaryDto avgSugarWeightTrendsSummary;
+    private TrendSummaryDto avgSleepDurationTrendsSummary;
 
 }

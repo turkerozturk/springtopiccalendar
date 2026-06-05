@@ -163,7 +163,7 @@ public class FoodController {
         model.addAttribute("lastDateMillis", lastMillis);
 
         model.addAttribute("gr", "g");
-        model.addAttribute("kcal", "k");
+        model.addAttribute("kcal", "kc");
         model.addAttribute("kg", "kg");
 
 
