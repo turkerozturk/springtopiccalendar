@@ -26,6 +26,8 @@ import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.helper.FoodParser;
 import com.turkerozturk.dtt.helper.SettingHelper;
+import com.turkerozturk.dtt.helper.datatrends.TrendDirection;
+import com.turkerozturk.dtt.helper.datatrends.TrendUtils;
 import com.turkerozturk.dtt.helper.usda.NutrientLimit;
 import com.turkerozturk.dtt.helper.usda.NutrientRequirementService;
 import com.turkerozturk.dtt.repository.EntryRepository;
@@ -42,6 +44,7 @@ import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 @Service
 @RequiredArgsConstructor
 public class FoodService {
+    private static final long ONE_DAY_MILLIS = 24 * 60 * 60 * 1000;
 
     private final SettingHelper settingHelper;
     private final NutrientRequirementService nutrientRequirementService;
@@ -195,7 +198,8 @@ public class FoodService {
                     mealGroup.setTotalGramSodium(0.0);
                     mealGroup.setTotalGramFatSaturated(0.0);
                     mealGroup.setTotalGramSugar(0.0);
-                    
+                    mealGroup.setTotalGram(0.0);
+
                     mealMap.put(mealCode, mealGroup);
                 }
 
@@ -217,6 +221,7 @@ public class FoodService {
                 Double gramSugar = FoodParser.calculateKcal(gramValue, FoodParser.extractSugar(topicDescription));
 
 
+                mealGroup.setTotalGram(mealGroup.getTotalGram() + gramValue);
                 mealGroup.setTotalCalories(mealGroup.getTotalCalories() + kcal);
                 mealGroup.setTotalGramFat(mealGroup.getTotalGramFat() + gramFat);
                 mealGroup.setTotalGramCarbohydrate(mealGroup.getTotalGramCarbohydrate() + gramCarbohydrate);
@@ -596,11 +601,23 @@ public class FoodService {
 
 
 
+/*
+        FoodSummaryDto dailyYesterday = getDailyFoodSummary(startDateMillis - ONE_DAY_MILLIS);
+        double realWeightDiffKg;
+        DataDirectionDto realWeights = new DataDirectionDto();
+        Map<Balance, Integer> realWeightDirectionMap;
+        LinkedList<Double> realWeightValues = new LinkedList<>();
+        LinkedList<Double> zeroValues = new LinkedList<>();
+
+        double calculatedWeightDiffKg;
+        DataDirectionDto calculatedWeights = new DataDirectionDto();
+        Map<Balance, Integer> calculatedWeightDirectionMap;
+        LinkedList<Double> calculatedWeightValues = new LinkedList<>();
+*/
+
 
         // gün gün dolaş
-        long oneDayMillis = 24 * 60 * 60 * 1000;
-
-        for (long date = startDateMillis; date <= endDateMillis; date += oneDayMillis) {
+        for (long date = startDateMillis; date <= endDateMillis; date += ONE_DAY_MILLIS) {
 
             totalDays++;
 
@@ -698,7 +715,35 @@ public class FoodService {
             totalPercentProtein += dto.getTotalPercentProtein();
 
             totalSleepDuration += dto.getSleepDurationDto().getSleepDurationSeconds();
+
+            /*
+            zeroValues.add(0.0);
+
+
+            calculatedWeightDiffKg = dailyYesterday.getFsd().getTotalGramDiffWithActivity() - daily.getFsd().getTotalGramDiffWithActivity();
+            calculatedWeightValues.add(calculatedWeightDiffKg);
+
+            realWeightDiffKg = dailyYesterday.getFsd().getHumanBody().getWeightKg() - daily.getFsd().getHumanBody().getWeightKg();
+            realWeightValues.add(realWeightDiffKg);
+
+          
+
+
+            dailyYesterday = daily;
+            */
         }
+
+        /*
+        realWeightDirectionMap = DataDirectionDto.getBalanceMap(realWeightValues, zeroValues);
+        realWeights.setDataValues(realWeightValues);
+        realWeights.setBaseValues(zeroValues);
+        realWeights.setMap(realWeightDirectionMap);
+
+        calculatedWeightDirectionMap = DataDirectionDto.getBalanceMap(calculatedWeightValues, zeroValues);
+        calculatedWeights.setDataValues(calculatedWeightValues);
+        calculatedWeights.setBaseValues(zeroValues);
+        calculatedWeights.setMap(calculatedWeightDirectionMap);
+        */
 
         FoodSummaryDto beginDay = getDailyFoodSummary(startDateMillis);
         FoodSummaryDto endDay = getDailyFoodSummary(startDateMillis);
@@ -707,7 +752,152 @@ public class FoodService {
 
         totalGramDiffWithActivityAndFactor = totalGramDiffWithActivity - endDay.getFsd().getTotalGramDiffWithActivity();
         totalGramDiffWithActivityAndFactor = totalGramDiffWithActivityAndFactor * activityCorrectionFactor;
+
+
+        List<TrendDirection> tdeeTrends = new ArrayList<>(); //1
+        List<TrendDirection> kcalTrends = new ArrayList<>(); //2
+        List<TrendDirection> kcalFoodDiffTrends = new ArrayList<>(); //3
+
+        List<TrendDirection> kgFoodDiffTrends = new ArrayList<>(); //4
+        List<TrendDirection> kcalActivityTrends = new ArrayList<>(); //5
+        List<TrendDirection> kcalFoodDiffAndActivityTrends = new ArrayList<>(); //6
+
+        List<TrendDirection> kgTheoraticallyDiffTrends = new ArrayList<>(); //7
+        List<TrendDirection> kgBodyWeightTrends = new ArrayList<>(); //8
+        List<TrendDirection> foodWeightTrends = new ArrayList<>(); //9
+
+        List<TrendDirection> fatWeightTrends = new ArrayList<>(); //10
+        List<TrendDirection> carbohydrateWeightTrends = new ArrayList<>(); //11
+        List<TrendDirection> proteinWeightTrends = new ArrayList<>(); //12
+
+        List<TrendDirection> fiberWeightTrends = new ArrayList<>(); //13
+        List<TrendDirection> sodiumWeightTrends = new ArrayList<>(); //14
+        List<TrendDirection> fatSaturatedWeightTrends = new ArrayList<>(); //15
+
+        List<TrendDirection> sugarWeightTrends = new ArrayList<>(); //16
+        List<TrendDirection> sleepDurationTrends = new ArrayList<>(); //17
+
+        FoodSummaryDto dailyYesterday = getDailyFoodSummary(startDateMillis - ONE_DAY_MILLIS);
+        DailyFoodSummaryDto previous = dailyYesterday.getFsd();//null;
+        for (DailyFoodSummaryDto current : dailyList) {
+
+            if (previous == null) {
+                current.setKcalTdeeTrend(TrendDirection.SAME); //1
+                current.setKcalFoodTrend(TrendDirection.SAME); //2
+                current.setKcalFoodDiffTrend(TrendDirection.SAME); //3
+
+                current.setKgFoodDiffTrend(TrendDirection.SAME); //4
+                current.setKcalActivityTrend(TrendDirection.SAME); //5
+                current.setKcalVirtualWeightTrend(TrendDirection.SAME); //6
+
+                current.setKgTheoreticalWeightTrend(TrendDirection.SAME); //7
+                current.setBodyWeightTrend(TrendDirection.SAME); //8
+                current.setFoodWeightTrend(TrendDirection.SAME); //9
+
+                current.setFatWeightTrend(TrendDirection.SAME); //10
+                current.setCarbohydrateWeightTrend(TrendDirection.SAME); //11
+                current.setProteinWeightTrend(TrendDirection.SAME); //12
+
+                current.setFiberWeightTrend(TrendDirection.SAME); //13
+                current.setSodiumWeightTrend(TrendDirection.SAME); //14
+                current.setFatSaturatedWeightTrend(TrendDirection.SAME); //15
+
+                current.setSugarWeightTrend(TrendDirection.SAME); //16
+                current.setSleepDurationTrend(TrendDirection.SAME); //17
+
+            } else {
+                current.setKcalTdeeTrend(TrendUtils.decideDirection(current.getHumanBody().getTdee(), previous.getHumanBody().getTdee()));
+                tdeeTrends.add(current.getKcalTdeeTrend()); //1
+
+                current.setKcalFoodTrend(TrendUtils.decideDirection(current.getTotalKcal(), previous.getTotalKcal()));
+                kcalTrends.add(current.getKcalFoodTrend()); //2
+
+                current.setKcalFoodDiffTrend(TrendUtils.decideDirection(current.getTotalKcalDiff(), previous.getTotalKcalDiff()));
+                kcalFoodDiffTrends.add(current.getKcalFoodDiffTrend()); //3
+
+                current.setKgFoodDiffTrend(TrendUtils.decideDirection(current.getTotalGramDiff(), previous.getTotalGramDiff()));
+                kgFoodDiffTrends.add(current.getKgFoodDiffTrend()); //4
+
+                current.setKcalActivityTrend(TrendUtils.decideDirection(current.getTotalActivityKcal(), previous.getTotalActivityKcal()));
+                kcalActivityTrends.add(current.getKcalActivityTrend()); //5
+
+                current.setKcalVirtualWeightTrend(TrendUtils.decideDirection(current.getTotalKcalDiffWithActivity(), previous.getTotalKcalDiffWithActivity()));
+                kcalFoodDiffAndActivityTrends.add(current.getKcalVirtualWeightTrend()); //6
+
+                current.setKgTheoreticalWeightTrend(TrendUtils.decideDirection(current.getTotalGramDiffWithActivity(), previous.getTotalGramDiffWithActivity()));
+                kgTheoraticallyDiffTrends.add(current.getKcalVirtualWeightTrend()); //7
+
+                current.setBodyWeightTrend(TrendUtils.decideDirection(current.getHumanBody().getWeightKg(), previous.getHumanBody().getWeightKg()));
+                kgBodyWeightTrends.add(current.getBodyWeightTrend()); //8
+
+                current.setFoodWeightTrend(TrendUtils.decideDirection(current.getTotalGram(), previous.getTotalGram()));
+                foodWeightTrends.add(current.getFoodWeightTrend()); //9
+
+                current.setFatWeightTrend(TrendUtils.decideDirection(current.getTotalGramFat(), previous.getTotalGramFat()));
+                fatWeightTrends.add(current.getFatWeightTrend()); //10
+
+                current.setCarbohydrateWeightTrend(TrendUtils.decideDirection(current.getTotalGramCarbohydrate(), previous.getTotalGramCarbohydrate()));
+                carbohydrateWeightTrends.add(current.getCarbohydrateWeightTrend()); //11
+
+                current.setProteinWeightTrend(TrendUtils.decideDirection(current.getTotalGramProtein(), previous.getTotalGramProtein()));
+                proteinWeightTrends.add(current.getProteinWeightTrend()); //12
+
+                current.setFiberWeightTrend(TrendUtils.decideDirection(current.getTotalGramFiber(), previous.getTotalGramFiber()));
+                fiberWeightTrends.add(current.getFiberWeightTrend()); //13
+
+                current.setSodiumWeightTrend(TrendUtils.decideDirection(current.getTotalGramSodium(), previous.getTotalGramSodium()));
+                sodiumWeightTrends.add(current.getSodiumWeightTrend()); //14
+
+                current.setFatSaturatedWeightTrend(TrendUtils.decideDirection(current.getTotalGramFatSaturated(), previous.getTotalGramFatSaturated()));
+                fatSaturatedWeightTrends.add(current.getFatSaturatedWeightTrend()); //15
+
+                current.setSugarWeightTrend(TrendUtils.decideDirection(current.getTotalGramSugar(), previous.getTotalGramSugar()));
+                sugarWeightTrends.add(current.getSugarWeightTrend()); //16
+
+                current.setSleepDurationTrend(TrendUtils.decideDirection(current.getSleepDurationDto().getSleepDurationSeconds(), previous.getSleepDurationDto().getSleepDurationSeconds()));
+                sleepDurationTrends.add(current.getSleepDurationTrend()); //17
+
+            }
+            previous = current;
+        }
+
+        rangeDto.setTdeeTrendsSummary(TrendUtils.summarize(tdeeTrends)); //1 kcal ihtiyac
+        rangeDto.setKcalTrendsSummary(TrendUtils.summarize(kcalTrends)); //2 kcal gida
+        rangeDto.setKcalDiffTrendsSummary(TrendUtils.summarize(kcalFoodDiffTrends)); //3 kcal gida fark
+
+        rangeDto.setKgDiffTrendsSummary(TrendUtils.summarize(kgFoodDiffTrends)); //4 kg gida fark
+        rangeDto.setKcalActivityTrendsSummary(TrendUtils.summarize(kcalActivityTrends)); //5 kcal aktivite
+        rangeDto.setKcalVirtualWeightTrendsSummary(TrendUtils.summarize(kcalFoodDiffAndActivityTrends)); // 6 kcal teorik fark
+
+        //rangeDto.setKcalTheoraticallyDiffTrendsSummary(TrendUtils.summarize(kcalTheoraticallyDiffTrends)); //7 kg teorik fark
+        rangeDto.setKgVirtualWeightTrendsSummary(TrendUtils.summarize(kgTheoraticallyDiffTrends)); //8
+        rangeDto.setKgBodyWeightTrendsSummary(TrendUtils.summarize(kgBodyWeightTrends)); //9 kg gercek vucut agirligi
+
+        rangeDto.setFoodWeightTrendsSummary(TrendUtils.summarize(foodWeightTrends)); //10 gr gramaj toplam gida agirligi
+        rangeDto.setFatWeightTrendsSummary(TrendUtils.summarize(fatWeightTrends)); //11 gr yag
+        rangeDto.setCarbohydrateWeightTrendsSummary(TrendUtils.summarize(carbohydrateWeightTrends)); //12 gr karbonhidrat
+
+        rangeDto.setProteinWeightTrendsSummary(TrendUtils.summarize(proteinWeightTrends)); //13 gr protein
+        rangeDto.setFiberWeightTrendsSummary(TrendUtils.summarize(fiberWeightTrends)); //14 gr lif
+        rangeDto.setSodiumWeightTrendsSummary(TrendUtils.summarize(sodiumWeightTrends)); //15 gr sodyum
+
+        rangeDto.setFatSaturatedWeightTrendsSummary(TrendUtils.summarize(fatSaturatedWeightTrends)); //16 doymus yag
+        rangeDto.setSugarWeightTrendsSummary(TrendUtils.summarize(sugarWeightTrends)); //17 gr seker
+        rangeDto.setSleepDurationTrendsSummary(TrendUtils.summarize(sleepDurationTrends)); //18 sn uyku
+
+        /*
+        for (DailyFoodSummaryDto current : dailyList) {
+
+            TrendUtils.summarize(realWeightValues);
+
+        }
+        */
+
+
+
         rangeDto.setDays(dailyList);
+
+
 
         rangeDto.setTotalKcal(totalKcal);
         rangeDto.setTotalGram(totalGram);
@@ -814,6 +1004,8 @@ public class FoodService {
         averageSleepDurationDto.setSleepDurationSeconds(averageSleepDurationSeconds);
         rangeDto.setAverageSleepDurationDto(averageSleepDurationDto);
 
+        //rangeDto.setCalculatedWeightDirections(calculatedWeights.getDirections());
+        //rangeDto.setRealWeightDirections(realWeights.getDirections());
 
         return rangeDto;
     }

@@ -36,7 +36,7 @@
         body { font-family: Arial; margin: 20px; }
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background-color: #f5f5f5; }
+        th { background-color: #f5f5f5; white-space: nowrap;}
         .total { font-weight: bold; background-color: #e8f5e9; }
 
         .vurgula {
@@ -98,10 +98,10 @@
 
     <style>
         .high-value {
-            background-color: red;
-            color: white;
+           /* background-color: red; */
+            color: red;
         }
-        .low-value { background-color: #2196f3; color: #fff; }
+        .low-value { /* background-color: #2196f3; */ color: blue; }
     </style>
 
     <style>
@@ -110,6 +110,12 @@
             color: white;
         }
         .low-avg { background-color: orange; color: #fff; }
+    </style>
+    <style>
+        .trendArrow-1 { background-color: white; color: red; border-style: solid; border-color: white; border-width:1px; font-weight: bold;}
+        .trendArrow--1 { background-color: lightblue; color: black; border-style: solid; border-color: white; border-width:1px; font-weight: bold;}
+        .trendArrow-0 { background-color: yellow; color: black; border-style: solid; border-color: white; border-width:1px; font-weight: bold;}
+
     </style>
 </head>
 <body>
@@ -179,16 +185,12 @@
         <th>Tarih</th>
         <th>Kcal İhtiyaç</th>
         <th>Kcal Gıda</th>
-
         <th>Kcal Gıda Fark</th>
         <th>KG Gıda Fark</th>
-
         <th>Kcal Aktivite</th>
-        <th>Kcal Toplam Fark</th>
+        <th>Kcal Teorik Fark</th>
         <th>KG Teorik Fark</th>
-
         <th>KG Gerçek Tartı</th>
-
         <th>Gramaj</th>
         <th>GR Yağ</th>
         <th>GR Karb</th>
@@ -197,9 +199,7 @@
         <th>GR Sodyum</th>
         <th>Doymuş Yağ</th>
         <th>GR Şeker</th>
-        <th>SN Uyku</th>
-
-
+        <th>Saniye Uyku</th>
     </tr>
     </thead>
 
@@ -213,10 +213,12 @@
 
 
 
-        <td class="az-vurgula"
-            th:classappend="${day.humanBody.tdee > summary.averageKcalTdee} ? 'high-avg' : (${day.humanBody.tdee < summary.averageKcalTdee} ? 'low-avg' : '')"
+        <td class="az-vurgula" style="background-color: white;"
+
         >
-            <span  th:text="${#numbers.formatDecimal(day.humanBody.tdee,1,2)} + ' kcal'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.humanBody.tdee,4,0)} + ${kcal}"></span>
+            <span th:text="${day.kcalTdeeTrend.symbol}" th:class="${'trendArrow-' + day.kcalTdeeTrend.number}"></span>
+
 
         </td>
 
@@ -224,7 +226,10 @@
         <td class="az-vurgula"
             th:classappend="${day.totalKcal > day.humanBody.tdee} ? 'high-value' : (${day.totalKcal < day.humanBody.tdee} ? 'low-value' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalKcal,1,2)} + ' kcal'"></span>
+
+            <span  th:text="${#numbers.formatDecimal(day.totalKcal,4,0)} + ${kcal}"></span>
+            <span th:text="${day.kcalFoodTrend.symbol}" th:class="${'trendArrow-' + day.kcalFoodTrend.number}"></span>
+
 
         </td>
 
@@ -232,17 +237,26 @@
         <td class="az-vurgula"
             th:classappend="${day.totalKcalDiff > summary.averageKcalDiff} ? 'high-avg' : (${day.totalKcalDiff < summary.averageKcalDiff} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiff,1,2)} + ' kcal'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiff,4,0)} + ${kcal}"></span>
+            <span th:text="${day.kcalFoodDiffTrend.symbol}" th:class="${'trendArrow-' + day.kcalFoodDiffTrend.number}"></span>
+
+
+        </td>
+
+        <td class="az-vurgula"
+        >
+            <span  th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)} + ${kg}"></span>
+            <span th:text="${day.kgFoodDiffTrend.symbol}" th:class="${'trendArrow-' + day.kgFoodDiffTrend.number}"></span>
+
 
         </td>
 
 
-        <td th:text="${#numbers.formatDecimal(day.totalGramDiff,1,2)} + ' kg'"></td>
-
         <td class="az-vurgula"
             th:classappend="${day.totalActivityKcal > summary.averageActivityKcal} ? 'high-avg' : (${day.totalActivityKcal < summary.averageActivityKcal} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalActivityKcal,1,2)} + ' kcal'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalActivityKcal,4,0)} + ${kcal}"></span>
+            <span th:text="${day.kcalActivityTrend.symbol}" th:class="${'trendArrow-' + day.kcalActivityTrend.number}"></span>
 
         </td>
 
@@ -252,20 +266,25 @@
         <td class="az-vurgula"
             th:classappend="${day.totalKcalDiffWithActivity > summary.averageKcalDiffWithActivity} ? 'high-avg' : (${day.totalKcalDiffWithActivity < summary.averageKcalDiffWithActivity} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiffWithActivity,1,2)} + ' kcal'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalKcalDiffWithActivity,4,0)} + ${kcal}"></span>
+            <span th:text="${day.kcalVirtualWeightTrend.symbol}" th:class="${'trendArrow-' + day.kcalVirtualWeightTrend.number}"></span>
 
         </td>
 
         <td class="az-vurgula"
             th:classappend="${day.totalGramDiffWithActivity > 0} ? 'high-value' : (${day.totalGramDiffWithActivity < 0} ? 'low-value' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalGramDiffWithActivity,1,2)} + ' kg'"></span>
+
+            <span  th:text="${#numbers.formatDecimal(day.totalGramDiffWithActivity,1,3)} + ${kg}"></span>
+
+            <span th:text="${day.kgTheoreticalWeightTrend.symbol}" th:class="${'trendArrow-' + day.kgTheoreticalWeightTrend.number}"></span>
+
 
         </td>
 
 
 
-
+        <!--/*
         <td class="az-vurgula"
             th:classappend="${day.humanBody.weightKg > summary.averageWeightKg} ? 'high-avg' : (${day.humanBody.weightKg < summary.averageWeightKg} ? 'low-avg' : '')"
         >
@@ -279,7 +298,21 @@
             </span>
 
         </td>
+        */-->
 
+        <td class="az-vurgula"
+        >
+
+            <span th:text="${#numbers.formatDecimal(day.humanBody.weightKg,1,2)} + ${kg}"></span>
+            <span th:text="${day.bodyWeightTrend.symbol}" th:class="${'trendArrow-' + day.bodyWeightTrend.number}"></span>
+            <span th:if="${!day.humanBody.weightUpdated}"
+                  th:text="'!'"
+                  style="color:red; font-weight:bold; cursor:help;"
+                  title="Bugünkü vücut ağırlığınızı kaydetmediğiniz için, application.properties dosyasında belirtilen ağırlık üzerinden hesaplama yapılmıştır.">
+            !
+            </span>
+
+        </td>
 
 
 
@@ -287,7 +320,8 @@
         <td class="az-vurgula"
             th:classappend="${day.totalGram > summary.averageGram} ? 'high-avg' : (${day.totalGram < summary.averageGram} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalGram,1,2)} + ' gr'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalGram,1,0)} + ${gr}"></span>
+            <span th:text="${day.foodWeightTrend.symbol}" th:class="${'trendArrow-' + day.foodWeightTrend.number}"></span>
 
         </td>
 
@@ -296,7 +330,8 @@
         <td class="az-vurgula"
             th:classappend="${day.totalPercentFat > day.fatRequirementMaxPercent} ? 'high-value' : (${day.totalPercentFat < day.fatRequirementMinPercent} ? 'low-value' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalGramFat,1,2)} + ' gr'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalGramFat,1,1)} + ${gr}"></span>
+            <span th:text="${day.fatWeightTrend.symbol}" th:class="${'trendArrow-' + day.fatWeightTrend.number}"></span>
 
         </td>
 
@@ -305,7 +340,9 @@
         ${day.totalPercentCarbohydrate > day.carbohydrateRequirementMaxPercent} ? 'high-value' :
         (${day.totalPercentCarbohydrate < day.carbohydrateRequirementMinPercent} ? 'low-value' : '')
         ">
-            <span th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,2)} + ' gr'"></span>
+            <span th:text="${#numbers.formatDecimal(day.totalGramCarbohydrate,1,1)} + ${gr}"></span>
+            <span th:text="${day.carbohydrateWeightTrend.symbol}" th:class="${'trendArrow-' + day.carbohydrateWeightTrend.number}"></span>
+
         </td>
 
         <td class="az-vurgula"
@@ -313,7 +350,9 @@
         ${day.totalPercentProtein > day.ProteinRequirementMaxPercent} ? 'high-value' :
         (${day.totalPercentProtein < day.ProteinRequirementMinPercent} ? 'low-value' : '')
         ">
-            <span th:text="${#numbers.formatDecimal(day.totalGramProtein,1,2)} + ' gr'"></span>
+            <span th:text="${#numbers.formatDecimal(day.totalGramProtein,1,1)} + ${gr}"></span>
+            <span th:text="${day.proteinWeightTrend.symbol}" th:class="${'trendArrow-' + day.proteinWeightTrend.number}"></span>
+
         </td>
 
 
@@ -322,7 +361,9 @@
         ${day.totalGramFiber > day.fiberRequirementGram + 11} ? 'high-value' :
         (${day.totalGramFiber < day.fiberRequirementGram - 11} ? 'low-value' : '')
         ">
-            <span th:text="${#numbers.formatDecimal(day.totalGramFiber,1,2)} + ' gr'"></span>
+            <span th:text="${#numbers.formatDecimal(day.totalGramFiber,1,1)} + ${gr}"></span>
+            <span th:text="${day.fiberWeightTrend.symbol}" th:class="${'trendArrow-' + day.fiberWeightTrend.number}"></span>
+
         </td>
 
         <td class="az-vurgula"
@@ -330,7 +371,9 @@
         ${day.totalGramSodium > day.sodiumRequirementGram} ? 'high-value' :
         (${day.totalGramSodium < day.sodiumRequirementGram - 0.8} ? 'low-value' : '')
         ">
-            <span th:text="${#numbers.formatDecimal(day.totalGramSodium,1,2)} + ' gr'"></span>
+            <span th:text="${#numbers.formatDecimal(day.totalGramSodium,1,1)} + ${gr}"></span>
+            <span th:text="${day.sodiumWeightTrend.symbol}" th:class="${'trendArrow-' + day.sodiumWeightTrend.number}"></span>
+
         </td>
 
 
@@ -339,7 +382,9 @@
         <td class="az-vurgula"
             th:classappend="${day.totalGramFatSaturated > summary.averageGramFatSaturated} ? 'high-avg' : (${day.totalGramFatSaturated < summary.averageGramFatSaturated} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalGramFatSaturated,1,2)} + ' gr'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalGramFatSaturated,1,1)} + ${gr}"></span>
+            <span th:text="${day.fatSaturatedWeightTrend.symbol}" th:class="${'trendArrow-' + day.fatSaturatedWeightTrend.number}"></span>
+
 
         </td>
 
@@ -347,7 +392,9 @@
         <td class="az-vurgula"
             th:classappend="${day.totalGramSugar > summary.averageGramSugar} ? 'high-avg' : (${day.totalGramSugar < summary.averageGramSugar} ? 'low-avg' : '')"
         >
-            <span  th:text="${#numbers.formatDecimal(day.totalGramSugar,1,2)} + ' gr'"></span>
+            <span  th:text="${#numbers.formatDecimal(day.totalGramSugar,1,1)} + ${gr}"></span>
+            <span th:text="${day.sugarWeightTrend.symbol}" th:class="${'trendArrow-' + day.sugarWeightTrend.number}"></span>
+
 
         </td>
 
@@ -360,6 +407,8 @@
         ">
             <span th:title="${#numbers.formatDecimal(day.sleepDurationDto.sleepDurationSeconds,1,0)}"
                   th:text="${day.sleepDurationDto.sleepDurationAsString}"></span>
+            <span th:text="${day.sleepDurationTrend.symbol}" th:class="${'trendArrow-' + day.sleepDurationTrend.number}"></span>
+
         </td>
 
     </tr>
@@ -373,6 +422,28 @@
         <th th:text="${#numbers.formatDecimal(summary.realWeightDifference,1,2)}"></th>
         <td colspan="9"></td>
     </tr>
+
+    <tr>
+        <th>Tarih</th>
+        <th>Kcal İhtiyaç</th>
+        <th>Kcal Gıda</th>
+        <th>Kcal Gıda Fark</th>
+        <th>KG Gıda Fark</th>
+        <th>Kcal Aktivite</th>
+        <th>Kcal Teorik Fark</th>
+        <th>KG Teorik Fark</th>
+        <th>KG Gerçek Tartı</th>
+        <th>Gramaj</th>
+        <th>GR Yağ</th>
+        <th>GR Karb</th>
+        <th>GR Protein</th>
+        <th>GR Lif</th>
+        <th>GR Sodyum</th>
+        <th>Doymuş Yağ</th>
+        <th>GR Şeker</th>
+        <th>SN Uyku</th>
+    </tr>
+
     <tr>
         <th th:text="${'TOPLAM ' + #numbers.formatDecimal(summary.totalDays,1,0) + ' gün'}"></th>
 
@@ -537,6 +608,85 @@
 
     </tr>
 
+    <tr>
+        <th th:text="${'İniş Çıkışlar'}"></th>
+        <th>
+            <span  th:text="${summary.tdeeTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kcalTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kcalDiffTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kgDiffTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kcalActivityTrendsSummary.displayText}"></span>
+        </th>
+
+
+
+        <th>
+            <span  th:text="${summary.kcalVirtualWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kgVirtualWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.kgBodyWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.foodWeightTrendsSummary.displayText}"></span>
+        </th>
+        <th>
+            <span  th:text="${summary.fatWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.carbohydrateWeightTrendsSummary.displayText}"></span>
+        </th>
+        <th>
+            <span  th:text="${summary.proteinWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.fiberWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.sodiumWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.fatSaturatedWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.sugarWeightTrendsSummary.displayText}"></span>
+        </th>
+
+        <th>
+            <span  th:text="${summary.sleepDurationTrendsSummary.displayText}"></span>
+        </th>
+
+
+
+
+
+
+    </tr>
+
+
+
     </tfoot>
 
 </table>
@@ -549,7 +699,7 @@
     <label><input type="checkbox" data-dataset="kgFoodDiff"> Kg Gıda Fark</label>
     <label><input type="checkbox" data-dataset="kcalActivity"> Kcal Aktivite</label>
 
-    <label><input type="checkbox" checked data-dataset="kcalTotal"> Kcal Toplam Fark</label>
+    <label><input type="checkbox" checked data-dataset="kcalTotal"> Kcal Teorik Fark</label>
 
     <label><input type="checkbox" data-dataset="kgTotalDiff"> KG Toplam Fark</label>
 
@@ -902,13 +1052,13 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
             borderWidth: 2
         },
         kcalTotal: {
-            label: "Kcal Toplam Fark",
+            label: "Kcal Teorik Fark",
             data: kcalTotal,
             yAxisID: 'y',
             borderWidth: 2
         },
         kgTotalDiff: {
-            label: "KG Toplam Fark",
+            label: "KG Teorik Fark",
             data: kgTotalDiff,
             yAxisID: 'y3',
             borderWidth: 2

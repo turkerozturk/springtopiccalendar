@@ -162,6 +162,12 @@ public class FoodController {
         model.addAttribute("firstDateMillis", firstMillis);
         model.addAttribute("lastDateMillis", lastMillis);
 
+        model.addAttribute("gr", "g");
+        model.addAttribute("kcal", "k");
+        model.addAttribute("kg", "kg");
+
+
+
         return "food-date-range";
     }
 

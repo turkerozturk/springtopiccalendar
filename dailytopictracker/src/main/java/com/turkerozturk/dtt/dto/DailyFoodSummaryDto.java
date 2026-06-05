@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.dto;
 
 
+import com.turkerozturk.dtt.helper.datatrends.TrendDirection;
 import lombok.Data;
 
 @Data
@@ -118,6 +119,26 @@ public class DailyFoodSummaryDto {
     private Double fatSaturatedRequirementGram;
     private Double fatSaturatedRequirementMinPercent;
     private Double fatSaturatedRequirementMaxPercent;
+
+
+    // TODO Artik varolan sutun verilerini de asagidaki yapilara aktaracagim:
+    private TrendDirection kcalTdeeTrend;
+    private TrendDirection kcalFoodTrend;
+    private TrendDirection kcalFoodDiffTrend;
+    private TrendDirection kgFoodDiffTrend;
+    private TrendDirection kcalActivityTrend;
+    private TrendDirection kcalVirtualWeightTrend;
+    private TrendDirection kgTheoreticalWeightTrend;
+    private TrendDirection bodyWeightTrend;
+    private TrendDirection foodWeightTrend;
+    private TrendDirection fatWeightTrend;
+    private TrendDirection carbohydrateWeightTrend;
+    private TrendDirection proteinWeightTrend;
+    private TrendDirection fiberWeightTrend;
+    private TrendDirection sodiumWeightTrend;
+    private TrendDirection fatSaturatedWeightTrend;
+    private TrendDirection sugarWeightTrend;
+    private TrendDirection sleepDurationTrend;
 
 
 }

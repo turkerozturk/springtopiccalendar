@@ -1,5 +1,6 @@
 package com.turkerozturk.dtt.dto;
 
+import com.turkerozturk.dtt.helper.datatrends.TrendSummaryDto;
 import lombok.Data;
 
 import java.util.List;
@@ -99,5 +100,28 @@ public class DateRangeFoodSummaryDto {
     private SleepDurationDto totalSleepDurationDto;
     private SleepDurationDto averageSleepDurationDto;
 
+    // Trend Summarries
+    private TrendSummaryDto tdeeTrendsSummary;
+    private TrendSummaryDto kcalTrendsSummary;
+    private TrendSummaryDto kcalDiffTrendsSummary;
+
+    private TrendSummaryDto kgDiffTrendsSummary;
+    private TrendSummaryDto kcalActivityTrendsSummary;
+    private TrendSummaryDto kcalVirtualWeightTrendsSummary; // TODO 0 0 0 cikiyor
+
+    private TrendSummaryDto kgVirtualWeightTrendsSummary;
+    private TrendSummaryDto kgBodyWeightTrendsSummary;
+
+    private TrendSummaryDto foodWeightTrendsSummary;
+    private TrendSummaryDto fatWeightTrendsSummary;
+    private TrendSummaryDto carbohydrateWeightTrendsSummary;
+
+    private TrendSummaryDto proteinWeightTrendsSummary;
+    private TrendSummaryDto fiberWeightTrendsSummary;
+    private TrendSummaryDto sodiumWeightTrendsSummary;
+
+    private TrendSummaryDto fatSaturatedWeightTrendsSummary;
+    private TrendSummaryDto sugarWeightTrendsSummary;
+    private TrendSummaryDto sleepDurationTrendsSummary;
 
 }
