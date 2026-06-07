@@ -183,4 +183,55 @@ public class FoodController {
 
     }
 
+    @GetMapping("/food-list-by-date-range")
+    public String getFoodListByDateRangePage(
+            @RequestParam(required = false) Long firstDateMillis,
+            @RequestParam(required = false) Long lastDateMillis,
+            Model model
+    ) {
+        ZoneId zoneId = timeZoneProvider.getZoneId();
+
+        LocalDate lastDate;
+        LocalDate firstDate;
+
+        if (lastDateMillis == null) {
+            lastDate = LocalDate.now(zoneId);
+        } else {
+            lastDate = Instant.ofEpochMilli(lastDateMillis)
+                    .atZone(zoneId)
+                    .toLocalDate();
+        }
+
+        if (firstDateMillis == null) {
+            firstDate = lastDate.minusDays(6);
+        } else {
+            firstDate = Instant.ofEpochMilli(firstDateMillis)
+                    .atZone(zoneId)
+                    .toLocalDate();
+        }
+
+        if (lastDate.isBefore(firstDate)) {
+            firstDate = lastDate;
+        }
+
+        long firstMillis = firstDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        long lastMillis = lastDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
+
+        DateRangeFoodSummaryDto summary =
+                foodService.getDateRangeSummary(firstMillis, lastMillis);
+
+        model.addAttribute("summary", summary);
+        model.addAttribute("zoneId", zoneId);
+        model.addAttribute("firstDateMillis", firstMillis);
+        model.addAttribute("lastDateMillis", lastMillis);
+
+        model.addAttribute("gr", "g");
+        model.addAttribute("kcal", "kc");
+        model.addAttribute("kg", "kg");
+
+
+
+        return "food-date-range";
+    }
+
 }

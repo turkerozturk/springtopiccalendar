@@ -11,6 +11,14 @@ public class TrendSummaryDto {
 
     private long sameCount;
 
+    // https://unicode-explorer.com/list/arrows
+
+    public String getDisplayText3() {
+        return downCount + htmlize("\uD83E\uDC1F",-1) + SEPARATOR // 🠟
+                + sameCount+ SEPARATOR // =
+                + upCount+ htmlize("\uD83E\uDC1D",1); //🠝
+    }
+
     public String getDisplayText2() {
         return downCount + htmlize("↓",-1) + SEPARATOR
                 + sameCount+ SEPARATOR // =

@@ -158,7 +158,23 @@ public class DailyFoodSummaryDto {
     private TrendDirection avgSugarWeightTrend;
     private TrendDirection avgSleepDurationTrend;
 
-
+    private TrendDirection lmtKcalTdeeTrend;
+    private TrendDirection lmtKcalFoodTrend;
+    private TrendDirection lmtKcalFoodDiffTrend;
+    private TrendDirection lmtKgFoodDiffTrend;
+    private TrendDirection lmtKcalActivityTrend;
+    private TrendDirection lmtKcalVirtualWeightTrend;
+    private TrendDirection lmtKgTheoreticalWeightTrend;
+    private TrendDirection lmtBodyWeightTrend;
+    private TrendDirection lmtFoodWeightTrend;
+    private TrendDirection lmtFatWeightTrend;
+    private TrendDirection lmtCarbohydrateWeightTrend;
+    private TrendDirection lmtProteinWeightTrend;
+    private TrendDirection lmtFiberWeightTrend;
+    private TrendDirection lmtSodiumWeightTrend;
+    private TrendDirection lmtFatSaturatedWeightTrend;
+    private TrendDirection lmtSugarWeightTrend;
+    private TrendDirection lmtSleepDurationTrend;
 
 
 }

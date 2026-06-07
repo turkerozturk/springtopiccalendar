@@ -69,5 +69,17 @@ public final class TrendUtils {
         }
     }
 
+    public static TrendDirection decideDirection2(double value, double lowerLimit, double upperLimit) {
+        if (value > upperLimit) {
+            return TrendDirection.UP;
+        }
+        else if (value < lowerLimit) {
+            return TrendDirection.DOWN;
+        }
+        else {
+            return TrendDirection.SAME;
+        }
+    }
+
 
 }

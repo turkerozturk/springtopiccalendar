@@ -914,6 +914,40 @@ public class FoodService {
         List<TrendDirection> avgSugarWeightTrends = new ArrayList<>(); //16
         List<TrendDirection> avgSleepDurationTrends = new ArrayList<>(); //17
 
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // limit trends
+        // TODO gunluk Aktivite limitleri, tarih araligindaki aktivite verilerinin dinamik ortalamasindan sabit katsayilar kadar uzaktadir. Simdilik boyle.
+        double lmt5 = rangeDto.getAverageActivityKcal();
+        double uLmtKcalActivity = lmt5 * 1.2;
+        double dLmtKcalActivity = lmt5 * 0.8;
+
+        double lmt9 = rangeDto.getAverageGram();
+        double uLmtFoodWeight = lmt9 * 1.2;
+        double dLmtFoodWeight = lmt9 * 0.8;
+
+        List<TrendDirection> lmtTdeeTrends = new ArrayList<>(); //1
+        List<TrendDirection> lmtKcalTrends = new ArrayList<>(); //2
+        List<TrendDirection> lmtKcalFoodDiffTrends = new ArrayList<>(); //3
+
+        List<TrendDirection> lmtKgFoodDiffTrends = new ArrayList<>(); //4
+        List<TrendDirection> lmtKcalActivityTrends = new ArrayList<>(); //5
+        List<TrendDirection> lmtKcalFoodDiffAndActivityTrends = new ArrayList<>(); //6
+
+        List<TrendDirection> lmtKgTheoraticallyDiffTrends = new ArrayList<>(); //7
+        List<TrendDirection> lmtKgBodyWeightTrends = new ArrayList<>(); //8
+        List<TrendDirection> lmtFoodWeightTrends = new ArrayList<>(); //9
+
+        List<TrendDirection> lmtFatWeightTrends = new ArrayList<>(); //10
+        List<TrendDirection> lmtCarbohydrateWeightTrends = new ArrayList<>(); //11
+        List<TrendDirection> lmtProteinWeightTrends = new ArrayList<>(); //12
+
+        List<TrendDirection> lmtFiberWeightTrends = new ArrayList<>(); //13
+        List<TrendDirection> lmtSodiumWeightTrends = new ArrayList<>(); //14
+        List<TrendDirection> lmtFatSaturatedWeightTrends = new ArrayList<>(); //15
+
+        List<TrendDirection> lmtSugarWeightTrends = new ArrayList<>(); //16
+        List<TrendDirection> lmtSleepDurationTrends = new ArrayList<>(); //17
+
         FoodSummaryDto dailyYesterday = getDailyFoodSummary(startDateMillis - ONE_DAY_MILLIS);
         DailyFoodSummaryDto previous = dailyYesterday.getFsd();//null;
         for (DailyFoodSummaryDto current : dailyList) {
@@ -1048,6 +1082,66 @@ public class FoodService {
                 current.setAvgSleepDurationTrend(TrendUtils.decideDirection(current.getSleepDurationDto().getSleepDurationSeconds(), averageSleepDurationSeconds));
                 avgSleepDurationTrends.add(current.getAvgSleepDurationTrend()); //17
 
+                // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //limit trends
+                double lmt1 = current.getHumanBody().getTdee();
+                current.setLmtKcalTdeeTrend(TrendUtils.decideDirection2(lmt1, current.getHumanBody().getBmi(),lmt1 * 1.375));
+                lmtTdeeTrends.add(current.getLmtKcalTdeeTrend()); //1
+
+                double lmt2 = current.getTotalKcal();
+                double uLmtKcalTdee = lmt1 * 1.2;
+                double dLmtKcalTdee = lmt1 * 0.8;
+
+                current.setLmtKcalFoodTrend(TrendUtils.decideDirection2(lmt2, dLmtKcalTdee,uLmtKcalTdee));
+                lmtKcalTrends.add(current.getLmtKcalFoodTrend()); //2
+
+                current.setLmtKcalFoodDiffTrend(TrendUtils.decideDirection(current.getTotalKcalDiff(), rangeDto.getAverageKcalDiff()));
+                lmtKcalFoodDiffTrends.add(current.getLmtKcalFoodDiffTrend()); //3
+
+                current.setLmtKgFoodDiffTrend(TrendUtils.decideDirection(current.getTotalGramDiff(), rangeDto.getAverageGramDiff()));
+                lmtKgFoodDiffTrends.add(current.getLmtKgFoodDiffTrend()); //4
+
+
+
+                current.setLmtKcalActivityTrend(TrendUtils.decideDirection2(current.getTotalActivityKcal(), dLmtKcalActivity, uLmtKcalActivity));
+                lmtKcalActivityTrends.add(current.getLmtKcalActivityTrend()); //5
+
+                current.setLmtKcalVirtualWeightTrend(TrendUtils.decideDirection(current.getTotalKcalDiffWithActivity(), rangeDto.getAverageKcalDiffWithActivity()));
+                lmtKcalFoodDiffAndActivityTrends.add(current.getLmtKcalVirtualWeightTrend()); //6
+
+                current.setLmtKgTheoreticalWeightTrend(TrendUtils.decideDirection(current.getTotalGramDiffWithActivity(), rangeDto.getAverageGramDiffWithActivity()));
+                lmtKgTheoraticallyDiffTrends.add(current.getLmtKcalVirtualWeightTrend()); //7
+
+                current.setLmtBodyWeightTrend(TrendUtils.decideDirection(current.getHumanBody().getWeightKg(), rangeDto.getAverageWeightKg()));
+                lmtKgBodyWeightTrends.add(current.getLmtBodyWeightTrend()); //8
+
+                current.setLmtFoodWeightTrend(TrendUtils.decideDirection2(current.getTotalGram(), dLmtFoodWeight, uLmtFoodWeight));
+                lmtFoodWeightTrends.add(current.getLmtFoodWeightTrend()); //9
+
+                current.setLmtFatWeightTrend(TrendUtils.decideDirection(current.getTotalGramFat(), rangeDto.getAverageGramFat()));
+                lmtFatWeightTrends.add(current.getLmtFatWeightTrend()); //10
+
+                current.setLmtCarbohydrateWeightTrend(TrendUtils.decideDirection(current.getTotalGramCarbohydrate(), rangeDto.getAverageGramCarbohydrate()));
+                lmtCarbohydrateWeightTrends.add(current.getLmtCarbohydrateWeightTrend()); //11
+
+                current.setLmtProteinWeightTrend(TrendUtils.decideDirection(current.getTotalGramProtein(), rangeDto.getAverageGramProtein()));
+                lmtProteinWeightTrends.add(current.getLmtProteinWeightTrend()); //12
+
+                current.setLmtFiberWeightTrend(TrendUtils.decideDirection(current.getTotalGramFiber(), rangeDto.getAverageGramFiber()));
+                lmtFiberWeightTrends.add(current.getLmtFiberWeightTrend()); //13
+
+                current.setLmtSodiumWeightTrend(TrendUtils.decideDirection(current.getTotalGramSodium(), rangeDto.getAverageGramSodium()));
+                lmtSodiumWeightTrends.add(current.getLmtSodiumWeightTrend()); //14
+
+                current.setLmtFatSaturatedWeightTrend(TrendUtils.decideDirection(current.getTotalGramFatSaturated(), rangeDto.getAverageGramFatSaturated()));
+                lmtFatSaturatedWeightTrends.add(current.getLmtFatSaturatedWeightTrend()); //15
+
+                current.setLmtSugarWeightTrend(TrendUtils.decideDirection(current.getTotalGramSugar(), rangeDto.getAverageGramSugar()));
+                lmtSugarWeightTrends.add(current.getLmtSugarWeightTrend()); //16
+
+                current.setLmtSleepDurationTrend(TrendUtils.decideDirection(current.getSleepDurationDto().getSleepDurationSeconds(), averageSleepDurationSeconds));
+                lmtSleepDurationTrends.add(current.getLmtSleepDurationTrend()); //17
+
             }
             previous = current;
         }
@@ -1099,8 +1193,46 @@ public class FoodService {
         rangeDto.setAvgSugarWeightTrendsSummary(TrendUtils.summarize(avgSugarWeightTrends)); //16 gr seker
         rangeDto.setAvgSleepDurationTrendsSummary(TrendUtils.summarize(avgSleepDurationTrends)); //17 sn uyku
 
+        // LIMIT TRENDS
+
+        rangeDto.setULmtKcalActivity(uLmtKcalActivity);
+        rangeDto.setDLmtKcalActivity(dLmtKcalActivity);
+
+        rangeDto.setULmtFoodWeight(uLmtFoodWeight);
+        rangeDto.setDLmtFoodWeight(dLmtFoodWeight);
+
+        rangeDto.setLmtKcalTdeeTrendsSummary(TrendUtils.summarize(lmtTdeeTrends)); //1 kcal ihtiyac
+        rangeDto.setLmtKcalTrendsSummary(TrendUtils.summarize(lmtKcalTrends)); //2 kcal gida
+        rangeDto.setLmtKcalDiffTrendsSummary(TrendUtils.summarize(lmtKcalFoodDiffTrends)); //3 kcal gida fark
+
+        rangeDto.setLmtKgDiffTrendsSummary(TrendUtils.summarize(lmtKgFoodDiffTrends)); //4 kg gida fark
+        rangeDto.setLmtKcalActivityTrendsSummary(TrendUtils.summarize(lmtKcalActivityTrends)); //5 kcal aktivite
+        rangeDto.setLmtKcalVirtualWeightTrendsSummary(TrendUtils.summarize(lmtKcalFoodDiffAndActivityTrends)); // 6 kcal teorik fark
+
+        rangeDto.setLmtKgVirtualWeightTrendsSummary(TrendUtils.summarize(lmtKgTheoraticallyDiffTrends)); //7
+        rangeDto.setLmtKgBodyWeightTrendsSummary(TrendUtils.summarize(lmtKgBodyWeightTrends)); //8 kg gercek vucut agirligi
+        rangeDto.setLmtFoodWeightTrendsSummary(TrendUtils.summarize(lmtFoodWeightTrends)); //9 gr gramaj toplam gida agirligi
+
+        rangeDto.setLmtFatWeightTrendsSummary(TrendUtils.summarize(lmtFatWeightTrends)); //10 gr yag
+        rangeDto.setLmtCarbohydrateWeightTrendsSummary(TrendUtils.summarize(lmtCarbohydrateWeightTrends)); //11 gr karbonhidrat
+        rangeDto.setLmtProteinWeightTrendsSummary(TrendUtils.summarize(lmtProteinWeightTrends)); //12 gr protein
+
+        rangeDto.setLmtFiberWeightTrendsSummary(TrendUtils.summarize(lmtFiberWeightTrends)); //13 gr lif
+        rangeDto.setLmtSodiumWeightTrendsSummary(TrendUtils.summarize(lmtSodiumWeightTrends)); //14 gr sodyum
+        rangeDto.setLmtFatSaturatedWeightTrendsSummary(TrendUtils.summarize(lmtFatSaturatedWeightTrends)); //15 doymus yag
+
+        rangeDto.setLmtSugarWeightTrendsSummary(TrendUtils.summarize(lmtSugarWeightTrends)); //16 gr seker
+        rangeDto.setLmtSleepDurationTrendsSummary(TrendUtils.summarize(lmtSleepDurationTrends)); //17 sn uyku
+
+
 
         rangeDto.setDays(dailyList);
+
+        List<FoodConsumptionDto> foodConsumptionDtosByCategory = getFoodListByDateRangeSummaryAndCategories(startDateMillis, endDateMillis);
+        rangeDto.setFoodConsumptionDtosByCategory(foodConsumptionDtosByCategory);
+
+        List<FoodConsumptionDto> foodConsumptionDtos = getFoodListByDateRangeSummary(startDateMillis, endDateMillis);
+        rangeDto.setFoodConsumptionDtos(foodConsumptionDtos);
 
         return rangeDto;
     }
@@ -1113,6 +1245,103 @@ public class FoodService {
     private double nvl(Double value) {
         return value == null ? 0.0 : value;
     }
+
+
+    public List<FoodConsumptionDto> getFoodListByDateRangeSummary(Long startDateMillis, Long endDateMillis) {
+
+        Map<Long, Double> foodWeights = new HashMap<>();
+        Map<Long, String> foodNames = new HashMap<>();
+        Map<Long, String> categoryNames = new HashMap<>();
+        Map<Long, Long> categoryIds = new HashMap<>();
+
+        // gün gün dolaş
+        for (long date = startDateMillis; date <= endDateMillis; date += ONE_DAY_MILLIS) {
+            //totalDays++;
+            FoodSummaryDto daily = getDailyFoodSummary(date);
+            for (FoodEntryDto fsd : daily.getItems()) {
+                long topicId = fsd.getTopicId();
+                foodWeights.merge(topicId, fsd.getGram(), Double::sum);
+                foodNames.computeIfAbsent(topicId, k -> fsd.getTopicName());
+                categoryNames.computeIfAbsent(topicId, k -> fsd.getCategoryName());
+                categoryIds.computeIfAbsent(topicId, k -> fsd.getCategoryId());
+            }
+        }
+
+        List<FoodConsumptionDto> foodConsumptionDtos = new ArrayList<>();
+        for (long topicId : foodWeights.keySet()) {
+            FoodConsumptionDto fcd = new FoodConsumptionDto();
+            fcd.setTopicId(topicId);
+            fcd.setFoodWeight(foodWeights.get(topicId));
+            fcd.setCategoryId(categoryIds.get(topicId));
+            fcd.setCategoryName(categoryNames.get(topicId));
+            fcd.setTopicName(foodNames.get(topicId));
+            foodConsumptionDtos.add(fcd);
+        }
+
+        //kalici sort
+        foodConsumptionDtos.sort(
+                Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed()
+        );
+
+        // gecici sort ve konsola yazdirmak
+        //foodConsumptionDtos.stream()
+        //        .sorted(Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed())
+        //        .forEach(System.out::println);
+
+
+        return foodConsumptionDtos;
+    }
+
+    public List<FoodConsumptionDto> getFoodListByDateRangeSummaryAndCategories(Long startDateMillis, Long endDateMillis) {
+
+        Map<Long, Double> foodWeights = new HashMap<>();
+        Map<Long, Set<String>> foodNameSets = new HashMap<>(); // set kullanmamizin sebebi, topic isimlerinin yani food namelerin tekrar etmemesi.
+        Map<Long, String> categoryNames = new HashMap<>();
+        Map<Long, Long> topicIds = new HashMap<>();
+
+        // gün gün dolaş
+        for (long date = startDateMillis; date <= endDateMillis; date += ONE_DAY_MILLIS) {
+            FoodSummaryDto daily = getDailyFoodSummary(date);
+
+            for (FoodEntryDto fsd : daily.getItems()) {
+                long categoryId = fsd.getCategoryId();
+
+                foodWeights.merge(categoryId, fsd.getGram(), Double::sum);
+
+                foodNameSets
+                        .computeIfAbsent(categoryId, k -> new LinkedHashSet<>())
+                        .add(fsd.getTopicName());
+
+                categoryNames.computeIfAbsent(categoryId, k -> fsd.getCategoryName());
+                topicIds.computeIfAbsent(categoryId, k -> fsd.getTopicId());
+            }
+        }
+
+        List<FoodConsumptionDto> foodConsumptionDtos = new ArrayList<>();
+        for (long categoryId : foodWeights.keySet()) {
+            FoodConsumptionDto fcd = new FoodConsumptionDto();
+            fcd.setTopicId(topicIds.get(categoryId));
+            fcd.setFoodWeight(foodWeights.get(categoryId));
+            fcd.setCategoryId(categoryId);
+            fcd.setCategoryName(categoryNames.get(categoryId));
+            fcd.setTopicName(foodNameSets.get(categoryId).toString());
+            foodConsumptionDtos.add(fcd);
+        }
+
+        //kalici sort
+        foodConsumptionDtos.sort(
+                Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed()
+        );
+
+        // gecici sort ve konsola yazdirmak
+        //foodConsumptionDtos.stream()
+        //        .sorted(Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed())
+        //        .forEach(System.out::println);
+
+
+        return foodConsumptionDtos;
+    }
+
 
 }
 

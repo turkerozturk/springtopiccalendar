@@ -148,4 +148,39 @@ public class DateRangeFoodSummaryDto {
     private TrendSummaryDto avgSugarWeightTrendsSummary;
     private TrendSummaryDto avgSleepDurationTrendsSummary;
 
+    // Limit Summaries
+    private TrendSummaryDto lmtKcalTdeeTrendsSummary;
+    private TrendSummaryDto lmtKcalTrendsSummary;
+    private TrendSummaryDto lmtKcalDiffTrendsSummary;
+
+    private TrendSummaryDto lmtKgDiffTrendsSummary;
+    private TrendSummaryDto lmtKcalActivityTrendsSummary;
+    private TrendSummaryDto lmtKcalVirtualWeightTrendsSummary;
+
+    private TrendSummaryDto lmtKgVirtualWeightTrendsSummary;
+    private TrendSummaryDto lmtKgBodyWeightTrendsSummary;
+
+    private TrendSummaryDto lmtFoodWeightTrendsSummary;
+    private TrendSummaryDto lmtFatWeightTrendsSummary;
+    private TrendSummaryDto lmtCarbohydrateWeightTrendsSummary;
+
+    private TrendSummaryDto lmtProteinWeightTrendsSummary;
+    private TrendSummaryDto lmtFiberWeightTrendsSummary;
+    private TrendSummaryDto lmtSodiumWeightTrendsSummary;
+
+    private TrendSummaryDto lmtFatSaturatedWeightTrendsSummary;
+    private TrendSummaryDto lmtSugarWeightTrendsSummary;
+    private TrendSummaryDto lmtSleepDurationTrendsSummary;
+
+    private double uLmtKcalActivity;
+    private double dLmtKcalActivity;
+
+    private double uLmtFoodWeight;
+    private double dLmtFoodWeight;
+
+    List<FoodConsumptionDto> foodConsumptionDtos;
+    List<FoodConsumptionDto> foodConsumptionDtosByCategory;
+
+
+
 }
