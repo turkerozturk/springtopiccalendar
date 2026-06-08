@@ -178,6 +178,13 @@
             z-index: -1;
         }
     </style>
+    <style>
+        /* https://stackoverflow.com/questions/30376886/is-it-possible-to-cross-out-cells-in-an-html-table */
+        .crossed {
+             background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), gray, transparent calc(50% + 1px));
+        }
+
+    </style>
 </head>
 <body>
 
@@ -275,7 +282,6 @@
 
 
         <td class="kol"
-
         >
             <span  th:text="${#numbers.formatDecimal(day.humanBody.tdee,4,0)} + ${kcal}"></span>
             <span th:text="${day.kcalTdeeTrend.symbol}" th:class="${'trendArrow-' + day.kcalTdeeTrend.number}"></span>
@@ -286,7 +292,10 @@
 
 
         <td class="kol"
-        >
+            th:classappend="${day.totalKcal > day.humanBody.tdee } ? 'above-limit' : (${day.totalKcal < (day.humanBody.bmr) } ? 'below-limit' : 'within-limit')"
+            th:title="${'Limits: ' + #numbers.formatDecimal(day.humanBody.bmr,1,0) + ' < x < ' + #numbers.formatDecimal(day.humanBody.tdee,1,0)}"
+
+            >
 
             <span  th:text="${#numbers.formatDecimal(day.totalKcal,4,0)} + ${kcal}"></span>
             <span th:text="${day.kcalFoodTrend.symbol}" th:class="${'trendArrow-' + day.kcalFoodTrend.number}"></span>
@@ -479,7 +488,7 @@
     <tfoot>
     <tr>
         <td colspan="7" style="text-align: right;"
-            th:text="${ summary.activityCorrectionFactor + ' olan Aktivite Düzeltme Katsayısı ile çarpılırsa, son kalori ve ilk vücut ağırlığı sayılmazsa -&gt;'}"></td>
+            th:utext="${ '<b>' + summary.activityCorrectionFactor + '</b> olarak belirlediğiniz Aktivite Düzeltme Katsayısı ile çarpılırsa, son kalori ve ilk vücut ağırlığı sayılmazsa -&gt;'}"></td>
         <th th:text="${#numbers.formatDecimal(summary.totalGramDiffWithActivityAndFactor,1,2)}" style="background-color: lightgray;"></th>
         <th>
             <!--/* <span th:text="${#numbers.formatDecimal(summary.realWeightDifference,1,2)}"></span> */-->
@@ -837,8 +846,8 @@
     <tr>
         <th th:text="${'Limit Sayaçları'}"></th>
 
-        <th>
-            <th:block  th:utext="${summary.lmtKcalTdeeTrendsSummary.displayText3}"></th:block>
+        <th class="crossed">
+           <!--/* <th:block  th:utext="${summary.lmtKcalTdeeTrendsSummary.displayText3}"></th:block> */-->
         </th>
 
         <th>
@@ -929,26 +938,32 @@
         <td>17</td>
     </tr>
 
+    <style>
+
+        .limitDescriptions {
+            word-spacing: 100vw; /* https://stackoverflow.com/questions/4212909/can-css-force-a-line-break-after-each-word-in-an-element */
+        }
+    </style>
     <tr>
         <td>Kriterler</td>
-        <td><span th:text="${summary.kcalTdeeDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kcalTdeeDataDescription}"></span></td>
 
-        <td><span th:text="${summary.kcalConsumptionDataDescription}"></span></td>
-        <td><span th:text="${summary.kcalFoodDiffDataDescription}"></span></td>
-        <td><span th:text="${summary.kgFoodDiffDataDescription}"></span></td>
-        <td><span th:text="${summary.kcalActivityDataDescription}"></span></td>
-        <td><span th:text="${summary.kcalTeoricalDiffDataDescription}"></span></td>
-        <td><span th:text="${summary.kgTeoricalDiffDataDescription}"></span></td>
-        <td><span th:text="${summary.bodyWeightDataDescription}"></span></td>
-        <td><span th:text="${summary.foodWeightDataDescription}"></span></td>
-        <td><span th:text="${summary.fatDataDescription}"></span></td>
-        <td><span th:text="${summary.carbohydrateDataDescription}"></span></td>
-        <td><span th:text="${summary.proteinDataDescription}"></span></td>
-        <td><span th:text="${summary.fiberDataDescription}"></span></td>
-        <td><span th:text="${summary.sodiumDataDescription}"></span></td>
-        <td><span th:text="${summary.fatSaturatedDataDescription}"></span></td>
-        <td><span th:text="${summary.sugarDataDescription}"></span></td>
-        <td><span th:text="${summary.sleepDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kcalConsumptionDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kcalFoodDiffDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kgFoodDiffDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kcalActivityDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kcalTeoricalDiffDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.kgTeoricalDiffDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.bodyWeightDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.foodWeightDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.fatDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.carbohydrateDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.proteinDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.fiberDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.sodiumDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.fatSaturatedDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.sugarDataDescription}"></span></td>
+        <td class="limitDescriptions"><span th:utext="${summary.sleepDataDescription}"></span></td>
     </tr>
 
     </tfoot>

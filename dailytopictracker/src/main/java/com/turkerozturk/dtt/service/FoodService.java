@@ -1093,6 +1093,9 @@ public class FoodService {
                 double col1 = current.getHumanBody().getTdee();
                 current.setLmtKcalTdeeTrend(TrendUtils.decideDirection2(col1, current.getHumanBody().getBmi(),col1 * 1.375));
                 lmtTdeeTrends.add(current.getLmtKcalTdeeTrend()); //1
+                //double avgTdeeString = Math.round(rangeDto.getAverageKcalTdee());
+                //double avgBmrString = Math.round(avgTdeeString / activityLevel.getMultiplier());//ActivityLevel.DISABLED.getMultiplier();
+
 
                 double col2 = current.getTotalKcal();
                 double uLmtKcalTdee = col1 * 1.2;
@@ -1257,24 +1260,28 @@ public class FoodService {
         rangeDto.setFoodConsumptionDtos(foodConsumptionDtos);
 
         // Data Descriptions
-        String activityLevelString = settingHelper.get("human.activityLevel", "activity level is not defined");
-        rangeDto.setKcalTdeeDataDescription(String.format("Günlük alınması gereken kalori(TDEE). BMR, Mifflin-St Jeor formülüne göre hesaplanır. Seçmiş olduğunuz aktivite seviyesi: %s", ActivityLevel.valueOf(activityLevelString)));
-        rangeDto.setKcalConsumptionDataDescription(String.format("Günlük tüketilmiş kalori miktarı."));
+        String activityLevelString = settingHelper.get("human.activityLevel", ActivityLevel.DISABLED.name());
+        ActivityLevel activityLevel = ActivityLevel.valueOf(activityLevelString);
+        rangeDto.setKcalTdeeDataDescription(String.format("Günlük alınması gereken kalori (TDEE). BMR, Mifflin-St Jeor formülüne göre hesaplanır. Seçmiş olduğunuz aktivite seviyesi: <b>%s</b>", ActivityLevel.valueOf(activityLevelString)));
+        double avgTdeeString = Math.round(rangeDto.getAverageKcalTdee());
+        double avgBmrString = Math.round(avgTdeeString / activityLevel.getMultiplier());//ActivityLevel.DISABLED.getMultiplier();
+
+        rangeDto.setKcalConsumptionDataDescription(String.format("Günlük tüketilmiş kalori miktarı. Şimdilik kişinin BMR'si (<b>%s</b>) ile ortalama TDEE'si (<b>%s</b>) arasını limit olarak kabul ediyoruz.", avgBmrString, avgTdeeString));
         rangeDto.setKcalFoodDiffDataDescription(String.format("Günlük alınması gereken kalori ile gerçekte tüketilmiş kalori arasındaki fark."));
         rangeDto.setKgFoodDiffDataDescription(String.format("Gıda yoluyla teorik olarak ileride kaç kg eksik veya fazla çıkacağı."));
         rangeDto.setKcalActivityDataDescription(String.format("Normalin dışında, fazladan fiziksel aktiviteler yoluyla kaybedilen kalori miktarı."));
         rangeDto.setKcalTeoricalDiffDataDescription(String.format("Teorik olarak günlük gıda tüketimi ve aktiveler sonrasında hesaplanan kalorinin, günlük alınması gereken kaloriye göre farkı."));
         rangeDto.setKgTeoricalDiffDataDescription(String.format("Teorik olarak gıda tüketimine ek olarak aktiviteleri de dahil edince ileride kaç kg eksik veya fazla oluşacağı."));
-        rangeDto.setBodyWeightDataDescription(String.format("Vücut kitle endeksi %s ile %s aralığında kaslı olmayanlar için %s sayılır.", BODY_MASS_INDEX_CATEGORY.getMinValue(), BODY_MASS_INDEX_CATEGORY.getMaxValue(), BODY_MASS_INDEX_CATEGORY.getDisplayName()));
-        rangeDto.setFoodWeightDataDescription(String.format("Şimdilik %s ile %s gram arasında yenilebilir gıda gerektiğini varsayıyoruz.", 0, 0));
-        rangeDto.setFatDataDescription(String.format("%%%s ile %%%s arasında yağ gerekiyor.", usdaFatRequirementMinPercent, usdaFatRequirementMaxPercent));
-        rangeDto.setCarbohydrateDataDescription(String.format("%%%s ile %%%s arasında ve en az %s gram karbonhidrat gerekiyor.", usdaCarbohydrateRequirementMinPercent, usdaCarbohydrateRequirementMaxPercent, usdaCarbohydrateGram));
-        rangeDto.setProteinDataDescription(String.format("%%%s ile %%%s arasında ve en az %s gram protein gerekiyor.", usdaProteinRequirementMinPercent, usdaProteinRequirementMaxPercent, usdaProteinGram));
-        rangeDto.setFiberDataDescription("TODO: Fiber miktarı her 1000 kcal için 14 gr olmalıdır. Şimdilik yaşa göre olan miktar uygulanmamıştır.");
+        rangeDto.setBodyWeightDataDescription(String.format("Vücut kitle endeksi <b>%s</b> ile <b>%s</b> aralığında kaslı olmayanlar için <b>%s</b> sayılır.", BODY_MASS_INDEX_CATEGORY.getMinValue(), BODY_MASS_INDEX_CATEGORY.getMaxValue(), BODY_MASS_INDEX_CATEGORY.getDisplayName()));
+        rangeDto.setFoodWeightDataDescription(String.format("Şimdilik <b>%s</b> ile <b>%s</b> gram arasında yenilebilir gıda gerektiğini varsaydık.", 0, 0));
+        rangeDto.setFatDataDescription(String.format("<b>%%%s</b> ile <b>%%%s</b> arasında yağ gerekiyor.", usdaFatRequirementMinPercent, usdaFatRequirementMaxPercent));
+        rangeDto.setCarbohydrateDataDescription(String.format("<b>%%%s</b> ile <b>%%%s</b> arasında ve en az <b>%s</b> gram karbo nhidrat gerekiyor.", usdaCarbohydrateRequirementMinPercent, usdaCarbohydrateRequirementMaxPercent, usdaCarbohydrateGram));
+        rangeDto.setProteinDataDescription(String.format("<b>%%%s</b> ile <b>%%%s</b> arasında ve en az <b>%s</b> gram protein gerekiyor.", usdaProteinRequirementMinPercent, usdaProteinRequirementMaxPercent, usdaProteinGram));
+        rangeDto.setFiberDataDescription("TODO: Fiber miktarı her <b>1000</b> kcal için <b>14</b> gr olmalıdır. Şimdilik yaşa göre olan miktar uygu lanmadı.");
         rangeDto.setSodiumDataDescription("TODO: Şimdilik ikiye bölmek mantıklı olur çünkü sodyumu değil tuz miktarını gösteriyor çoğunlukla.");
-        rangeDto.setFatSaturatedDataDescription("Doymuş yağ ile ilgili henüz mantıklı bir limit hesaplaması bulunmamaktadır. Ortalama değer üzerinden hardcode edilmiş bir katsayı kullanılmıştır.");
-        rangeDto.setSugarDataDescription("Şeker gramajı ile ilgili henüz mantıklı bir hesaplama bulunmamaktadır. Ortalamanın üstü ve altı için hardcoded bir katsayı kullanılmıştır.");
-        rangeDto.setSleepDataDescription("Uyku verisi için şimdilik limitler minimum 6 max 8 saat olarak hardcode edilmiştir.");
+        rangeDto.setFatSaturatedDataDescription("Doymuş yağ ile ilgili henüz mantıklı bir limit hesaplaması uygulan madı. Ortalama değer üzerinden hardcode edilmiş bir katsayı kullanıl mıştır.");
+        rangeDto.setSugarDataDescription("Şeker gramajı ile ilgili henüz mantıklı bir hesaplama uygulanmadı. Ortalamanın üstü ve altı için hardcoded bir katsayı kullanıl mıştır.");
+        rangeDto.setSleepDataDescription("Uyku verisi için şimdilik limitler minimum <b>6</b> max <b>8</b> saat olarak hardcode edilmiştir.");
 
         return rangeDto;
     }
