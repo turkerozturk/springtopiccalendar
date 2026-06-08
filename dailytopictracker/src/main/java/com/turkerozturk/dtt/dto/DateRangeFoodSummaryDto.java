@@ -178,6 +178,27 @@ public class DateRangeFoodSummaryDto {
     private double uLmtFoodWeight;
     private double dLmtFoodWeight;
 
+
+    private String kcalTdeeDataDescription;
+    private String kcalConsumptionDataDescription;
+    private String kcalFoodDiffDataDescription;
+    private String kgFoodDiffDataDescription;
+    private String kcalActivityDataDescription;
+    private String kcalTeoricalDiffDataDescription;
+    private String kgTeoricalDiffDataDescription;
+    private String bodyWeightDataDescription;
+    private String foodWeightDataDescription;
+    private String fatDataDescription;
+    private String carbohydrateDataDescription;
+    private String proteinDataDescription;
+    private String fiberDataDescription;
+    private String sodiumDataDescription;
+    private String fatSaturatedDataDescription;
+    private String sugarDataDescription;
+    private String sleepDataDescription;
+
+
+
     List<FoodConsumptionDto> foodConsumptionDtos;
     List<FoodConsumptionDto> foodConsumptionDtosByCategory;
 

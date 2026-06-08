@@ -28,6 +28,7 @@ import com.turkerozturk.dtt.helper.FoodParser;
 import com.turkerozturk.dtt.helper.SettingHelper;
 import com.turkerozturk.dtt.helper.datatrends.TrendDirection;
 import com.turkerozturk.dtt.helper.datatrends.TrendUtils;
+import com.turkerozturk.dtt.helper.usda.BodyMassIndexCategory;
 import com.turkerozturk.dtt.helper.usda.NutrientLimit;
 import com.turkerozturk.dtt.helper.usda.NutrientRequirementService;
 import com.turkerozturk.dtt.repository.EntryRepository;
@@ -58,6 +59,11 @@ public class FoodService {
 
     private static final double FIBER_REQ_PER_KCAL = (double) 14 / THOUSAND_KCAL;
     private static final double SATURATED_FAT_REQUIREMENT_PERCENT = 0.10;
+
+
+    // TODO settingsden al
+    private static final BodyMassIndexCategory BODY_MASS_INDEX_CATEGORY = BodyMassIndexCategory.NORMAL_WEIGHT;
+
 
 
     private final TopicRepository topicRepository;
@@ -1084,15 +1090,17 @@ public class FoodService {
 
                 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 //limit trends
-                double lmt1 = current.getHumanBody().getTdee();
-                current.setLmtKcalTdeeTrend(TrendUtils.decideDirection2(lmt1, current.getHumanBody().getBmi(),lmt1 * 1.375));
+                double col1 = current.getHumanBody().getTdee();
+                current.setLmtKcalTdeeTrend(TrendUtils.decideDirection2(col1, current.getHumanBody().getBmi(),col1 * 1.375));
                 lmtTdeeTrends.add(current.getLmtKcalTdeeTrend()); //1
 
-                double lmt2 = current.getTotalKcal();
-                double uLmtKcalTdee = lmt1 * 1.2;
-                double dLmtKcalTdee = lmt1 * 0.8;
+                double col2 = current.getTotalKcal();
+                double uLmtKcalTdee = col1 * 1.2;
+                double dLmtKcalTdee = col1 * 0.8;
 
-                current.setLmtKcalFoodTrend(TrendUtils.decideDirection2(lmt2, dLmtKcalTdee,uLmtKcalTdee));
+
+
+                current.setLmtKcalFoodTrend(TrendUtils.decideDirection2(col2, dLmtKcalTdee,uLmtKcalTdee));
                 lmtKcalTrends.add(current.getLmtKcalFoodTrend()); //2
 
                 current.setLmtKcalFoodDiffTrend(TrendUtils.decideDirection(current.getTotalKcalDiff(), rangeDto.getAverageKcalDiff()));
@@ -1112,19 +1120,33 @@ public class FoodService {
                 current.setLmtKgTheoreticalWeightTrend(TrendUtils.decideDirection(current.getTotalGramDiffWithActivity(), rangeDto.getAverageGramDiffWithActivity()));
                 lmtKgTheoraticallyDiffTrends.add(current.getLmtKcalVirtualWeightTrend()); //7
 
-                current.setLmtBodyWeightTrend(TrendUtils.decideDirection(current.getHumanBody().getWeightKg(), rangeDto.getAverageWeightKg()));
+                /*
+                18,5 altı	Zayıf
+                18,5 – 24,9	Normal kilolu
+                25,0 – 29,9	Fazla kilolu
+                30,0 – 34,9	Obez (Sınıf I)
+                35,0 – 39,9	Obez (Sınıf II)
+                40 ve üzeri	İleri derece obez
+                 */
+                double col8 = current.getHumanBody().getBmi();
+                double uLmtKgBodyWeight = BODY_MASS_INDEX_CATEGORY.getMaxValue();
+                double dLmtKgBodyWeight = BODY_MASS_INDEX_CATEGORY.getMinValue();
+                current.setLmtBodyWeightTrend(TrendUtils.decideDirection2(col8, dLmtKgBodyWeight, uLmtKgBodyWeight));
                 lmtKgBodyWeightTrends.add(current.getLmtBodyWeightTrend()); //8
 
                 current.setLmtFoodWeightTrend(TrendUtils.decideDirection2(current.getTotalGram(), dLmtFoodWeight, uLmtFoodWeight));
                 lmtFoodWeightTrends.add(current.getLmtFoodWeightTrend()); //9
 
-                current.setLmtFatWeightTrend(TrendUtils.decideDirection(current.getTotalGramFat(), rangeDto.getAverageGramFat()));
+                double col10 = current.getTotalPercentFat();
+                current.setLmtFatWeightTrend(TrendUtils.decideDirection2(col10, rangeDto.getFatRequirementMinPercent(), rangeDto.getFatRequirementMaxPercent()));
                 lmtFatWeightTrends.add(current.getLmtFatWeightTrend()); //10
 
-                current.setLmtCarbohydrateWeightTrend(TrendUtils.decideDirection(current.getTotalGramCarbohydrate(), rangeDto.getAverageGramCarbohydrate()));
+                double col11 = current.getTotalPercentCarbohydrate();
+                current.setLmtCarbohydrateWeightTrend(TrendUtils.decideDirection2(col11, rangeDto.getCarbohydrateRequirementMinPercent() ,rangeDto.getCarbohydrateRequirementMaxPercent()));
                 lmtCarbohydrateWeightTrends.add(current.getLmtCarbohydrateWeightTrend()); //11
 
-                current.setLmtProteinWeightTrend(TrendUtils.decideDirection(current.getTotalGramProtein(), rangeDto.getAverageGramProtein()));
+                double col12 = current.getTotalPercentProtein();
+                current.setLmtProteinWeightTrend(TrendUtils.decideDirection2(col12, rangeDto.getProteinRequirementMinPercent(), rangeDto.getProteinRequirementMaxPercent()));
                 lmtProteinWeightTrends.add(current.getLmtProteinWeightTrend()); //12
 
                 current.setLmtFiberWeightTrend(TrendUtils.decideDirection(current.getTotalGramFiber(), rangeDto.getAverageGramFiber()));
@@ -1233,6 +1255,26 @@ public class FoodService {
 
         List<FoodConsumptionDto> foodConsumptionDtos = getFoodListByDateRangeSummary(startDateMillis, endDateMillis);
         rangeDto.setFoodConsumptionDtos(foodConsumptionDtos);
+
+        // Data Descriptions
+        String activityLevelString = settingHelper.get("human.activityLevel", "activity level is not defined");
+        rangeDto.setKcalTdeeDataDescription(String.format("Günlük alınması gereken kalori(TDEE). BMR, Mifflin-St Jeor formülüne göre hesaplanır. Seçmiş olduğunuz aktivite seviyesi: %s", ActivityLevel.valueOf(activityLevelString)));
+        rangeDto.setKcalConsumptionDataDescription(String.format("Günlük tüketilmiş kalori miktarı."));
+        rangeDto.setKcalFoodDiffDataDescription(String.format("Günlük alınması gereken kalori ile gerçekte tüketilmiş kalori arasındaki fark."));
+        rangeDto.setKgFoodDiffDataDescription(String.format("Gıda yoluyla teorik olarak ileride kaç kg eksik veya fazla çıkacağı."));
+        rangeDto.setKcalActivityDataDescription(String.format("Normalin dışında, fazladan fiziksel aktiviteler yoluyla kaybedilen kalori miktarı."));
+        rangeDto.setKcalTeoricalDiffDataDescription(String.format("Teorik olarak günlük gıda tüketimi ve aktiveler sonrasında hesaplanan kalorinin, günlük alınması gereken kaloriye göre farkı."));
+        rangeDto.setKgTeoricalDiffDataDescription(String.format("Teorik olarak gıda tüketimine ek olarak aktiviteleri de dahil edince ileride kaç kg eksik veya fazla oluşacağı."));
+        rangeDto.setBodyWeightDataDescription(String.format("Vücut kitle endeksi %s ile %s aralığında kaslı olmayanlar için %s sayılır.", BODY_MASS_INDEX_CATEGORY.getMinValue(), BODY_MASS_INDEX_CATEGORY.getMaxValue(), BODY_MASS_INDEX_CATEGORY.getDisplayName()));
+        rangeDto.setFoodWeightDataDescription(String.format("Şimdilik %s ile %s gram arasında yenilebilir gıda gerektiğini varsayıyoruz.", 0, 0));
+        rangeDto.setFatDataDescription(String.format("%%%s ile %%%s arasında yağ gerekiyor.", usdaFatRequirementMinPercent, usdaFatRequirementMaxPercent));
+        rangeDto.setCarbohydrateDataDescription(String.format("%%%s ile %%%s arasında ve en az %s gram karbonhidrat gerekiyor.", usdaCarbohydrateRequirementMinPercent, usdaCarbohydrateRequirementMaxPercent, usdaCarbohydrateGram));
+        rangeDto.setProteinDataDescription(String.format("%%%s ile %%%s arasında ve en az %s gram protein gerekiyor.", usdaProteinRequirementMinPercent, usdaProteinRequirementMaxPercent, usdaProteinGram));
+        rangeDto.setFiberDataDescription("TODO: Fiber miktarı her 1000 kcal için 14 gr olmalıdır. Şimdilik yaşa göre olan miktar uygulanmamıştır.");
+        rangeDto.setSodiumDataDescription("TODO: Şimdilik ikiye bölmek mantıklı olur çünkü sodyumu değil tuz miktarını gösteriyor çoğunlukla.");
+        rangeDto.setFatSaturatedDataDescription("Doymuş yağ ile ilgili henüz mantıklı bir limit hesaplaması bulunmamaktadır. Ortalama değer üzerinden hardcode edilmiş bir katsayı kullanılmıştır.");
+        rangeDto.setSugarDataDescription("Şeker gramajı ile ilgili henüz mantıklı bir hesaplama bulunmamaktadır. Ortalamanın üstü ve altı için hardcoded bir katsayı kullanılmıştır.");
+        rangeDto.setSleepDataDescription("Uyku verisi için şimdilik limitler minimum 6 max 8 saat olarak hardcode edilmiştir.");
 
         return rangeDto;
     }

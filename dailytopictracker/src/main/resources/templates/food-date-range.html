@@ -248,11 +248,11 @@
         <th>Kcal Gıda</th>
         <th>Kcal Gıda Fark</th>
         <th>KG Gıda Fark</th>
-        <th style="background-color: lime;">Kcal Aktivite</th>
+        <th>Kcal Aktivite</th>
         <th>Kcal Teorik Fark</th>
         <th>KG Teorik Fark</th>
         <th>KG Gerçek Tartı</th>
-        <th style="background-color: lime;">GR Gıda</th>
+        <th>GR Gıda</th>
         <th>GR Yağ</th>
         <th>GR Karb</th>
         <th>GR Protein</th>
@@ -828,6 +828,11 @@
 
     </tr>
 
+    <style>
+        .finished { background-color: lime; }
+        .todo { background-color: cyan; }
+
+    </style>
     <!-- Sutunlardaki degerlerden kac tanesinin limitlerin altinda, icinde veya ustunde oldugu -->
     <tr>
         <th th:text="${'Limit Sayaçları'}"></th>
@@ -849,7 +854,7 @@
         </th>
 
         <th>
-            <span  th:utext="${summary.lmtKcalActivityTrendsSummary.displayText3}"></span>
+            <span class="finished"  th:utext="${summary.lmtKcalActivityTrendsSummary.displayText3}"></span>
         </th>
 
 
@@ -863,21 +868,21 @@
         </th>
 
         <th>
-            <span  th:utext="${summary.lmtKgBodyWeightTrendsSummary.displayText3}"></span>
+            <span class="finished" th:utext="${summary.lmtKgBodyWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.lmtFoodWeightTrendsSummary.displayText3}"></span>
+            <span  class="finished" th:utext="${summary.lmtFoodWeightTrendsSummary.displayText3}"></span>
         </th>
         <th>
-            <span  th:utext="${summary.lmtFatWeightTrendsSummary.displayText3}"></span>
+            <span  class="finished"  th:utext="${summary.lmtFatWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.lmtCarbohydrateWeightTrendsSummary.displayText3}"></span>
+            <span  class="finished" th:utext="${summary.lmtCarbohydrateWeightTrendsSummary.displayText3}"></span>
         </th>
         <th>
-            <span  th:utext="${summary.lmtProteinWeightTrendsSummary.displayText3}"></span>
+            <span  class="finished" th:utext="${summary.lmtProteinWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
@@ -903,10 +908,84 @@
 
     </tr>
 
+    <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+        <td>9</td>
+        <td>10</td>
+        <td>11</td>
+        <td>12</td>
+        <td>13</td>
+        <td>14</td>
+        <td>15</td>
+        <td>16</td>
+        <td>17</td>
+    </tr>
+
+    <tr>
+        <td>Kriterler</td>
+        <td><span th:text="${summary.kcalTdeeDataDescription}"></span></td>
+
+        <td><span th:text="${summary.kcalConsumptionDataDescription}"></span></td>
+        <td><span th:text="${summary.kcalFoodDiffDataDescription}"></span></td>
+        <td><span th:text="${summary.kgFoodDiffDataDescription}"></span></td>
+        <td><span th:text="${summary.kcalActivityDataDescription}"></span></td>
+        <td><span th:text="${summary.kcalTeoricalDiffDataDescription}"></span></td>
+        <td><span th:text="${summary.kgTeoricalDiffDataDescription}"></span></td>
+        <td><span th:text="${summary.bodyWeightDataDescription}"></span></td>
+        <td><span th:text="${summary.foodWeightDataDescription}"></span></td>
+        <td><span th:text="${summary.fatDataDescription}"></span></td>
+        <td><span th:text="${summary.carbohydrateDataDescription}"></span></td>
+        <td><span th:text="${summary.proteinDataDescription}"></span></td>
+        <td><span th:text="${summary.fiberDataDescription}"></span></td>
+        <td><span th:text="${summary.sodiumDataDescription}"></span></td>
+        <td><span th:text="${summary.fatSaturatedDataDescription}"></span></td>
+        <td><span th:text="${summary.sugarDataDescription}"></span></td>
+        <td><span th:text="${summary.sleepDataDescription}"></span></td>
+    </tr>
 
     </tfoot>
 
 </table>
+
+
+
+<table id="foodConsumptionTableByCategory" class="table table-sm table-bordered">
+    <tbody>
+    <tr>
+        <th>Weight GR</th>
+        <th>Food Name</th>
+        <th>Category Name</th>
+    </tr>
+    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtosByCategory}">
+        <td><span th:text="${#numbers.formatDecimal(foodConsumptionDto.foodWeight,5,1) + ' gr'}"></span></td>
+        <td><span th:text="${foodConsumptionDto.topicName}"></span></td>
+        <td><span th:text="${foodConsumptionDto.categoryName}"></span></td>
+    </tr>
+</table>
+
+<table id="foodConsumptionTable" class="table table-sm table-bordered">
+    <tbody>
+    <tr>
+        <th>Weight GR</th>
+        <th>Food Name</th>
+        <th>Category Name</th>
+    </tr>
+    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtos}">
+        <td><span th:text="${#numbers.formatDecimal(foodConsumptionDto.foodWeight,5,1) + ' gr'}"></span></td>
+        <td><span th:text="${foodConsumptionDto.topicName}"></span></td>
+        <td><span th:text="${foodConsumptionDto.categoryName}"></span></td>
+    </tr>
+</table>
+
+
 
 
 <div>
@@ -940,33 +1019,6 @@
 <canvas id="myChart"></canvas>
 
 
-<table id="foodConsumptionTableByCategory" class="table table-sm table-bordered">
-    <tbody>
-    <tr>
-        <th>Weight GR</th>
-        <th>Food Name</th>
-        <th>Category Name</th>
-    </tr>
-    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtosByCategory}">
-        <td><span th:text="${#numbers.formatDecimal(foodConsumptionDto.foodWeight,5,1) + ' gr'}"></span></td>
-        <td><span th:text="${foodConsumptionDto.topicName}"></span></td>
-        <td><span th:text="${foodConsumptionDto.categoryName}"></span></td>
-    </tr>
-</table>
-
-<table id="foodConsumptionTable" class="table table-sm table-bordered">
-    <tbody>
-    <tr>
-        <th>Weight GR</th>
-        <th>Food Name</th>
-        <th>Category Name</th>
-    </tr>
-    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtos}">
-        <td><span th:text="${#numbers.formatDecimal(foodConsumptionDto.foodWeight,5,1) + ' gr'}"></span></td>
-        <td><span th:text="${foodConsumptionDto.topicName}"></span></td>
-        <td><span th:text="${foodConsumptionDto.categoryName}"></span></td>
-    </tr>
-</table>
 
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
 
