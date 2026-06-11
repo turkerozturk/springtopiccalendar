@@ -14,6 +14,12 @@ public class TrendSummaryDto {
     // https://unicode-explorer.com/list/arrows
 
     public String getDisplayText3() {
+        return htmlize(String.format("%03d", downCount),-1) + SEPARATOR3 // 🠟
+                + htmlize(String.format("%03d", sameCount), 0) + SEPARATOR3 // =
+                + htmlize(String.format("%03d", upCount),1); //🠝
+    }
+
+    public String getDisplayText4() {
         return downCount + htmlize("\uD83E\uDC1F",-1) + SEPARATOR // 🠟
                 + sameCount+ SEPARATOR // =
                 + upCount+ htmlize("\uD83E\uDC1D",1); //🠝
@@ -32,6 +38,7 @@ public class TrendSummaryDto {
     }
 
     private static final String SEPARATOR = ",";
+    private static final String SEPARATOR3 = "";
 
     private static String htmlize(String value, int direction) {
         StringBuilder sb = new StringBuilder();
@@ -50,9 +57,9 @@ public class TrendSummaryDto {
     }
 
     // html headerdaki CSS yi uygulamadigi icin burada inline css olarak tanimlamak gerekti.
-    private static final String cssTrendArrowUp = "background-color: white; color: red; border-style: solid; border-color: white; border-width:1px; font-weight: bold;";
-    private static final String cssTrendArrowDown = "background-color: lightblue; color: black; border-style: solid; border-color: white; border-width:1px; font-weight: bold;";
-    private static final String cssTrendArrowSame = "background-color: yellow; color: black; border-style: solid; border-color: white; border-width:1px; font-weight: bold;";
+    private static final String cssTrendArrowUp = "background-color: salmon; color: cyan; border-style: solid; border-color: black; border-width:1px; font-weight: bold;";
+    private static final String cssTrendArrowDown = "background-color: powderblue; color: salmon; border-style: solid; border-color: black; border-width:1px; font-weight: bold;";
+    private static final String cssTrendArrowSame = "background-color: green; color: yellow; border-style: solid; border-color: black; border-width:1px; font-weight: normal;";
 
 
 }

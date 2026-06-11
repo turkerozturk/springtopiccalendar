@@ -200,7 +200,7 @@ public class DateRangeFoodSummaryDto {
 
 
     List<FoodConsumptionDto> foodConsumptionDtos;
-    List<FoodConsumptionDto> foodConsumptionDtosByCategory;
+    private FoodConsumptionDtosByCategoryDto foodConsumptionDtosByCategoryDto;
 
 
 

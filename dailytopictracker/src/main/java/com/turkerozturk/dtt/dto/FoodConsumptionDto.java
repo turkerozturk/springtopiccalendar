@@ -10,6 +10,7 @@ public class FoodConsumptionDto {
     private String topicName;
     private String categoryName;
     private Long categoryId;
+    private int topicsCount;
 
     @Override
     public String toString() {

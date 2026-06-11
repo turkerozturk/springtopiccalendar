@@ -682,73 +682,73 @@
     </tr>
 
     <tr>
-        <th th:text="${'Göreli Sayaçlar'}"></th>
+        <th th:text="${'Göreli Sayaçlar🡥🡦'}"></th>
         <th>
-            <span  th:utext="${summary.tdeeTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.tdeeTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kcalTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kcalTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kcalDiffTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kcalDiffTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kgDiffTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kgDiffTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kcalActivityTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kcalActivityTrendsSummary.displayText3}"></span>
         </th>
 
 
 
         <th>
-            <span  th:utext="${summary.kcalVirtualWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kcalVirtualWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kgVirtualWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kgVirtualWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.kgBodyWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.kgBodyWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.foodWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.foodWeightTrendsSummary.displayText3}"></span>
         </th>
         <th>
-            <span  th:utext="${summary.fatWeightTrendsSummary.displayText}"></span>
-        </th>
-
-        <th>
-            <span  th:utext="${summary.carbohydrateWeightTrendsSummary.displayText}"></span>
-        </th>
-        <th>
-            <span  th:utext="${summary.proteinWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.fatWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.fiberWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.carbohydrateWeightTrendsSummary.displayText3}"></span>
+        </th>
+        <th>
+            <span  th:utext="${summary.proteinWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.sodiumWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.fiberWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.fatSaturatedWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.sodiumWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.sugarWeightTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.fatSaturatedWeightTrendsSummary.displayText3}"></span>
         </th>
 
         <th>
-            <span  th:utext="${summary.sleepDurationTrendsSummary.displayText}"></span>
+            <span  th:utext="${summary.sugarWeightTrendsSummary.displayText3}"></span>
+        </th>
+
+        <th>
+            <span  th:utext="${summary.sleepDurationTrendsSummary.displayText3}"></span>
         </th>
 
 
@@ -760,7 +760,7 @@
 
     <!-- Sutunlardaki degerlerden kac tanesinin ortalamanin altinda veya ustunde oldugu -->
     <tr>
-        <th th:text="${'Ortalama Sayaçları'}"></th>
+        <th th:text="${'Ortalama Sayaçları↑↓'}"></th>
 
         <th>
             <th:block  th:utext="${summary.avgTdeeTrendsSummary.displayText2}"></th:block>
@@ -851,14 +851,14 @@
         </th>
 
         <th>
-            <th:block  th:utext="${summary.lmtKcalTrendsSummary.displayText3}"></th:block>
+            <span class="finished" th:utext="${summary.lmtKcalTrendsSummary.displayText3}"></span>
         </th>
 
-        <th>
+        <th class="crossed">
             <span  th:utext="${summary.lmtKcalDiffTrendsSummary.displayText3}"></span>
         </th>
 
-        <th>
+        <th class="crossed">
             <span  th:utext="${summary.lmtKgDiffTrendsSummary.displayText3}"></span>
         </th>
 
@@ -941,7 +941,9 @@
     <style>
 
         .limitDescriptions {
-            word-spacing: 100vw; /* https://stackoverflow.com/questions/4212909/can-css-force-a-line-break-after-each-word-in-an-element */
+            word-wrap: break-word;
+            word-spacing: 100vw;/* https://stackoverflow.com/questions/4212909/can-css-force-a-line-break-after-each-word-in-an-element */
+
         }
     </style>
     <tr>
@@ -973,17 +975,38 @@
 
 
 <table id="foodConsumptionTableByCategory" class="table table-sm table-bordered">
-    <tbody>
+    <thead>
     <tr>
         <th>Weight GR</th>
-        <th>Food Name</th>
         <th>Category Name</th>
+        <th>Foods Count</th>
+        <th>Food Names</th>
     </tr>
-    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtosByCategory}">
+    </thead>
+    <tbody>
+    <tr th:each="foodConsumptionDto : ${summary.foodConsumptionDtosByCategoryDto.foodConsumptionDtosByCategory}">
         <td><span th:text="${#numbers.formatDecimal(foodConsumptionDto.foodWeight,5,1) + ' gr'}"></span></td>
+        <td>
+            <a th:href="@{/entry-filter/form?categoryId={id}(id=${foodConsumptionDto.categoryId})}"
+               target="_blank"
+               th:title="${foodConsumptionDto.categoryName}">
+                <i class="fa-solid fa-gear" style="color: #FFD43B;">
+                </i>
+                <span th:text="${foodConsumptionDto.categoryName}"></span>
+            </a>
+        </td>
+        <td><span th:text="${foodConsumptionDto.topicsCount}"></span></td>
         <td><span th:text="${foodConsumptionDto.topicName}"></span></td>
-        <td><span th:text="${foodConsumptionDto.categoryName}"></span></td>
     </tr>
+    </tbody>
+    <tfoot>
+    <th><span th:text="${#numbers.formatDecimal(summary.foodConsumptionDtosByCategoryDto.totalFoodWeightsCount,5,1) + ' gr'}"></span></th>
+    <th><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalCategoriesCount}"></span></th>
+    <th><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalFoodsCount}"></span></th>
+    <th>Veriler <b><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalDaysCount}"></span></b> günlük zaman aralığı içindir.</th>
+
+
+    </tfoot>
 </table>
 
 <table id="foodConsumptionTable" class="table table-sm table-bordered">
