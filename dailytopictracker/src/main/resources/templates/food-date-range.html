@@ -1003,7 +1003,12 @@
     <th><span th:text="${#numbers.formatDecimal(summary.foodConsumptionDtosByCategoryDto.totalFoodWeightsCount,5,1) + ' gr'}"></span></th>
     <th><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalCategoriesCount}"></span></th>
     <th><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalFoodsCount}"></span></th>
-    <th>Veriler <b><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalDaysCount}"></span></b> günlük zaman aralığı içindir.</th>
+    <th>Veriler <b><span th:text="${summary.foodConsumptionDtosByCategoryDto.totalDaysCount}"></span></b> günlük zaman aralığı içindir
+        (<span th:text="${#dates.format(summary.startDateMillis, 'yyyy-MM-dd')}"></span> -
+        <span th:text="${#dates.format(summary.endDateMillis, 'yyyy-MM-dd')}"></span>).
+    </th>
+
+
 
 
     </tfoot>

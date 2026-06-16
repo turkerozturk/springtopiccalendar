@@ -10,6 +10,9 @@ public class DateRangeFoodSummaryDto {
 
     private List<DailyFoodSummaryDto> days;
 
+    private Long startDateMillis;
+    private Long endDateMillis;
+
     private Double totalKcal;
     private Double totalGram;
 

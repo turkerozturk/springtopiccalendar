@@ -74,7 +74,7 @@
         <div class="mb-3 row">
             <label for="categoryFilter" class="col-sm-5 col-form-label col-form-label-sm">Select a Category:</label>
             <div class="col-sm-7">
-                <select id="categoryFilter" class="form-select form-select-sm" name="categoryId" onchange="loadTopicsByCategory(this.value)">
+                <select id="categoryFilter" class="form-select form-select-sm" name="categoryId" onchange="loadTopicsByCategory(this.value)" tabindex="1">
                     <option th:each="cat : ${categories}"
                             th:value="${cat.id}"
                             th:text="${cat.name}"
@@ -87,7 +87,7 @@
         <div class="mb-3 row">
             <label for="topicSearch" class="col-sm-5 col-form-label col-form-label-sm">Filter Topic:</label>
             <div class="col-sm-7">
-                <input type="text" id="topicSearch" class="form-control form-control-sm" oninput="filterTopics()"/>
+                <input type="text" id="topicSearch" class="form-control form-control-sm" oninput="filterTopics()" tabindex="2"/>
             </div>
         </div>
 
@@ -95,7 +95,7 @@
         <div class="mb-3 row">
             <label for="topicSelect" class="col-sm-4 col-form-label col-form-label-sm">Topic:</label>
             <div class="col-sm-8">
-                <select th:field="*{topic.id}" id="topicSelect" class="form-select form-select-sm">
+                <select th:field="*{topic.id}" id="topicSelect" class="form-select form-select-sm" tabindex="3">
                     <option th:each="t : ${topics}"
                             th:value="${t.id}"
                             th:text="${t.name}"
@@ -119,9 +119,10 @@
                                 .toLocalDate()
                              : ''
                        }"
+                       tabindex="4"
                 />
                 <span class="input-group-append">
-                                         <button class="btn btn-outline-secondary" type="button">
+                                         <button class="btn btn-outline-secondary" type="button" tabindex="5">
                                              <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
                                              <i class="far fa-calendar" aria-hidden="true"></i>
                                          </button>
@@ -138,24 +139,24 @@
             <div class="col-sm-6 d-flex gap-3">
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="2" >
+                    <input type="radio" th:field="*{status}" value="2" tabindex="6">
                     <i class="fas fa-circle-exclamation" title="Warning" style="cursor: pointer; color: tomato; font-size: 1.5em;"></i>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="0" >
+                    <input type="radio" th:field="*{status}" value="0" tabindex="7">
                     <i class="fas fa-circle-dot text-secondary" title="Not Marked" style="cursor: pointer; color: gainsboro; font-size: 1.5em;"></i>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="1" >
+                    <input type="radio" th:field="*{status}" value="1" tabindex="8">
                     <i class="fas fa-check-circle text-success" title="Done" style="cursor: pointer; color: palegreen; font-size: 1.5em;"></i>
                 </label>
 
 
             </div>
 
-            <button type="submit" class="btn btn-sm btn-secondary col-sm-2">Save</button>
+            <button type="submit" class="btn btn-sm btn-secondary col-sm-2" tabindex="9">Save</button>
 
         </div>
 
@@ -168,7 +169,7 @@
             <!-- markdown easymde -->
             <label for="note_content" class="col-sm-2 col-form-label col-form-label-sm">Note:</label>
             <div class="col-sm-9">
-                <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control" autofocus></textarea>
+                <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control" tabindex="10" autofocus></textarea>
             </div>
         </div>
         </fieldset>
@@ -181,7 +182,7 @@
         <input type="hidden" name="entryId" th:value="${entry.id}" th:if="${entry.id != null}">
         <input type="hidden" name="topicId" th:value="${entry.topic.id}" th:if="${entry.topic != null}">
         <input type="hidden" name="categoryGroupId" th:value="${categoryGroupId}" th:if="${entry.topic != null}">
-        <button type="submit" class="btn btn-sm btn-secondary col-sm-2">Cancel</button>
+        <button type="submit" class="btn btn-sm btn-secondary col-sm-2" tabindex="11">Cancel</button>
 
     </form>
 
@@ -196,7 +197,7 @@
                                             returnPage=${returnPage}
                                             )}"
            onclick="return confirm('Bu kaydı silmek istediğinize emin misiniz?');"
-           class="btn btn-sm btn-danger col-sm-3">
+           class="btn btn-sm btn-danger col-sm-3" tabindex="12">
             Delete Entry
         </a>
     </div>
@@ -382,12 +383,14 @@ document.addEventListener('DOMContentLoaded', () => {
     Fakat onu devredışı bıraktık çünkü image link de ekleyebiliyoruz ve onda zorluk çıkarıyor, yoksa kolaylık idi.
     Burada yaptırdığımıza şey, yapıştırılan metin https veya http ile başlıyorsa köşe parantez ile çevrelemesi.
     Böylece markdown link haline gelir.
+    https://github.com/Ionaru/easy-markdown-editor
 */-->
 <script>
     var easyMDE = new EasyMDE({
         element: document.getElementById("note_content"),
         spellChecker: false,
         forceSync: true, // <-- onemli: EasyMDE icerigini textarea ile senkronize eder
+        indentWithTabs: false,
         toolbar: [
             "bold", "italic", "heading",
             "|",
@@ -442,6 +445,98 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     */
+
+    /*
+    easyMDE.codemirror.addKeyMap({
+        "Tab": function(cm) {
+            cm.getInputField().blur();
+        },
+        "Ctrl-Right": function() {
+            moveStatus(1);
+        },
+        "Ctrl-Left": function() {
+            moveStatus(-1);
+        },
+        "Ctrl-Enter": function() {
+            saveButton.click();
+        }
+    });
+    */
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        let lastFocusedElement = document.activeElement;
+
+        // Focus takibi
+        document.addEventListener('focusin', function (e) {
+            lastFocusedElement = e.target;
+        });
+
+        const statusRadios = Array.from(
+            document.querySelectorAll('input[name="status"]')
+        );
+
+        const saveButton = document.querySelector('button[type="submit"]');
+
+        function restoreFocus() {
+            if (
+                lastFocusedElement &&
+                document.contains(lastFocusedElement) &&
+                !statusRadios.includes(lastFocusedElement)
+            ) {
+                setTimeout(() => {
+                    lastFocusedElement.focus();
+                }, 0);
+            }
+        }
+
+        function moveStatus(direction) {
+
+            const currentIndex = statusRadios.findIndex(r => r.checked);
+
+            let newIndex = currentIndex + direction;
+
+            if (newIndex < 0) {
+                newIndex = statusRadios.length - 1;
+            }
+
+            if (newIndex >= statusRadios.length) {
+                newIndex = 0;
+            }
+
+            statusRadios[newIndex].checked = true;
+
+            statusRadios[newIndex].dispatchEvent(
+                new Event('change', { bubbles: true })
+            );
+
+            restoreFocus();
+        }
+
+        document.addEventListener('keydown', function (e) {
+
+            if (!e.ctrlKey) {
+                return;
+            }
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                moveStatus(-1);
+            }
+
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                moveStatus(1);
+            }
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveButton.click();
+            }
+        });
+    });
 </script>
 
 

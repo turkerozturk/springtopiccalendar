@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.Collator;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
 
@@ -761,8 +762,8 @@ public class FoodService {
         totalGramDiffWithActivityAndFactor = totalGramDiffWithActivityAndFactor * activityCorrectionFactor;
 
 
-
-
+        rangeDto.setStartDateMillis(startDateMillis);
+        rangeDto.setEndDateMillis(endDateMillis);
 
 
         rangeDto.setTotalKcal(totalKcal);
@@ -1355,7 +1356,15 @@ public class FoodService {
         return foodConsumptionDtos;
     }
 
+    private static final String FOOD_NAME_SEPARATOR = ", ";
+
+    private static final String BRAND_NAME_SEPARATOR = " ~";
+
     public FoodConsumptionDtosByCategoryDto getFoodListByDateRangeSummaryAndCategories(Long startDateMillis, Long endDateMillis) {
+
+        Locale locale = Locale.forLanguageTag(appLocale);
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY); // case-insensitive
 
         Map<Long, Double> foodWeights = new HashMap<>();
         Map<Long, Set<String>> foodNameSets = new HashMap<>(); // set kullanmamizin sebebi, topic isimlerinin yani food namelerin tekrar etmemesi.
@@ -1374,7 +1383,7 @@ public class FoodService {
 
                 foodNameSets
                         .computeIfAbsent(categoryId, k -> new LinkedHashSet<>())
-                        .add(fsd.getTopicName());
+                        .add(fsd.getTopicName().replaceAll(",",BRAND_NAME_SEPARATOR));
 
                 categoryNames.computeIfAbsent(categoryId, k -> fsd.getCategoryName());
                 topicIds.computeIfAbsent(categoryId, k -> fsd.getTopicId());
@@ -1393,7 +1402,13 @@ public class FoodService {
             totalFoodWeightsCount += foodWeight;
             fcd.setCategoryId(categoryId);
             fcd.setCategoryName(categoryNames.get(categoryId));
-            fcd.setTopicName(foodNameSets.get(categoryId).toString());
+
+            Set<String> topicNames = foodNameSets.get(categoryId);
+            String joinedTopicNames = topicNames.stream()
+                    .sorted(collator)
+                    .collect(Collectors.joining(FOOD_NAME_SEPARATOR));
+            fcd.setTopicName(joinedTopicNames);
+
             int topicsCount = foodNameSets.get(categoryId).size();
             fcd.setTopicsCount(topicsCount);
             totalFoodNamesCount += topicsCount;
@@ -1405,10 +1420,6 @@ public class FoodService {
                 Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed()
         );
 
-        // gecici sort ve konsola yazdirmak
-        //foodConsumptionDtos.stream()
-        //        .sorted(Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed())
-        //        .forEach(System.out::println);
 
         FoodConsumptionDtosByCategoryDto foodConsumptionDtosByCategoryDto = new FoodConsumptionDtosByCategoryDto();
         foodConsumptionDtosByCategoryDto.setFoodConsumptionDtosByCategory(foodConsumptionDtos);
@@ -1418,6 +1429,10 @@ public class FoodService {
         foodConsumptionDtosByCategoryDto.setTotalDaysCount(totalDaysCount);
         return foodConsumptionDtosByCategoryDto;
     }
+    // gecici sort ve konsola yazdirmak
+    //foodConsumptionDtos.stream()
+    //        .sorted(Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed())
+    //        .forEach(System.out::println);
 
 
 }
