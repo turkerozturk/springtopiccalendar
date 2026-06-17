@@ -28,6 +28,7 @@ import java.util.Map;
 @Data
 public class MealGroupDto {
     private Character mealCode; // a, c, z gibi
+    private String mealLabel; // eger tanimlanmissa a, c, z g,b, harflerin yerine gelir, yani gerektiginde mealCode yerine kullanilir.
     private Double totalCalories;
     private List<MealItemDto> items;
 
@@ -40,4 +41,16 @@ public class MealGroupDto {
     private Double totalGramSodium;
     private Double totalGramFatSaturated;
     private Double totalGramSugar;
+
+    // per 100 grams
+    private Double totalCalories100;
+
+    private Double totalGramFat100;
+    private Double totalGramCarbohydrate100;
+    private Double totalGramProtein100;
+
+    private Double totalGramFiber100;
+    private Double totalGramSodium100;
+    private Double totalGramFatSaturated100;
+    private Double totalGramSugar100;
 }

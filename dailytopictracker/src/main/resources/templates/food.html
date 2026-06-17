@@ -154,6 +154,12 @@
             }
     </style>
 
+    <style>
+        .gr100 {
+            background-color: ivory !important;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -711,13 +717,19 @@
 
 <div th:each="meal : ${summary.meals}" class="row">
 
-    <p>
-
 
     <!-- https://www.w3schools.com/howto/howto_css_table_side_by_side.asp -->
 
     <div class="column">
         <table class="table table-sm table-striped" style="max-width: 600px;">
+            <thead>
+            <tr>
+                <td colspan="2">
+                    Öğün Kodu: <b><span th:text="${'' + meal.mealLabel}"></span></b>
+                </td>
+            </tr>
+
+            </thead>
             <caption>Gıda Listesi</caption>
             <tbody>
                 <tr><th>Gıda İsmi</th><th>Gramaj</th></tr>
@@ -732,19 +744,20 @@
         </table>
     </div>
 
+
     <div class="column">
         <table class="table table-sm table-striped" style="max-width: 600px;">
             <caption>Besin Değerleri</caption>
             <tbody>
                 <tr><th>Besin Değerleri</th><th>Tüketim</th><th>100 gr için</th></tr>
-                <tr><td>Enerji</td><td><cite th:text="${#numbers.formatDecimal(meal.totalCalories,1,2)}"></cite> kcal</td><td></td></tr>
-                <tr><td>Yağ</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFat,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>&ensp;- Doymuş Yağ</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFatSaturated,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>Karbonhidrat</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramCarbohydrate,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>&ensp;- Şeker</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramSugar,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>Protein</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramProtein,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>Fiber</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFiber,1,2)}"></cite> gr</td><td></td></tr>
-                <tr><td>Tuz</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramSodium,1,2)}"></cite> gr</td><td></td></tr>
+                <tr><td>Enerji</td><th><cite th:text="${#numbers.formatDecimal(meal.totalCalories,1,2)}"></cite> kcal</th><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalCalories100,1,2)}"></cite> kcal</td></tr>
+                <tr><td>Yağ</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFat,1,2)}"></cite> gr</td><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalGramFat100,1,2)}"></cite> gr</td></tr>
+                <tr><td class="small">&ensp;- Doymuş Yağ</td><td class="small"><cite th:text="${#numbers.formatDecimal(meal.totalGramFatSaturated,1,2)}"></cite> gr</td><td class="gr100 small"><cite th:text="${#numbers.formatDecimal(meal.totalGramFatSaturated100,1,2)}"></cite> gr</td></tr>
+                <tr><td>Karbonhidrat</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramCarbohydrate,1,2)}"></cite> gr</td><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalGramCarbohydrate100,1,2)}"></cite> gr</td></tr>
+                <tr><td class="small">&ensp;- Şeker</td><td class="small"><cite th:text="${#numbers.formatDecimal(meal.totalGramSugar,1,2)}"></cite> gr</td><td class="gr100 small"><cite th:text="${#numbers.formatDecimal(meal.totalGramSugar100,1,2)}"></cite> gr</td></tr>
+                <tr><td>Protein</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramProtein,1,2)}"></cite> gr</td><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalGramProtein100,1,2)}"></cite> gr</td></tr>
+                <tr><td>Fiber</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramFiber,1,2)}"></cite> gr</td><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalGramFiber100,1,2)}"></cite> gr</td></tr>
+                <tr><td>Tuz</td><td><cite th:text="${#numbers.formatDecimal(meal.totalGramSodium,1,2)}"></cite> gr</td><td class="gr100"><cite th:text="${#numbers.formatDecimal(meal.totalGramSodium100,1,2)}"></cite> gr</td></tr>
             </tbody>
 
         </table>

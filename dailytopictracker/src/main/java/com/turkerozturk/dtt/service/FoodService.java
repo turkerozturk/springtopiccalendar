@@ -158,6 +158,12 @@ public class FoodService {
         double totalGramFatSaturatedByStatus2 = 0.0;
         double totalGramSugarByStatus2 = 0.0;
 
+        String customMealLabelsRaw =
+                settingHelper.get("customMealLabels", "");
+
+        Map<Character, String> customMealLabels =
+                parseMealLabels(customMealLabelsRaw);
+
         Map<Character, MealGroupDto> mealMap = new LinkedHashMap<>();
 
         for (Entry entry : entries) {
@@ -197,6 +203,12 @@ public class FoodService {
                 if (mealGroup == null) {
                     mealGroup = new MealGroupDto();
                     mealGroup.setMealCode(mealCode);
+                    mealGroup.setMealLabel(
+                            customMealLabels.getOrDefault(
+                                    Character.toLowerCase(mealCode),
+                                    String.valueOf(mealCode)
+                            )
+                    );
                     mealGroup.setItems(new ArrayList<>());
                     mealGroup.setTotalCalories(0.0);
                     mealGroup.setTotalGramFat(0.0);
@@ -238,6 +250,36 @@ public class FoodService {
                 mealGroup.setTotalGramSodium(mealGroup.getTotalGramSodium() + gramSodium);
                 mealGroup.setTotalGramFatSaturated(mealGroup.getTotalGramFatSaturated() + gramFatSaturated);
                 mealGroup.setTotalGramSugar(mealGroup.getTotalGramSugar() + gramSugar);
+
+                // per 100 grams
+                if (mealGroup.getTotalGram() > 0) {
+
+                    double factor = 100.0 / mealGroup.getTotalGram();
+                    mealGroup.setTotalCalories100(
+                            mealGroup.getTotalCalories() * factor);
+
+                    mealGroup.setTotalGramFat100(
+                            mealGroup.getTotalGramFat() * factor);
+
+                    mealGroup.setTotalGramCarbohydrate100(
+                            mealGroup.getTotalGramCarbohydrate() * factor);
+
+                    mealGroup.setTotalGramProtein100(
+                            mealGroup.getTotalGramProtein() * factor);
+
+                    mealGroup.setTotalGramFiber100(
+                            mealGroup.getTotalGramFiber() * factor);
+
+                    mealGroup.setTotalGramSodium100(
+                            mealGroup.getTotalGramSodium() * factor);
+
+                    mealGroup.setTotalGramFatSaturated100(
+                            mealGroup.getTotalGramFatSaturated() * factor);
+
+                    mealGroup.setTotalGramSugar100(
+                            mealGroup.getTotalGramSugar() * factor);
+                }
+
             }
 
 
@@ -1434,6 +1476,36 @@ public class FoodService {
     //        .sorted(Comparator.comparing(FoodConsumptionDto::getFoodWeight).reversed())
     //        .forEach(System.out::println);
 
+    private Map<Character, String> parseMealLabels(String raw) {
+
+        Map<Character, String> result = new HashMap<>();
+
+        if (raw == null || raw.isBlank()) {
+            return result;
+        }
+
+        String[] pairs = raw.split(",");
+
+        for (String pair : pairs) {
+
+            String[] kv = pair.split("=", 2);
+
+            if (kv.length != 2) {
+                continue;
+            }
+
+            String key = kv[0].trim().toLowerCase();
+            String value = kv[1].trim();
+
+            if (key.length() != 1 || value.isBlank()) {
+                continue;
+            }
+
+            result.put(key.charAt(0), value);
+        }
+
+        return result;
+    }
 
 }
 
