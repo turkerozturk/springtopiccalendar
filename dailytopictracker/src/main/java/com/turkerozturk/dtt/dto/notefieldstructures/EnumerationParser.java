@@ -212,6 +212,11 @@ public class EnumerationParser implements NoteFieldStructure {
         return sb.toString();
     }
 
+    @Override
+    public void setCustomDaysCounter(int customDaysCounter) {
+
+    }
+
     private static String escapeJson(String s) {
         return s.replace("\"", "\\\"");
     }

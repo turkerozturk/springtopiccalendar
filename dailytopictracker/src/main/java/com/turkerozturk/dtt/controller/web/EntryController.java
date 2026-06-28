@@ -336,6 +336,7 @@ public class EntryController {
             NoteFieldStructure customParserClass = ParserFactory.create(topic.getDataClassName());
 
 
+            customParserClass.setCustomDaysCounter(manualDateRange.size()); //turkerozturkk
             customParserClass.parseRawData(manualEntries);
 
             model.addAttribute("parserReport", customParserClass.getReport());

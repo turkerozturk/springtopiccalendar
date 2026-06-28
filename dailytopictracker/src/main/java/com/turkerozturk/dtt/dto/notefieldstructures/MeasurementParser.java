@@ -14,9 +14,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.turkerozturk.dtt.helper.FoodParser.extractMealGrams;
+
 @Data
 public class MeasurementParser implements NoteFieldStructure {
-    private static final Pattern LINE_PATTERN = Pattern.compile("^\\s*(\\d+(?:[.,]\\d+)?)\\s*(.*)$");
+    //private static final Pattern LINE_PATTERN = Pattern.compile("^\\s*(\\d+(?:[.,]\\d+)?)\\s*(.*)$");
+    private static final Pattern RAW_UNIT_PATTERN = Pattern.compile("^\\s*(\\d+(?:[.,]\\d+)?)\\s*(.*)$");
+    private static final Pattern LINE_PATTERN = Pattern.compile(
+            "^\\s*([a-z]?\\d+(?:[.,]\\d+)?(?:\\s*[+\\-x*/]\\s*[a-z]?\\d+(?:[.,]\\d+)?)*)\\s*([a-zA-Z]*)\\s*$",
+            Pattern.CASE_INSENSITIVE);
 
     private List<ParsedEntry> parsedEntries = new LinkedList<>();
     private String measurementUnit;
@@ -45,6 +51,8 @@ public class MeasurementParser implements NoteFieldStructure {
 
     int countTotal = 0;
 
+    private Integer customCountOfDays = null;
+
 
     @Override
     public String getName() {
@@ -61,7 +69,7 @@ public class MeasurementParser implements NoteFieldStructure {
         parsedEntries.clear();
         Map<String, Integer> unitCount = new HashMap<>();
         double sum = 0;
-        int count = 0;
+        int filledEntriesCounter = 0;
 
         for (Entry entry : entries) {
             if (entry.getStatus() != 1 || entry.getNote() == null) continue;
@@ -71,16 +79,41 @@ public class MeasurementParser implements NoteFieldStructure {
 
             String firstLine = lines[0].trim();
             Matcher matcher = LINE_PATTERN.matcher(firstLine);
-            if (!matcher.matches()) continue;
+            if (!matcher.matches()) {
+                System.out.println(firstLine);
+                continue;
+            }
+            else {
+
+            };
+
+
+
 
             try {
-                String rawNumber = matcher.group(1).replace(",", "."); // normalize decimal separator
-                Double value = Double.parseDouble(rawNumber);
-                String rawUnit = matcher.group(2).trim();
+                String rawNumber = matcher.group(1);
+               // System.out.println(rawNumber);
+
+                // Bir not iceriginde toplam ve carpim biciminde birden cok gramaj ve mealCode olabilir:
+                Map<Character, Double> mealGrams = extractMealGrams(rawNumber); // yeni parser (daha gelismis)
+                Double value = 0.0;
+                for(Character mealCode : mealGrams.keySet()) {
+                    value += mealGrams.get(mealCode);
+                }
+                //String rawUnit = null;
+
+
+                //String rawNumber = matcher.group(1).replace(",", "."); // normalize decimal separator
+                //Double value = Double.parseDouble(rawNumber);
+               // String rawUnit = "tr";//matcher.group(2).trim();
+                String rawUnit = matcher.group(2);
+
+                // System.out.println("rawUnit: " + rawUnit);
 
                 parsedEntries.add(new ParsedEntry(entry.getDateMillisYmd(), value, rawUnit));
                 sum += value;
-                count++;
+               // System.out.println(filledEntriesCounter + " -> " + value);
+                filledEntriesCounter++;
 
                 if (!rawUnit.isEmpty()) {
                     unitCount.put(rawUnit, unitCount.getOrDefault(rawUnit, 0) + 1);
@@ -88,7 +121,9 @@ public class MeasurementParser implements NoteFieldStructure {
 
             } catch (Exception e) {
                 // geçersiz format, atla
+                System.out.println(e.getMessage());
             }
+
         }
 
         this.measurementUnit = unitCount.entrySet()
@@ -98,8 +133,14 @@ public class MeasurementParser implements NoteFieldStructure {
                 .orElse("unknown");
 
         this.sumTotal = sum;
-        this.average = count > 0 ? sum / count : 0;
+        double filledAverage = filledEntriesCounter > 0 ? sum / filledEntriesCounter : 0;
+        int missingDaysCount = customCountOfDays - filledEntriesCounter;
+        double missingDaysFakeSum = filledAverage * missingDaysCount;
+        //this.average = filledEntriesCounter > 0 ? sum / filledEntriesCounter : 0;
+        //this.average = filledEntriesCounter > 0 ? sum / customCountOfDays : 0;
+        this.average = filledEntriesCounter > 0 ? (sum + missingDaysFakeSum) / customCountOfDays : 0;
 
+        System.out.println("avg: " + this.average + ", entriessize " + entries.size());
 
         for (ParsedEntry parsedEntry : parsedEntries) {
 
@@ -412,6 +453,11 @@ public class MeasurementParser implements NoteFieldStructure {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public void setCustomDaysCounter(int customDaysCounter) {
+        this.customCountOfDays = customDaysCounter;
     }
 
     @Data

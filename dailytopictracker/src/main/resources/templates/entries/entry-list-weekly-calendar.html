@@ -784,6 +784,7 @@
             var yMin = Math.floor(minValue - (maxValue - minValue) * 0.2);
             var yMax = Math.ceil(maxValue + (maxValue - minValue) * 0.2);
 
+            if (parsed.unit == 'unknown') parsed.unit = ''; // bunu ekleme sebebim cirkin goruntu olusturmamasi icin.
 
             var parserCtx = document.getElementById('measurementChart').getContext('2d');
             var myChart = new Chart(parserCtx, {
@@ -798,7 +799,7 @@
                         backgroundColor: 'rgba(35, 92, 92, 0.2)',
                         tension: 0.3,
                         borderWidth: 1,
-                        pointRadius: 0.5
+                        pointRadius: 1.5
                     }]
                 },
                 options: {
@@ -875,7 +876,7 @@
                                     borderColor: 'blue',
                                     borderWidth: 1,
                                     borderDash: [6, 6] // kesikli cizgi
-                                    // lable tanimlamasini buraya degil, ayri annotation olarak yaptim cunku buradaki tanim ekranda goruntulenmedi, hata da vermemisti.
+                                    // label tanimlamasini buraya degil, ayri annotation olarak yaptim cunku buradaki tanim ekranda goruntulenmedi, hata da vermemisti.
 
                                 }
                             }

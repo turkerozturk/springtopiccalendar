@@ -297,6 +297,11 @@ public class GeneralParser implements NoteFieldStructure {
         return sb.toString();
     }
 
+    @Override
+    public void setCustomDaysCounter(int customDaysCounter) {
+
+    }
+
     private static String escapeHtml(String s) {
         if (s == null) return "";
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
