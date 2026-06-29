@@ -42,7 +42,15 @@ document
 
         socket.onmessage = function (e) {
 
-            console.log(e.data);
+           // console.log(e.data);
+
+           const msg = JSON.parse(e.data);
+
+           document
+               .getElementById("note")
+               .value = msg.text;
+
+
         };
 
     };
