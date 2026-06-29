@@ -153,21 +153,46 @@ public class VoskSpeechService {
                     continue;
                 }
 
-                recognizer.acceptWaveForm(
-                        buffer,
-                        bytesRead);
 
-                String json =
-                        recognizer.getPartialResult();
+                boolean completed =
+                        recognizer.acceptWaveForm(
+                                buffer,
+                                bytesRead);
 
-                String partial =
-                        extractPartial(json);
+                if (completed) {
 
-                if (!partial.isBlank()) {
+                    String json =
+                            recognizer.getResult();
 
-                    broadcastPartial(partial);
+                    String text =
+                            extractResult(json);
+
+                    if (!text.isBlank()) {
+
+                        broadcastFinal(text);
+
+                    }
 
                 }
+                else {
+
+                    String json =
+                            recognizer.getPartialResult();
+
+                    String partial =
+                            extractPartial(json);
+
+                    if (!partial.isBlank()) {
+
+                        broadcastPartial(partial);
+
+                    }
+
+                }
+
+
+
+
 
             }
             catch (Exception ex) {
@@ -213,6 +238,17 @@ public class VoskSpeechService {
 
     private void broadcastPartial(String text) {
 
+        sendMessage(
+                new SpeechMessage(
+                        "partial",
+                        text));
+
+    }
+
+
+    /*
+    private void broadcastPartial(String text) {
+
         SpeechMessage message =
                 new SpeechMessage(
                         "partial",
@@ -241,5 +277,66 @@ public class VoskSpeechService {
         }
 
     }
+    */
+
+    private String extractResult(String json) {
+
+        try {
+
+            JsonNode node =
+                    mapper.readTree(json);
+
+            return fixTurkish(
+                    node.path("text")
+                            .asText(""));
+
+        }
+        catch (Exception ex) {
+
+            return "";
+
+        }
+
+    }
+
+    private void broadcastFinal(String text) {
+
+        SpeechMessage message =
+                new SpeechMessage(
+                        "final",
+                        text);
+
+        sendMessage(message);
+
+    }
+
+    private void sendMessage(
+            SpeechMessage message) {
+
+        try {
+
+            String json =
+                    mapper.writeValueAsString(message);
+
+            for (WebSocketSession session : sessions) {
+
+                if (session.isOpen()) {
+
+                    session.sendMessage(
+                            new TextMessage(json));
+
+                }
+
+            }
+
+        }
+        catch (Exception ex) {
+
+            ex.printStackTrace();
+
+        }
+
+    }
+
 
 }
