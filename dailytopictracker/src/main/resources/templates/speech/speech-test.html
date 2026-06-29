@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!--/*
+        This file is part of the DailyTopicTracker project.
+        Please refer to the project's README.md file for additional details.
+        https://github.com/turkerozturk/springtopiccalendar
+        */-->
+    <meta charset="UTF-8">
+
+    <title>Speech Test</title>
+
+</head>
+
+<body>
+
+<h2>Speech Test</h2>
+
+<textarea
+        id="note"
+        rows="15"
+        cols="100"></textarea>
+
+<br><br>
+
+<button id="connect">
+    Connect
+</button>
+
+<script
+        th:src="@{/js/speech-test.js}">
+</script>
+
+</body>
+
+</html>
