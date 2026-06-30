@@ -18,66 +18,62 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
-
-let socket;
-
-let finalText = "";
-
-let partialText = "";
-
-const textarea =
-    document.getElementById("note");
-
-connect();
-
-function connect(){
-
-    socket =
-        new WebSocket(
-            "ws://localhost:8080/ws/speech");
-
-    socket.onopen=function(){
-
-     /*   console.log("connected"); */
-
-    };
-
-    socket.onmessage=function(e){
-
-        const msg =
-            JSON.parse(e.data);
-
-             /*       console.log(msg); */
+package com.turkerozturk.dtt.speech2text;
 
 
-        switch(msg.type){
+import org.springframework.web.socket.WebSocketSession;
 
-            case "partial":
+public class SpeechSession {
 
-                partialText =
-                    msg.text;
+    private final WebSocketSession socket;
 
-                break;
+    private boolean commandMode;
 
-            case "final":
+    private final StringBuilder finalText =
+            new StringBuilder();
 
-                if(msg.text.length>0){
+    private String partialText = "";
 
-                    finalText +=
-                        msg.text+" ";
+    public SpeechSession(WebSocketSession socket) {
 
-                }
+        this.socket = socket;
 
-                partialText="";
+    }
 
-                break;
+    public WebSocketSession getSocket() {
 
-        }
+        return socket;
 
-        textarea.value =
-                finalText +
-                partialText;
+    }
 
-    };
+    public boolean isCommandMode() {
+
+        return commandMode;
+
+    }
+
+    public void setCommandMode(boolean commandMode) {
+
+        this.commandMode = commandMode;
+
+    }
+
+    public StringBuilder getFinalText() {
+
+        return finalText;
+
+    }
+
+    public String getPartialText() {
+
+        return partialText;
+
+    }
+
+    public void setPartialText(String partialText) {
+
+        this.partialText = partialText;
+
+    }
 
 }

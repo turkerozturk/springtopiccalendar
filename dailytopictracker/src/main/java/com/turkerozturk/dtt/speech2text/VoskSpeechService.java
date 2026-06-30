@@ -33,6 +33,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -57,14 +58,28 @@ public class VoskSpeechService {
 
     private volatile boolean initialized = false;
 
-    private final Set<WebSocketSession> sessions =
-            ConcurrentHashMap.newKeySet();
+
+
+
+    private final ConcurrentHashMap<
+            String,
+            SpeechSession> sessions =
+            new ConcurrentHashMap<>();
+
+    private volatile SpeechSession activeSession;
 
     private volatile boolean recording = false;
 
     public void register(WebSocketSession session) {
 
-        sessions.add(session);
+        SpeechSession speechSession =
+                new SpeechSession(session);
+
+        sessions.put(
+                session.getId(),
+                speechSession);
+
+        activeSession = speechSession;
 
         System.out.println(
                 "Client connected : "
@@ -78,9 +93,19 @@ public class VoskSpeechService {
         }
     }
 
-    public void unregister(WebSocketSession session) {
 
-        sessions.remove(session);
+    public synchronized void unregister(
+            WebSocketSession session){
+
+        SpeechSession removed =
+                sessions.remove(
+                        session.getId());
+
+        if(removed==activeSession){
+
+            activeSession=null;
+
+        }
 
         System.out.println(
                 "Client disconnected : "
@@ -151,18 +176,24 @@ public class VoskSpeechService {
                                 0,
                                 buffer.length);
 
+              //  System.out.println("loop");
+
                 if (bytesRead <= 0) {
                     continue;
                 }
 
+                /* TODO gecici olarak commen ettik
                 if (!recording) {
                     continue;
                 }
+                */
 
                 boolean completed =
                         recognizer.acceptWaveForm(
                                 buffer,
                                 bytesRead);
+
+            //    System.out.println("is completed: " + completed);
 
                 if (completed) {
 
@@ -174,6 +205,21 @@ public class VoskSpeechService {
 
                     if (!text.isBlank()) {
 
+                        if(activeSession!=null){
+
+
+                            // metnin ilk harfini buyuk yapalim, sonuna nokta ve bosluk koyalim.
+                            text = text.substring(0, 1).toUpperCase(new Locale("tr", "TR")) + text.substring(1);
+                            text += ".";
+
+                            activeSession
+                                    .getFinalText()
+                                    .append(text)
+                                    .append(" ");
+
+                        }
+
+
                         broadcastFinal(text);
 
                     }
@@ -184,10 +230,22 @@ public class VoskSpeechService {
                     String json =
                             recognizer.getPartialResult();
 
+            //        System.out.println(json);
+
                     String partial =
                             extractPartial(json);
 
+             //       System.out.println(partial);
+
                     if (!partial.isBlank()) {
+
+                        if(activeSession!=null){
+
+                            activeSession
+                                    .setPartialText(
+                                            partial);
+
+                        }
 
                         broadcastPartial(partial);
 
@@ -251,38 +309,7 @@ public class VoskSpeechService {
     }
 
 
-    /*
-    private void broadcastPartial(String text) {
 
-        SpeechMessage message =
-                new SpeechMessage(
-                        "partial",
-                        text);
-
-        try {
-
-            String json =
-                    mapper.writeValueAsString(message);
-
-            for (WebSocketSession session : sessions) {
-
-                if (session.isOpen()) {
-
-                    session.sendMessage(
-                            new TextMessage(json));
-
-                }
-
-            }
-
-        }
-        catch (Exception ex) {
-
-            ex.printStackTrace();
-        }
-
-    }
-    */
 
     private String extractResult(String json) {
 
@@ -315,27 +342,35 @@ public class VoskSpeechService {
 
     }
 
+
     private void sendMessage(
-            SpeechMessage message) {
+            SpeechMessage message){
 
-        try {
+        if(activeSession==null){
 
-            String json =
-                    mapper.writeValueAsString(message);
+            return;
 
-            for (WebSocketSession session : sessions) {
+        }
 
-                if (session.isOpen()) {
+        try{
 
-                    session.sendMessage(
-                            new TextMessage(json));
+            String json=
+                    mapper.writeValueAsString(
+                            message);
 
-                }
+            if(activeSession
+                    .getSocket()
+                    .isOpen()){
+
+                activeSession
+                        .getSocket()
+                        .sendMessage(
+                                new TextMessage(json));
 
             }
 
         }
-        catch (Exception ex) {
+        catch(Exception ex){
 
             ex.printStackTrace();
 
