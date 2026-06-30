@@ -19,6 +19,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.en.html>.
  */
 
+let finalText="";
 
 let socket = null;
 
@@ -41,16 +42,50 @@ document
         };
 
         socket.onmessage = function (e) {
+            //    document.getElementById("note").value = e.data;
 
            // console.log(e.data);
 
            const msg = JSON.parse(e.data);
 
-           document
-               .getElementById("note")
-               .value = msg.text;
+
+
+
+           const mtype = msg.type;
+
+            if(mtype == "final") {
+                document.getElementById("note").value = msg.text;
+            } else {
+              //  document.getElementById("note").value = "pariyal";
+
+            }
+
 
 
         };
+
+
+        document
+            .getElementById("start")
+            .onclick=function(){
+
+            socket.send(
+                JSON.stringify({
+                    action:"start"
+                }));
+
+        };
+
+        document
+            .getElementById("stop")
+            .onclick=function(){
+
+            socket.send(
+                JSON.stringify({
+                    action:"stop"
+                }));
+
+        };
+
 
     };

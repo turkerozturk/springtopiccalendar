@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.speech2text;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -30,6 +31,9 @@ public class SpeechWebSocketHandler
         extends TextWebSocketHandler {
 
     private final VoskSpeechService speechService;
+
+    private final ObjectMapper mapper =
+            new ObjectMapper();
 
     public SpeechWebSocketHandler(
             VoskSpeechService speechService) {
@@ -52,6 +56,31 @@ public class SpeechWebSocketHandler
             throws Exception {
 
         speechService.unregister(session);
+    }
+
+    @Override
+    protected void handleTextMessage(
+            WebSocketSession session,
+            TextMessage message)
+            throws Exception {
+
+        SpeechControlMessage control =
+                mapper.readValue(
+                        message.getPayload(),
+                        SpeechControlMessage.class);
+
+        switch (control.getAction()) {
+
+            case "start":
+                speechService.startRecording();
+                break;
+
+            case "stop":
+                speechService.stopRecording();
+                break;
+
+        }
+
     }
 
 }

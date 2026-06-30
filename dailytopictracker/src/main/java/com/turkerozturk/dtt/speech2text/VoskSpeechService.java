@@ -60,6 +60,8 @@ public class VoskSpeechService {
     private final Set<WebSocketSession> sessions =
             ConcurrentHashMap.newKeySet();
 
+    private volatile boolean recording = false;
+
     public void register(WebSocketSession session) {
 
         sessions.add(session);
@@ -153,6 +155,9 @@ public class VoskSpeechService {
                     continue;
                 }
 
+                if (!recording) {
+                    continue;
+                }
 
                 boolean completed =
                         recognizer.acceptWaveForm(
@@ -336,6 +341,22 @@ public class VoskSpeechService {
 
         }
 
+    }
+
+    public void startRecording() {
+
+        recording = true;
+
+        recognizer.reset();
+
+        System.out.println("Recording started");
+    }
+
+    public void stopRecording() {
+
+        recording = false;
+
+        System.out.println("Recording stopped");
     }
 
 
