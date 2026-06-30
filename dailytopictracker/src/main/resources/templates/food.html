@@ -715,19 +715,41 @@
 
 
 
-<div th:each="meal : ${summary.meals}" class="row">
+<div th:each="meal : ${summary.meals}"
+     class="row meal-row"
 
+     th:attr="
+        data-kcal=${#numbers.formatDecimal(meal.totalCalories100,1,2)},
+        data-fat=${#numbers.formatDecimal(meal.totalGramFat100,1,2)},
+        data-fat-saturated=${#numbers.formatDecimal(meal.totalGramFatSaturated100,1,2)},
+        data-carbohydrate=${#numbers.formatDecimal(meal.totalGramCarbohydrate100,1,2)},
+        data-sugar=${#numbers.formatDecimal(meal.totalGramSugar100,1,2)},
+        data-protein=${#numbers.formatDecimal(meal.totalGramProtein100,1,2)},
+        data-fiber=${#numbers.formatDecimal(meal.totalGramFiber100,1,2)},
+        data-sodium=${#numbers.formatDecimal(meal.totalGramSodium100,1,2)},
+        data-totalgram=${#numbers.formatDecimal(meal.totalGram,1,2)}
+">
 
     <!-- https://www.w3schools.com/howto/howto_css_table_side_by_side.asp -->
 
     <div class="column">
-        <table class="table table-sm table-striped" style="max-width: 600px;">
+        <table class="table table-sm table-striped food-list-table" style="max-width: 600px;">
             <thead>
             <tr>
                 <td colspan="2">
-                    Öğün Kodu: <b><span th:text="${'' + meal.mealLabel}"></span></b>
+                    Öğün Kodu:
+                    <b th:text="${meal.mealLabel}"></b>
+
+                    <button type="button"
+                            class="btn btn-sm btn-secondary float-end food-topic-btn"
+                            title="Bu öğündeki verileri panoya food topic formatında kopyalayın."
+                    >
+                        Topic Biçiminde Göster
+                    </button>
                 </td>
             </tr>
+
+
 
             </thead>
             <caption>Gıda Listesi</caption>
@@ -908,6 +930,33 @@
 
 
 
+</div>
+
+
+<!--/*  Meal tablolarindaki dugmelere tiklandiginda bu modal icerisinde o ogunun besin degerleri
+manuel olarak new topic olusturmaya uygun formatta goruntulenir.
+*/-->
+<div class="modal fade" id="foodTopicModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Food Topic</h5>
+
+                <button class="btn-close"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <textarea id="foodTopicText"
+                          class="form-control"
+                          rows="25"></textarea>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
@@ -1310,6 +1359,71 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
         });
 
     });
+
+</script>
+
+
+<script>
+    document.querySelectorAll(".food-topic-btn").forEach(btn => {
+
+    btn.addEventListener("click", async function () {
+
+        const meal = btn.closest(".meal-row");
+
+        let text =
+`#food
+kcal ${meal.dataset.kcal}
+fat ${meal.dataset.fat}
+carbohydrate ${meal.dataset.carbohydrate}
+protein ${meal.dataset.protein}
+fiber ${meal.dataset.fiber}
+sodium ${meal.dataset.sodium}
+fat-saturated ${meal.dataset.fatSaturated}
+sugar ${meal.dataset.sugar}
+default ${meal.dataset.totalgram}
+price 0
+price-date 0000-00-00
+
+Varsayılan toplam ağırlığı: ${meal.dataset.totalgram} gr (default etiketinde de belirtildi).
+Besin değerleri 100 gram üzerinden hesaplanmıştır.
+Bu gıda ürünü, aşağıdaki gıdalardan oluşmaktadır.
+
+`;
+
+        const rows = meal.querySelectorAll(".food-list-table tbody tr");
+
+        rows.forEach(r => {
+
+            const cols = r.querySelectorAll("td");
+
+            if (cols.length !== 2)
+                return;
+
+            const food = cols[0].innerText.trim();
+            const gram = cols[1].innerText
+                .replace("gr", "")
+                .trim();
+
+            text += food + " " + gram + " gr\n";
+
+        });
+
+        document.getElementById("foodTopicText").value = text;
+
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch(e){
+            console.log(e);
+        }
+
+        new bootstrap.Modal(
+            document.getElementById("foodTopicModal")
+        ).show();
+
+    });
+
+});
+
 
 </script>
 
