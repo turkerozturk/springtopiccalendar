@@ -1066,7 +1066,12 @@ manuel olarak new topic olusturmaya uygun formatta goruntulenir.
 
         $('#calorieDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
 
-        $('#caloriesTableDateCell').text(initialDateStr);
+
+        const dateObj = new Date(initialDateStr + 'T00:00:00');
+        // https://www.w3schools.com/jsref/jsref_tolocaledatestring.asp
+        const dayName = dateObj.toLocaleDateString(appLocale, { weekday: 'short', month: 'short' }); // long, short, narrow yazilis
+        $('#caloriesTableDateCell').text(`${initialDateStr} ${dayName}`);
+
 
 
         $('#calorieDateContainer .calorieDateStyle.date').datepicker({
