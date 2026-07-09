@@ -63,6 +63,11 @@ public class EntryService {
         return entryRepository.findByCategoryIdAndStatusOfDoneEntriesWithDateInterval(categoryId, dateMillisYmd);
     }
 
+    public List<Entry> findAllByCategoryAndOneDay(Long categoryId, Long dateMillisYmd) {
+
+        return entryRepository.findByCategoryIdAndStatusOfAllEntriesWithDateInterval(categoryId, dateMillisYmd);
+    }
+
     public List<Entry> findByTopicIdAndDateInterval(Long topicId, long startDateMillis, long endDateMillis) {
         return entryRepository.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
     }

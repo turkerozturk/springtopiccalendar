@@ -79,7 +79,9 @@ public class DayViewRestController {
         stringFormatSb.append("<div style='text-align: left;'>");
         stringFormatSb.append("%s");
 
+        stringFormatSb.append("<span class=\"status-%s\">");
         stringFormatSb.append("ⓘ");
+        stringFormatSb.append("</span>");
         stringFormatSb.append("<a class='topic-name' ")
                 .append("hx-get='/topics/info/")
                 .append("%s")
@@ -94,10 +96,10 @@ public class DayViewRestController {
         stringFormatSb.append("%s");
         stringFormatSb.append("'>");
 
-        stringFormatSb.append("<sub>");
+        stringFormatSb.append("<sup>");
 
         stringFormatSb.append("%s");
-        stringFormatSb.append("</sub>");
+        stringFormatSb.append("</sup>");
 
         stringFormatSb.append("</a>");
 
@@ -124,10 +126,13 @@ public class DayViewRestController {
         int totalWeight = 0;
 
         for (Category c : categories) {
-            List<Entry> doneEntries = entryService.findDonesByCategory(c.getId(), dateMillisYmd);
+            //List<Entry> doneEntries = entryService.findDonesByCategory(c.getId(), dateMillisYmd);
+
+            List<Entry> allEntriesByCategoryAndOneDay = entryService.findAllByCategoryAndOneDay(c.getId(), dateMillisYmd);
+
 
             List<Entry> weightedEntries = new ArrayList<>();
-            for(Entry e : doneEntries) {
+            for(Entry e : allEntriesByCategoryAndOneDay) {
                 if(e.getTopic().getWeight() >= 0) {
                     weightedEntries.add(e);
                 } else {
@@ -135,6 +140,7 @@ public class DayViewRestController {
 
                     reportForNegativeWeight.append(String.format(stringFormatSb.toString(),
                             topic.getWeight(),
+                            e.getStatus(),
                             topic.getId(),
                             topic.getName(),
                             topic.getCategory().getId(),
@@ -155,11 +161,15 @@ public class DayViewRestController {
 
                     Topic topic = entry.getTopic();
                     if(topic.getWeight() > 0) {
-                        totalWeight += topic.getWeight();
-                        categoryWeight += topic.getWeight();
+                        if(entry.getStatus().equals(1)) {
+
+                            totalWeight += topic.getWeight();
+                            categoryWeight += topic.getWeight();
+                        }
 
                         reportForPositiveWeight.append(String.format(stringFormatSb.toString(),
                                 topic.getWeight(),
+                                entry.getStatus(),
                                 topic.getId(),
                                 topic.getName(),
                                 topic.getCategory().getId(),
@@ -170,6 +180,7 @@ public class DayViewRestController {
                     } else if(topic.getWeight() == 0) {
                         reportForZeroWeight.append(String.format(stringFormatSb.toString(),
                                 topic.getWeight(),
+                                entry.getStatus(),
                                 topic.getId(),
                                 topic.getName(),
                                 topic.getCategory().getId(),
