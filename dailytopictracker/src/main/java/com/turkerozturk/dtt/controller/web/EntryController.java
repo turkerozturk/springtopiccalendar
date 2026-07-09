@@ -1627,6 +1627,8 @@ public class EntryController {
                     return "redirect:/category-groups";
                 case "calorietracker":
                     return "redirect:/food?dateMillisYmd=" + dateMillisYmd;
+                case "dayviewtracker":
+                    return "redirect:/dayview?dateMillisYmd=" + dateMillisYmd;
 
                 // Eğer ileride farklı sayfalardan gelme ihtimali varsa
                 default:

@@ -365,6 +365,23 @@ public class TopicService {
                 .toList();
     }
 
+    public List<TopicDto> searchDayViewTopics(String q) {
+
+        List<Topic> topics = topicRepository.findAll();
+
+        Locale locale = Locale.forLanguageTag(appLocale);
+        // 2) Collator: case-insensitive ve aksansız karşılaştırma
+        Collator collator = Collator.getInstance(locale);
+        collator.setStrength(Collator.PRIMARY);
+
+        return topics.stream()
+                .filter(t -> t.getName().toLowerCase(locale).contains(q.toLowerCase(locale)))
+                .sorted(Comparator.comparing(Topic::getName,
+                        collator))
+                .map(t -> new TopicDto(t.getId(), t.getName()))
+                .toList();
+    }
+
     public List<Topic> getActivityTopics() {
         List<Topic> topics = topicRepository.findActivityTopicsRaw();
         return topics;

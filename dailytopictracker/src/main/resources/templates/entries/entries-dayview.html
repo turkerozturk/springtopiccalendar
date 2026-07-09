@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <!--/*
+  This file is part of the DailyTopicTracker project.
+  Please refer to the project's README.md file for additional details.
+  https://github.com/turkerozturk/springtopiccalendar
+  */-->
+  <title>Daily Topic Tracker</title>
+  <meta charset="UTF-8">
+
+
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+  <!--/* favicon */-->
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+
+
+
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
+
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
+
+  <style>
+
+    a.category-name:hover {
+        text-decoration: underline !important;
+    }
+
+    a.category-name {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    a.topic-name:hover {
+        text-decoration: underline !important;
+    }
+
+    a.topic-name {
+        text-decoration: none;
+        /* color: inherit; */
+    }
+  </style>
+
+  <style>
+    sub {
+      color: darkgray;
+    }
+
+  </style>
+
+
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f5f5f5; }
+    .total { font-weight: bold; background-color: #e8f5e9; }
+
+    .vurgula {
+      font-size: 1.875em;
+      background-color: lightgreen;
+    }
+
+    .az-vurgula {
+      background-color: lightgreen;
+    }
+
+    .az-vurgula2 {
+      background-color: #c5e7c5;
+    }
+
+    .daha-az-vurgula {
+      background-color: #eeeecc;
+    }
+
+  .status-0 {
+    background-color: gainsboro !important;
+  }
+  .status-1 {
+    background-color: palegreen !important;
+  }
+  .status-2 {
+    background-color: tomato !important;
+  }
+
+  .status-fg-0 {
+    color: gainsboro !important;
+  }
+  .status-fg-1 {
+    color: palegreen !important;
+  }
+  .status-fg-2 {
+    color: tomato !important;
+  }
+  </style>
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .row {
+      margin-left:-5px;
+      margin-right:-5px;
+    }
+
+    .column {
+      float: left;
+      width: 50%;
+      padding: 5px;
+    }
+
+    /* Clearfix (clear floats) */
+    .row::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      width: 100%;
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 16px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+  </style>
+
+  <style>
+    /* Liste asagi kaydiriyor → overlay yapalim (CSS FIX) */
+    #foodSearchResults {
+        position: absolute;
+        width: 100%;
+        z-index: 1000;
+        max-height: 250px;
+        overflow-y: auto;
+    }
+  </style>
+
+  <style>
+    .high-value-1 {
+        color: red;
+    }
+    .low-value-1 { color: blue; }
+    .good-value-1 { color:green; }
+
+    .high-value-2 {
+        background-color: red;
+        color: white;
+    }
+    .low-value-2 { background-color: #2196f3; color: white; }
+   /* .good-value-2 { color:darkgreen; color: white; } */
+
+  </style>
+
+  <style>
+    .cerceve {
+        border-style: solid;
+        border-width: 5px;
+        border-color: green;
+
+        }
+  </style>
+
+  <style>
+    .gr100 {
+        background-color: ivory !important;
+    }
+  </style>
+
+</head>
+<body>
+
+<h2><!-- Sol tarafta logo veya Home -->
+  <a class="navbar-brand" href="/" target="_blank">🏠 Home</a> | Daily Entries Tracker
+</h2>
+
+<p>
+
+  <!--/* buraya radar linki koyabilirsin */-->
+
+</p>
+
+<div class="container mb-3" style="position: relative; max-width: 400px;">
+  <label>Öğe Ekle</label>
+  <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Öğe adı yaz..." autofocus>
+
+  <ul id="foodSearchResults" class="list-group mt-1"></ul>
+</div>
+
+<!--/*
+
+
+<form method="get" action="/dayview">
+
+
+
+  <div class="container mb-0" id="calorieDateContainer" style="max-width: 400px; background-color:floralwhite;">
+    <div class="input-group calorieDateStyle date">
+      <label for="calorieDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
+      <span class="input-group-append">
+                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + prevDayDateMillis}">
+                        &lt;
+                    </a>
+            </span>
+      <input type="text" id="calorieDatePicker"
+             class="form-control form-control-sm"/>
+      <span class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="far fa-calendar" aria-hidden="true"></i>
+                    </button>
+            </span>
+
+      <span class="input-group-append">
+                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + nextDayDateMillis}">
+                        &gt;
+                    </a>
+            </span>
+
+
+
+    </div>
+  </div>
+
+</form>
+
+*/-->
+
+<!--/* chart */-->
+<script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+
+
+
+
+<!--/* https://rgbacolorpicker.com/ */-->
+
+
+
+
+
+
+
+<div class="container mb-3" style="max-width: 600px;">
+  <div class="mx-auto" style="background-color:white; max-width: 450px;">
+
+    <div style="max-width: 300px; height: 300px; margin:auto;">
+      <canvas id="radarChart"></canvas>
+    </div>
+
+    <!--/* chartInfo icerisinde javascript ile olusturulmus html icerik var(h5, a, br, div elementleri icinde metinler). */-->
+    <div id="chartInfo" class="mb-2 text-center"></div>
+
+    <div style="background-color:white; color:darkgray; text-align:center; margin: 0 auto;">
+      The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
+
+
+
+
+<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+
+<script type="text/javascript"
+        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+
+<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
+
+<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
+<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
+
+
+<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
+
+<script>
+    $(document).ready(function () {
+        let table = new DataTable('#caloriesTable', {
+
+            pageLength: 50,
+            layout: {
+                topStart: '',
+                topEnd: '',
+                bottomStart: 'search',
+                bottomEnd: 'pageLength'
+            }
+        });
+        // https://hatchjs.com/datatables-sort-by-date/
+        // TODO asagidaki ayarlar ise yaramadi. Ogrenip tekrar dene.
+        // table.order('Kalori', 'desc');
+        // table.order(3 , 'desc');
+    });
+
+</script>
+
+<script th:inline="javascript">
+    const ZONE_ID = [[${zoneId}]];
+    const DATE_MILLIS = [[${dateMillisYmd}]];
+</script>
+
+<script>
+    function convertDateToMillis(dateStr) {
+
+        // dateStr = "2026-04-06"
+
+        const parts = dateStr.split("-");
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // JS month 0-based
+        const day = parseInt(parts[2]);
+
+        // Local midnight oluştur
+        const localDate = new Date(year, month, day);
+
+        return localDate.getTime();
+    }
+
+    function loadCalorieData(dateStr) {
+
+        const millis = convertDateToMillis(dateStr);
+
+        const url = `/food?dateMillisYmd=${millis}`;
+
+        // Sayfayı redirect ederek yenile
+        window.location.href = url;
+    }
+
+    function convertMillisToDateStr(millis) {
+
+        const date = new Date(millis);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    function redirectToNewEntry(topicId) {
+
+        let dateStr;
+
+        if (DATE_MILLIS) {
+            dateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            dateStr = new Date().toISOString().slice(0, 10);
+        }
+
+        const url = `/entries/new?topicId=${topicId}&dateYmd=${dateStr}&returnPage=dayviewtracker`;
+
+        window.open(url, '_self'); // yeni sekme
+    }
+
+    $(function () {
+
+
+        let initialDateStr;
+
+        if (DATE_MILLIS) {
+            initialDateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            initialDateStr = new Date().toISOString().slice(0, 10);
+        }
+
+        $('#calorieDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
+
+
+        const dateObj = new Date(initialDateStr + 'T00:00:00');
+        // https://www.w3schools.com/jsref/jsref_tolocaledatestring.asp
+        const dayName = dateObj.toLocaleDateString(appLocale, { weekday: 'short', month: 'short' }); // long, short, narrow yazilis
+        $('#caloriesTableDateCell').text(`${initialDateStr} ${dayName}`);
+
+
+
+        $('#calorieDateContainer .calorieDateStyle.date').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            autoclose: true,
+            todayHighlight: true
+        }).on("changeDate", function (e) {
+            loadCalorieData(e.format(0, "yyyy-mm-dd"));
+        });
+
+
+        // topic arama kodu
+
+        const $input = $('#foodSearchInput');
+        const $results = $('#foodSearchResults');
+
+
+        // Kullanici yazarken her tusta API cagrisi yapmamak icin bekleme koyar.
+        // bu debounce olmasa da filtreleme calisiyordu.
+        // debounce ile:
+        // kullanici yazmayi birakinca (ornegin 300ms sonra) cagri yapilir.
+        let debounceTimer;
+
+        $input.on('input', function () {
+
+            clearTimeout(debounceTimer);
+
+            const query = $(this).val();
+
+            if (query.length < 2) {
+                $results.empty();
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                if (query.length >= 2) {
+                    //const csrfToken = $('meta[name="_csrf"]').attr('content');
+                    //const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+                    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+
+                    $.ajax({
+                        url: '/api/dayview-topics',
+                        data: { q: query },
+                        beforeSend: function (xhr) {
+                                xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
+                        success: function (data) {
+
+                            currentResults = data;
+                            selectedIndex = -1;
+
+                            $results.empty();
+
+                            if (data.length === 0) {
+                                $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
+                            }
+
+                            data.forEach((item, index) => {
+
+                                const highlighted = highlightMatch(item.name, query);
+
+                                const li = $(`
+                                    <li class="list-group-item list-group-item-action" style="cursor:pointer;">
+                                        ${highlighted}
+                                    </li>
+                                `);
+
+                                li.on('click', function () {
+                                    redirectToNewEntry(item.id);
+                                });
+
+                                $results.append(li);
+                            });
+
+
+                        }
+                    });
+
+
+                }
+            }, 300);
+
+
+        });
+
+
+
+    // ⬇️⬆️ ENTER ESC kontrolü
+    $input.on('keydown', function (e) {
+
+        const items = $results.find('li');
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelection(items);
+        }
+
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, 0);
+            updateSelection(items);
+        }
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex >= 0 && currentResults[selectedIndex]) {
+                redirectToNewEntry(currentResults[selectedIndex].id);
+            }
+        }
+
+        if (e.key === 'Escape') {
+            $results.empty();
+            selectedIndex = -1;
+        }
+    });
+
+    // dışarı tıklama
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#foodSearchInput, #foodSearchResults').length) {
+            $results.empty();
+            selectedIndex = -1;
+        }
+    });
+
+
+});
+
+function updateSelection(items) {
+    items.removeClass('active');
+
+    if (selectedIndex >= 0) {
+        const $selected = $(items[selectedIndex]);
+        $selected.addClass('active');
+
+        // 👇 kritik kisim
+        const container = $('#foodSearchResults');
+
+        const itemTop = $selected.position().top;
+        const itemBottom = itemTop + $selected.outerHeight();
+
+        const containerScrollTop = container.scrollTop();
+        const containerHeight = container.height();
+
+        if (itemBottom > containerHeight) {
+            container.scrollTop(containerScrollTop + (itemBottom - containerHeight));
+        } else if (itemTop < 0) {
+            container.scrollTop(containerScrollTop + itemTop);
+        }
+    }
+}
+
+// asagidaki kodlar arama kutusuna yazilan harflerin sonuclar icerisinde vurgulu gosterilmeleri icin.
+const appLocale = /*[[${appLocale}]]*/ 'en';
+//const collator = new Intl.Collator(appLocale, { sensitivity: 'base' });
+
+function normalizeText(str) {
+    return str
+        .toLocaleLowerCase(appLocale)
+        .normalize("NFD")                 // karakterleri parçala
+        .replace(/\p{Diacritic}/gu, "");  // aksanları sil
+}
+function highlightMatch(text, query) {
+
+    const normText = normalizeText(text);
+    const normQuery = normalizeText(query);
+
+    const index = normText.indexOf(normQuery);
+
+    if (index === -1) return text;
+
+    const end = index + normQuery.length;
+
+    return text.substring(0, index)
+        + "<strong style=\"background-color: LightPink; color: gray;\">" + text.substring(index, end) + "</strong>"
+        + text.substring(end);
+}
+
+</script>
+
+<!--/* https://github.com/SheetJS/sheetjs https://docs.sheetjs.com/
+new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
+<script src="/webjars/xlsx/dist/xlsx.full.min.js"></script>
+
+<!--/* <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> */-->
+
+<script>
+  /*
+    document.getElementById("btnExcel").addEventListener("click", function () {
+        // pivot-table elementini seç
+        var table = document.getElementById("caloriesTable");
+
+        // HTML tablodan worksheet oluştur
+        var wb = XLSX.utils.table_to_book(table, { sheet: "CaloriesTable" });
+
+        // Dosyayı indir
+        XLSX.writeFile(wb, "calories-table.xlsx");
+    });
+  */
+</script>
+
+
+
+<script>
+  /*
+    // COPY THE FOOD LIST TO THE CLIPBOARD
+    document.getElementById("btnCopy").addEventListener("click", function () {
+
+        let initialDateStr;
+
+        if (DATE_MILLIS) {
+            initialDateStr = convertMillisToDateStr(DATE_MILLIS);
+        } else {
+            initialDateStr = new Date().toISOString().slice(0, 10);
+        }
+
+
+        let result = [];
+        result.push("Date: " + initialDateStr)
+        result.push("Planned food weight");
+
+
+        $("#caloriesTable tbody tr").each(function () {
+            let columnIndexKcalPer100gr = 0 + 3;
+            let columnIndexFoodName = 0 + 4;
+            let columnIndexGramsToBeConsumed = 0 + 5;
+            let columnIndexCaloriesToBeConsumed = 0 + 6;
+            let kcalPer100gr = $(this).find("td:eq(" + columnIndexKcalPer100gr + ")").text().trim(); // 100 gramda kac kalori oldugu
+            let foodName = $(this).find("td:eq(" + columnIndexFoodName + ")").text().trim(); // topic ismi yani gida adi
+            let gramsToBeConsumed = $(this).find("td:eq(" + columnIndexGramsToBeConsumed + ")").text().trim(); // tuketilecek gram
+            let caloriesToBeConsumed = $(this).find("td:eq(" + columnIndexCaloriesToBeConsumed + ")").text().trim(); // tuketilecek kalori
+            let dataSeparator = "|"; // libreoffice'de cift bosluk gibi ayrac belirtmek yok. o yuzden pipe kullandim.
+
+            if (kcalPer100gr || foodName) {
+                result.push(gramsToBeConsumed + dataSeparator + "gr " + dataSeparator +
+                            foodName + dataSeparator +
+                            caloriesToBeConsumed + dataSeparator + "kcal"
+                            );
+            }
+        });
+
+        let finalText = result.join("\n");
+
+        // panoya kopyala
+        navigator.clipboard.writeText(finalText).then(function () {
+
+            // mesaj göster
+            $("#copyInfo").fadeIn(200);
+
+            setTimeout(function () {
+                $("#copyInfo").fadeOut(200);
+            }, 1500);
+
+        }).catch(function (err) {
+            console.error("Kopyalama hatası:", err);
+        });
+    });
+  */
+</script>
+
+<script>
+    $(document).ready(function () {
+
+    let table = new DataTable('#caloriesTable');
+
+    // Custom filter
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+
+            let row = table.row(dataIndex).node();
+
+            let selectedStatuses = $('.status-filter:checked')
+                .map(function () { return $(this).val(); })
+                .get();
+
+            // satırın class'ından status yakala
+            let rowStatus = null;
+            for (let i = 0; i <= 2; i++) {
+                if ($(row).hasClass('status-hide-' + i)) {
+                    rowStatus = i.toString();
+                    break;
+                }
+            }
+
+            // seçili değilse gösterme
+            return selectedStatuses.includes(rowStatus);
+        });
+
+        // checkbox değişince tabloyu yeniden filtrele
+        $('.status-filter').on('change', function () {
+            table.draw();
+        });
+
+    });
+
+</script>
+
+
+<script>
+    document.querySelectorAll(".food-topic-btn").forEach(btn => {
+
+    btn.addEventListener("click", async function () {
+
+        const meal = btn.closest(".meal-row");
+
+        let text =
+`#food
+kcal ${meal.dataset.kcal}
+fat ${meal.dataset.fat}
+carbohydrate ${meal.dataset.carbohydrate}
+protein ${meal.dataset.protein}
+fiber ${meal.dataset.fiber}
+sodium ${meal.dataset.sodium}
+fat-saturated ${meal.dataset.fatSaturated}
+sugar ${meal.dataset.sugar}
+default ${meal.dataset.totalgram}
+price 0
+price-date 0000-00-00
+
+Varsayılan toplam ağırlığı: ${meal.dataset.totalgram} gr (default etiketinde de belirtildi).
+Besin değerleri 100 gram üzerinden hesaplanmıştır.
+Bu gıda ürünü, aşağıdaki gıdalardan oluşmaktadır.
+
+`;
+
+        const rows = meal.querySelectorAll(".food-list-table tbody tr");
+
+        rows.forEach(r => {
+
+            const cols = r.querySelectorAll("td");
+
+            if (cols.length !== 2)
+                return;
+
+            const food = cols[0].innerText.trim();
+            const gram = cols[1].innerText
+                .replace("gr", "")
+                .trim();
+
+            text += food + " " + gram + " gr\n";
+
+        });
+
+        document.getElementById("foodTopicText").value = text;
+
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch(e){
+            console.log(e);
+        }
+
+        new bootstrap.Modal(
+            document.getElementById("foodTopicModal")
+        ).show();
+
+    });
+
+});
+
+
+</script>
+
+
+
+
+<script>
+  let radarChart;
+
+  function loadRadarChart(date) {
+      $.getJSON("/api/dayview-radar", {date: date}, function (data) {
+          const ctx = document.getElementById('radarChart').getContext('2d');
+
+          if (radarChart) {
+              radarChart.destroy();
+          }
+
+          radarChart = new Chart(ctx, {
+              type: 'radar',
+              data: {
+                  labels: data.categoryLabels,
+                  datasets: [
+                      {
+                          data: data.categoryCounts,
+                          fill: true,
+                          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                      },
+                      {
+                          data: data.categoryWeights,
+                          fill: true,
+                          backgroundColor: 'rgba(0, 102, 0, 0.2)',
+                          borderColor: 'rgba(0, 102, 0, 1)',
+                          pointBackgroundColor: 'rgba(0, 102, 0, 1)'
+                      }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      r: {
+                          beginAtZero: true,
+                          pointLabels: {display: true},
+                          ticks: {stepSize: 1, precision: 0}
+                      }
+                  },
+                  plugins: {legend: {display: false}}
+              }
+          });
+
+          $("#chartInfo").html(
+              "You collected <b style='color:darkgreen'>" + data.totalWeight + " / " + [[${dailyGoalScore}]] + "</b> points."
+              + "<br><span style='color: dodgerblue;'> Entries: <b>" + data.categoryTotalCount + "</b></span>"
+              + " | Categories: " + data.categoryTotalCategories
+              + "<br>"
+              + "<h5>Scoring Details</h5>"
+              + data.reportForPositiveWeight
+              + "<hr>"
+              + "<h5>Unscored</h5>"
+              + data.reportForZeroWeight
+              + "<hr>"
+              + "<h5>Those excluded from the scoring</h5>"
+              + data.reportForNegativeWeight
+          );
+
+         // Asagidaki htmx satiri cok onemli, html kodunu backendde urettigimiz icin, ajax ile gelen hx-get calismaz.
+         // Ajax ile gelen HTML (report string’leri) → htmx.process(...) ile yeniden isleniyor ve calisiyor.
+         // bu satir konuyu tekrar ele alarak hx-get in calismasini saglar(chatgpt aciklamasi notlarda var):
+         htmx.process(document.getElementById("chartInfo"));
+      });
+  }
+
+  // sayfa ilk açıldığında bugünün tarihi ile yükle
+  $(function () {
+      const today = new Date().toISOString().slice(0, 10);
+      loadRadarChart(today);
+
+      $('#chartDateContainer .chartDateStyle.date').datepicker({
+          format: "yyyy-mm-dd",
+          todayBtn: "linked",
+          daysOfWeekHighlighted: "0,6",
+          autoclose: true,
+          todayHighlight: true
+      }).on("changeDate", function (e) {
+          loadRadarChart(e.format(0, "yyyy-mm-dd"));
+      });
+  });
+</script>
+
+
+
+
+</body>
+</html>
