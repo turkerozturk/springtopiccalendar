@@ -191,9 +191,9 @@
 </head>
 <body>
 
-<h2><!-- Sol tarafta logo veya Home -->
-  <a class="navbar-brand" href="/" target="_blank">🏠 Home</a> | Daily Entries Tracker
-</h2>
+<h4 class="text-center"><!-- Sol tarafta logo veya Home -->
+  <a class="navbar-brand" href="/" target="_blank">🏠 Daily Topic Tracker</a> | Daily Summary
+</h4>
 
 <p>
 
@@ -202,35 +202,31 @@
 </p>
 
 <div class="container mb-3" style="position: relative; max-width: 400px;">
-  <label>Öğe Ekle</label>
+  <label>Add Entry</label>
   <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Öğe adı yaz..." autofocus>
 
   <ul id="foodSearchResults" class="list-group mt-1"></ul>
-</div>
 
+<label>Select Date</label>
 
 <form action="/dayview" method="get">
-  <div class="container mb-0" id="dwDateContainer" style="max-width: 400px; background-color:floralwhite;">
-    <div class="input-group dwDateStyle date">
-      <label class="col-sm-4 col-form-label col-form-label-sm" for="dwDatePicker">Select Date:</label>
+  <div class="container mb-0 text-center" id="dwDateContainer" style="max-width: 400px; background-color:floralwhite;">
 
+    <div class="input-group">
       <span class="input-group-append">
-            <a class="btn btn-outline-secondary" th:href="${'/dayview?dateMillisYmd=' + prevDayDateMillis}">
-                &lt;
-            </a>
-      </span>
-
-      <input class="form-control form-control-sm" id="dwDatePicker" type="text"/>
-      <span class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button">
-                <i aria-hidden="true" class="far fa-calendar"></i>
-            </button>
+              <button id="prevDayBtn" class="btn btn-outline-secondary" type="button">
+                  &lt;
+              </button>
       </span>
 
       <span class="input-group-append">
-            <a class="btn btn-outline-secondary" th:href="${'/dayview?dateMillisYmd=' + nextDayDateMillis}">
-                &gt;
-            </a>
+        <input class="form-control form-control-sm dwDateStyle date" id="dwDatePicker" type="text"/>
+      </span>
+
+      <span class="input-group-append">
+          <button id="nextDayBtn" class="btn btn-outline-secondary" type="button">
+              &gt;
+          </button>
       </span>
 
     </div>
@@ -238,6 +234,7 @@
 </form>
 
 
+</div>
 
 
 <!--/* chart */-->
@@ -257,12 +254,14 @@
 <div class="container mb-3" style="max-width: 600px;">
   <div class="mx-auto" style="background-color:white; max-width: 450px;">
 
-    <div style="max-width: 300px; height: 300px; margin:auto;">
+    <!--/* chartInfo icerisinde javascript ile olusturulmus html icerik var(h5, a, br, div elementleri icinde metinler). */-->
+    <div id="chartInfo" class="mb-2 text-center"></div>
+
+    <div style="max-width: 300px; height: 300px; margin:auto; background-color:floralwhite;">
       <canvas id="radarChart"></canvas>
     </div>
 
-    <!--/* chartInfo icerisinde javascript ile olusturulmus html icerik var(h5, a, br, div elementleri icinde metinler). */-->
-    <div id="chartInfo" class="mb-2 text-center"></div>
+
 
     <div style="background-color:white; color:darkgray; text-align:center; margin: 0 auto;">
       The radar chart provides statistics on done entries of topics with a weight value of 0 or greater in non-archive categories.
@@ -292,30 +291,93 @@
 
 <!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
 
-<script>
-    $(document).ready(function () {
-        let table = new DataTable('#caloriesTable', {
 
-            pageLength: 50,
-            layout: {
-                topStart: '',
-                topEnd: '',
-                bottomStart: 'search',
-                bottomEnd: 'pageLength'
-            }
-        });
-        // https://hatchjs.com/datatables-sort-by-date/
-        // TODO asagidaki ayarlar ise yaramadi. Ogrenip tekrar dene.
-        // table.order('Kalori', 'desc');
-        // table.order(3 , 'desc');
-    });
-
-</script>
 
 <script th:inline="javascript">
     const ZONE_ID = [[${zoneId}]];
     const DATE_MILLIS = [[${dateMillisYmd}]];
+
+  let initialDateStr;
+  let prevDateStr;
+  let nextDateStr;
 </script>
+
+
+
+<script>
+  let radarChart;
+
+  function loadRadarChart(date) {
+
+        console.log("*** date: " + date);
+        console.log("*** initialDateStr: " + initialDateStr);
+        console.log("*** prevDateStr: " + prevDateStr);
+        console.log("*** nextDateStr: " + nextDateStr);
+
+      $.getJSON("/api/dayview-radar", {date: date}, function (data) {
+          const ctx = document.getElementById('radarChart').getContext('2d');
+
+          if (radarChart) {
+              radarChart.destroy();
+          }
+
+          radarChart = new Chart(ctx, {
+              type: 'radar',
+              data: {
+                  labels: data.categoryLabels,
+                  datasets: [
+                      {
+                          data: data.categoryCounts,
+                          fill: true,
+                          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                      },
+                      {
+                          data: data.categoryWeights,
+                          fill: true,
+                          backgroundColor: 'rgba(0, 102, 0, 0.2)',
+                          borderColor: 'rgba(0, 102, 0, 1)',
+                          pointBackgroundColor: 'rgba(0, 102, 0, 1)'
+                      }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      r: {
+                          beginAtZero: true,
+                          pointLabels: {display: true},
+                          ticks: {stepSize: 1, precision: 0}
+                      }
+                  },
+                  plugins: {legend: {display: false}}
+              }
+          });
+
+          $("#chartInfo").html(
+              "You collected <b style='color:darkgreen'>" + data.totalWeight + " / " + [[${dailyGoalScore}]] + "</b> points."
+              + "<br><span style='color: dodgerblue;'> Entries: <b>" + data.categoryTotalCount + "</b></span>"
+              + " | Categories: " + data.categoryTotalCategories
+              + "<br>"
+              + "<h5>Scoring Details</h5>"
+              + data.reportForPositiveWeight
+              + "<hr>"
+              + "<h5>Unscored</h5>"
+              + data.reportForZeroWeight
+              + "<hr>"
+              + "<h5>Those excluded from the scoring</h5>"
+              + data.reportForNegativeWeight
+          );
+
+         // Asagidaki htmx satiri cok onemli, html kodunu backendde urettigimiz icin, ajax ile gelen hx-get calismaz.
+         // Ajax ile gelen HTML (report string’leri) → htmx.process(...) ile yeniden isleniyor ve calisiyor.
+         // bu satir konuyu tekrar ele alarak hx-get in calismasini saglar(chatgpt aciklamasi notlarda var):
+         htmx.process(document.getElementById("chartInfo"));
+      });
+  }
+</script>
+
 
 <script>
     function convertDateToMillis(dateStr) {
@@ -333,15 +395,6 @@
         return localDate.getTime();
     }
 
-    function loadCalorieData(dateStr) {
-
-        const millis = convertDateToMillis(dateStr);
-
-        const url = `/food?dateMillisYmd=${millis}`;
-
-        // Sayfayı redirect ederek yenile
-        window.location.href = url;
-    }
 
     function convertMillisToDateStr(millis) {
 
@@ -369,12 +422,50 @@
         window.open(url, '_self'); // yeni sekme
     }
 
+  $('#prevDayBtn').click(function () {
+
+    initialDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) - 86400000
+    );
+
+    prevDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) - 86400000
+    );
+
+    nextDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) + 86400000
+    );
+
+    $('#dwDatePicker').datepicker('update', initialDateStr);
+
+    loadRadarChart(initialDateStr);
+});
+
+$('#nextDayBtn').click(function () {
+
+    initialDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) + 86400000
+    );
+
+    prevDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) - 86400000
+    );
+
+    nextDateStr = convertMillisToDateStr(
+        convertDateToMillis(initialDateStr) + 86400000
+    );
+
+    $('#dwDatePicker').datepicker('update', initialDateStr);
+
+    loadRadarChart(initialDateStr);
+});
+
     $(function () {
 
+        console.log("BURASI TEK DEFA CALISIR, SADECE SAYFA REFRESH ILE");
 
-        let initialDateStr;
-        let prevDateStr;
-        let nextDateStr;
+
+
 
         if (DATE_MILLIS) {
             initialDateStr = convertMillisToDateStr(DATE_MILLIS);
@@ -382,18 +473,25 @@
             initialDateStr = new Date().toISOString().slice(0, 10);
         }
 
-        prevDateStr = convertMillisToDateStr(DATE_MILLIS - 86400000);
-        nextDateStr = convertMillisToDateStr(DATE_MILLIS + 86400000);
+        prevDateStr = convertMillisToDateStr(convertDateToMillis(initialDateStr) - 86400000);
+        nextDateStr = convertMillisToDateStr(convertDateToMillis(initialDateStr) + 86400000);
+
+        /*
+        console.log("initialDateStr" + initialDateStr);
+        console.log("prevDateStr" + prevDateStr);
+        console.log("nextDateStr" + nextDateStr);
+        */
 
         $('#dwDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
 
         const dateObj = new Date(initialDateStr + 'T00:00:00');
         // https://www.w3schools.com/jsref/jsref_tolocaledatestring.asp
         const dayName = dateObj.toLocaleDateString(appLocale, { weekday: 'short', month: 'short' }); // long, short, narrow yazilis
-        $('#caloriesTableDateCell').text(`${initialDateStr} ${dayName}`);
 
-        const today = new Date().toISOString().slice(0, 10);
-        loadRadarChart(today);
+
+
+
+        loadRadarChart(initialDateStr);
 
         $('#dwDateContainer .dwDateStyle.date').datepicker({
             format: "yyyy-mm-dd",
@@ -402,8 +500,19 @@
             autoclose: true,
             todayHighlight: true
         }).on("changeDate", function (e) {
-            loadRadarChart(e.format(0, "yyyy-mm-dd"));
-        });
+
+          initialDateStr = e.format(0, "yyyy-mm-dd");
+
+          prevDateStr = convertMillisToDateStr(
+              convertDateToMillis(initialDateStr) - 86400000
+          );
+
+          nextDateStr = convertMillisToDateStr(
+              convertDateToMillis(initialDateStr) + 86400000
+          );
+
+          loadRadarChart(initialDateStr);
+      });
 
 
         // topic arama kodu
@@ -577,261 +686,5 @@ function highlightMatch(text, query) {
 }
 
 </script>
-
-<!--/* https://github.com/SheetJS/sheetjs https://docs.sheetjs.com/
-new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
-<script src="/webjars/xlsx/dist/xlsx.full.min.js"></script>
-
-<!--/* <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> */-->
-
-<script>
-  /*
-    document.getElementById("btnExcel").addEventListener("click", function () {
-        // pivot-table elementini seç
-        var table = document.getElementById("caloriesTable");
-
-        // HTML tablodan worksheet oluştur
-        var wb = XLSX.utils.table_to_book(table, { sheet: "CaloriesTable" });
-
-        // Dosyayı indir
-        XLSX.writeFile(wb, "calories-table.xlsx");
-    });
-  */
-</script>
-
-
-
-<script>
-  /*
-    // COPY THE FOOD LIST TO THE CLIPBOARD
-    document.getElementById("btnCopy").addEventListener("click", function () {
-
-        let initialDateStr;
-
-        if (DATE_MILLIS) {
-            initialDateStr = convertMillisToDateStr(DATE_MILLIS);
-        } else {
-            initialDateStr = new Date().toISOString().slice(0, 10);
-        }
-
-
-        let result = [];
-        result.push("Date: " + initialDateStr)
-        result.push("Planned food weight");
-
-
-        $("#caloriesTable tbody tr").each(function () {
-            let columnIndexKcalPer100gr = 0 + 3;
-            let columnIndexFoodName = 0 + 4;
-            let columnIndexGramsToBeConsumed = 0 + 5;
-            let columnIndexCaloriesToBeConsumed = 0 + 6;
-            let kcalPer100gr = $(this).find("td:eq(" + columnIndexKcalPer100gr + ")").text().trim(); // 100 gramda kac kalori oldugu
-            let foodName = $(this).find("td:eq(" + columnIndexFoodName + ")").text().trim(); // topic ismi yani gida adi
-            let gramsToBeConsumed = $(this).find("td:eq(" + columnIndexGramsToBeConsumed + ")").text().trim(); // tuketilecek gram
-            let caloriesToBeConsumed = $(this).find("td:eq(" + columnIndexCaloriesToBeConsumed + ")").text().trim(); // tuketilecek kalori
-            let dataSeparator = "|"; // libreoffice'de cift bosluk gibi ayrac belirtmek yok. o yuzden pipe kullandim.
-
-            if (kcalPer100gr || foodName) {
-                result.push(gramsToBeConsumed + dataSeparator + "gr " + dataSeparator +
-                            foodName + dataSeparator +
-                            caloriesToBeConsumed + dataSeparator + "kcal"
-                            );
-            }
-        });
-
-        let finalText = result.join("\n");
-
-        // panoya kopyala
-        navigator.clipboard.writeText(finalText).then(function () {
-
-            // mesaj göster
-            $("#copyInfo").fadeIn(200);
-
-            setTimeout(function () {
-                $("#copyInfo").fadeOut(200);
-            }, 1500);
-
-        }).catch(function (err) {
-            console.error("Kopyalama hatası:", err);
-        });
-    });
-  */
-</script>
-
-<script>
-    $(document).ready(function () {
-
-    let table = new DataTable('#caloriesTable');
-
-    // Custom filter
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-
-            let row = table.row(dataIndex).node();
-
-            let selectedStatuses = $('.status-filter:checked')
-                .map(function () { return $(this).val(); })
-                .get();
-
-            // satırın class'ından status yakala
-            let rowStatus = null;
-            for (let i = 0; i <= 2; i++) {
-                if ($(row).hasClass('status-hide-' + i)) {
-                    rowStatus = i.toString();
-                    break;
-                }
-            }
-
-            // seçili değilse gösterme
-            return selectedStatuses.includes(rowStatus);
-        });
-
-        // checkbox değişince tabloyu yeniden filtrele
-        $('.status-filter').on('change', function () {
-            table.draw();
-        });
-
-    });
-
-</script>
-
-
-<script>
-    document.querySelectorAll(".food-topic-btn").forEach(btn => {
-
-    btn.addEventListener("click", async function () {
-
-        const meal = btn.closest(".meal-row");
-
-        let text =
-`#food
-kcal ${meal.dataset.kcal}
-fat ${meal.dataset.fat}
-carbohydrate ${meal.dataset.carbohydrate}
-protein ${meal.dataset.protein}
-fiber ${meal.dataset.fiber}
-sodium ${meal.dataset.sodium}
-fat-saturated ${meal.dataset.fatSaturated}
-sugar ${meal.dataset.sugar}
-default ${meal.dataset.totalgram}
-price 0
-price-date 0000-00-00
-
-Varsayılan toplam ağırlığı: ${meal.dataset.totalgram} gr (default etiketinde de belirtildi).
-Besin değerleri 100 gram üzerinden hesaplanmıştır.
-Bu gıda ürünü, aşağıdaki gıdalardan oluşmaktadır.
-
-`;
-
-        const rows = meal.querySelectorAll(".food-list-table tbody tr");
-
-        rows.forEach(r => {
-
-            const cols = r.querySelectorAll("td");
-
-            if (cols.length !== 2)
-                return;
-
-            const food = cols[0].innerText.trim();
-            const gram = cols[1].innerText
-                .replace("gr", "")
-                .trim();
-
-            text += food + " " + gram + " gr\n";
-
-        });
-
-        document.getElementById("foodTopicText").value = text;
-
-        try {
-            await navigator.clipboard.writeText(text);
-        } catch(e){
-            console.log(e);
-        }
-
-        new bootstrap.Modal(
-            document.getElementById("foodTopicModal")
-        ).show();
-
-    });
-
-});
-
-
-</script>
-
-
-
-
-<script>
-  let radarChart;
-
-  function loadRadarChart(date) {
-      $.getJSON("/api/dayview-radar", {date: date}, function (data) {
-          const ctx = document.getElementById('radarChart').getContext('2d');
-
-          if (radarChart) {
-              radarChart.destroy();
-          }
-
-          radarChart = new Chart(ctx, {
-              type: 'radar',
-              data: {
-                  labels: data.categoryLabels,
-                  datasets: [
-                      {
-                          data: data.categoryCounts,
-                          fill: true,
-                          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                          borderColor: 'rgba(54, 162, 235, 1)',
-                          pointBackgroundColor: 'rgba(54, 162, 235, 1)'
-                      },
-                      {
-                          data: data.categoryWeights,
-                          fill: true,
-                          backgroundColor: 'rgba(0, 102, 0, 0.2)',
-                          borderColor: 'rgba(0, 102, 0, 1)',
-                          pointBackgroundColor: 'rgba(0, 102, 0, 1)'
-                      }
-                  ]
-              },
-              options: {
-                  responsive: true,
-                  scales: {
-                      r: {
-                          beginAtZero: true,
-                          pointLabels: {display: true},
-                          ticks: {stepSize: 1, precision: 0}
-                      }
-                  },
-                  plugins: {legend: {display: false}}
-              }
-          });
-
-          $("#chartInfo").html(
-              "You collected <b style='color:darkgreen'>" + data.totalWeight + " / " + [[${dailyGoalScore}]] + "</b> points."
-              + "<br><span style='color: dodgerblue;'> Entries: <b>" + data.categoryTotalCount + "</b></span>"
-              + " | Categories: " + data.categoryTotalCategories
-              + "<br>"
-              + "<h5>Scoring Details</h5>"
-              + data.reportForPositiveWeight
-              + "<hr>"
-              + "<h5>Unscored</h5>"
-              + data.reportForZeroWeight
-              + "<hr>"
-              + "<h5>Those excluded from the scoring</h5>"
-              + data.reportForNegativeWeight
-          );
-
-         // Asagidaki htmx satiri cok onemli, html kodunu backendde urettigimiz icin, ajax ile gelen hx-get calismaz.
-         // Ajax ile gelen HTML (report string’leri) → htmx.process(...) ile yeniden isleniyor ve calisiyor.
-         // bu satir konuyu tekrar ele alarak hx-get in calismasini saglar(chatgpt aciklamasi notlarda var):
-         htmx.process(document.getElementById("chartInfo"));
-      });
-  }
-</script>
-
-
-
-
 </body>
 </html>
