@@ -208,43 +208,37 @@
   <ul id="foodSearchResults" class="list-group mt-1"></ul>
 </div>
 
-<!--/*
 
-
-<form method="get" action="/dayview">
-
-
-
-  <div class="container mb-0" id="calorieDateContainer" style="max-width: 400px; background-color:floralwhite;">
-    <div class="input-group calorieDateStyle date">
-      <label for="calorieDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
-      <span class="input-group-append">
-                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + prevDayDateMillis}">
-                        &lt;
-                    </a>
-            </span>
-      <input type="text" id="calorieDatePicker"
-             class="form-control form-control-sm"/>
-      <span class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button">
-                        <i class="far fa-calendar" aria-hidden="true"></i>
-                    </button>
-            </span>
+<form action="/dayview" method="get">
+  <div class="container mb-0" id="dwDateContainer" style="max-width: 400px; background-color:floralwhite;">
+    <div class="input-group dwDateStyle date">
+      <label class="col-sm-4 col-form-label col-form-label-sm" for="dwDatePicker">Select Date:</label>
 
       <span class="input-group-append">
-                    <a class="btn btn-outline-secondary" th:href="${'/food?dateMillisYmd=' + nextDayDateMillis}">
-                        &gt;
-                    </a>
-            </span>
+            <a class="btn btn-outline-secondary" th:href="${'/dayview?dateMillisYmd=' + prevDayDateMillis}">
+                &lt;
+            </a>
+      </span>
 
+      <input class="form-control form-control-sm" id="dwDatePicker" type="text"/>
+      <span class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">
+                <i aria-hidden="true" class="far fa-calendar"></i>
+            </button>
+      </span>
 
+      <span class="input-group-append">
+            <a class="btn btn-outline-secondary" th:href="${'/dayview?dateMillisYmd=' + nextDayDateMillis}">
+                &gt;
+            </a>
+      </span>
 
     </div>
   </div>
-
 </form>
 
-*/-->
+
+
 
 <!--/* chart */-->
 <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
@@ -379,6 +373,8 @@
 
 
         let initialDateStr;
+        let prevDateStr;
+        let nextDateStr;
 
         if (DATE_MILLIS) {
             initialDateStr = convertMillisToDateStr(DATE_MILLIS);
@@ -386,23 +382,27 @@
             initialDateStr = new Date().toISOString().slice(0, 10);
         }
 
-        $('#calorieDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
+        prevDateStr = convertMillisToDateStr(DATE_MILLIS - 86400000);
+        nextDateStr = convertMillisToDateStr(DATE_MILLIS + 86400000);
 
+        $('#dwDatePicker').val(initialDateStr); // 👉 .val() sadece input, textarea, select için çalışır
 
         const dateObj = new Date(initialDateStr + 'T00:00:00');
         // https://www.w3schools.com/jsref/jsref_tolocaledatestring.asp
         const dayName = dateObj.toLocaleDateString(appLocale, { weekday: 'short', month: 'short' }); // long, short, narrow yazilis
         $('#caloriesTableDateCell').text(`${initialDateStr} ${dayName}`);
 
+        const today = new Date().toISOString().slice(0, 10);
+        loadRadarChart(today);
 
-
-        $('#calorieDateContainer .calorieDateStyle.date').datepicker({
+        $('#dwDateContainer .dwDateStyle.date').datepicker({
             format: "yyyy-mm-dd",
             todayBtn: "linked",
+            daysOfWeekHighlighted: "0,6",
             autoclose: true,
             todayHighlight: true
         }).on("changeDate", function (e) {
-            loadCalorieData(e.format(0, "yyyy-mm-dd"));
+            loadRadarChart(e.format(0, "yyyy-mm-dd"));
         });
 
 
@@ -828,22 +828,6 @@ Bu gıda ürünü, aşağıdaki gıdalardan oluşmaktadır.
          htmx.process(document.getElementById("chartInfo"));
       });
   }
-
-  // sayfa ilk açıldığında bugünün tarihi ile yükle
-  $(function () {
-      const today = new Date().toISOString().slice(0, 10);
-      loadRadarChart(today);
-
-      $('#chartDateContainer .chartDateStyle.date').datepicker({
-          format: "yyyy-mm-dd",
-          todayBtn: "linked",
-          daysOfWeekHighlighted: "0,6",
-          autoclose: true,
-          todayHighlight: true
-      }).on("changeDate", function (e) {
-          loadRadarChart(e.format(0, "yyyy-mm-dd"));
-      });
-  });
 </script>
 
 
