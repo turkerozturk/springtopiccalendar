@@ -43,15 +43,15 @@ public class DayViewController {
 
     @GetMapping("/dayview")
     public String getFoodPage(
-            @RequestParam(required = false) Long dateMillis,
+            @RequestParam(required = false) Long dateMillisYmd,
             Model model
     ) {
         ZoneId zoneId = timeZoneProvider.getZoneId(); // olusturdugumuz component. application.properties'den zone ceker.
 
-        if (dateMillis == null) {
+        if (dateMillisYmd == null) {
             // default: bugün (senin formatına göre ayarlarsın)
 
-            dateMillis = LocalDate.now()
+            dateMillisYmd = LocalDate.now()
                     .atStartOfDay(zoneId)
                     .toInstant()
                     .toEpochMilli();
@@ -60,7 +60,7 @@ public class DayViewController {
         //FoodSummaryDto summary = foodService.getDailyFoodSummary(dateMillis);
 
         //model.addAttribute("summary", summary);
-        model.addAttribute("dateMillis", dateMillis);
+        model.addAttribute("dateMillisYmd", dateMillisYmd);
         model.addAttribute("zoneId", zoneId);
 
         return "entries/entries-dayview";

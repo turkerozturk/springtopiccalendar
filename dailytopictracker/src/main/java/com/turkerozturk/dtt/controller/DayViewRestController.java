@@ -82,26 +82,37 @@ public class DayViewRestController {
         stringFormatSb.append("<span class=\"status-%s\">");
         stringFormatSb.append("ⓘ");
         stringFormatSb.append("</span>");
+
         stringFormatSb.append("<a class='topic-name' ")
-                .append("hx-get='/topics/info/")
-                .append("%s")
-                .append("' hx-target='#topicInfoContent' ")
-                .append("hx-trigger='click' ")
-                .append("data-bs-toggle='modal' data-bs-target='#topicInfoModal'>")
-                .append("%s")
-                .append("</a>");
+                        .append("hx-get='/topics/info/")
+                        .append("%s")
+                        .append("' hx-target='#topicInfoContent' ")
+                        .append("hx-trigger='click' ")
+                        .append("data-bs-toggle='modal' data-bs-target='#topicInfoModal'>");
+        stringFormatSb.append("%s");
+        stringFormatSb.append("</a>");
 
         stringFormatSb.append("<br/>");
-        stringFormatSb.append("<a class='category-name' href='/entry-filter/form?categoryId=");
+
+        stringFormatSb.append("<a class='category-name' href='/entry-filter/form?categoryId=")
+                        .append("%s")
+                        .append("'>")
+                        .append("<sup>");
         stringFormatSb.append("%s");
-        stringFormatSb.append("'>");
+        stringFormatSb.append("</sup>")
+                        .append("</a>");
 
-        stringFormatSb.append("<sup>");
-
-        stringFormatSb.append("%s");
-        stringFormatSb.append("</sup>");
-
-        stringFormatSb.append("</a>");
+        stringFormatSb.append("<a class='entry-edit' href='/entries/edit/")
+                .append("%s")
+                .append("?categoryId=")
+                .append("%s")
+                .append("&topicId=")
+                .append("%s")
+                .append("&returnPage=")
+                .append("dayviewtracker")
+                .append("'>")
+                .append("✎")
+                .append("</a>");
 
         stringFormatSb.append("</div>");
 
@@ -144,7 +155,12 @@ public class DayViewRestController {
                             topic.getId(),
                             topic.getName(),
                             topic.getCategory().getId(),
-                            topic.getCategory().getName() )
+                            topic.getCategory().getName(),
+
+                            e.getId(),
+                            topic.getCategory().getId(),
+                            topic.getId()
+                            )
                     );
 
                 }
@@ -173,7 +189,12 @@ public class DayViewRestController {
                                 topic.getId(),
                                 topic.getName(),
                                 topic.getCategory().getId(),
-                                topic.getCategory().getName() )
+                                topic.getCategory().getName(),
+
+                                entry.getId(),
+                                topic.getCategory().getId(),
+                                topic.getId()
+                                )
                         );
 
 
@@ -184,7 +205,12 @@ public class DayViewRestController {
                                 topic.getId(),
                                 topic.getName(),
                                 topic.getCategory().getId(),
-                                topic.getCategory().getName() )
+                                topic.getCategory().getName(),
+
+                                entry.getId(),
+                                topic.getCategory().getId(),
+                                topic.getId()
+                                )
                         );
                     } else {
                         // reportForNegativeWeight islemlerini burada degil, blok disinda yukarida hallettik zaten.
