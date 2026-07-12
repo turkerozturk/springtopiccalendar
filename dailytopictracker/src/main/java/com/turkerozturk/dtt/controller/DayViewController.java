@@ -60,6 +60,8 @@ public class DayViewController {
         //FoodSummaryDto summary = foodService.getDailyFoodSummary(dateMillis);
 
         //model.addAttribute("summary", summary);
+        // ASLINDA YMD string dehil, dateMillis yani bu. Ama hem food hem de dailyview'de o sekilde kullanmisim URL parametresi ve redirectionda.
+        // O yuzden calisan kodu simdilik gelistirme geregi duymadim.
         model.addAttribute("dateMillisYmd", dateMillisYmd);
         model.addAttribute("zoneId", zoneId);
 

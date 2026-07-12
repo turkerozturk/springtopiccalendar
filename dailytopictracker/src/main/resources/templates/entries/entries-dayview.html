@@ -152,7 +152,7 @@
         position: absolute;
         width: 100%;
         z-index: 1000;
-        max-height: 250px;
+        max-height: 170px;
         overflow-y: auto;
     }
   </style>
@@ -188,20 +188,42 @@
     }
   </style>
 
+  <style>
+    .list-group-item {
+        padding-top: 3px;
+        padding-bottom: 3px;
+        padding-left: 4px;
+        padding-right: 0px;
+        border-bottom: 2px solid yellow;
+        background-color: Snow;
+    }
+    .category-name-in-search-box {
+        font-size: small;
+        font-style: italic;
+        font-color: DarkGray;
+        background-color: LightYellow;
+    }
+
+  </style>
+
+
 </head>
 <body>
 
-<h4 class="text-center"><!-- Sol tarafta logo veya Home -->
-  <a class="navbar-brand" href="/" target="_blank">🏠 Daily Topic Tracker</a> | Daily Summary
-</h4>
 
-<p>
 
-  <!--/* buraya radar linki koyabilirsin */-->
-
-</p>
 
 <div class="container mb-3" style="position: relative; max-width: 400px;">
+
+  <h6 class="text-center"><!-- Sol tarafta logo veya Home -->
+    <b>
+      <a class="navbar-brand" href="/" target="_blank">🏠 DTT</a> | Daily Summary
+    </b>
+  </h6>
+
+
+
+
   <label>Add Entry</label>
   <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Öğe adı yaz..." autofocus>
 
@@ -248,7 +270,11 @@
 
 
 
+<p>
 
+  <!--/* TODO buraya radar linki koyabilirsin */-->
+
+</p>
 
 
 <div class="container mb-3" style="max-width: 600px;">
@@ -295,7 +321,7 @@
 
 <script th:inline="javascript">
     const ZONE_ID = [[${zoneId}]];
-    const DATE_MILLIS = [[${dateMillisYmd}]];
+    let DATE_MILLIS = [[${dateMillisYmd}]];
 
   let initialDateStr;
   let prevDateStr;
@@ -309,10 +335,13 @@
 
   function loadRadarChart(date) {
 
+        /*
+        console.log("BURASI COK DEFA CALISIR, AJAX ile baska tarih cagrildiginda.");
         console.log("*** date: " + date);
         console.log("*** initialDateStr: " + initialDateStr);
         console.log("*** prevDateStr: " + prevDateStr);
         console.log("*** nextDateStr: " + nextDateStr);
+        */
 
       $.getJSON("/api/dayview-radar", {date: date}, function (data) {
           const ctx = document.getElementById('radarChart').getContext('2d');
@@ -428,6 +457,11 @@
         convertDateToMillis(initialDateStr) - 86400000
     );
 
+    // ESKIDEN bu constant idi ama simdi degisken yapmamin ve buna deger atamamin sebebi, hersey ajax ile geldiginden,
+    // hizli entry ekleme isleminde baska tarihli sayfada kalma durumu oluyordu. Sİmdi problem yok, ama tabi ugly code oldu biraz.
+    DATE_MILLIS = initialDateStr;
+
+
     prevDateStr = convertMillisToDateStr(
         convertDateToMillis(initialDateStr) - 86400000
     );
@@ -462,7 +496,7 @@ $('#nextDayBtn').click(function () {
 
     $(function () {
 
-        console.log("BURASI TEK DEFA CALISIR, SADECE SAYFA REFRESH ILE");
+        // console.log("BURASI TEK DEFA CALISIR, SADECE SAYFA REFRESH ILE");
 
 
 

@@ -378,8 +378,14 @@ public class TopicService {
                 .filter(t -> t.getName().toLowerCase(locale).contains(q.toLowerCase(locale)))
                 .sorted(Comparator.comparing(Topic::getName,
                         collator))
-                .map(t -> new TopicDto(t.getId(), t.getName()))
-                .toList();
+                .map(t -> new TopicDto(t.getId(), t.getName()
+                        + " \uD83E\uDC70 <span class='category-name-in-search-box'>"
+                        + t.getCategory().getName()
+                        + "["
+                        + t.getWeight()
+                        + "]"
+                        + "</small>"))
+                .toList();  // 🡰
     }
 
     public List<Topic> getActivityTopics() {
