@@ -42,7 +42,7 @@ public class TodayTopicService {
     public record Snapshot(String topicId, String topicName, LocalDate date, TodayEntry entry, String revision,
                            TopicDetails details) {}
     public record TopicDetails(String description, String category, String group, String intervalRule,
-                               LocalDate latestDoneDate, LocalDate predictionDate, boolean pinned) {}
+                               LocalDate latestDoneDate, LocalDate predictionDate, boolean pinned, String categoryId) {}
     public record TodayEntry(Integer status, String note) {}
     public record Update(LocalDate date, String revision, Integer status, String note) {}
 
@@ -147,12 +147,12 @@ public class TodayTopicService {
     private Snapshot snapshot(Topic topic, LocalDate date, Entry entry) {
         TodayEntry selected = entry == null ? null : new TodayEntry(entry.getStatus(), note(entry));
         TopicDetails details = jdbc.queryForObject("""
-                SELECT c.name, g.name FROM topics t
+                SELECT c.name, g.name, c.id FROM topics t
                 LEFT JOIN categories c ON c.id = t.category_id
                 LEFT JOIN category_groups g ON g.id = c.category_group_number
                 WHERE t.id = ?
                 """, (row, index) -> new TopicDetails(topic.getDescription(), row.getString(1), row.getString(2),
-                topic.getIntervalRule(), topic.getLastPastEntryDate(), topic.getPredictionDate(), topic.isPinned()),
+                topic.getIntervalRule(), topic.getLastPastEntryDate(), topic.getPredictionDate(), topic.isPinned(), row.getString(3)),
                 topic.getId());
         return new Snapshot(topic.getId().toString(), topic.getName(), date, selected, revision(entry), details);
     }
