@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/bridge/v1/topics/{topicId}/today")
+@RequestMapping("/api/bridge/v1/topics/{topicId}")
 public class TodayTopicController {
     private final TodayTopicService service;
 
@@ -32,21 +32,41 @@ public class TodayTopicController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/today")
     public TodayTopicService.Snapshot read(@PathVariable long topicId) {
         return service.read(topicId);
     }
 
-    @PutMapping
+    @PutMapping("/today")
     public TodayTopicService.Snapshot save(@PathVariable long topicId, @RequestBody TodayTopicService.Update update) {
         return service.save(topicId, update);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/today")
     public TodayTopicService.Snapshot delete(@PathVariable long topicId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam String revision) {
         return service.delete(topicId, date, revision);
+    }
+
+    @GetMapping("/entries/{date}")
+    public TodayTopicService.Snapshot readDate(@PathVariable long topicId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return service.readDate(topicId, date);
+    }
+
+    @PutMapping("/entries/{date}")
+    public TodayTopicService.Snapshot saveDate(@PathVariable long topicId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestBody TodayTopicService.Update update) {
+        return service.saveDate(topicId, date, update);
+    }
+
+    @DeleteMapping("/entries/{date}")
+    public TodayTopicService.Snapshot deleteDate(@PathVariable long topicId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam String revision) {
+        return service.deleteDate(topicId, date, revision);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
