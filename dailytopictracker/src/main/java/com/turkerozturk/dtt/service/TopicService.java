@@ -259,6 +259,10 @@ public class TopicService {
 // TODO asagidaki metodlari ornegin bir topic raporlama servisine tasi
 
     public List<Topic> getNextNeutralTopics(int limit) {
+        return getNextNeutralTopics(limit, null);
+    }
+
+    public List<Topic> getNextNeutralTopics(int limit, Long profileId) {
         ZoneId zoneId = AppTimeZoneProvider.getZone(); // ZoneId dynamic
         LocalDate today = LocalDate.now(zoneId);
 
@@ -268,7 +272,7 @@ public class TopicService {
                 .toInstant()
                 .toEpochMilli();
 
-        List<Topic> result = topicRepository.findTop10FutureNeutralTopicsFromToday(todayEpochMillis);
+        List<Topic> result = topicRepository.findTop10FutureNeutralTopicsFromToday(todayEpochMillis, profileId);
 
         // elle LIMIT 10 uygula (ekstra güvenlik için)
         return result.stream().limit(limit).toList();
@@ -276,15 +280,23 @@ public class TopicService {
 
     // Yeni metod: prediction_date_millis_ymd <= bugünün millis değeri olanlar
     public List<Topic> getTopicsWithPredictionDateBeforeOrEqualToday() {
+        return getTopicsWithPredictionDateBeforeOrEqualToday(null);
+    }
+
+    public List<Topic> getTopicsWithPredictionDateBeforeOrEqualToday(Long profileId) {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
         LocalDate today = LocalDate.now(zoneId);
         long todayEpochMillis = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
 
-        return topicRepository.findTopicsWithPredictionDateBeforeOrEqualToday(todayEpochMillis);
+        return topicRepository.findTopicsWithPredictionDateBeforeOrEqualToday(todayEpochMillis, profileId);
     }
 
     public List<Topic> getAllUrgentTopicsSortedByMostRecentWarning() {
-        return topicRepository.findAllByWarningDateNotNullOrderByWarningDateDesc();
+        return getAllUrgentTopicsSortedByMostRecentWarning(null);
+    }
+
+    public List<Topic> getAllUrgentTopicsSortedByMostRecentWarning(Long profileId) {
+        return topicRepository.findAllByWarningDateNotNullOrderByWarningDateDesc(profileId);
     }
 
     public List<Topic> getLastActivitiesLimitedToN(int limit) {
@@ -293,16 +305,20 @@ public class TopicService {
     }
 
     public List<Topic> getLastActivitiesLimitedToTodayAndThenToN(int limit) {
+        return getLastActivitiesLimitedToTodayAndThenToN(limit, null);
+    }
+
+    public List<Topic> getLastActivitiesLimitedToTodayAndThenToN(int limit, Long profileId) {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
         LocalDate today = LocalDate.now(zoneId);
         long todayEpochMillis = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
         List<Topic> combined = new ArrayList<>();
 
-        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(todayEpochMillis);
+        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(todayEpochMillis, profileId);
         combined.addAll(todayList);
 
         if(limit > 0) {
-            List<Topic> previousList = topicRepository.findTopNByLastPastEntryDateBeforeToday(todayEpochMillis, PageRequest.of(0, limit));
+            List<Topic> previousList = topicRepository.findTopNByLastPastEntryDateBeforeToday(todayEpochMillis, profileId, PageRequest.of(0, limit));
             combined.addAll(previousList);
         }
 
@@ -313,7 +329,7 @@ public class TopicService {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
         LocalDate today = LocalDate.now(zoneId);
         long dateMillisYmd = today.atStartOfDay(zoneId).toInstant().toEpochMilli();
-        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(dateMillisYmd);
+        List<Topic> todayList = topicRepository.findAllByLastPastEntryDateIsToday(dateMillisYmd, null);
         return todayList;
     }
 

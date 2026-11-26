@@ -30,6 +30,7 @@ import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
 
 
+import com.turkerozturk.dtt.service.CategoryProfileService;
 import com.turkerozturk.dtt.service.TopicReportCatGrpService;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
 import com.turkerozturk.dtt.dto.DatedTopicViewModel;
+import com.turkerozturk.dtt.entity.CategoryProfile;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.repository.EntryRepository;
@@ -84,8 +86,16 @@ public class TopicReportController {
     @Autowired
     private TopicReportCatGrpService topicReportCatGrpService;
 
-    public TopicReportController(AppTimeZoneProvider timeZoneProvider) {
+    private final CategoryProfileService profileService;
+
+    public TopicReportController(AppTimeZoneProvider timeZoneProvider, CategoryProfileService profileService) {
         this.timeZoneProvider = timeZoneProvider;
+        this.profileService = profileService;
+    }
+
+    private Long activeProfileId() {
+        return profileService.getActiveProfileId().flatMap(profileService::findById)
+                .map(CategoryProfile::getId).orElse(null);
     }
 
     @GetMapping("/neutral")
@@ -123,10 +133,12 @@ public class TopicReportController {
     public String showDoneWarnPredNeutTopics(Model model) {
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
-        List<Topic> importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
-        List<Topic> neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
-        List<Topic> predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
-        List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+        Long profileId = activeProfileId();
+
+        List<Topic> importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning(profileId);
+        List<Topic> neutrals = topicService.getNextNeutralTopics(neutralItemsLimit, profileId);
+        List<Topic> predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday(profileId);
+        List<Topic> finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit, profileId);
 
         List<DatedTopicViewModel> allItems = new ArrayList<>();
 
@@ -468,11 +480,12 @@ public class TopicReportController {
         List<Topic> finisheds = new ArrayList<>();
 
         if(categoryGroupId == null) {
-            importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning();
-            neutrals = topicService.getNextNeutralTopics(neutralItemsLimit);
-            predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday();
+            Long profileId = activeProfileId();
+            importants = topicService.getAllUrgentTopicsSortedByMostRecentWarning(profileId);
+            neutrals = topicService.getNextNeutralTopics(neutralItemsLimit, profileId);
+            predictions = topicService.getTopicsWithPredictionDateBeforeOrEqualToday(profileId);
             if(exclude0 == null || exclude0 != 1) {
-                finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit);
+                finisheds = topicService.getLastActivitiesLimitedToTodayAndThenToN(finishedItemsLimit, profileId);
             }
         } else {
             importants = topicReportCatGrpService.getAllUrgentTopicsSortedByMostRecentWarning(categoryGroupId);

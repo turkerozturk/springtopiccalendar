@@ -32,6 +32,9 @@ import java.util.Optional;
 
 public interface TopicRepository extends JpaRepository<Topic, Long> {
 
+    String PROFILE_SCOPE = "AND (:profileId IS NULL OR t.category.id IN "
+            + "(SELECT c.id FROM CategoryProfile p JOIN p.categories c WHERE p.id = :profileId)) ";
+
     List<Topic> findByCategoryId(Long categoryId);
 
     List<Topic> findByCategoryIdOrderByPinnedDescNameAsc(Long categoryId);
@@ -40,8 +43,9 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     @Query(value = "SELECT t FROM Topic t " +
             "WHERE t.firstFutureNeutralEntryDateMillisYmd IS NOT NULL " +
             "AND t.firstFutureNeutralEntryDateMillisYmd >= :todayEpochMillis " +
+            PROFILE_SCOPE +
             "ORDER BY t.firstFutureNeutralEntryDateMillisYmd DESC")
-    List<Topic> findTop10FutureNeutralTopicsFromToday(@Param("todayEpochMillis") Long todayEpochMillis);
+    List<Topic> findTop10FutureNeutralTopicsFromToday(@Param("todayEpochMillis") Long todayEpochMillis, @Param("profileId") Long profileId);
 
     /**
      * The difference from the query above is that it only contains one category group.
@@ -63,8 +67,9 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     @Query("SELECT t FROM Topic t " +
             "WHERE t.predictionDateMillisYmd IS NOT NULL " +
             "AND t.predictionDateMillisYmd <= :todayEpochMillis " +
+            PROFILE_SCOPE +
             "ORDER BY t.predictionDateMillisYmd DESC")
-    List<Topic> findTopicsWithPredictionDateBeforeOrEqualToday(@Param("todayEpochMillis") Long todayEpochMillis);
+    List<Topic> findTopicsWithPredictionDateBeforeOrEqualToday(@Param("todayEpochMillis") Long todayEpochMillis, @Param("profileId") Long profileId);
 
     /**
      * The difference from the query above is that it only contains one category group.
@@ -83,8 +88,9 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     @Query("SELECT t FROM Topic t " +
             "WHERE t.firstWarningEntryDateMillisYmd IS NOT NULL " +
+            PROFILE_SCOPE +
             "ORDER BY t.firstWarningEntryDateMillisYmd DESC")
-    List<Topic> findAllByWarningDateNotNullOrderByWarningDateDesc();
+    List<Topic> findAllByWarningDateNotNullOrderByWarningDateDesc(@Param("profileId") Long profileId);
 
     /**
      * The difference from the query above is that it only contains one category group.
@@ -117,8 +123,9 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     @Query("SELECT t FROM Topic t " +
             "WHERE t.lastPastEntryDateMillisYmd = :todayEpochMillis " +
+            PROFILE_SCOPE +
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
-    List<Topic> findAllByLastPastEntryDateIsToday(@Param("todayEpochMillis") Long todayEpochMillis);
+    List<Topic> findAllByLastPastEntryDateIsToday(@Param("todayEpochMillis") Long todayEpochMillis, @Param("profileId") Long profileId);
 
     /**
      * The difference from the query above is that it only contains one category group.
@@ -137,8 +144,9 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     @Query("SELECT t FROM Topic t " +
             "WHERE t.lastPastEntryDateMillisYmd IS NOT NULL " +
             "AND t.lastPastEntryDateMillisYmd < :todayEpochMillis " +
+            PROFILE_SCOPE +
             "ORDER BY t.lastPastEntryDateMillisYmd DESC")
-    List<Topic> findTopNByLastPastEntryDateBeforeToday(@Param("todayEpochMillis") Long todayEpochMillis, Pageable pageable);
+    List<Topic> findTopNByLastPastEntryDateBeforeToday(@Param("todayEpochMillis") Long todayEpochMillis, @Param("profileId") Long profileId, Pageable pageable);
 
     /**
      * The difference from the query above is that it only contains one category group.
