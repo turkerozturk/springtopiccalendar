@@ -71,12 +71,20 @@ public class TopicWebController {
     }
 
     @GetMapping("/{id}")
-    public String showTopic(@PathVariable long id, @RequestParam(required = false) Long listCategoryId, Model model) {
+    public String showTopic(@PathVariable long id, @RequestParam(required = false) Long listCategoryId,
+                            @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter, Model model) {
         var detail = topicDetailsService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         model.addAttribute("topic", detail);
         model.addAttribute("descriptionHtml", markdownService.render(detail.description()));
         model.addAttribute("listCategoryId", listCategoryId != null ? listCategoryId : detail.categoryId());
+        String error = historyFilter.validationMessage();
+        model.addAttribute("historyFilterError", error);
+        if (error == null && historyFilter.isActive()) {
+            model.addAttribute("entryHistory",
+                    topicDetailsService.findHistory(id, historyFilter.fromDate(), historyFilter.toDate(),
+                            historyFilter.pageIndex()));
+        }
         return "topics/topic-detail";
     }
 

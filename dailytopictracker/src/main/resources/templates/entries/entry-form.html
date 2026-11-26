@@ -45,8 +45,8 @@
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <a th:if="${topicEntryForm == true and returnPage == 'topicDetail'}" class="d-inline-block mb-3"
-       th:href="@{/topics/{id}(id=${entry.topic.id},listCategoryId=${listCategoryId})}">← Back to topic</a>
+    <a th:if="${topicReturnPath != null}" class="d-inline-block mb-3"
+       th:href="@{${topicReturnPath}}">← Back to topic</a>
     <a th:if="${topicEntryForm == true and returnPage == 'topicList'}" class="d-inline-block mb-3"
        th:href="@{/topics(categoryId=${listCategoryId})} + '#topic-' + ${entry.topic.id}">← Back to topics</a>
 
@@ -63,6 +63,12 @@
         <!-- kaydolunca geri donecegi sayfayi belirten bir placeholer string. bkz. save metodu.(gizli alan) -->
         <input type="hidden" name="returnPage" th:value="${returnPage}">
         <input th:if="${topicEntryForm}" type="hidden" name="listCategoryId" th:value="${listCategoryId}">
+        <th:block th:if="${topicReturnPath != null}">
+            <input th:if="${historyFilter.fromDate != null}" type="hidden" name="fromDate" th:value="${historyFilter.fromDate}">
+            <input th:if="${historyFilter.toDate != null}" type="hidden" name="toDate" th:value="${historyFilter.toDate}">
+            <input th:if="${historyFilter.historyPage != null}" type="hidden" name="historyPage"
+                   th:value="${historyFilter.historyPage}">
+        </th:block>
 
 
 

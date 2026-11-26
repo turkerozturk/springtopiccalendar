@@ -1237,6 +1237,7 @@ public class EntryController {
             @RequestParam(name="categoryId", required=false) Long categoryId,
             @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
             @RequestParam(required = false) Long listCategoryId,
+            @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
             Model model) {
 
         // System.out.println("dateYmd: " + dateString );
@@ -1274,7 +1275,7 @@ public class EntryController {
             if (entry.getTopic() == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             }
-            return showTopicEntryForm(entry, returnPage, listCategoryId, model);
+            return showTopicEntryForm(entry, returnPage, listCategoryId, historyFilter, model);
         }
 
         // to make topic selection easier from gui, we are sending categories to selection box:
@@ -1325,6 +1326,7 @@ public class EntryController {
                             @RequestParam(required = false) Long listCategoryId,
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                             LocalDate topicEntryDate,
+                            @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
                             Model model,
                             HttpServletRequest request) {
 
@@ -1378,7 +1380,7 @@ public class EntryController {
                 // Kayıt varsa formu tekrar göster ve hata mesajı ver
                 if (fromTopic) {
                     model.addAttribute("errorMessage", "An entry already exists for this date. Choose a different date.");
-                    return showTopicEntryForm(formEntry, returnPage, listCategoryId, model);
+                    return showTopicEntryForm(formEntry, returnPage, listCategoryId, historyFilter, model);
                 }
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
@@ -1459,7 +1461,7 @@ public class EntryController {
         if (fromTopic) {
             long listCategory = listCategoryId != null ? listCategoryId : categoryId;
             if ("topicDetail".equals(returnPage)) {
-                return "redirect:/topics/" + topicId + "?listCategoryId=" + listCategory;
+                return "redirect:" + historyFilter.returnPath(topicId, listCategory);
             }
             return "redirect:/topics?categoryId=" + listCategory + "#topic-" + topicId;
         }
@@ -1481,11 +1483,16 @@ public class EntryController {
         return "topicDetail".equals(returnPage) || "topicList".equals(returnPage);
     }
 
-    private String showTopicEntryForm(Entry entry, String returnPage, Long listCategoryId, Model model) {
+    private String showTopicEntryForm(Entry entry, String returnPage, Long listCategoryId,
+                                      TopicHistoryFilter historyFilter, Model model) {
         model.addAttribute("entry", entry);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("topicEntryForm", true);
-        model.addAttribute("listCategoryId", listCategoryId != null ? listCategoryId : entry.getTopic().getCategory().getId());
+        long listCategory = listCategoryId != null ? listCategoryId : entry.getTopic().getCategory().getId();
+        model.addAttribute("listCategoryId", listCategory);
+        if ("topicDetail".equals(returnPage)) {
+            model.addAttribute("topicReturnPath", historyFilter.returnPath(entry.getTopic().getId(), listCategory));
+        }
         model.addAttribute("topicEntryDate", Instant.ofEpochMilli(entry.getDateMillisYmd())
                 .atZone(timeZoneProvider.getZoneId()).toLocalDate());
         return "entries/entry-form";
