@@ -1,0 +1,39 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="summary(activity)" th:with="topics=${activity.topics}">
+    <h2 class="h5 mb-1" id="weekly-activity-heading">This week's activity</h2>
+    <p class="small text-body-secondary mb-3">
+        <time th:attr="datetime=${activity.fromDate}" th:text="${activity.fromDate}"></time>
+        <th:block th:if="${activity.fromDate != activity.throughDate}">
+            –
+            <time th:attr="datetime=${activity.throughDate}" th:text="${activity.throughDate}"></time>
+        </th:block>
+    </p>
+
+    <p class="mb-0" th:if="${topics.isEmpty()}">No entries so far this week.</p>
+    <ul class="list-group list-group-flush" th:unless="${topics.isEmpty()}" style="overflow-wrap: anywhere;">
+        <li class="list-group-item px-0 d-flex flex-wrap justify-content-between align-items-baseline gap-2"
+            th:each="activityTopic : ${topics.content}">
+            <div>
+                <a class="fw-semibold"
+                   th:href="@{/topics/{id}(id=${activityTopic.topicId},fromDate=${activity.fromDate},toDate=${activity.throughDate})}"
+                   th:text="${activityTopic.topicName}">Topic</a>
+                <div class="small text-body-secondary" th:text="${activityTopic.categoryName}">Category</div>
+            </div>
+            <div class="small text-body-secondary">
+                <span th:text="|${activityTopic.doneCount} done · ${activityTopic.entryCount} ${activityTopic.entryCount == 1 ? 'entry' : 'entries'}|"></span>
+                <div>
+                    Latest <time th:attr="datetime=${activityTopic.latestEntryDate}"
+                                 th:text="${activityTopic.latestEntryDate}"></time>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+    <nav class="d-flex flex-wrap align-items-center gap-2 mt-3" aria-label="Weekly activity pages"
+         th:if="${topics.totalPages > 1}">
+        <a class="btn btn-sm btn-outline-secondary" rel="prev" th:if="${topics.hasPrevious()}"
+           th:href="@{/(activityPage=${topics.number})} + '#weekly-activity'">Previous</a>
+        <span class="small" th:text="|Page ${topics.number + 1} of ${topics.totalPages}|"></span>
+        <a class="btn btn-sm btn-outline-secondary" rel="next" th:if="${topics.hasNext()}"
+           th:href="@{/(activityPage=${topics.number + 2})} + '#weekly-activity'">Next</a>
+    </nav>
+</th:block>

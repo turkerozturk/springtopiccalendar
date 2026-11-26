@@ -180,6 +180,10 @@ background-image: url("data:image/svg+xml,%3Csvg width='84' height='84' viewBox=
 
 
 
+    <section th:if="${weeklyActivity != null}" th:insert="~{fragments/weekly-activity :: summary(${weeklyActivity})}"
+             id="weekly-activity" class="bg-body rounded border px-3 py-3 mb-3" aria-labelledby="weekly-activity-heading">
+    </section>
+
     <!--/* Bağlantılar (List Group) */-->
     <table class="table" style="border: solid 3px; background-color:WhiteSmoke;">
         <tr>

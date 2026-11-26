@@ -21,27 +21,21 @@
 package com.turkerozturk.dtt.controller.web;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
-import com.turkerozturk.dtt.entity.Category;
-import com.turkerozturk.dtt.entity.Entry;
-import com.turkerozturk.dtt.entity.Topic;
-import com.turkerozturk.dtt.service.EntryService;
-import com.turkerozturk.dtt.service.TopicService;
+import com.turkerozturk.dtt.service.WeeklyActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.repository.CategoryRepository;
 import com.turkerozturk.dtt.repository.EntryRepository;
 import com.turkerozturk.dtt.repository.TopicRepository;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class IndexController {
@@ -66,8 +60,14 @@ public class IndexController {
 
 
 
+    private final WeeklyActivityService weeklyActivityService;
+
+    public IndexController(WeeklyActivityService weeklyActivityService) {
+        this.weeklyActivityService = weeklyActivityService;
+    }
+
     @GetMapping
-    public String homePage(Model model) {
+    public String homePage(@RequestParam(defaultValue = "1") int activityPage, Model model) {
 
         ZoneId zoneId = AppTimeZoneProvider.getZone();
 
@@ -107,12 +107,12 @@ public class IndexController {
 
         model.addAttribute("categoryGroupsCount", categoryGroupRepository.count());
         model.addAttribute("categoriesCount", categoryRepository.count());
-        model.addAttribute("topicsCount", topicRepository.count());
+        long topicsCount = topicRepository.count();
+        model.addAttribute("topicsCount", topicsCount);
         model.addAttribute("entriesCount", entryRepository.count());
-
-
-
-
+        if (topicsCount > 0) {
+            model.addAttribute("weeklyActivity", weeklyActivityService.currentWeek(activityPage));
+        }
 
         return "index";
     }

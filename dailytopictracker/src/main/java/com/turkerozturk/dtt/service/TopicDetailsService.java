@@ -77,9 +77,11 @@ public class TopicDetailsService {
 
                 ORDER BY e.date_millis_ymd DESC, e.id DESC
                 LIMIT ? OFFSET ?
-                """, (row, number) -> new RecentEntry(
-                Instant.ofEpochMilli(row.getLong("date_millis_ymd")).atZone(zone).toLocalDate(),
-                row.getObject("status", Integer.class), row.getString("content")),
-                topicId, fromMillis, throughMillis, page.getPageSize(), page.getOffset());
+                """, (row, number) -> {
+            int statusValue = row.getInt("status");
+            Integer status = row.wasNull() ? null : statusValue;
+            return new RecentEntry(Instant.ofEpochMilli(row.getLong("date_millis_ymd")).atZone(zone).toLocalDate(),
+                    status, row.getString("content"));
+        }, topicId, fromMillis, throughMillis, page.getPageSize(), page.getOffset());
     }
 }
