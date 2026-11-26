@@ -25,6 +25,8 @@ import com.turkerozturk.dtt.component.MarkdownService;
 import com.turkerozturk.dtt.component.ParserRegistryLoader;
 import com.turkerozturk.dtt.entity.Entry;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -36,6 +38,8 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.CategoryService;
 import com.turkerozturk.dtt.service.TopicDetailsService;
+import com.turkerozturk.dtt.service.TopicListCriteria;
+import com.turkerozturk.dtt.service.TopicListService;
 import com.turkerozturk.dtt.service.TopicService;
 
 import java.io.File;
@@ -62,22 +66,30 @@ public class TopicWebController {
 
     private final TopicDetailsService topicDetailsService;
     private final MarkdownService markdownService;
+    private final TopicListService topicListService;
 
     public TopicWebController(AppTimeZoneProvider timeZoneProvider, TopicDetailsService topicDetailsService,
-                              MarkdownService markdownService) {
+                              MarkdownService markdownService, TopicListService topicListService) {
         this.timeZoneProvider = timeZoneProvider;
         this.topicDetailsService = topicDetailsService;
         this.markdownService = markdownService;
+        this.topicListService = topicListService;
     }
 
     @GetMapping("/{id}")
     public String showTopic(@PathVariable long id, @RequestParam(required = false) Long listCategoryId,
+                            @RequestParam(required = false) String listReturn,
                             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter, Model model) {
         var detail = topicDetailsService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         model.addAttribute("topic", detail);
         model.addAttribute("descriptionHtml", markdownService.render(detail.description()));
-        model.addAttribute("listCategoryId", listCategoryId != null ? listCategoryId : detail.categoryId());
+        long returnCategory = listCategoryId != null ? listCategoryId : detail.categoryId();
+        String listPath = PageReturnPath.topicList(listReturn);
+        model.addAttribute("listCategoryId", returnCategory);
+        model.addAttribute("listReturn", listPath);
+        model.addAttribute("topicListPath", PageReturnPath.topicAnchor(
+                listPath != null ? listPath : "/topics?categoryId=" + returnCategory, id));
         String error = historyFilter.validationMessage();
         model.addAttribute("historyFilterError", error);
         if (error == null && historyFilter.isActive()) {
@@ -89,57 +101,38 @@ public class TopicWebController {
     }
 
 
-    // Tüm topic'leri veya belli kategoriye ait topic'leri listeleyen sayfa
     @GetMapping
-    public String listTopics(@RequestParam(value = "categoryId", required = false) Long categoryId,
-                             Model model) {
-
-        var categoryList = categoryService.getAllCategories();
-        List<Topic> topicList;
-        Long selectedCategoryId;
-        String selectedCategoryName;
-
-        if (categoryId == null) {
-            Optional<Category> firstCategoryOpt = categoryService.findFirstByOrderByIdAsc();
-            if (firstCategoryOpt.isPresent()) {
-                Category firstCategory = firstCategoryOpt.get();
-                selectedCategoryId = firstCategory.getId();
-                selectedCategoryName = firstCategory.getName();
-                topicList = topicService.getTopicsByCategoryId(selectedCategoryId);
-            } else {
-                selectedCategoryId = null;
-                selectedCategoryName = "None";
-                topicList = Collections.emptyList();
-            }
-        } else if (Objects.equals(categoryId, -1L)) {
-            // All seçildi
-            selectedCategoryId = -1L;
-            selectedCategoryName = "All";
-            topicList = topicService.findAll();
-        } else {
-            selectedCategoryId = categoryId;
-            selectedCategoryName = categoryService.findById(categoryId)
-                    .map(Category::getName)
-                    .orElse("Unknown");
-            topicList = topicService.getTopicsByCategoryId(categoryId);
+    public String listTopics(@RequestParam(required = false) Long categoryId,
+                             @ModelAttribute("criteria") TopicListCriteria criteria,
+                             HttpServletRequest request, HttpServletResponse response, Model model) {
+        var categories = categoryService.getAllCategories();
+        Long selectedCategoryId = categoryId;
+        if (selectedCategoryId == null) {
+            selectedCategoryId = categories.stream().map(Category::getId).min(Long::compareTo).orElse(null);
         }
-
-        model.addAttribute("topics", topicList);
-        model.addAttribute("categories", categoryList);
+        var topics = topicListService.browse(selectedCategoryId, criteria);
+        String listReturn = criteria.path(selectedCategoryId, topics.getNumber());
+        model.addAttribute("categories", categories);
         model.addAttribute("selectedCategoryId", selectedCategoryId);
-        model.addAttribute("selectedCategoryName", selectedCategoryName);
+        model.addAttribute("sortOptions", TopicListCriteria.Sort.values());
+        model.addAttribute("topicsPage", topics);
+        model.addAttribute("listReturn", listReturn);
+        model.addAttribute("previousPath", topics.hasPrevious() ? criteria.path(selectedCategoryId, topics.getNumber() - 1) : null);
+        model.addAttribute("nextPath", topics.hasNext() ? criteria.path(selectedCategoryId, topics.getNumber() + 1) : null);
 
-
+        response.addHeader("Vary", "HX-Request, HX-History-Restore-Request");
+        if ("true".equals(request.getHeader("HX-Request"))
+                && !"true".equals(request.getHeader("HX-History-Restore-Request"))) {
+            response.setHeader("HX-Push-Url", request.getContextPath() + listReturn);
+            return "topics/topic-list :: results";
+        }
         return "topics/topic-list";
     }
-
-
-
-
 
     // Yeni topic oluşturma formu
     @GetMapping("/create")
     public String showCreateForm(HttpSession session,
+                                 @RequestParam(required = false) String listReturn,
                                  @RequestParam(name="categoryId", required=false) Long categoryId,
                                  @RequestParam(name="returnPage", required=false) String returnPage,
                                  @RequestParam(name = "dateMillisYmd", required = false) Long dateMillisYmd,
@@ -203,15 +196,22 @@ public class TopicWebController {
 
         model.addAttribute("availableParsers", parserRegistryLoader.getParserClassNames());
 
+        String listPath = PageReturnPath.topicList(listReturn);
+        if (listPath != null) {
+            model.addAttribute("listReturn", listPath);
+            model.addAttribute("topicListPath", topic.getId() == null ? listPath : PageReturnPath.topicAnchor(listPath, topic.getId()));
+        }
         return "topics/topic-form"; // templates/topic-form.html
     }
 
     // Yeni topic kaydetme
     @PostMapping
     public String saveTopic(@ModelAttribute("topic") Topic topic,
+                            @RequestParam(required = false) String listReturn,
                             @RequestParam(name="returnPage", required=false) String returnPage,
                             @RequestParam(required = false) Long dateMillisYmd
                             ) {
+        String listPath = PageReturnPath.topicList(listReturn);
         // Seçilen category'yi veritabanından bul
         var categoryId = topic.getCategory().getId();
         Category category = categoryService
@@ -226,6 +226,10 @@ public class TopicWebController {
 
         // Kaydet
         topicService.saveTopic(topic);
+        if (listPath != null) {
+            return "redirect:" + PageReturnPath.topicAnchor(listPath, topic.getId());
+        }
+
 
         // Hangi sayfadan gelindiğini kontrol ediyoruz.
         if (returnPage != null) {
@@ -258,6 +262,7 @@ public class TopicWebController {
     // Mevcut topic'i düzenleme formu
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id,
+                               @RequestParam(required = false) String listReturn,
                                @RequestParam(name = "returnPage", required = false) String returnPage,
                                @RequestParam(name = "dateMillisYmd", required = false) Long dateMillisYmd,
                                Model model) {
@@ -308,16 +313,23 @@ public class TopicWebController {
 
         model.addAttribute("dateMillisYmd", dateMillisYmd);
         //System.out.println("edit ********* " + dateMillisYmd);
+        String listPath = PageReturnPath.topicList(listReturn);
+        if (listPath != null) {
+            model.addAttribute("listReturn", listPath);
+            model.addAttribute("topicListPath", topic.getId() == null ? listPath : PageReturnPath.topicAnchor(listPath, topic.getId()));
+        }
         return "topics/topic-form"; // Aynı formu kullanacağız
     }
 
     // Mevcut topic'i güncelleme
     @PostMapping("/update/{id}")
     public String updateTopic(@PathVariable Long id,
+                              @RequestParam(required = false) String listReturn,
                               @RequestParam(name = "returnPage", required = false) String returnPage,
                               @ModelAttribute("topic") Topic topic,
                               Model model,
                               @RequestParam(required = false) Long dateMillisYmd) {
+        String listPath = PageReturnPath.topicList(listReturn);
         // Veritabanından topic bul
         Topic existingTopic = topicService
                 .getTopicById(id)
@@ -350,6 +362,10 @@ public class TopicWebController {
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());
+        if (listPath != null) {
+            return "redirect:" + PageReturnPath.topicAnchor(listPath, existingTopic.getId());
+        }
+
 
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("dateMillisYmd", dateMillisYmd);
@@ -384,8 +400,10 @@ public class TopicWebController {
     }
 
     // Topic silme
-    @GetMapping("/delete/{id}")
-    public String deleteTopic(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @RequestMapping(value = "/delete/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    public String deleteTopic(@PathVariable Long id, @RequestParam(required = false) String listReturn,
+                              RedirectAttributes redirectAttributes) {
+        String listPath = PageReturnPath.topicList(listReturn);
 
         Topic topic = topicService.getTopicById(id).get(); // for redirection after delete
         var categoryId = topic.getCategory().getId(); // for redirection after delete
@@ -394,6 +412,9 @@ public class TopicWebController {
             topicService.deleteTopic(id);
         } catch (IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        if (listPath != null) {
+            return "redirect:" + listPath;
         }
         return "redirect:/topics?categoryId=" + categoryId;
     }

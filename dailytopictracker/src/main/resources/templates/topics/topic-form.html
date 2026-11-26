@@ -52,6 +52,7 @@
 
         <!-- preserve returnPage -->
         <input type="hidden" name="returnPage" th:value="${returnPage}"/>
+        <input th:if="${listReturn != null}" type="hidden" name="listReturn" th:value="${listReturn}">
 
         <!--/* dateMillisYmd yi bu topic formda sadece food.html kalori takip sayfasinda dogru gune geri donmek icin kullaniyoruz */-->
         <input type="hidden" id="dateMillisYmd" name="dateMillisYmd" th:value="${dateMillisYmd}" />
@@ -261,6 +262,8 @@
 
         <button type="submit" class="btn btn-primary w-100">Save</button>
 
+        <a th:if="${topicListPath != null}" class="btn btn-outline-secondary mt-2" th:href="@{${topicListPath}}">Cancel</a>
+
         <!-- if user hits “cancel,” send them back -->
         <a th:if="${returnPage=='pivottable'}"
            th:href="@{/entry-filter/return}">
@@ -297,7 +300,7 @@ WebJars path'leri şu yapıyı izler:
     Please enable JavaScript.
 </noscript>
 
-<script>
+<script th:inline="javascript">
     /**
      * Date Picker’da tarih seçilince,
      * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
@@ -325,8 +328,7 @@ WebJars path'leri şu yapıyı izler:
     function useFirstDoneEntryDate() {
 
 
-        const lastMillis = [[${firstDoneEntryDateMillisYmd}]];
-        //const lastMillis = /*[[${firstDoneEntryDateMillisYmd}]]*/ 0;
+        const lastMillis = /*[[${firstDoneEntryDateMillisYmd}]]*/ null;
 
         if (lastMillis) {
             const dateObj = new Date(Number(lastMillis));
@@ -373,7 +375,7 @@ WebJars path'leri şu yapıyı izler:
 </script>
 
 
-<script>
+<script th:inline="javascript">
     /**
      * Date Picker’da tarih seçilince,
      * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
@@ -401,8 +403,7 @@ WebJars path'leri şu yapıyı izler:
     function useTodaysDate() {
 
 
-        const todayMillis = [[${todayMillisYmd}]];
-        //const todayMillis = /*[[${todayMillisYmd}]]*/ 0;
+        const todayMillis = /*[[${todayMillisYmd}]]*/ null;
 
         if (todayMillis) {
             const dateObj = new Date(Number(todayMillis));

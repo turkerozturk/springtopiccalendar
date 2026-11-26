@@ -5,6 +5,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Map;
 
 public record TopicHistoryFilter(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
@@ -29,7 +30,7 @@ public record TopicHistoryFilter(
         return historyPage == null || historyPage < 1 ? 0 : historyPage - 1;
     }
 
-    String returnPath(long topicId, long listCategoryId) {
+    String returnPath(long topicId, long listCategoryId, String listReturn) {
         var uri = UriComponentsBuilder.fromPath("/topics/" + topicId).queryParam("listCategoryId", listCategoryId);
         if (isActive() && validationMessage() == null) {
             uri.queryParamIfPresent("fromDate", Optional.ofNullable(fromDate))
@@ -37,6 +38,10 @@ public record TopicHistoryFilter(
             if (pageIndex() > 0) {
                 uri.queryParam("historyPage", historyPage);
             }
+        }
+        if (listReturn != null) {
+            uri.queryParam("listReturn", "{listReturn}");
+            return uri.encode().buildAndExpand(Map.of("listReturn", listReturn)).toUriString();
         }
         return uri.build().toUriString();
     }

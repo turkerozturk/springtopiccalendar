@@ -48,7 +48,7 @@
     <a th:if="${topicReturnPath != null}" class="d-inline-block mb-3"
        th:href="@{${topicReturnPath}}">← Back to topic</a>
     <a th:if="${topicEntryForm == true and returnPage == 'topicList'}" class="d-inline-block mb-3"
-       th:href="@{/topics(categoryId=${listCategoryId})} + '#topic-' + ${entry.topic.id}">← Back to topics</a>
+       th:href="@{${topicListPath}}">← Back to topics</a>
 
     <form th:action="@{/entries/save}" th:object="${entry}" method="post"
           th:with="nativeEntryDate=${topicEntryForm == true or entryReturnPath != null}"
@@ -65,6 +65,7 @@
         <input type="hidden" name="returnPage" th:value="${returnPage}">
         <th:block th:if="${entryReturnPath != null}" th:insert="~{::entryReturnFields}"></th:block>
         <input th:if="${topicEntryForm}" type="hidden" name="listCategoryId" th:value="${listCategoryId}">
+        <input th:if="${topicEntryForm == true and listReturn != null}" type="hidden" name="listReturn" th:value="${listReturn}">
         <th:block th:if="${topicReturnPath != null}">
             <input th:if="${historyFilter.fromDate != null}" type="hidden" name="fromDate" th:value="${historyFilter.fromDate}">
             <input th:if="${historyFilter.toDate != null}" type="hidden" name="toDate" th:value="${historyFilter.toDate}">

@@ -1,387 +1,199 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
-    This file is part of the DailyTopicTracker project.
-    Please refer to the project's README.md file for additional details.
-    https://github.com/turkerozturk/springtopiccalendar
-    -->
-    <meta charset="UTF-8"/>
-
-    <!-- favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
-
-
-
-
-
-
-
-    <title>Topic List</title>
-
-
-    <style>
-
-        body {
-        background-color: [[${htmlBackgroundColor}]];
-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='77' height='107' viewBox='0 0 77 107'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='stamp-collection' fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M46 101a5 5 0 0 1 5 5h5a5 5 0 0 1 10 0h5a5 5 0 0 1 5-5v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10v-5a5 5 0 0 1 0-10V6a5 5 0 0 1-5-5h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0h-5a5 5 0 0 1-10 0H6a5 5 0 0 1-5 5v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 0 10v5a5 5 0 0 1 5 5h5a5 5 0 0 1 10 0h5a5 5 0 0 1 10 0h5a5 5 0 0 1 5-5zm15-2a7 7 0 0 0-6.71 5h-1.58a7 7 0 0 0-13.42 0h-1.58a7 7 0 0 0-13.42 0h-1.58a7 7 0 0 0-13.42 0H7.71A7.01 7.01 0 0 0 3 99.29v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58a7 7 0 0 0 0-13.42v-1.58A7 7 0 0 0 3 9.29V7.71A7.02 7.02 0 0 0 7.71 3h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58a7 7 0 0 0 13.42 0h1.58A7.02 7.02 0 0 0 74 7.71v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7 7 0 0 0 0 13.42v1.58a7.01 7.01 0 0 0-4.71 4.71h-1.58A7 7 0 0 0 61 99zM12 12h53v83H12V12zm51 81H14V14h49v79z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-
-
-
-.status-0 {
-           background-color: gainsboro !important;
-}
-.status-1 {
-   background-color: palegreen !important;
-}
-.status-2 {
-   background-color: tomato !important;
-}
-.status-3 {
-   background-color: LightBlue !important;
-}
-
-
-#categorySelect {
-/* max-width: 250px; *//* Genişliği sınırla */
- text-overflow: ellipsis;
- white-space: nowrap;
- overflow: hidden;
-}
-
-
-
-.fonbg {
-   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-}
-
-#topicsTable {
-
-
- background-color: WhiteSmoke;
- border: 3px solid black;
-}
-/* Mevcut link stilleri korundu */
-a {
-  text-decoration: none;
-  color: inherit;
-}
-a:visited {
-  color: inherit;
-}
-a:hover {
-  color: blue;
-}
-
-
-/* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
-#topicsTable input.form-control {
-  width: 100%; /* Hücrenin tamamını kaplasın */
-}
-
-.topic-title {
-    overflow-wrap: anywhere;
-    text-decoration: underline;
-}
-.topic-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .25rem .75rem;
-    align-items: center;
-}
-.topic-actions .btn-link {
-    color: inherit;
-    text-decoration: underline;
-}
-
-#navigation-panel button, a{
-border-radius:10px !important;
-}
-
-
-#navigation-panel {
-max-width: 740px;
-margin-top: 10px;
-margin-bottom: 5px;
-margin-left: auto;
-margin-right: auto;
-padding: 3px;
-border: 2px solid DarKGray;
-border-radius: 7px 7px 7px 7px;
-
-/* https://cssgradient.io/ */
-
-background: #a7d6e8;
-background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-}
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Topics</title>
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon-180x180.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style th:inline="css">
+        body { background-color: /*[[${htmlBackgroundColor}]]*/ #f4f5f7; }
+        .topics-page { max-width: 64rem; overflow-wrap: anywhere; }
+        .topic-row { scroll-margin-top: 1rem; }
+        .topic-row:target { box-shadow: inset .25rem 0 var(--bs-primary); background: var(--bs-primary-bg-subtle); }
+        .topic-identity { min-width: 0; }
     </style>
 </head>
-    <body>
-
-
-        <div  id="navigation-panel">
-            <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
-
-            <div>
-                <!-- "Create New Topic" butonu -->
-                <!-- eğer bir kategori seçili değilse (null ya da boş) parametre gönderme,
-                     seçiliyse ?catId=xxx şeklinde gönder -->
-                <a th:if="${selectedCategoryId != null}"
-                   th:href="@{/topics/create(categoryId=${selectedCategoryId})}"
-                   class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-                    <i class="fa-solid fa-circle-plus"></i> New Topic
-                </a>
-                <a th:if="${selectedCategoryId == null}"
-                   th:href="@{/topics/create}"
-                   class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-                    <i class="fa-solid fa-circle-plus"></i> New Topic
-                </a>
-
-                <a
-                   th:href="@{/file-manager}"
-                   class="btn btn-secondary btn-sm" style="color:white; margin-top:4px;">
-                    <i class="fa-solid fa-circle-plus"></i>Image Manager
-                </a>
-            </div>
-        </div>
-
-
-
-        <!-- Hata mesajı varsa göster -->
-        <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
-            <p th:text="${errorMessage}"></p>
-        </div>
-
-        <div class="container my-2">
-
-
-            <h1><span class="fonbg">Topics</span></h1>
-
-            <div style="width:100%; text-align:right; background-color:rgba(203, 231, 242, 0.50);">
-                <span th:text="'Current Filter: ' + (${selectedCategoryName} != null ? ${selectedCategoryName} : 'None')">
-                        Filter
-                </span>
-                &nbsp;
-
-                <a class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" href="#details" role="button">
-                    <!-- selectedCategoryName controller tarafından geliyor; null ise 'None' göster -->
-                    <span>
-                        Expand Filter
-                    </span>
-                </a>
-            </div>
-
-            <div class="collapse mt-2" id="details">
-                <div style="background-color:WhiteSmoke;">
-                    <div class="row align-items-center mb-3">
-                        <label for="categoryTextFilter" class="col-sm-4 col-form-label">Category Filter:</label>
-                        <div class="col-auto">
-                            <input type="text" id="categoryTextFilter" class="form-control" placeholder="Category Containing..">
-                        </div>
-
-                        <label for="categorySelect" class="col-auto col-form-label">Category: </label>
-                        <div class="col-auto">
-                            <select id="categorySelect" class="form-select" onchange="onCategoryChange()">
-                                <!-- All = -1 -->
-                                <option th:value="-1" th:selected="${selectedCategoryId == -1}">All</option>
-
-                                <!-- Gerçek kategoriler -->
-                                <option th:each="cat : ${categories}"
-                                        th:value="${cat.id}"
-                                        th:text="${cat.name}"
-                                        th:selected="${cat.id == selectedCategoryId}">
-                                </option>
-                            </select>
-                        </div>
-                    </div>
+<body>
+<div class="container topics-page mt-2">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+</div>
+<main class="container topics-page my-3">
+    <header class="bg-body border rounded p-3 mb-3">
+        <h1 class="h3 mb-3">Topics</h1>
+        <form method="get" th:action="@{/topics}" th:attr="hx-get=@{/topics}"
+              hx-trigger="submit, input changed delay:350ms from:#topic-query, change from:#topic-category, change from:#topic-sort"
+              hx-target="#topic-results" hx-swap="outerHTML" hx-sync="this:replace">
+            <div class="row g-2">
+                <div class="col-12 col-lg-5">
+                    <label for="topic-query" class="form-label mb-1">Topic name</label>
+                    <input id="topic-query" name="q" type="search" class="form-control"
+                           th:value="${criteria.q}" autocomplete="off" maxlength="160"
+                           aria-describedby="topic-query-help">
+                    <div id="topic-query-help" class="form-text">Letters can have gaps, in the same order. Try “tmg” for “Tomato Garden”.</div>
+                </div>
+                <div class="col-sm-6 col-lg-4">
+                    <label for="topic-category" class="form-label mb-1">Category</label>
+                    <select id="topic-category" name="categoryId" class="form-select">
+                        <option value="-1" th:selected="${selectedCategoryId == -1}">All categories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                th:selected="${cat.id == selectedCategoryId}"></option>
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="topic-sort" class="form-label mb-1">Sort by</label>
+                    <select id="topic-sort" name="sort" class="form-select">
+                        <option th:each="option : ${sortOptions}" th:value="${option.name()}" th:text="${option.label}"
+                                th:selected="${option == criteria.sort}"></option>
+                    </select>
                 </div>
             </div>
 
-
-
-
-            <div style="background-color: white;">
-                <!-- Topics Tablosu -->
-                <table id="topicsTable" th:attr="data-category-id=${selectedCategoryId}"
-                       class="table table-striped table-bordered table-sm align-middle"
-                       style="margin-top: 10px; border-collapse: collapse;">
-                    <thead>
-                    <tr>
-                        <th style="cursor: pointer;">ID</th>
-
-
-
-                        <th style="cursor: pointer;">Topic Name</th>
-
-                    </tr>
-
-
-                    </thead>
-
-                    <tbody>
-                    <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
-                    <tr th:each="topic : ${topics}" th:id="'topic-' + ${topic.id}"
-                        th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
-
-                        <td style="text-align:center;">
-                            <span
-                                    th:text="${zeroPaddedTopicId}">
-                                topic id
-                            </span>
-                        </td>
-
-
-
-                        <td class="p-2" th:attr="data-order=${topic.name},data-search=${topic.name}">
-                            <a class="topic-title fw-semibold" data-remember-topic-list
-                               th:href="@{/topics/{id}(id=${topic.id},listCategoryId=${selectedCategoryId})}"
-                               th:text="${topic.name}">Topic name</a>
-
-                            <div class="topic-actions mt-1">
-                                <a class="btn btn-sm btn-outline-primary" data-remember-topic-list
-                                   th:href="@{/entries/new(topicId=${topic.id},returnPage='topicList',listCategoryId=${selectedCategoryId})}">
-                                    Add entry
-                                </a>
-                                <a th:href="@{/entries(topicId=${topic.id})}">Entries</a>
-                                <button type="button" class="btn btn-sm btn-link p-0"
-                                        th:hx-get="@{/topics/info/{id}(id=${topic.id})}"
-                                        hx-target="#topicInfoContent"
-                                        data-bs-toggle="modal" data-bs-target="#topicInfoModal">Overview</button>
-                                <a th:href="@{/entries/weekly-calendar(topicId=${topic.id})}"
-                                   th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id},fragment='true')}"
-                                   hx-target="#modal-content" hx-swap="innerHTML"
-                                   onclick="document.getElementById('modal').style.display='block'; return false;"
-                                   title="View weekly calendar" aria-label="View weekly calendar">📅</a>
-                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                                   title="Edit topic" aria-label="Edit topic">✎</a>
-                                <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-                                   onclick="return confirm('Are you sure to delete this topic?')"
-                                   title="Delete topic" aria-label="Delete topic">🗑</a>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <details class="my-3" th:open="${criteria.advanced()}">
+                <summary>Advanced search</summary>
+                <div class="row g-2 mt-1">
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-id" class="form-label mb-1">Topic ID</label>
+                        <input id="topic-id" type="number" name="id" class="form-control" min="1" th:value="${criteria.id}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-description" class="form-label mb-1">Description contains</label>
+                        <input id="topic-description" name="description" class="form-control" th:value="${criteria.description}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-pinned" class="form-label mb-1">Pinned</label>
+                        <select id="topic-pinned" name="pinned" class="form-select">
+                            <option value="" th:selected="${criteria.pinned == null}">Any</option>
+                            <option value="true" th:selected="${criteria.pinned == true}">Pinned</option>
+                            <option value="false" th:selected="${criteria.pinned == false}">Not pinned</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-weight" class="form-label mb-1">Weight</label>
+                        <input id="topic-weight" name="weight" type="number" class="form-control" th:value="${criteria.weight}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-prediction-days" class="form-label mb-1">Prediction days</label>
+                        <input id="topic-prediction-days" name="predictionDays" type="number" class="form-control"
+                               min="0" th:value="${criteria.predictionDays}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-interval-rule" class="form-label mb-1">Interval rule contains</label>
+                        <input id="topic-interval-rule" name="intervalRule" class="form-control" th:value="${criteria.intervalRule}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-parser" class="form-label mb-1">Parser contains</label>
+                        <input id="topic-parser" name="parser" class="form-control" th:value="${criteria.parser}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-image" class="form-label mb-1">Image filename contains</label>
+                        <input id="topic-image" name="image" class="form-control" th:value="${criteria.image}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-base-date" class="form-label mb-1">Base date</label>
+                        <input id="topic-base-date" name="baseDate" type="date" class="form-control"
+                               min="0001-01-01" max="9999-12-31" th:value="${criteria.baseDate}">
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <label for="topic-end-date" class="form-label mb-1">End date</label>
+                        <input id="topic-end-date" name="endDate" type="date" class="form-control"
+                               min="0001-01-01" max="9999-12-31" th:value="${criteria.endDate}">
+                    </div>
+                </div>
+            </details>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a class="btn btn-outline-secondary" th:href="@{/topics}">Reset</a>
+                <a class="btn btn-outline-secondary" th:href="@{/file-manager}">Image manager</a>
             </div>
+        </form>
+    </header>
 
+    <section id="topic-results" th:fragment="results" aria-label="Topic results" class="bg-body border rounded p-3">
+        <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <p class="text-body-secondary mb-0" role="status" th:if="${topicsPage.hasContent()}"
+               th:text="|${topicsPage.pageable.offset + 1}–${topicsPage.pageable.offset + topicsPage.numberOfElements} of ${topicsPage.totalElements} topics|"></p>
+            <a th:unless="${categories.isEmpty()}" class="btn btn-sm btn-outline-primary"
+               th:href="@{/topics/create(categoryId=${selectedCategoryId != -1 ? selectedCategoryId : null},
+                                        listReturn=${listReturn})}">New topic</a>
         </div>
+        <nav th:fragment="topicPagination" th:if="${topicsPage.totalPages > 1}" aria-label="Topic pages"
+             class="d-flex flex-wrap gap-2 align-items-center my-2">
+            <a th:if="${previousPath != null}" class="btn btn-sm btn-outline-secondary" rel="prev"
+               th:href="@{${previousPath}}">Previous</a>
+            <span class="small" th:text="|Page ${topicsPage.number + 1} of ${topicsPage.totalPages}|"></span>
+            <a th:if="${nextPath != null}" class="btn btn-sm btn-outline-secondary" rel="next"
+               th:href="@{${nextPath}}">Next</a>
+        </nav>
+        <p th:unless="${topicsPage.hasContent()}" class="mb-0" role="status"
+           th:text="${categories.isEmpty() ? 'Create a category before adding topics.' : 'No topics match these filters.'}"></p>
+        <ul th:if="${topicsPage.hasContent()}" class="list-group list-group-flush">
+            <li th:each="topic : ${topicsPage.content}" th:id="'topic-' + ${topic.id}"
+                class="topic-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="topic-identity">
+                    <a class="topic-title fw-semibold"
+                       th:href="@{/topics/{id}(id=${topic.id},listCategoryId=${selectedCategoryId},listReturn=${listReturn})}"
+                       th:text="${topic.name}">Topic</a>
+                    <div class="small text-body-secondary">
+                        <span th:text="${topic.categoryName}"></span>
+                        <span th:text="| · #${topic.id}|"></span>
+                        <span th:if="${topic.pinned}"> · Pinned</span>
+                        <span th:if="${topic.weight != 0}" th:text="| · Weight ${topic.weight}|"></span>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-outline-primary"
+                       th:href="@{/entries/new(topicId=${topic.id},returnPage='topicList',listCategoryId=${selectedCategoryId},
+                                              listReturn=${listReturn})}">Add entry</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/entries(topicId=${topic.id})}">Entries</a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                            th:attr="hx-get=@{/topics/info/{id}(id=${topic.id})}"
+                            hx-target="#topicInfoContent" hx-sync="#topicInfoContent:replace"
+                            data-bs-toggle="modal" data-bs-target="#topicInfoModal">Overview</button>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entries/weekly-calendar(topicId=${topic.id})}"
+                       th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id},fragment='true')}"
+                       hx-target="#topic-calendar-content" hx-sync="#topic-calendar-content:replace"
+                       data-bs-toggle="modal" data-bs-target="#topic-calendar">Calendar</a>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/topics/edit/{id}(id=${topic.id},listReturn=${listReturn})}">Edit</a>
+                    <form method="post" th:action="@{/topics/delete/{id}(id=${topic.id})}"
+                          onsubmit="return confirm('Delete this topic?')">
+                        <input type="hidden" name="listReturn" th:value="${listReturn}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+        <div th:replace="~{::topicPagination}"></div>
+    </section>
+</main>
 
 
-        <!-- Modal yapısı weekly entry calendar icin -->
-        <div id="modal" class="modal text-center" style="display:none;background-color:rgba(0, 0, 0, 0.5);">
-            <button onclick="document.getElementById('modal').style.display='none'"
-                    style="background-color:WhiteSmoke;"
-            >Close</button>
-            <div class="modal-content" id="modal-content">
-                <!-- İçerik buraya yüklenecek -->
+
+<div class="modal fade" id="topic-calendar" tabindex="-1" aria-labelledby="topic-calendar-title" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="topic-calendar-title" class="modal-title h5">Weekly calendar</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div id="topic-calendar-content" class="modal-body">Loading calendar…</div>
         </div>
-
-
-        <!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-        cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-        WebJars path'leri şu yapıyı izler:
-        /webjars/{artifactId}/{version}/{dosya}
-        -->
-        <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-
-        <script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-        <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
-
-        <!-- https://datatables.net/plug-ins/sorting/turkish-string -->
-        <script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
-
-
-        <!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
-        <script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
-
-        <!-- chart -->
-        <script type="text/javascript" th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script> -->
-        <script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
-        <!-- https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js -->
-        <script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
-
-        <!-- Modal yapısı weekly entry calendar icin -->
-        <script>
-            // Modal disina tıklaninca da modali kapatmak icin bu script gerekli cunku kutuphaneli bir modal kullanmadik.
-            document.getElementById('modal').addEventListener('click', function (event) {
-                const modalContent = document.getElementById('modal-content');
-                if (!modalContent.contains(event.target)) {
-                    this.style.display = 'none';
-                }
-            });
-        </script>
-
-        <script th:src="@{/js/topic-list.js}"></script>
-
-        <!-- 3️⃣ Filtreleme için JS -->
-        <script>
-            (function(){
-              const filterInput = document.getElementById('categoryTextFilter');
-              const selectEl    = document.getElementById('categorySelect');
-
-              // 1️⃣ Orijinal kategori seçeneklerini (dummy hariç) saklıyoruz
-              const dummyOption = { value: '-1', text: 'All' };
-              const categoryOptions = Array.from(selectEl.options)
-                  .filter(opt => opt.value !== '-1') // All hariç gerçek kategoriler
-                  .map(opt => ({
-                      value: opt.value,
-                      text: opt.dataset.fulltext || opt.text
-                    }));
-
-
-                filterInput.addEventListener('input', function(){
-                const term = this.value.trim().toLowerCase();
-
-                // 2️⃣ Select'i temizle
-                selectEl.innerHTML = '';
-
-                // 3️⃣ En başa hep dummy seçeneğini ekle
-                selectEl.add(new Option(dummyOption.text, dummyOption.value));
-
-                // 4️⃣ Sonra, arama terimine uyan gerçek kategorileri ekle
-                categoryOptions
-                  .filter(({ text }) => term === '' || text.toLowerCase().includes(term))
-                  .forEach(({ text, value }) => {
-                    const opt = new Option(text, value);
-                    opt.dataset.fulltext = text;
-                    opt.title = text;
-                    selectEl.add(opt);
-                  });
-              });
-            })();
-        </script>
-
-        <script th:inline="javascript">
-            function onCategoryChange() {
-              var selectEl = document.getElementById("categorySelect");
-              var categoryId = selectEl.value;
-              var baseUrl = /*[[@{/topics}]]*/ '/topics';
-
-              // -1 gelirse controller 'All' olarak işliyor; isterseniz baseUrl (param yok) de gönderebilirsiniz.
-              window.location.href = baseUrl + "?categoryId=" + encodeURIComponent(categoryId);
-            }
-        </script>
-
-        <div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
-
-
-    </body>
+    </div>
+</div>
+<div th:replace="~{fragments/topicInfoModal :: topicInfoModal}"></div>
+<script th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+<script th:src="@{/webjars/chart.js/4.5.0/dist/chart.umd.js}"></script>
+<script th:src="@{/js/chartjs-plugin-annotation.js}"></script>
+<script th:src="@{/js/chartjs-adapter-date-fns.bundle.min.js}"></script>
+<script th:src="@{/js/topic-list.js}"></script>
+</body>
 </html>

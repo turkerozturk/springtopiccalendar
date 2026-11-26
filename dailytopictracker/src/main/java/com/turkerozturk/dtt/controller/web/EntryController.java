@@ -1227,6 +1227,7 @@ public class EntryController {
             @RequestParam(name="categoryId", required=false) Long categoryId,
             @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
             @RequestParam(required = false) Long listCategoryId,
+            @RequestParam(required = false) String listReturn,
             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
             @RequestParam(required = false) String browseReturn,
             @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
@@ -1267,7 +1268,7 @@ public class EntryController {
             if (entry.getTopic() == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND);
             }
-            return showTopicEntryForm(entry, returnPage, listCategoryId, historyFilter, model);
+            return showTopicEntryForm(entry, returnPage, listCategoryId, historyFilter, PageReturnPath.topicList(listReturn), model);
         }
 
         // to make topic selection easier from gui, we are sending categories to selection box:
@@ -1317,6 +1318,7 @@ public class EntryController {
     @PostMapping("/save")
     public String saveEntry(@ModelAttribute("entry") Entry formEntry,
                             @RequestParam(required = false) Long listCategoryId,
+                            @RequestParam(required = false) String listReturn,
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                             LocalDate topicEntryDate,
                             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
@@ -1328,6 +1330,7 @@ public class EntryController {
         String returnPage = request.getParameter("returnPage");
         boolean fromTopic = returnsToTopic(returnPage) && formEntry.getId() == null;
         boolean hasReturnLocation = "entryList".equals(returnPage) || "entryBrowse".equals(returnPage);
+        String topicListPath = fromTopic ? PageReturnPath.topicList(listReturn) : null;
         if (fromTopic || hasReturnLocation) {
             Long topicId = formEntry.getTopic() == null ? null : formEntry.getTopic().getId();
             Topic topic = topicId == null ? null : topicService.getByIdOrNull(topicId);
@@ -1377,7 +1380,7 @@ public class EntryController {
                 // Kayıt varsa formu tekrar göster ve hata mesajı ver
                 if (fromTopic) {
                     model.addAttribute("errorMessage", "An entry already exists for this date. Choose a different date.");
-                    return showTopicEntryForm(formEntry, returnPage, listCategoryId, historyFilter, model);
+                    return showTopicEntryForm(formEntry, returnPage, listCategoryId, historyFilter, topicListPath, model);
                 }
                 model.addAttribute("errorMessage", "There is already an entry for this topic on this date! Select a different topic or date or edit the existing entry.");
                 model.addAttribute("entry", formEntry);
@@ -1467,9 +1470,10 @@ public class EntryController {
         if (fromTopic) {
             long listCategory = listCategoryId != null ? listCategoryId : categoryId;
             if ("topicDetail".equals(returnPage)) {
-                return "redirect:" + historyFilter.returnPath(topicId, listCategory);
+                return "redirect:" + historyFilter.returnPath(topicId, listCategory, topicListPath);
             }
-            return "redirect:/topics?categoryId=" + listCategory + "#topic-" + topicId;
+            String path = topicListPath != null ? topicListPath : "/topics?categoryId=" + listCategory;
+            return "redirect:" + PageReturnPath.topicAnchor(path, topicId);
         }
 
         return "redirect:/entries/redirect"
@@ -1490,14 +1494,18 @@ public class EntryController {
     }
 
     private String showTopicEntryForm(Entry entry, String returnPage, Long listCategoryId,
-                                      TopicHistoryFilter historyFilter, Model model) {
+                                      TopicHistoryFilter historyFilter, String topicListPath, Model model) {
         model.addAttribute("entry", entry);
         model.addAttribute("returnPage", returnPage);
         model.addAttribute("topicEntryForm", true);
         long listCategory = listCategoryId != null ? listCategoryId : entry.getTopic().getCategory().getId();
         model.addAttribute("listCategoryId", listCategory);
+        model.addAttribute("listReturn", topicListPath);
         if ("topicDetail".equals(returnPage)) {
-            model.addAttribute("topicReturnPath", historyFilter.returnPath(entry.getTopic().getId(), listCategory));
+            model.addAttribute("topicReturnPath", historyFilter.returnPath(entry.getTopic().getId(), listCategory, topicListPath));
+        } else {
+            String path = topicListPath != null ? topicListPath : "/topics?categoryId=" + listCategory;
+            model.addAttribute("topicListPath", PageReturnPath.topicAnchor(path, entry.getTopic().getId()));
         }
         model.addAttribute("topicEntryDate", Instant.ofEpochMilli(entry.getDateMillisYmd())
                 .atZone(timeZoneProvider.getZoneId()).toLocalDate());
@@ -1554,7 +1562,7 @@ public class EntryController {
         if ("entryList".equals(returnPage)) {
             return location.path(entryId);
         }
-        return "entryBrowse".equals(returnPage) ? EntryBrowseReturn.path(browseReturn, entryId) : null;
+        return "entryBrowse".equals(returnPage) ? PageReturnPath.entryBrowse(browseReturn, entryId) : null;
     }
 
     @GetMapping("/editByDate")
