@@ -1,0 +1,10 @@
+<nav xmlns:th="http://www.thymeleaf.org" th:fragment="controls(page,topicId)"
+     th:if="${page.hasContent()}" aria-label="Entry pages" class="d-flex flex-wrap gap-2 align-items-center">
+    <a class="btn btn-sm btn-outline-secondary"
+       th:href="@{/entries(topicId=${topicId},size=${page.size})}">Near today</a>
+    <a class="btn btn-sm btn-outline-secondary" rel="prev" th:if="${page.hasPrevious()}"
+       th:href="@{/entries(topicId=${topicId},page=${page.number - 1},size=${page.size})}">Previous</a>
+    <span class="small" th:text="|Page ${page.number + 1} of ${page.totalPages}|"></span>
+    <a class="btn btn-sm btn-outline-secondary" rel="next" th:if="${page.hasNext()}"
+       th:href="@{/entries(topicId=${topicId},page=${page.number + 1},size=${page.size})}">Next</a>
+</nav>

@@ -106,62 +106,52 @@ public class EntryController {
 
     @GetMapping
     public String listEntries(
-            @RequestParam(name = "topicId", required = false) Long topicId,
-            @RequestParam(name = "page", required = false) Integer page,  // Artık default yok
-            @RequestParam(name = "size", defaultValue = "100") int size,
+            @RequestParam(required = false) Long topicId,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageNumber,
+            @RequestParam(defaultValue = "100") int size,
             Model model) {
 
-        ZoneId zoneId = timeZoneProvider.getZoneId();
+        Topic topic = topicId == null ? null : topicService.getTopicById(topicId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        size = Math.max(1, Math.min(200, size));
 
-        DateUtils dateUtils = new DateUtils();
-        dateUtils.setZoneId(zoneId);
-        long todayMillisYmd = dateUtils.getEpochMillisToday();
-
-        // Sayfa parametresi yoksa, bugüne en yakın entry'nin sırasına göre sayfa numarasını hesapla
-        if (page == null) {
-            int indexOfClosestEntry;
-
-            if (topicId != null) {
-                indexOfClosestEntry = entryRepository.countEntriesWithDateGreaterThanEqualAndTopicId(todayMillisYmd, topicId);
-            } else {
-                indexOfClosestEntry = entryRepository.countEntriesWithDateGreaterThanEqual(todayMillisYmd);
-            }
-
-            page = indexOfClosestEntry / size;
+        if (pageNumber != null) {
+            page = Math.max(1, pageNumber) - 1;
+        } else if (page == null) {
+            ZoneId zone = timeZoneProvider.getZoneId();
+            long tomorrow = LocalDate.now(zone).plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
+            int futureEntries = topicId == null
+                    ? entryRepository.countEntriesWithDateGreaterThanEqual(tomorrow)
+                    : entryRepository.countEntriesWithDateGreaterThanEqualAndTopicId(tomorrow, topicId);
+            page = futureEntries / size;
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateMillisYmd"));
-        Page<Entry> entriesPage;
-
-        if (topicId != null) {
-            entriesPage = entryRepository.findByTopicIdOrderByDateMillisYmdDescIdDesc(topicId, pageable);
-            Topic topic = topicService.getById(topicId);
-            model.addAttribute("topic", topic);
-            String topicDescriptionAsHtml = convertUrlsToLinksSafe(topic.getDescription());
-            model.addAttribute("topicDescriptionAsHtml", topicDescriptionAsHtml);
-
-        } else {
-            entriesPage = entryRepository.findAllByOrderByDateMillisYmdDescIdDesc(pageable);
+        page = Math.max(0, page);
+        int largestQueryablePage = Integer.MAX_VALUE / size;
+        if (page > largestQueryablePage) {
+            long entryCount = topicId == null ? entryRepository.count() : entryRepository.countByTopicId(topicId);
+            page = (int) Math.min(largestQueryablePage, Math.max(0, (entryCount - 1) / size));
         }
-
+        Page<Entry> entriesPage = loadEntriesPage(topicId, PageRequest.of(page, size));
+        int lastPage = Math.max(0, entriesPage.getTotalPages() - 1);
+        if (entriesPage.getNumber() > lastPage) {
+            entriesPage = loadEntriesPage(topicId, PageRequest.of(lastPage, size));
+        }
         model.addAttribute("entriesPage", entriesPage);
         model.addAttribute("topicId", topicId);
-
-        final int pagingDistance = 4;
-
-        int current = entriesPage.getNumber();
-        int total = entriesPage.getTotalPages();
-        int start = Math.max(0, current - pagingDistance);
-        int end = Math.min(total - 1, current + pagingDistance);
-
-        model.addAttribute("startPage", start);
-        model.addAttribute("endPage", end);
-        model.addAttribute("zoneId", zoneId);
-
+        model.addAttribute("topic", topic);
+        if (topic != null) {
+            model.addAttribute("topicDescriptionAsHtml", convertUrlsToLinksSafe(topic.getDescription()));
+        }
         return "entries/entry-list";
     }
 
-
+    private Page<Entry> loadEntriesPage(Long topicId, Pageable pageable) {
+        return topicId == null
+                ? entryRepository.findAllByOrderByDateMillisYmdDescIdDesc(pageable)
+                : entryRepository.findByTopicIdOrderByDateMillisYmdDescIdDesc(topicId, pageable);
+    }
 
     public LocalDate getEndOfWeek(LocalDate date, DayOfWeek startDayOfWeek) {
         int startOrdinal = startDayOfWeek.getValue();
@@ -1238,6 +1228,7 @@ public class EntryController {
             @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
             @RequestParam(required = false) Long listCategoryId,
             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
+            @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
             Model model) {
 
         // System.out.println("dateYmd: " + dateString );
@@ -1298,6 +1289,7 @@ public class EntryController {
             model.addAttribute("categoryGroupId", categoryGroupId);
         }
 
+        addEntryListReturn(model, returnPage, entryListLocation, entry);
         return "entries/entry-form";
     }
 
@@ -1327,12 +1319,14 @@ public class EntryController {
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                             LocalDate topicEntryDate,
                             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
+                            @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
                             Model model,
                             HttpServletRequest request) {
 
         String returnPage = request.getParameter("returnPage");
         boolean fromTopic = returnsToTopic(returnPage) && formEntry.getId() == null;
-        if (fromTopic) {
+        boolean fromEntryList = "entryList".equals(returnPage);
+        if (fromTopic || fromEntryList) {
             Long topicId = formEntry.getTopic() == null ? null : formEntry.getTopic().getId();
             Topic topic = topicId == null ? null : topicService.getByIdOrNull(topicId);
             if (topic == null || topicEntryDate == null) {
@@ -1341,6 +1335,7 @@ public class EntryController {
             formEntry.setTopic(topic);
             formEntry.setDateMillisYmd(topicEntryDate.atStartOfDay(timeZoneProvider.getZoneId()).toInstant().toEpochMilli());
         }
+        addEntryListReturn(model, returnPage, entryListLocation, formEntry);
         // start **** category id nin elde edilmesi (ugly code)
         // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
         String paramCategoryId = request.getParameter("categoryId");
@@ -1409,6 +1404,11 @@ public class EntryController {
             Entry dbEntry = entryRepository.findById(formEntry.getId())
                     .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + formEntry.getId()));
 
+            if (fromEntryList && topicEntryDate.equals(dbEntry.getDate())) {
+                dateMillisYmd = dbEntry.getDateMillisYmd();
+                formEntry.setDateMillisYmd(dateMillisYmd);
+            }
+
             // a) Aynı topic+date var mı diye kontrol et
             // Ama bulduğumuz kayıt kendi id'si ise problem değil;
             // farklı bir kaydın id'siyse problem.
@@ -1458,6 +1458,10 @@ public class EntryController {
 
 
 
+        if (fromEntryList) {
+            return "redirect:" + entryListLocation.path(formEntry.getId());
+        }
+
         if (fromTopic) {
             long listCategory = listCategoryId != null ? listCategoryId : categoryId;
             if ("topicDetail".equals(returnPage)) {
@@ -1503,6 +1507,7 @@ public class EntryController {
                                @RequestParam(name="topicId", required=false) Long topicId,
                                @RequestParam(name="returnPage", required=false) String returnPage,
                                @RequestParam(name="categoryId", required=false) Long categoryId,
+                               @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
                                Model model) {
         Entry entry = entryRepository.findById(entryId)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + entryId));
@@ -1529,7 +1534,15 @@ public class EntryController {
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("topicId", topicId);
 
+        addEntryListReturn(model, returnPage, entryListLocation, entry);
         return "entries/entry-form";
+    }
+
+    private void addEntryListReturn(Model model, String returnPage, EntryListLocation location, Entry entry) {
+        if ("entryList".equals(returnPage)) {
+            model.addAttribute("entryListReturnPath", location.path(entry.getId()));
+            model.addAttribute("topicEntryDate", entry.getDate());
+        }
     }
 
     @GetMapping("/editByDate")
@@ -1574,9 +1587,10 @@ public class EntryController {
     }
 
 
-    @GetMapping("/delete/{id}")
+    @RequestMapping(value = "/delete/{id}", method = {RequestMethod.GET, RequestMethod.POST})
     public String deleteEntry(@PathVariable Long id,
-                              @RequestParam(name="returnPage", required=true) String returnPage) {
+                              @RequestParam(name="returnPage", required=true) String returnPage,
+                              @ModelAttribute("entryListLocation") EntryListLocation entryListLocation) {
 
 
         Entry entry = entryRepository.findById(id)
@@ -1594,6 +1608,10 @@ public class EntryController {
 
         // predictionDate'i tekrar hesapla ve kaydet
         topicService.updateTopicStatus(topicId);
+
+        if ("entryList".equals(returnPage)) {
+            return "redirect:" + entryListLocation.path(null);
+        }
 
         return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage
@@ -1634,10 +1652,6 @@ public class EntryController {
         return escaped.replaceAll(urlRegex,
                 "<a href=\"$1\" target=\"_blank\" rel=\"noopener noreferrer\">$1</a>");
     }
-
-
-
-
 
     /**
      * entry form sayfasinda new veya update veya delete entry veya cancel islemleri sonrasinda

@@ -1,555 +1,143 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
-    This file is part of the DailyTopicTracker project.
-    Please refer to the project's README.md file for additional details.
-    https://github.com/turkerozturk/springtopiccalendar
-    -->
-    <meta charset="UTF-8"/>
-
-    <!-- favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-    <title>Entry Listesi</title>
-
-
-
-    <!-- Bootstrap CSS (Örnek 5.x sürümü) -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" /> -->
-
-    <style>
-
-
-                body {
-
-        background-color: [[${htmlBackgroundColor}]];
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-                 }
-
-                .fonbg {
-                    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-                }
-
-                #entries-table {
-
-                   background-color: WhiteSmoke;
-                   border: 3px solid black;
-
-                }
-
-                      /* Mevcut link stilleriniz */
-                      a {
-                          text-decoration: none;
-                          color: inherit;
-                      }
-                      a:visited {
-                          color: inherit;
-                      }
-                      a:hover {
-                          color: blue;
-                      }
-
-
-
-                      .actions-column {
-                          text-align: center;
-                      }
-
-                      .status-0 {
-                        background-color: gainsboro !important;
-                      }
-                      .status-1 {
-                        background-color: palegreen !important;
-                      }
-                      .status-2 {
-                        background-color: tomato !important;
-                      }
-
-                      .status-fg-0 {
-                        color: gainsboro !important;
-                      }
-                      .status-fg-1 {
-                        color: palegreen !important;
-                      }
-                      .status-fg-2 {
-                        color: tomato !important;
-                      }
-
-
-
-
-                #navigation-panel button, a{
-                  border-radius:10px !important;
-                }
-
-                      #navigation-panel {
-                   max-width: 740px;
-                   margin-top: 10px;
-                   margin-bottom: 5px;
-                   margin-left: auto;
-                   margin-right: auto;
-                   padding: 3px;
-                   border: 2px solid DarKGray;
-                   border-radius: 7px 7px 7px 7px;
-
-                   /* https://cssgradient.io/ */
-
-                   background: #a7d6e8;
-                   background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-                }
-
-    </style>
-
-    <style>
-
-        /* https://codepen.io/cemg/pen/LQrxLV */
-        #noteModal .modal-body {
-          position: relative;
-          overflow-y: auto;
-          min-height: 100px !important;
-          max-height: 600px !important;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${topic == null ? 'Entries' : topic.name + ' | Entries'}">Entries</title>
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon-180x180.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style th:inline="css">
+        body { background-color: /*[[${htmlBackgroundColor}]]*/ #f4f5f7; }
+        .entries-page { max-width: 64rem; overflow-wrap: anywhere; }
+        .entry-row { scroll-margin-top: 1rem; }
+        .entry-row:target { box-shadow: inset .25rem 0 var(--bs-primary); background: var(--bs-primary-bg-subtle); }
+        .entry-content { min-width: 0; }
+        .entry-note img, .entries-page img { max-width: 100%; height: auto; }
+        .entry-note pre, .entries-page pre { white-space: pre-wrap; }
+        .entry-note { overflow-wrap: anywhere; }
+        .page-control { max-width: 7rem; }
     </style>
 </head>
 <body>
-
-
-<div  id="navigation-panel">
+<div class="container entries-page mt-2">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
-
-    <!-- Yeni Entry Butonu -->
-    <div th:if="${topic == null}" style="margin-top:4px;">
-        <a th:href="@{/entries/new?returnPage=entries}"
-           title="Add New Entry"
-           class="btn btn-secondary btn-sm"
-           style="color:white;">
-            <i class="fa-solid fa-circle-plus"></i> New Entry</a>
-
-        <a th:href="@{/entry-results/page}"
-           title="Blog View"
-           class="btn btn-secondary btn-sm"
-           style="color:white;">
-            <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
-
-
-        <a th:href="@{/search}"
-           title="Search in Notes"
-           class="btn btn-secondary btn-sm"
-           style="color:white;">
-            <i class="fas fa-search"></i> Search in Notes</a>
-    </div>
-
-
-    <div th:if="${topic != null}" style="margin-top:4px;">
-
-
-
-        <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='entries', categoryId=${topic.category.id})}"
-            title="Add New Entry"
-            class="btn btn-secondary btn-sm"
-           style="color:white;">
-            <i class="fa-solid fa-circle-plus"></i>&nbsp;<span th:text="${'New Entry (' + topic.name + ')'}"></span></a>
-
-        <a th:href="@{/entry-results/page(topicId=${topic.id})}"
-           title="Blog View"
-           class="btn btn-secondary btn-sm"
-           style="color:white;">
-            <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
-
-        <a th:href="@{/entry-filter/form(categoryId=${topic.category.id})}"
-           class="btn btn-secondary btn-sm"
-           style="color:white;"
-            title="Click to open the Tracker gage"
-        ><i class="fa-solid fa-gear" style="color: #FFD43B;"></i> Tracker
-            <span th:text="${' (' + topic.category.name + ')'}"></span>
-        </a>
-
-    </div>
-
-
 </div>
 
-
-<div class="container my-2">
-
-
-
-    <h1><span class="fonbg">Entries</span></h1>
-
-<div style="background-color:WhiteSmoke;">
-
-
-
-    <div th:if="${topic != null}" class="mb-3">
-        <p>
-
-
-            <span th:text="${topic.name}" style="font-size: 1.17em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    margin-left: 0;
-    margin-right: 0;
-    ">Topic Name</span>
-
-            <spam th:utext="${': ' + topicDescriptionAsHtml}" style="white-space: pre-line;">Topic Description</spam>
-
-
-        </p>
-
-
-
-    </div>
-
-    <!-- Uyarı Mesajı (Collapse ile) -->
-
-        <div style="width:100%; text-align:right;">
-            <a class="btn btn-link p-0 ms-1" data-bs-toggle="collapse" href="#details" role="button">
-
-                <!-- 4️⃣ Sayfa etiketi: bulunduğumuz / toplam -->
-                Page&nbsp;
-                <span class="align-self-center">
-                    <span th:text="${entriesPage.number + 1}">1</span> /
-                    <span th:text="${entriesPage.totalPages}">7</span>
-                </span>
-
-            </a>
+<main class="container entries-page my-3">
+    <header class="bg-body border rounded p-3 mb-3">
+        <h1 class="h3 mb-2" th:text="${topic == null ? 'Entries' : topic.name + ' · Entries'}">Entries</h1>
+        <div th:if="${topic != null}" class="mb-3">
+            <div class="mb-2" style="white-space: pre-line;" th:if="${!topicDescriptionAsHtml.isEmpty()}"
+                 th:utext="${topicDescriptionAsHtml}"></div>
+            <nav class="d-flex flex-wrap gap-3" aria-label="Topic views">
+                <a th:href="@{/entries(size=${entriesPage.size})}">All topics</a>
+                <a th:href="@{/topics/{id}(id=${topic.id})}">Topic details</a>
+                <a th:href="@{/entries/weekly-calendar(topicId=${topic.id})}">Weekly calendar</a>
+                <a th:href="@{/entry-filter/form(categoryId=${topic.category.id})}">Category tracker</a>
+            </nav>
         </div>
-
-        <div class="collapse mt-2" id="details">
-            <!-- pagination start -->
-            <div class="d-flex justify-content-center align-items-center mt-3">
-
-                <!--  pagination nav code -->
-                <!-- 1️⃣ << < önceki 5 … sonraki 5 … > >> -->
-                <nav th:with="startPage=${startPage}, endPage=${endPage}">
-                    <ul class="pagination mb-0">
-                        <!-- << -->
-                        <li class="page-item" th:classappend="${entriesPage.first} ? 'disabled'">
-                            <a class="page-link"
-                               th:href="@{/entries(topicId=${topicId},page=0,size=${entriesPage.size})}">
-                                &laquo;&laquo;
-                            </a>
-                        </li>
-
-                        <!-- < -->
-                        <li class="page-item" th:classappend="${!entriesPage.hasPrevious()} ? 'disabled'">
-                            <a class="page-link"
-                               th:href="@{/entries(topicId=${topicId},page=${entriesPage.number-1},size=${entriesPage.size})}">
-                                &laquo;
-                            </a>
-                        </li>
-
-                        <!-- startPage…endPage -->
-                        <li class="page-item"
-                            th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                            th:classappend="${i == entriesPage.number} ? 'active'">
-
-                            <span class="page-link"
-                                th:if="${i == entriesPage.number}"
-                                th:text="${i + 1}">1</span>
-
-                            <a class="page-link"
-                               th:if="${i != entriesPage.number}"
-                               th:href="@{/entries(topicId=${topicId},page=${i},size=${entriesPage.size})}"
-                               th:text="${i + 1}">1</a>
-                        </li>
-
-                        <!-- > -->
-                        <li class="page-item" th:classappend="${!entriesPage.hasNext()} ? 'disabled'">
-                            <a class="page-link"
-                               th:href="@{/entries(topicId=${topicId},page=${entriesPage.number+1},size=${entriesPage.size})}">
-                                &raquo;
-                            </a>
-                        </li>
-
-                        <!-- >> -->
-                        <li class="page-item" th:classappend="${entriesPage.last} ? 'disabled'">
-                            <a class="page-link"
-                               th:href="@{/entries(topicId=${topicId},page=${entriesPage.totalPages-1},size=${entriesPage.size})}">
-                                &raquo;&raquo;
-                            </a>
-                        </li>
-                    </ul>
-
-
-
-
-
-                </nav>
-
-
-
-
-            </div>
-
-            <div>
-                <!-- 2️⃣ Sayfa başına satır sayısı -->
-                <form th:action="@{/entries}" method="get">
-                    <input type="hidden" name="topicId" th:value="${topicId}" />
-                    <input type="hidden" name="page"    th:value="${entriesPage.number}" />
-                    <div class="form-group row">
-                        <label for="size"  class="col-sm-2 col-form-label">Paging</label>
-                        <div class="col-sm-2">
-                            <select name="size" id="size"
-                                    class="form-select form-select-sm"
-                                    th:onchange="this.form.submit()">
-                                <option th:value="10"  th:selected="${entriesPage.size == 10}">10</option>
-                                <option th:value="20"  th:selected="${entriesPage.size == 20}">20</option>
-                                <option th:value="50"  th:selected="${entriesPage.size == 50}">50</option>
-                                <option th:value="100" th:selected="${entriesPage.size == 100}">100</option>
-                                <option th:value="200" th:selected="${entriesPage.size == 200}">200</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- 3️⃣ “Go to” sayfa numarası (select) -->
-                <form th:action="@{/entries}" method="get">
-                    <input type="hidden" name="topicId" th:value="${topicId}" />
-                    <input type="hidden" name="size"    th:value="${entriesPage.size}" />
-                    <div class="form-group row">
-                        <label for="page"  class="col-sm-2 col-form-label">Page</label>
-                        <div class="col-sm-2">
-                            <select name="page" id="page"
-                                    class="form-select form-select-sm"
-                                    th:onchange="this.form.submit()">
-                                <option th:each="i : ${#numbers.sequence(0, entriesPage.totalPages-1)}"
-                                        th:value="${i}"
-                                        th:text="${i + 1}"
-                                        th:selected="${i == entriesPage.number}">
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-
+        <div class="d-flex flex-wrap gap-2">
+            <a th:if="${hasTopics}" class="btn btn-primary"
+               th:href="@{/entries/new(topicId=${topicId},returnPage='entryList',
+                                      listTopicId=${topicId},listPage=${entriesPage.number},listSize=${entriesPage.size})}">New entry</a>
+            <a class="btn btn-outline-secondary" th:href="@{/entry-results/page(topicId=${topicId})}">Blog view</a>
+            <a class="btn btn-outline-secondary" th:href="@{/search}">Search notes</a>
         </div>
+    </header>
 
-
-
-
-</div>
-
-    <div style="background-color:rgba(203, 231, 242, 0.50);">
-
-
-        <!-- dinamik olarak tum kategori profilleri -->
-        <div class="col"  th:each="entry, iStat : ${entriesPage.content}" th:with="zeroPaddedEntryId=${#numbers.formatInteger(entry.id, 7)}">
-            <div class="card shadow-sm">
-                <div class="card-body py-1">
-
-                    <!-- Üst satır: ID, Name (crop), Actions -->
-                    <div class="d-flex justify-content-between ">
-
-                        <span class="white-space: nowrap;">
-                            <span  style="white-space:nowrap; color: gray;"
-                                  th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd')
-                                      .format(T(java.time.Instant).ofEpochMilli(entry.dateMillisYmd)
-                                      .atZone(T(java.time.ZoneId).systemDefault())
-                                      .toLocalDate())}"
-                                  th:title="${entry.dateMillisYmd}">
-                            </span>
-
-                            &nbsp;
-                            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + entry.status}"></i>
-
-                            &nbsp;
-
-
-
-                            <span class="text-truncate" style="overflow: hidden; white-space: nowrap;"
-                                  th:text="${entry.topic.name}"></span>
-                        </span>
-
-                        <div class="d-flex">
-                            <a th:href="@{/entries/edit/{id}(id=${entry.id},
-                                            categoryId=${entry.topic.category.id},
-                                            topicId=${entry.topic.id},
-                                            returnPage=entries
-                                            )}"
-                               target="_blank" rel="noopener noreferrer"
-                               title="Edit Entry">
-                                ✎
-                            </a>
-
-                            &nbsp;
-
-
-
-                            <!-- todo fragment yapilabilir cunku neredeyse aynisi intelligent report sayfasinda var. -->
-                                <span   style="cursor: pointer;"
-                                        class="note-snippet"
-                                        th:attr="hx-get=@{/entries/{id}/note-full(id=${entry.id})},
-                                                        data-entry-id=${entry.id},
-                                                        data-topic-name=${entry.topic.name},
-                                                        data-entry-date=${entry.dateFormatted},
-                                                        data-category-id=${entry.topic.category.id}"
-
-                                        hx-trigger="click"
-                                        hx-target="#noteModal .modal-body"
-                                        hx-swap="innerHTML"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#noteModal">
-
-                                        <th:block th:if="${entry.note == null or #strings.isEmpty(entry.note.content)}">
-                                            <i class="fa-brands fa-readme" style="color: lightgray;"></i>
-                                        </th:block>
-                                        <th:block th:if="${entry.note != null and !#strings.isEmpty(entry.note.content)}">
-                                            <i class="fa-brands fa-readme" style="color: blue;"></i>
-                                        </th:block>
-                                </span>
-
-
-
-
-
-                        </div>
-                    </div>
-
-
-
-
+    <section aria-label="Entry list" class="bg-body border rounded p-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <p class="text-body-secondary mb-0" th:if="${entriesPage.hasContent()}"
+               th:text="|${entriesPage.pageable.offset + 1}–${entriesPage.pageable.offset + entriesPage.numberOfElements} of ${entriesPage.totalElements} entries|"></p>
+            <div th:replace="~{entries/entry-pagination :: controls(${entriesPage},${topicId})}"></div>
+        </div>
+        <details th:if="${entriesPage.hasContent()}" class="mb-3">
+            <summary>Page options</summary>
+            <form class="d-flex flex-wrap gap-2 align-items-end mt-2" th:action="@{/entries}" method="get">
+                <input th:if="${topicId != null}" type="hidden" name="topicId" th:value="${topicId}">
+                <div>
+                    <label for="entry-page" class="form-label mb-0">Page number</label>
+                    <input id="entry-page" class="form-control page-control" type="number" name="pageNumber"
+                           min="1" th:value="${entriesPage.number + 1}">
                 </div>
-            </div>
+                <div>
+                    <label for="entry-size" class="form-label mb-0">Entries per page</label>
+                    <input id="entry-size" class="form-control page-control" type="number" name="size"
+                           min="1" max="200" th:value="${entriesPage.size}" required>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Go</button>
+            </form>
+        </details>
+
+        <p th:unless="${entriesPage.hasContent()}" class="mb-0">No entries yet.</p>
+        <ul th:if="${entriesPage.hasContent()}" class="list-group list-group-flush">
+            <li th:each="entry : ${entriesPage.content}" th:id="'entry-' + ${entry.id}"
+                class="entry-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-start gap-2"
+                th:with="hasNote=${entry.note != null and entry.note.content != null and !entry.note.content.isBlank()}">
+                <div class="entry-content flex-grow-1">
+                    <div class="d-flex flex-wrap align-items-baseline gap-2">
+                        <a class="fw-semibold"
+                           th:href="@{/topics/{id}(id=${entry.topic.id})}" th:text="${entry.topic.name}">Topic</a>
+                        <span class="badge rounded-pill"
+                              th:classappend="${entry.status == 1 ? 'text-bg-success' : (entry.status == 2 ? 'text-bg-warning' : 'text-bg-secondary')}"
+                              th:text="${entry.status == 1 ? 'Done' : (entry.status == 2 ? 'Warning' : 'Not marked')}"></span>
+                    </div>
+                    <div class="small text-body-secondary">
+                        <time th:if="${entry.date != null}" th:attr="datetime=${entry.date}" th:text="${entry.date}"></time>
+                        <span th:unless="${entry.date != null}">No date</span>
+                        <span th:if="${entry.topic.category != null}" th:text="| · ${entry.topic.category.name}|"></span>
+                    </div>
+                    <p class="small mb-0 mt-1" th:if="${hasNote}"
+                       th:text="${#strings.abbreviate(entry.note.content.strip(), 145)}"></p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a th:if="${topicId == null}" class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entries(topicId=${entry.topic.id},size=${entriesPage.size})}">Topic entries</a>
+                    <a class="btn btn-sm btn-outline-secondary entry-edit"
+                       th:href="@{/entries/edit/{id}(id=${entry.id},categoryId=${entry.topic.category.id},
+                                                      returnPage='entryList',listTopicId=${topicId},
+                                                      listPage=${entriesPage.number},listSize=${entriesPage.size})}">Edit</a>
+                    <a th:if="${hasNote}" class="btn btn-sm btn-outline-secondary entry-note-link"
+                       th:href="@{/entries/{id}/note-full(id=${entry.id})}"
+                       th:attr="data-bs-toggle='modal',data-bs-target='#entry-note-modal',
+                                data-topic-name=${entry.topic.name},data-entry-date=${entry.date},
+                                data-tracker-url=@{/entry-filter/form(categoryId=${entry.topic.category.id})}">Read note</a>
+                </div>
+            </li>
+        </ul>
+        <div class="mt-3" th:if="${entriesPage.totalPages > 1}">
+            <div th:replace="~{entries/entry-pagination :: controls(${entriesPage},${topicId})}"></div>
         </div>
+    </section>
+</main>
 
-
-    </div>
-
-</div>
-
-<!-- sayfanın en altına yakın bir yere ekleyin -->
-<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="entry-note-modal" tabindex="-1" aria-labelledby="entry-note-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
-                &nbsp;
-
-                &nbsp;
-
-                &nbsp;
-
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
-
+                <div>
+                    <h2 class="modal-title h5" id="entry-note-title">Entry note</h2>
+                    <p class="text-body-secondary small mb-0" id="entry-note-date"></p>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
-                <!-- HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor -->
-            </div>
-            <div class="modal-footer" id="noteModalFooter">
-                <button type="button" class="btn btn-primary">Save changes</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <div class="modal-body entry-note" id="entry-note-content" aria-live="polite"></div>
+            <div class="modal-footer">
+                <span class="me-auto small" id="entry-note-copy-status" role="status"></span>
+                <a id="entry-note-tracker" class="btn btn-outline-secondary">Category tracker</a>
+                <a id="entry-note-edit" class="btn btn-outline-secondary">Edit</a>
+                <button id="entry-note-copy" type="button" class="btn btn-outline-secondary" disabled>Copy note</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
-
-
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-WebJars path'leri şu yapıyı izler:
-/webjars/{artifactId}/{version}/{dosya}
--->
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-<script type="text/javascript" th:src="@{/webjars/jquery-ui/1.14.1/jquery-ui.min.js}"></script>
-
-
-<script>
-    function confirmDelete() {
-        return confirm("Are you sure to delete this entry?");
-    }
-</script>
-
-<script>
-    // HTMX olayı: içerik yüklendikten hemen sonra
-    document.body.addEventListener('htmx:afterSwap', function(evt) {
-      // Eğer swap hedefi modal-body içindeyse
-      if (evt.detail.target.closest('#noteModal .modal-body')) {
-        // Bootstrap modal’ı göster
-        var modalEl = document.getElementById('noteModal');
-      //  var modal = new bootstrap.Modal(modalEl);
-      //  modal.show();
-
-        // Copy butonunu bağla
-        document.getElementById('copyNoteBtn').onclick = function() {
-          var text = modalEl.querySelector('.modal-body').innerText;
-          navigator.clipboard.writeText(text)
-            .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
-        };
-      }
-    });
-
-
-</script>
-
-<script>
-
-    $(function() {
-  if ($("#noteModal").length > 0) {
-    $(".modal").on("show.bs.modal", resize);
-    $(window).on("resize", resize);
-  }
-});
-
-
-function resize() {
-  var winHeight = $(window).height();
-  //alert(winHeight);
-  $("#noteModal .modal-body").css({
-    width: "auto",
-    height: (winHeight - 200) + "px"
-  });
-}
-
-</script>
-
-<script>
-
-    document.addEventListener("click", function (e) {
-  if (e.target.closest(".note-snippet")) {
-    let el = e.target.closest(".note-snippet");
-    let entryId = el.dataset.entryId;
-    let entryDate = el.dataset.entryDate;
-    let topicName = el.dataset.topicName;
-    let categoryId = el.dataset.categoryId;
-
-        document.querySelector("#noteModalLabel").innerText = topicName;
-
-
-    document.querySelector("#noteModalFooter").innerHTML =
-      "Entry ID: " + entryId + ' ' +
-      "Date: " + entryDate + ' ' +
-      // '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' + ' ' +
-      '<a href="/entry-filter/form?categoryId=' + categoryId + '"'  + ' ' +
-         'title="Click to open the Tracker gage"' + ' ' +
-         '><i class="fa-solid fa-gear" style="color: #FFD43B;"></i></a>' + ' ';
-
-  }
-});
-
-
-</script>
-
-
-
+<script th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/entry-list.js}"></script>
 </body>
 </html>

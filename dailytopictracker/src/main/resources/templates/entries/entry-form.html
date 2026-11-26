@@ -51,7 +51,8 @@
        th:href="@{/topics(categoryId=${listCategoryId})} + '#topic-' + ${entry.topic.id}">← Back to topics</a>
 
     <form th:action="@{/entries/save}" th:object="${entry}" method="post"
-          th:classappend="${topicEntryForm == true ? 'px-3 py-2' : ''}">
+          th:with="nativeEntryDate=${topicEntryForm == true or entryListReturnPath != null}"
+          th:classappend="${nativeEntryDate ? 'px-3 py-2' : ''}">
         <fieldset>
 
             <legend th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry (id: ' + entry.id + ')'}"></legend>
@@ -62,6 +63,7 @@
 
         <!-- kaydolunca geri donecegi sayfayi belirten bir placeholer string. bkz. save metodu.(gizli alan) -->
         <input type="hidden" name="returnPage" th:value="${returnPage}">
+        <th:block th:if="${entryListReturnPath != null}" th:insert="~{::entryListFields}"></th:block>
         <input th:if="${topicEntryForm}" type="hidden" name="listCategoryId" th:value="${listCategoryId}">
         <th:block th:if="${topicReturnPath != null}">
             <input th:if="${historyFilter.fromDate != null}" type="hidden" name="fromDate" th:value="${historyFilter.fromDate}">
@@ -81,7 +83,7 @@
         <input type="hidden" th:field="*{id}"/>
 
         <!-- dateMillisYmd (artık gizli) -->
-        <input th:unless="${topicEntryForm}" type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
+        <input th:unless="${nativeEntryDate}" type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
 
         <div th:if="${topicEntryForm}" class="mb-3">
             <input type="hidden" th:field="*{topic.id}"/>
@@ -93,7 +95,7 @@
         <div class="mb-3 row">
             <label for="categoryFilter" class="col-sm-5 col-form-label col-form-label-sm">Select a Category:</label>
             <div class="col-sm-7">
-                <select id="categoryFilter" class="form-select form-select-sm" name="categoryId" onchange="loadTopicsByCategory(this.value)" tabindex="1">
+                <select id="categoryFilter" class="form-select form-select-sm" name="categoryId" onchange="loadTopicsByCategory(this.value)" th:attr="tabindex=${nativeEntryDate ? null : 1}">
                     <option th:each="cat : ${categories}"
                             th:value="${cat.id}"
                             th:text="${cat.name}"
@@ -106,7 +108,7 @@
         <div class="mb-3 row">
             <label for="topicSearch" class="col-sm-5 col-form-label col-form-label-sm">Filter Topic:</label>
             <div class="col-sm-7">
-                <input type="text" id="topicSearch" class="form-control form-control-sm" oninput="filterTopics()" tabindex="2"/>
+                <input type="text" id="topicSearch" class="form-control form-control-sm" oninput="filterTopics()" th:attr="tabindex=${nativeEntryDate ? null : 2}"/>
             </div>
         </div>
 
@@ -114,7 +116,8 @@
         <div class="mb-3 row">
             <label for="topicSelect" class="col-sm-4 col-form-label col-form-label-sm">Topic:</label>
             <div class="col-sm-8">
-                <select th:field="*{topic.id}" id="topicSelect" class="form-select form-select-sm" tabindex="3">
+                <select th:field="*{topic.id}" id="topicSelect" class="form-select form-select-sm"
+                        th:required="${entryListReturnPath != null}" th:attr="tabindex=${nativeEntryDate ? null : 3}">
                     <option th:each="t : ${topics}"
                             th:value="${t.id}"
                             th:text="${t.name}"
@@ -126,14 +129,14 @@
 
         </th:block>
 
-        <div th:if="${topicEntryForm}" class="mb-3">
+        <div th:if="${nativeEntryDate}" class="mb-3">
             <label for="topicEntryDate" class="form-label">Date</label>
             <input type="date" id="topicEntryDate" name="topicEntryDate" class="form-control"
                    th:value="${topicEntryDate}" required>
         </div>
 
         <!-- Alternatif: Date Picker (tıklayarak seçim) -->
-        <div th:unless="${topicEntryForm}" class="row mb-3" id="entryDateContainer">
+        <div th:unless="${nativeEntryDate}" class="row mb-3" id="entryDateContainer">
             <div class="input-group entryDateStyle date">
                 <label for="entryDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
                 <input type="text" id="entryDatePicker"
@@ -146,10 +149,10 @@
                                 .toLocalDate()
                              : ''
                        }"
-                       tabindex="4"
+                       th:attr="tabindex=${nativeEntryDate ? null : 4}"
                 />
                 <span class="input-group-append">
-                                         <button class="btn btn-outline-secondary" type="button" tabindex="5">
+                                         <button class="btn btn-outline-secondary" type="button" th:attr="tabindex=${nativeEntryDate ? null : 5}">
                                              <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
                                              <i class="far fa-calendar" aria-hidden="true"></i>
                                          </button>
@@ -163,30 +166,30 @@
         <div class="mb-3 row">
             <span class="col-sm-3 col-form-label col-form-label-sm">Status:</span>
 
-            <div class="d-flex flex-wrap gap-3" th:classappend="${topicEntryForm == true ? 'col-sm-9' : 'col-sm-6'}">
+            <div class="d-flex flex-wrap gap-3" th:classappend="${nativeEntryDate ? 'col-sm-9' : 'col-sm-6'}">
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="2" th:attr="tabindex=${topicEntryForm == true ? null : 6}" aria-label="Warning">
-                    <i th:unless="${topicEntryForm}" class="fas fa-circle-exclamation" title="Warning" style="cursor: pointer; color: tomato; font-size: 1.5em;"></i>
-                    <span th:if="${topicEntryForm}">Warning</span>
+                    <input type="radio" th:field="*{status}" value="2" th:attr="tabindex=${nativeEntryDate ? null : 6}" aria-label="Warning">
+                    <i th:unless="${nativeEntryDate}" class="fas fa-circle-exclamation" title="Warning" style="cursor: pointer; color: tomato; font-size: 1.5em;"></i>
+                    <span th:if="${nativeEntryDate}">Warning</span>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="0" th:attr="tabindex=${topicEntryForm == true ? null : 7}" aria-label="Not marked">
-                    <i th:unless="${topicEntryForm}" class="fas fa-circle-dot text-secondary" title="Not Marked" style="cursor: pointer; color: gainsboro; font-size: 1.5em;"></i>
-                    <span th:if="${topicEntryForm}">Not marked</span>
+                    <input type="radio" th:field="*{status}" value="0" th:attr="tabindex=${nativeEntryDate ? null : 7}" aria-label="Not marked">
+                    <i th:unless="${nativeEntryDate}" class="fas fa-circle-dot text-secondary" title="Not Marked" style="cursor: pointer; color: gainsboro; font-size: 1.5em;"></i>
+                    <span th:if="${nativeEntryDate}">Not marked</span>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="1" th:attr="tabindex=${topicEntryForm == true ? null : 8}" aria-label="Done">
-                    <i th:unless="${topicEntryForm}" class="fas fa-check-circle text-success" title="Done" style="cursor: pointer; color: palegreen; font-size: 1.5em;"></i>
-                    <span th:if="${topicEntryForm}">Done</span>
+                    <input type="radio" th:field="*{status}" value="1" th:attr="tabindex=${nativeEntryDate ? null : 8}" aria-label="Done">
+                    <i th:unless="${nativeEntryDate}" class="fas fa-check-circle text-success" title="Done" style="cursor: pointer; color: palegreen; font-size: 1.5em;"></i>
+                    <span th:if="${nativeEntryDate}">Done</span>
                 </label>
 
 
             </div>
 
-            <button th:unless="${topicEntryForm}" type="submit" class="btn btn-sm btn-secondary col-sm-2" tabindex="9">Save</button>
+            <button th:unless="${nativeEntryDate}" type="submit" class="btn btn-sm btn-secondary col-sm-2" th:attr="tabindex=${nativeEntryDate ? null : 9}">Save</button>
 
         </div>
 
@@ -200,15 +203,18 @@
             <label for="note_content" class="col-sm-2 col-form-label col-form-label-sm">Note:</label>
             <div class="col-sm-9">
                 <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control"
-                          th:attr="tabindex=${topicEntryForm == true ? null : 10},autofocus=${topicEntryForm == true ? null : 'autofocus'}"></textarea>
+                          th:attr="tabindex=${nativeEntryDate ? null : 10},autofocus=${nativeEntryDate ? null : 'autofocus'}"></textarea>
             </div>
         </div>
-        <button th:if="${topicEntryForm}" type="submit" class="btn btn-primary mb-3">Save entry</button>
+        <button th:if="${nativeEntryDate}" type="submit" class="btn btn-primary mb-3">Save entry</button>
         </fieldset>
     </form>
 
 
-    <form th:unless="${topicEntryForm}" th:action="@{/entries/redirect}" id="cancelForm" method="post">
+    <a th:if="${entryListReturnPath != null}" th:href="@{${entryListReturnPath}}" class="btn btn-outline-secondary">
+        Cancel
+    </a>
+    <form th:if="${topicEntryForm != true and entryListReturnPath == null}" th:action="@{/entries/redirect}" id="cancelForm" method="post">
         <!-- dateMillisYmd (artık gizli) -->
         <input type="hidden" name="dateMillisYmd" th:value="${entry.dateMillisYmd}" />
         <input type="hidden" name="returnPage" th:value="${returnPage}">
@@ -223,7 +229,20 @@
 
 
     <!-- Eğer entry.id null değilse, bir "Delete" linki göster -->
-    <div th:if="${entry.id != null}" class="mt-3">
+    <form th:if="${entry.id != null and entryListReturnPath != null}"
+          th:action="@{/entries/delete/{id}(id=${entry.id})}" method="post" class="mt-3"
+          onsubmit="return confirm('Delete this entry?')">
+        <input type="hidden" name="returnPage" value="entryList">
+        <th:block th:fragment="entryListFields">
+            <input th:if="${entryListLocation.listTopicId != null}" type="hidden" name="listTopicId"
+                   th:value="${entryListLocation.listTopicId}">
+            <input type="hidden" name="listPage" th:value="${entryListLocation.listPage}">
+            <input type="hidden" name="listSize" th:value="${entryListLocation.listSize}">
+        </th:block>
+        <button type="submit" class="btn btn-outline-danger">Delete entry</button>
+    </form>
+
+    <div th:if="${entry.id != null and entryListReturnPath == null}" class="mt-3">
 
         <a th:href="@{/entries/delete/{id}(
                                             id=${entry.id},
