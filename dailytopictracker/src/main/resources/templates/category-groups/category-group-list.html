@@ -252,6 +252,12 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <p th:if="${activeProfileName != null}" class="bg-body rounded p-2">
+        Active profile <a th:href="@{/profiles}" th:text="${activeProfileName}">Profile</a>
+    </p>
+    <p th:if="${activeProfileName != null and groups.isEmpty()}" class="alert alert-info">
+        This profile has no visible categories. <a th:href="@{/profiles}">Manage profiles</a>
+    </p>
     <div class="category-groups">
 
 
@@ -259,6 +265,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
         <div class="cg-cerceve"
              th:each="grp, jStats : ${groups}"
+             th:with="groupCategories=${visibleCategories.get(grp.id)}"
              th:attr="data-id=${grp.id}"
              th:classappend="${grp.totalWarningCount > 0} ? ' warning_border' : ''"
              >
@@ -437,11 +444,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
                         <!--/* Categories list */-->
                         <div class="cg-categories">
-                            <a th:if="${grp.categories.size == 0}"
+                            <a th:if="${groupCategories.isEmpty()}"
                                th:href="@{/categories/create(categoryGroupId=${grp.id}, returnPage='categorygroups')}"
                                title="Add Category" style="font-family:sans-serif;">Add Category</a>
 
-                            <ul th:each="cat, iStats : ${grp.categories}">
+                            <ul th:each="cat, iStats : ${groupCategories}">
                                 <li style="padding-left:4px; padding-top:3px;">
                                     <span style="white-space: nowrap;">
 

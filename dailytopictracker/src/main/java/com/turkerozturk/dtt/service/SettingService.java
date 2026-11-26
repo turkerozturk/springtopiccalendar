@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +41,11 @@ public class SettingService {
         return settingRepository.findAll();
     }
 
-    public Setting findById(Long id) {
-        return settingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Setting not found"));
+    public Optional<Setting> findById(Long id) {
+        return settingRepository.findById(id);
+    }
+
+    public static class DuplicateKeyException extends RuntimeException {
     }
 
     public Setting save(Setting setting) {
@@ -55,7 +58,7 @@ public class SettingService {
                                     !existing.getId().equals(setting.getId());
 
                     if (differentEntity) {
-                        throw new RuntimeException("Setting key already exists");
+                        throw new DuplicateKeyException();
                     }
                 });
 

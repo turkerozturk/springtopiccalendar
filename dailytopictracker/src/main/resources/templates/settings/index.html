@@ -1,312 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
-<html
-        xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--/*
-    This file is part of the DailyTopicTracker project.
-    Please refer to the project's README.md file for additional details.
-    https://github.com/turkerozturk/springtopiccalendar
-    */-->
-    <title>Settings</title>
-
     <meta charset="UTF-8">
-
-
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-    <!--/* favicon */-->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
-
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
-
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Settings</title>
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon-180x180.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style th:inline="css">
+        body { background-color: /*[[${htmlBackgroundColor}]]*/ #f4f5f7; }
+        .settings-page { max-width: 60rem; overflow-wrap: anywhere; }
+        .setting-value, .setting-key { white-space: pre-wrap; word-break: normal; overflow-wrap: anywhere; }
+        .setting-value { max-height: 10rem; overflow: auto; }
+        .setting-content { min-width: 0; }
+    </style>
 </head>
 <body>
-
-<div class="container mt-4">
-
-    <div class="d-flex justify-content-between mb-3">
-
-
-
-        <h2><!-- Sol tarafta logo veya Home -->
-            <a class="navbar-brand" href="/" target="_self">🏠 Home</a> | Daily Topic Tracker
-        </h2>
-
-
-        <button class="btn btn-primary"
-                id="btnAdd">
-            Add Setting
-        </button>
-
-        <button class="btn btn-secondary"
-                id="btnHelp">
-            Help
-        </button>
-
-    </div>
-
-    <table id="settingsTable"
-           class="table table-bordered table-striped">
-
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Key</th>
-            <th>Value</th>
-            <th width="180">Actions</th>
-        </tr>
-        </thead>
-
-        <tbody>
-
-        <tr th:each="s : ${settings}">
-
-            <td th:text="${s.id}"></td>
-
-            <td class="setting-key"
-                th:text="${s.key}"></td>
-
-            <td class="setting-value"
-                th:text="${s.value}"></td>
-
-            <td>
-
-                <button class="btn btn-sm btn-warning btn-edit"
-                        th:data-id="${s.id}">
-                    Edit
-                </button>
-
-                <button class="btn btn-sm btn-danger btn-delete"
-                        th:data-id="${s.id}">
-                    Delete
-                </button>
-
-            </td>
-
-        </tr>
-
-        </tbody>
-
-    </table>
-
+<div class="container settings-page mt-2">
+    <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
 </div>
+<main class="container settings-page my-3">
+    <header class="border rounded bg-body p-3 mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h1 class="h3 mb-0">Settings</h1>
+            <button type="button" class="btn btn-primary" id="add-setting">Add setting</button>
+        </div>
 
-<!-- Modal -->
+        <div class="row g-2">
+            <div class="col-sm-8">
+                <label for="setting-search" class="form-label mb-1">Filter by key or value</label>
+                <div class="input-group">
+                    <input id="setting-search" type="search" class="form-control" autocomplete="off">
+                    <button type="button" class="btn btn-outline-secondary" id="clear-setting-search">Clear</button>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <label for="setting-sort" class="form-label mb-1">Sort by</label>
+                <select id="setting-sort" class="form-select">
+                    <option value="key">Key A–Z</option>
+                    <option value="key-desc">Key Z–A</option>
+                    <option value="value">Value A–Z</option>
+                    <option value="id-desc">Newest added</option>
+                </select>
+            </div>
+        </div>
+    </header>
 
-<div class="modal fade"
-     id="settingModal"
-     tabindex="-1">
+    <div id="settings-feedback" role="status" aria-live="polite" hidden></div>
 
-    <div class="modal-dialog">
+    <section class="border rounded bg-body p-3 mb-3" aria-label="Saved settings">
+        <p id="setting-count" class="small text-body-secondary mb-2" role="status"
+           th:text="|${settings.size()} settings|"></p>
+        <p id="settings-empty" class="mb-0" th:hidden="${!settings.isEmpty()}">No saved settings.</p>
+        <ul class="list-group list-group-flush" id="settings-list">
+            <li th:each="s : ${settings}" class="setting-row list-group-item px-0 py-3"
+                th:attr="data-setting-id=${s.id}">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                    <div class="setting-content flex-grow-1">
+                        <code class="setting-key fw-semibold" th:text="${s.key}"></code>
+                        <div class="setting-value mt-1" th:text="${s.value}"></div>
+                        <div class="small text-body-secondary mt-1" th:if="${s.value == null or s.value.isEmpty()}">Empty value</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-edit-setting>Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                th:attr="data-delete-setting=@{/settings/delete/{id}(id=${s.id})}">Delete</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </section>
 
-        <div class="modal-content">
+    <details class="border rounded bg-body p-3">
+        <summary class="fw-semibold">Nutrition settings reference</summary>
+        <p class="small text-body-secondary mt-2">Saved values override the corresponding configuration or defaults.</p>
+        <dl class="row align-items-baseline gy-2 mb-0">
+            <dt class="col-sm-4"><code>human.age</code></dt>
+            <dd class="col-sm-8">Years <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-setting-key="human.age">Set age</button></dd>
+            <dt class="col-sm-4"><code>human.height</code></dt>
+            <dd class="col-sm-8">Centimeters <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-setting-key="human.height">Set height</button></dd>
+            <dt class="col-sm-4"><code>human.weight</code></dt>
+            <dd class="col-sm-8">Kilograms <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-setting-key="human.weight">Set weight</button></dd>
+            <dt class="col-sm-4"><code>human.gender</code></dt>
+            <dd class="col-sm-8">
+                <span th:each="option, iter : ${genders}"><code th:text="${option.name()}"></code><span th:unless="${iter.last}">, </span></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-1" data-setting-key="human.gender">Set gender</button>
+            </dd>
+            <dt class="col-sm-4"><code>human.activityLevel</code></dt>
+            <dd class="col-sm-8">
+                <ul class="list-unstyled mb-1">
+                    <li th:each="option : ${activityLevels}">
+                        <code th:text="${option.name()}"></code> <span th:text="|×${option.multiplier}|"></span>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-setting-key="human.activityLevel">Set activity level</button>
+            </dd>
+        </dl>
+    </details>
+</main>
 
+<div class="modal fade" id="setting-modal" tabindex="-1" aria-labelledby="setting-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <form class="modal-content" id="setting-form" th:action="@{/settings/save}" method="post">
             <div class="modal-header">
-                <h5 class="modal-title">Setting</h5>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"></button>
+                <h2 class="modal-title h5" id="setting-modal-title">Setting</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
-
-                <input type="hidden" id="settingId">
-
+                <div id="setting-form-error" class="alert alert-danger" role="alert" hidden></div>
+                <input type="hidden" id="setting-id" name="id">
                 <div class="mb-3">
-
-                    <label class="form-label">
-                        Key
-                    </label>
-
-                    <input type="text"
-                           class="form-control"
-                           id="settingKey">
-
+                    <label class="form-label" for="setting-key">Key</label>
+                    <input type="text" name="key" id="setting-key" class="form-control" required spellcheck="false">
                 </div>
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-                        Value
-                    </label>
-
-                    <textarea class="form-control"
-                              id="settingValue"
-                              rows="4"></textarea>
-
+                <div>
+                    <label class="form-label" for="setting-value">Value</label>
+                    <textarea name="value" id="setting-value" class="form-control" rows="4"></textarea>
                 </div>
-
             </div>
-
             <div class="modal-footer">
-
-                <button class="btn btn-secondary"
-                        data-bs-dismiss="modal">
-                    Cancel
-                </button>
-
-                <button class="btn btn-primary"
-                        id="btnSave">
-                    Save
-                </button>
-
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="save-setting">Save</button>
             </div>
-
-        </div>
-
+        </form>
     </div>
-
 </div>
-
-<div id = "helpModal" class="modal fade" tabindex="-1">
-
-    <div class="modal-dialog">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title">Setting</h5>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-    <div th:utext="${helpText}"></div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
-
-<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
-<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
-
-
-<!-- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.bootstrap5.min.js}"></script> -->
-
-
-<script>
-
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-    $.ajaxSetup({
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader(csrfHeader, csrfToken);
-        }
-    });
-
-
-    const table = new DataTable('#settingsTable');
-
-    const modalElement = document.getElementById('settingModal');
-
-    const modal = new bootstrap.Modal(modalElement);
-
-    $('#btnAdd').click(function () {
-
-        $('#settingId').val('');
-        $('#settingKey').val('');
-        $('#settingValue').val('');
-
-        modal.show();
-    });
-
-    $(document).on('click', '.btn-edit', function () {
-
-        const row = $(this).closest('tr');
-
-        const id = $(this).data('id');
-
-        const key = row.find('.setting-key').text().trim();
-
-        const value = row.find('.setting-value').text().trim();
-
-        $('#settingId').val(id);
-        $('#settingKey').val(key);
-        $('#settingValue').val(value);
-
-        modal.show();
-    });
-
-    $('#btnSave').click(function () {
-
-        $.post('/settings/save', {
-            id: $('#settingId').val(),
-            key: $('#settingKey').val(),
-            value: $('#settingValue').val()
-        })
-        .done(function () {
-
-            location.reload();
-
-        })
-        .fail(function (xhr) {
-
-            alert(xhr.responseText || 'Save error');
-
-        });
-    });
-
-    $(document).on('click', '.btn-delete', function () {
-
-        if (!confirm('Delete this setting?')) {
-            return;
-        }
-
-        const id = $(this).data('id');
-
-        $.post('/settings/delete/' + id)
-            .done(function () {
-
-                location.reload();
-
-            })
-            .fail(function () {
-
-                alert('Delete error');
-
-            });
-    });
-
-    const helpModalElement = document.getElementById('helpModal');
-    const helpModal = new bootstrap.Modal(helpModalElement);
-    $('#btnHelp').click(function () {
-        helpModal.show();
-    });
-
-</script>
-
+<script th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/settings.js}"></script>
 </body>
 </html>

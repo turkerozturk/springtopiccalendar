@@ -34,6 +34,7 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.CategoryProfileService;
 
 import java.io.File;
 import java.text.Collator;
@@ -49,19 +50,26 @@ public class CategoryGroupController {
     private CategoryService categoryService;
 
     private final CategoryGroupRepository repo;
+    private final CategoryProfileService profileService;
 
     //  satirlari dile gore dogru siralamak icin
     @Value("${app.locale:en}")
     private String appLocale;
 
-    public CategoryGroupController(CategoryGroupRepository repo) {
+    public CategoryGroupController(CategoryGroupRepository repo, CategoryProfileService profileService) {
         this.repo = repo;
+        this.profileService = profileService;
     }
 
     // LIST
     @GetMapping
     public String list(Model model) {
         List<CategoryGroup> groups = repo.findAllByOrderByPriorityDesc();
+
+        var activeProfile = profileService.getActiveProfileId().flatMap(profileService::findById).orElse(null);
+        Set<Long> profileCategories = activeProfile == null ? Set.of() : activeProfile.getCategories().stream()
+                .map(Category::getId).collect(Collectors.toSet());
+        Map<Long, List<Category>> visibleCategories = new HashMap<>();
 
         Locale locale = Locale.forLanguageTag(appLocale);
         Collator collator = Collator.getInstance(locale);
@@ -76,7 +84,7 @@ public class CategoryGroupController {
         groups.forEach(g -> {
 
             List<Category> sorted = g.getCategories().stream()
-                    .filter(cat -> !cat.isArchived()) // ✅ sadece archived=false olanlar
+                    .filter(cat -> !cat.isArchived() && (activeProfile == null || profileCategories.contains(cat.getId())))
                     .peek(cat -> {
                         CategoryEntryStatsDto dto = statsMap.get(cat.getId());
                         if (dto != null) {
@@ -95,11 +103,16 @@ public class CategoryGroupController {
                     })
                     .sorted(Comparator.comparing(Category::getName, collator))
                     .collect(Collectors.toList());
-            g.setCategories(sorted);
+            visibleCategories.put(g.getId(), sorted);
 
         });
 
+        if (activeProfile != null) {
+            groups = groups.stream().filter(group -> !visibleCategories.get(group.getId()).isEmpty()).toList();
+            model.addAttribute("activeProfileName", activeProfile.getName());
+        }
         model.addAttribute("groups", groups);
+        model.addAttribute("visibleCategories", visibleCategories);
         return "category-groups/category-group-list";
     }
 

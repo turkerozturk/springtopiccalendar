@@ -27,6 +27,8 @@ import com.turkerozturk.dtt.dto.Gender;
 import com.turkerozturk.dtt.entity.Setting;
 import com.turkerozturk.dtt.service.SettingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,78 +46,33 @@ public class SettingController {
 
         model.addAttribute("settings", settingService.findAll());
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("<br/>");
-        sb.append("Programdaki bazı değişkenler bu sayfadan ayarlanırsa, onlar için application.properties dosyası veya kodlar içine gömülmüş varsayılan değerler yerine, buradaki değerler geçerli olacaktır. Örnekler:");
-        sb.append("<br/>");
-        sb.append("");
-        sb.append("<br/>");
-        sb.append("Kalori Hesaplamasında Kullanılanlar");
-        sb.append("<dl>");
-
-        sb.append("<dt>");
-        sb.append("human.age");
-        sb.append("<dd/>");
-        sb.append("Yaş");
-
-
-        sb.append("<dt>");
-        sb.append("human.gender");
-        sb.append("<dd/>");
-        for (Gender g : Gender.values()) {
-            sb.append(g.toString());
-            sb.append("&nbsp;");
-        }
-        sb.append("<dt>");
-        sb.append("human.height");
-        sb.append("<dd/>");
-        sb.append("Boy");
-
-        sb.append("<dt>");
-        sb.append("human.ActivityLevel");
-        sb.append("<dd>");
-
-        for (ActivityLevel a :ActivityLevel.values()) {
-            sb.append(a.toString());
-            sb.append("&nbsp;");
-            sb.append(a.getMultiplier());
-            sb.append("<br/>");
-        }
-        sb.append("");
-        sb.append("<br/>");
-        sb.append("");
-        sb.append("<br/>");
-        sb.append("");
-
-        String helpText = sb.toString();
-
-        model.addAttribute("helpText", helpText);
+        model.addAttribute("genders", Gender.values());
+        model.addAttribute("activityLevels", ActivityLevel.values());
 
         return "settings/index";
     }
 
     @PostMapping("/save")
     @ResponseBody
-    public ResponseEntity<?> save(
-            @RequestParam(required = false) Long id,
-            @RequestParam String key,
-            @RequestParam String value
-    ) {
+    public ResponseEntity<String> save(@RequestParam(required = false) Long id,
+                                       @RequestParam String key, @RequestParam String value) {
+        if (key.isBlank()) {
+            return ResponseEntity.badRequest().body("Enter a setting key.");
+        }
 
-
-        Setting setting;
-
-        if (id != null) {
-            setting = settingService.findById(id);
-        } else {
-            setting = new Setting();
+        Setting setting = id == null ? new Setting() : settingService.findById(id).orElse(null);
+        if (setting == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("This setting no longer exists.");
         }
 
         setting.setKey(key);
         setting.setValue(value);
 
-        settingService.save(setting);
-
+        try {
+            settingService.save(setting);
+        } catch (SettingService.DuplicateKeyException | DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("A setting with this key already exists.");
+        }
         return ResponseEntity.ok().build();
     }
 
