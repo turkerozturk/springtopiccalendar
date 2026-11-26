@@ -20,65 +20,56 @@
  */
 package com.turkerozturk.dtt.controller;
 
-import com.turkerozturk.dtt.dto.NoteSearchResultDTO;
 import com.turkerozturk.dtt.service.NoteSearchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/search")
 public class NoteSearchController {
+    private final NoteSearchService noteSearchService;
 
-    @Autowired
-    private NoteSearchService noteSearchService;
-
-    @GetMapping
-    public String searchPage() {
-
-        return "search"; // search.html Thymeleaf sayfası
-    }
-
-    @GetMapping("/results")
-    public String searchResults(@RequestParam(name = "q") String searchTerm,
-                                @RequestParam(defaultValue = "false") boolean exactMatch,
-                                @RequestParam(defaultValue = "0") int page,
-                                @RequestParam(defaultValue = "10") int pageSize,
-                                Model model) {
-
-
-        //System.out.println(exactMatch + ", " + q);
-        List<NoteSearchResultDTO> results = noteSearchService.search(searchTerm, exactMatch, page, pageSize);
-
-        long noteCount = results.size();
-        /*
-        long totalMatches = results.stream()
-                .mapToLong(r -> ((String) r.get("html"))
-                        .split("(?i)" + Pattern.quote(searchTerm)).length - 1)
-                .sum();
-        */
-
-        model.addAttribute("results", results);
-        model.addAttribute("query", searchTerm);
+    @GetMapping({"", "/results"})
+    public String search(@RequestParam(name = "q", defaultValue = "") String query,
+                         @RequestParam(defaultValue = "false") boolean exactMatch,
+                         @RequestParam(defaultValue = "0") int page,
+                         @RequestParam(defaultValue = "10") int pageSize,
+                         jakarta.servlet.http.HttpServletRequest servletRequest,
+                         Model model) {
+        query = query.strip();
+        model.addAttribute("query", query);
         model.addAttribute("exactMatch", exactMatch);
-        //model.addAttribute("noteCount", noteCount);
-        //model.addAttribute("totalMatches", totalMatches);
-        model.addAttribute("page", page);
-        model.addAttribute("hasMore", noteCount == pageSize);
-
-        return "fragments/search-results :: results";
+        page = Math.max(0, page);
+        pageSize = Math.max(1, Math.min(100, pageSize));
+        model.addAttribute("pageSize", pageSize);
+        if (page > (Integer.MAX_VALUE - pageSize) / pageSize) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        if (!query.isBlank()) {
+            var result = noteSearchService.search(query, exactMatch, PageRequest.of(page, pageSize));
+            model.addAttribute("results", result.getContent());
+            model.addAttribute("resultPage", page);
+            model.addAttribute("resultReturnPath", path(query, exactMatch, page, pageSize));
+            model.addAttribute("previousPath", result.hasPrevious() ? path(query, exactMatch, page - 1, pageSize) : null);
+            model.addAttribute("nextPath", result.hasNext() ? path(query, exactMatch, page + 1, pageSize) : null);
+            model.addAttribute("emptyMessage", "No matching notes on this page.");
+        }
+        return "/search/results".equals(servletRequest.getServletPath()) ? "fragments/entry-results :: results" : "search";
     }
 
-
-
+    private String path(String query, boolean exactMatch, int page, int size) {
+        return UriComponentsBuilder.fromPath("/search")
+                .queryParam("q", "{query}").queryParam("exactMatch", exactMatch)
+                .queryParam("page", page).queryParam("pageSize", size)
+                .encode().buildAndExpand(query).toUriString();
+    }
 }
-

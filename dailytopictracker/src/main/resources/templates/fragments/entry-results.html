@@ -1,63 +1,50 @@
-<div th:fragment="results">
-
-    <div th:if="${#lists.isEmpty(results)}">
-        <div class="alert alert-warning">Sonuç bulunamadı.</div>
-    </div>
-
-    <div th:each="r : ${results}" class="card note-card mb-3">
-        <h5>
-            <i class="fa-solid fa-square" th:classappend="${'status-fg-' + r.status}"></i>
-            <a th:href="@{/entries(topicId=${r.topicId})}" th:text="${r.topicName}" target="_blank"></a>
-        </h5>
-
-        <div th:utext="${r.html}"></div>
-
-        <div class="meta mt-2">
-            <p style="text-align:right;">
-                <a th:href="@{/entry-filter/form?categoryId={id}(id=${r.categoryId})}">
-                    <span th:text="${r.categoryName}"></span>
-                </a>
-                <br>
-                <a th:href="@{/entries/edit/{id}(id=${r.entryId},
-                                            categoryId=${r.categoryId},
-                                            topicId=${r.topicId},
-                                            returnPage=entries)}"
-                   target="_blank" rel="noopener noreferrer"
-                   title="Edit Entry">
-                    <span th:text="${r.date}"></span>
-                </a>
-            </p>
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="results">
+    <th:block th:if="${results != null}">
+        <div th:replace="~{::resultPagination}"></div>
+        <p th:if="${results.isEmpty()}" class="bg-body border rounded p-3" th:text="${emptyMessage}"></p>
+        <article class="card result-card mb-3" th:each="r : ${results}"
+                 th:id="${r.entryId != null ? 'result-entry-' + r.entryId : null}">
+            <div class="card-body">
+                <header class="mb-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-baseline">
+                        <h3 class="h5 mb-0">
+                            <a th:if="${r.topicId != null}" th:href="@{/topics/{id}(id=${r.topicId})}"
+                               th:text="${r.topicName}"></a>
+                            <span th:unless="${r.topicId != null}">Entry</span>
+                        </h3>
+                        <span class="badge rounded-pill"
+                              th:classappend="${r.status == 1 ? 'text-bg-success' : (r.status == 2 ? 'text-bg-warning' : 'text-bg-secondary')}"
+                              th:text="${r.status == 1 ? 'Done' : (r.status == 2 ? 'Warning' : 'Not marked')}"></span>
+                    </div>
+                    <div class="small text-body-secondary mt-1 d-flex flex-wrap gap-2">
+                        <time th:if="${!r.date.isEmpty()}" th:attr="datetime=${r.date}" th:text="${r.date}"></time>
+                        <span th:if="${r.date.isEmpty()}">No date</span>
+                        <a th:if="${r.categoryId != null}" th:href="@{/entry-filter/form(categoryId=${r.categoryId})}"
+                           th:text="${r.categoryName}" title="Category tracker"></a>
+                    </div>
+                </header>
+                <div th:if="${!r.html.isBlank()}" class="result-body" th:utext="${r.html}"></div>
+                <p th:if="${r.html.isBlank()}" class="small text-body-secondary">No note</p>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                    <a th:if="${r.topicId != null}" class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entries(topicId=${r.topicId})}">Topic entries</a>
+                    <a th:if="${r.entryId != null}" class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entries/edit/{id}(id=${r.entryId},categoryId=${r.categoryId},returnPage='entryBrowse',
+                                                       browseReturn=${resultReturnPath})}">Edit</a>
+                </div>
+            </div>
+        </article>
+        <div th:if="${!results.isEmpty()}">
+            <div th:replace="~{::resultPagination}"></div>
         </div>
-    </div>
-
-
-    <div class="text-center mt-3" th:if="${hasMore}">
-        <button class="btn btn-outline-secondary"
-                th:with="
-                tId=${topicId != null ? topicId : 0},
-                cId=${categoryId != null ? categoryId : 0},
-                cgId=${categoryGroupId != null ? categoryGroupId : 0},
-                cpId=${categoryProfileId != null ? categoryProfileId : 0},
-                joinedTopicIds=${topicIds != null ? #strings.arrayJoin(topicIds, ',') : ''}"
-                th:hx-get="@{/entry-results(
-                topicId=${tId},
-                categoryId=${cId},
-                categoryGroupId=${cgId},
-                categoryProfileId=${cpId},
-                topicIds=${joinedTopicIds},
-                page=${page+1}
-            )}"
-                hx-target="#results"
-                hx-swap="beforeend"
-                hx-trigger="revealed">
-            ...
-        </button>
-    </div>
-
-
-
-
-
-
-
+    </th:block>
 </div>
+
+<nav th:fragment="resultPagination" th:if="${previousPath != null or nextPath != null}"
+     aria-label="Result pages" class="d-flex flex-wrap align-items-center gap-2 my-2 p-2 rounded border bg-body">
+    <a th:if="${previousPath != null}" class="btn btn-sm btn-outline-secondary" rel="prev"
+       th:href="@{${previousPath}}">Previous</a>
+    <span class="small" th:text="|Page ${resultPage + 1}|"></span>
+    <a th:if="${nextPath != null}" class="btn btn-sm btn-outline-secondary" rel="next"
+       th:href="@{${nextPath}}">Next</a>
+</nav>

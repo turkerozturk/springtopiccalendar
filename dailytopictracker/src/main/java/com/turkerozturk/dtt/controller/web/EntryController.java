@@ -1228,6 +1228,7 @@ public class EntryController {
             @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
             @RequestParam(required = false) Long listCategoryId,
             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
+            @RequestParam(required = false) String browseReturn,
             @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
             Model model) {
 
@@ -1289,7 +1290,7 @@ public class EntryController {
             model.addAttribute("categoryGroupId", categoryGroupId);
         }
 
-        addEntryListReturn(model, returnPage, entryListLocation, entry);
+        addEntryReturn(model, returnPage, entryListLocation, browseReturn, entry);
         return "entries/entry-form";
     }
 
@@ -1319,14 +1320,15 @@ public class EntryController {
                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                             LocalDate topicEntryDate,
                             @ModelAttribute("historyFilter") TopicHistoryFilter historyFilter,
+                            @RequestParam(required = false) String browseReturn,
                             @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
                             Model model,
                             HttpServletRequest request) {
 
         String returnPage = request.getParameter("returnPage");
         boolean fromTopic = returnsToTopic(returnPage) && formEntry.getId() == null;
-        boolean fromEntryList = "entryList".equals(returnPage);
-        if (fromTopic || fromEntryList) {
+        boolean hasReturnLocation = "entryList".equals(returnPage) || "entryBrowse".equals(returnPage);
+        if (fromTopic || hasReturnLocation) {
             Long topicId = formEntry.getTopic() == null ? null : formEntry.getTopic().getId();
             Topic topic = topicId == null ? null : topicService.getByIdOrNull(topicId);
             if (topic == null || topicEntryDate == null) {
@@ -1335,7 +1337,7 @@ public class EntryController {
             formEntry.setTopic(topic);
             formEntry.setDateMillisYmd(topicEntryDate.atStartOfDay(timeZoneProvider.getZoneId()).toInstant().toEpochMilli());
         }
-        addEntryListReturn(model, returnPage, entryListLocation, formEntry);
+        addEntryReturn(model, returnPage, entryListLocation, browseReturn, formEntry);
         // start **** category id nin elde edilmesi (ugly code)
         // 1) Burada önce formdan gelen categoryId değerini alıyoruz:
         String paramCategoryId = request.getParameter("categoryId");
@@ -1404,7 +1406,7 @@ public class EntryController {
             Entry dbEntry = entryRepository.findById(formEntry.getId())
                     .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + formEntry.getId()));
 
-            if (fromEntryList && topicEntryDate.equals(dbEntry.getDate())) {
+            if (hasReturnLocation && topicEntryDate.equals(dbEntry.getDate())) {
                 dateMillisYmd = dbEntry.getDateMillisYmd();
                 formEntry.setDateMillisYmd(dateMillisYmd);
             }
@@ -1458,8 +1460,8 @@ public class EntryController {
 
 
 
-        if (fromEntryList) {
-            return "redirect:" + entryListLocation.path(formEntry.getId());
+        if (hasReturnLocation) {
+            return "redirect:" + entryReturnPath(returnPage, entryListLocation, browseReturn, formEntry.getId());
         }
 
         if (fromTopic) {
@@ -1507,7 +1509,8 @@ public class EntryController {
                                @RequestParam(name="topicId", required=false) Long topicId,
                                @RequestParam(name="returnPage", required=false) String returnPage,
                                @RequestParam(name="categoryId", required=false) Long categoryId,
-                               @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
+                               @RequestParam(required = false) String browseReturn,
+                              @ModelAttribute("entryListLocation") EntryListLocation entryListLocation,
                                Model model) {
         Entry entry = entryRepository.findById(entryId)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + entryId));
@@ -1534,15 +1537,24 @@ public class EntryController {
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("topicId", topicId);
 
-        addEntryListReturn(model, returnPage, entryListLocation, entry);
+        addEntryReturn(model, returnPage, entryListLocation, browseReturn, entry);
         return "entries/entry-form";
     }
 
-    private void addEntryListReturn(Model model, String returnPage, EntryListLocation location, Entry entry) {
-        if ("entryList".equals(returnPage)) {
-            model.addAttribute("entryListReturnPath", location.path(entry.getId()));
+    private void addEntryReturn(Model model, String returnPage, EntryListLocation location, String browseReturn, Entry entry) {
+        String path = entryReturnPath(returnPage, location, browseReturn, entry.getId());
+        if (path != null) {
+            model.addAttribute("entryReturnPath", path);
+            model.addAttribute("browseReturn", browseReturn);
             model.addAttribute("topicEntryDate", entry.getDate());
         }
+    }
+
+    private String entryReturnPath(String returnPage, EntryListLocation location, String browseReturn, Long entryId) {
+        if ("entryList".equals(returnPage)) {
+            return location.path(entryId);
+        }
+        return "entryBrowse".equals(returnPage) ? EntryBrowseReturn.path(browseReturn, entryId) : null;
     }
 
     @GetMapping("/editByDate")
@@ -1590,8 +1602,11 @@ public class EntryController {
     @RequestMapping(value = "/delete/{id}", method = {RequestMethod.GET, RequestMethod.POST})
     public String deleteEntry(@PathVariable Long id,
                               @RequestParam(name="returnPage", required=true) String returnPage,
+                              @RequestParam(required = false) String browseReturn,
                               @ModelAttribute("entryListLocation") EntryListLocation entryListLocation) {
 
+
+        String redirectPath = entryReturnPath(returnPage, entryListLocation, browseReturn, null);
 
         Entry entry = entryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entry bulunamadı: " + id));
@@ -1609,8 +1624,8 @@ public class EntryController {
         // predictionDate'i tekrar hesapla ve kaydet
         topicService.updateTopicStatus(topicId);
 
-        if ("entryList".equals(returnPage)) {
-            return "redirect:" + entryListLocation.path(null);
+        if (redirectPath != null) {
+            return "redirect:" + redirectPath;
         }
 
         return "redirect:/entries/redirect"

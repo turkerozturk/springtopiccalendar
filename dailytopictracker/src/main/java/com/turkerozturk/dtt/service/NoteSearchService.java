@@ -31,9 +31,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import java.util.List;
-import java.util.Map;
+
 
 /**
  * hibernate search kullanir
@@ -49,7 +51,7 @@ public class NoteSearchService {
     @Autowired
     private MarkdownService markdownService;
 
-    public List<NoteSearchResultDTO> search(String term, boolean exactMatch, int page, int size) {
+    public Slice<NoteSearchResultDTO> search(String term, boolean exactMatch, Pageable page) {
         var searchSession = org.hibernate.search.mapper.orm.Search.session(entityManager);
 
         var query  = searchSession.search(Note.class);
@@ -71,10 +73,10 @@ public class NoteSearchService {
                     }
                 })
                         .sort(f -> f.field("idSort").desc()) // burada "idSort" kullan
-                        .fetchHits(page * size, size);
+                        .fetchHits(Math.toIntExact(page.getOffset()), page.getPageSize() + 1);
 
 
-        return result.stream().map(note -> {
+        List<NoteSearchResultDTO> hits = result.stream().limit(page.getPageSize()).map(note -> {
             var entry = note.getEntry();
             var topic = entry != null ? entry.getTopic() : null;
             var category = topic != null ? topic.getCategory() : null;
@@ -94,6 +96,7 @@ public class NoteSearchService {
                     category != null ? category.getName() : ""
             );
         }).toList();
+        return new SliceImpl<>(hits, page, result.size() > page.getPageSize());
     }
 
 

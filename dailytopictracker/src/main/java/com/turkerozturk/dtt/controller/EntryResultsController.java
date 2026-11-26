@@ -20,23 +20,28 @@
  */
 package com.turkerozturk.dtt.controller;
 
-import com.turkerozturk.dtt.dto.NoteSearchResultDTO;
+import com.turkerozturk.dtt.entity.Category;
+import com.turkerozturk.dtt.entity.CategoryGroup;
+import com.turkerozturk.dtt.entity.CategoryProfile;
 import com.turkerozturk.dtt.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-
-
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/entry-results")
 public class EntryResultsController {
+    private static final int PAGE_SIZE = 10;
 
     private final EntryResultService entryResultService;
     private final TopicService topicService;
@@ -44,87 +49,73 @@ public class EntryResultsController {
     private final CategoryGroupService categoryGroupService;
     private final CategoryProfileService categoryProfileService;
 
-    /**
-     * Sayfa görünümü (ilk yükleme)
-     */
-    @GetMapping("/page")
-    public String showPage(@RequestParam(required = false) Long topicId,
-                           @RequestParam(required = false) Long categoryId,
-                           @RequestParam(required = false) Long categoryGroupId,
-                           @RequestParam(required = false) Long categoryProfileId,
-                           @RequestParam(required = false) List<Long> topicIds,
+    @GetMapping({"", "/page"})
+    public String showPage(@ModelAttribute("filter") BlogFilter filter,
+                           @RequestParam(defaultValue = "0") int page,
+                           @RequestHeader(name = "HX-Request", required = false) String htmx,
                            Model model) {
+        int pageIndex = Math.max(0, page);
+        if (pageIndex > Integer.MAX_VALUE / PAGE_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        var request = PageRequest.of(pageIndex, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "dateMillisYmd", "id"));
+        var result = entryResultService.browse(filter.topicId(), filter.categoryId(), filter.categoryGroupId(),
+                filter.categoryProfileId(), filter.topicIds(), request);
 
-        // Başlık veya açıklama için context nesnesi
-        if (topicId != null) {
-            topicService.findById(topicId).ifPresent(t -> model.addAttribute("topic", t));
-        } else if (categoryId != null) {
-            categoryService.findById(categoryId).ifPresent(c -> model.addAttribute("category", c));
-        } else if (categoryGroupId != null) {
-            categoryGroupService.findById(categoryGroupId).ifPresent(g -> model.addAttribute("categoryGroup", g));
-        } else if (categoryProfileId != null) {
-            categoryProfileService.findById(categoryProfileId).ifPresent(p -> model.addAttribute("categoryProfile", p));
-        } else if (topicIds != null && !topicIds.isEmpty()) {
-            model.addAttribute("topicIds", topicIds);
+        model.addAttribute("results", result.getContent());
+        model.addAttribute("resultPage", pageIndex);
+        model.addAttribute("resultReturnPath", filter.path(pageIndex));
+        model.addAttribute("previousPath", result.hasPrevious() ? filter.path(pageIndex - 1) : null);
+        model.addAttribute("nextPath", result.hasNext() ? filter.path(pageIndex + 1) : null);
+        model.addAttribute("emptyMessage", "No entries on this page.");
+
+        if ("true".equalsIgnoreCase(htmx)) {
+            return "fragments/entry-results :: results";
         }
 
+        if (filter.topicId() != null) {
+            topicService.findById(filter.topicId()).ifPresent(topic -> {
+                model.addAttribute("topic", topic);
+                model.addAttribute("scopeName", topic.getName());
+            });
+        } else if (filter.categoryId() != null) {
+            model.addAttribute("scopeName", categoryService.findById(filter.categoryId())
+                    .map(Category::getName).orElse("Category"));
+        } else if (filter.categoryGroupId() != null) {
+            model.addAttribute("scopeName", categoryGroupService.findById(filter.categoryGroupId())
+                    .map(CategoryGroup::getName).orElse("Category group"));
+        } else if (filter.categoryProfileId() != null) {
+            model.addAttribute("scopeName", categoryProfileService.findById(filter.categoryProfileId())
+                    .map(CategoryProfile::getName).orElse("Category profile"));
+        } else if (filter.topicIds() != null && !filter.topicIds().isEmpty()) {
+            model.addAttribute("scopeName", "Selected topics");
+        }
         return "entry-results-page";
     }
 
-    /**
-     * Fragment (hx-get ile sonuçları çeken endpoint)
-     */
-    @GetMapping
-    public String getEntries(@RequestParam(required = false) Long topicId,
-                             @RequestParam(required = false) Long categoryId,
-                             @RequestParam(required = false) Long categoryGroupId,
-                             @RequestParam(required = false) Long categoryProfileId,
-                             @RequestParam(required = false) List<Long> topicIds,
-                             @RequestParam(defaultValue = "0") int page,
-                             Model model) {
-
-        int pageSize = 10;
-        List<NoteSearchResultDTO> results;
-        boolean hasMore;
-
-
-        // 0 değerlerini null’a dönüştür
-        if (topicId != null && topicId == 0) topicId = null;
-        if (categoryId != null && categoryId == 0) categoryId = null;
-        if (categoryGroupId != null && categoryGroupId == 0) categoryGroupId = null;
-        if (categoryProfileId != null && categoryProfileId == 0) categoryProfileId = null;
-        if (topicIds != null && topicIds.isEmpty()) topicIds = null;
-
-        // --- Öncelik sırasına göre hangi sorgu yapılacaksa ---
-        if (topicId != null) {
-            results = entryResultService.getEntriesByTopic(topicId, page, pageSize);
-            hasMore = entryResultService.hasMoreByTopic(topicId, page, pageSize);
-        } else if (categoryId != null) {
-            results = entryResultService.getEntriesByCategoryId(categoryId, page, pageSize);
-            hasMore = entryResultService.hasMoreByCategory(categoryId, page, pageSize);
-        } else if (categoryGroupId != null) {
-            results = entryResultService.getEntriesByCategoryGroupId(categoryGroupId, page, pageSize);
-            hasMore = entryResultService.hasMoreByCategoryGroup(categoryGroupId, page, pageSize);
-        } else if (categoryProfileId != null) {
-            results = entryResultService.getEntriesByCategoryProfileId(categoryProfileId, page, pageSize);
-            hasMore = entryResultService.hasMoreByCategoryProfile(categoryProfileId, page, pageSize);
-        } else if (topicIds != null && !topicIds.isEmpty()) {
-            results = entryResultService.getEntriesByTopics(topicIds, page, pageSize);
-            hasMore = entryResultService.hasMoreByTopics(topicIds, page, pageSize);
-        } else {
-            results = entryResultService.getAllEntries(page, pageSize);
-            hasMore = entryResultService.hasMoreAll(page, pageSize);
+    public record BlogFilter(Long topicId, Long categoryId, Long categoryGroupId,
+                             Long categoryProfileId, List<Long> topicIds) {
+        public BlogFilter {
+            topicId = normalize(topicId);
+            categoryId = normalize(categoryId);
+            categoryGroupId = normalize(categoryGroupId);
+            categoryProfileId = normalize(categoryProfileId);
         }
 
-        model.addAttribute("results", results);
-        model.addAttribute("hasMore", hasMore);
-        model.addAttribute("page", page);
-        model.addAttribute("topicId", topicId);
-        model.addAttribute("categoryId", categoryId);
-        model.addAttribute("categoryGroupId", categoryGroupId);
-        model.addAttribute("categoryProfileId", categoryProfileId);
-        model.addAttribute("topicIds", topicIds);
+        private String path(int page) {
+            var uri = UriComponentsBuilder.fromPath("/entry-results/page")
+                    .queryParamIfPresent("topicId", Optional.ofNullable(topicId))
+                    .queryParamIfPresent("categoryId", Optional.ofNullable(categoryId))
+                    .queryParamIfPresent("categoryGroupId", Optional.ofNullable(categoryGroupId))
+                    .queryParamIfPresent("categoryProfileId", Optional.ofNullable(categoryProfileId));
+            if (topicIds != null && !topicIds.isEmpty()) {
+                uri.queryParam("topicIds", topicIds);
+            }
+            return uri.queryParam("page", page).build().toUriString();
+        }
 
-        return "fragments/entry-results :: results";
+        private static Long normalize(Long value) {
+            return Long.valueOf(0L).equals(value) ? null : value;
+        }
     }
 }

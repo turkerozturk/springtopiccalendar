@@ -1,0 +1,17 @@
+.result-page {
+    max-width: 58rem;
+    overflow-wrap: anywhere;
+}
+.result-body img {
+    max-width: 100%;
+    height: auto;
+}
+.result-body pre {
+    white-space: pre-wrap;
+}
+.result-card {
+    scroll-margin-top: 1rem;
+}
+.result-card:target {
+    border-color: var(--bs-primary);
+}

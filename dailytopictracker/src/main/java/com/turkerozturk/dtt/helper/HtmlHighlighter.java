@@ -79,18 +79,13 @@ public class HtmlHighlighter {
 
             if (!matcher.find()) continue; // eşleşme yoksa geç
 
-            StringBuffer sb = new StringBuffer();
+            int start = 0;
             do {
-                matcher.appendReplacement(sb,
-                        "<mark>" + Matcher.quoteReplacement(matcher.group()) + "</mark>");
+                textNode.before(new TextNode(text.substring(start, matcher.start())));
+                textNode.before(new Element("mark").text(matcher.group()));
+                start = matcher.end();
             } while (matcher.find());
-            matcher.appendTail(sb);
-
-            // Yeni fragmanı parse et ve orijinal düğümü değiştir
-            List<Node> replacementNodes = Jsoup.parseBodyFragment(sb.toString()).body().childNodes();
-            for (Node rn : replacementNodes) {
-                textNode.before(rn);
-            }
+            textNode.before(new TextNode(text.substring(start)));
             textNode.remove();
         }
 
