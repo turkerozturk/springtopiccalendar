@@ -53,6 +53,7 @@
         <!-- preserve returnPage -->
         <input type="hidden" name="returnPage" th:value="${returnPage}"/>
         <input th:if="${listReturn != null}" type="hidden" name="listReturn" th:value="${listReturn}">
+        <input th:if="${categoryReturn != null}" type="hidden" name="categoryReturn" th:value="${categoryReturn}">
 
         <!--/* dateMillisYmd yi bu topic formda sadece food.html kalori takip sayfasinda dogru gune geri donmek icin kullaniyoruz */-->
         <input type="hidden" id="dateMillisYmd" name="dateMillisYmd" th:value="${dateMillisYmd}" />

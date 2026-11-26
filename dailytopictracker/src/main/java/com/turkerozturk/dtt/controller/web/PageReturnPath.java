@@ -18,6 +18,14 @@ final class PageReturnPath {
         return value == null || value.isEmpty() ? null : localPath(value, "/topics");
     }
 
+    static String categoryList(String value) {
+        return value == null || value.isEmpty() ? null : localPath(value, "/categories");
+    }
+
+    static String categoryAnchor(String path, long categoryId) {
+        return path + "#category-" + categoryId;
+    }
+
     static String topicAnchor(String path, long topicId) {
         return path + "#topic-" + topicId;
     }

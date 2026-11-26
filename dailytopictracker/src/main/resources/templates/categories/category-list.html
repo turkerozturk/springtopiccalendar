@@ -1,308 +1,132 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
-    This file is part of the DailyTopicTracker project.
-    Please refer to the project's README.md file for additional details.
-    https://github.com/turkerozturk/springtopiccalendar
-    -->
-    <meta charset="UTF-8"/>
-
-    <!-- favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/datatables/2.3.0/css/dataTables.jqueryui.min.css}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Categories</title>
-
-
-    <style>
-        body {
-         background-color: [[${htmlBackgroundColor}]];
-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M41 37.59V25h-2v12.59l-8.9-8.9-1.41 1.41 8.9 8.9H25v2h12.59l-8.9 8.9 1.41 1.41 8.9-8.9V55h2V42.41l8.9 8.9 1.41-1.41-8.9-8.9H55v-2H42.41l8.9-8.9-1.41-1.41-8.9 8.9zM1 1h2v2H1V1zm0 4h2v2H1V5zm0 4h2v2H1V9zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm0 4h2v2H1v-2zm4 0h2v2H5v-2zm4 0h2v2H9v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM5 1h2v2H5V1zm4 0h2v2H9V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm4 0h2v2h-2V1zm0 4h2v2h-2V5zm0 4h2v2h-2V9zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zM5 5h70v70H5V5zm2 68h66V7H7v66zM9 9h62v62H9V9zm2 60h58V11H11v58zm2-39.6V13h16.4A29.1 29.1 0 0 0 13 29.4zM15 15v6.67A31.17 31.17 0 0 1 21.67 15H15zm-2 52V50.6A29.1 29.1 0 0 0 29.4 67H13zm2-8.67V65h6.67A31.17 31.17 0 0 1 15 58.33zM67 67H50.6A29.1 29.1 0 0 0 67 50.6V67zm-8.67-2H65v-6.67A31.17 31.17 0 0 1 58.33 65zM67 13v16.4A29.1 29.1 0 0 0 50.6 13H67zm-2 8.67V15h-6.67A31.17 31.17 0 0 1 65 21.67zM39 13h2v2h-2v-2zm7.02.66l1.93.52-.51 1.93-1.94-.52.52-1.93zm6.61 2.46l1.74 1-1 1.73-1.74-1 1-1.73zm5.75 4.08l1.42 1.42-1.42 1.4-1.4-1.4 1.4-1.42zm4.5 5.43l1 1.74-1.73 1-1-1.74 1.73-1zm2.94 6.42l.52 1.93-1.93.52-.52-1.94 1.93-.51zM67 39v2h-2v-2h2zm-.66 7.02l-.52 1.93-1.93-.51.52-1.94 1.93.52zm-2.46 6.61l-1 1.74-1.73-1 1-1.74 1.73 1zm-4.08 5.75l-1.42 1.42-1.4-1.42 1.4-1.4 1.42 1.4zm-5.43 4.5l-1.74 1-1-1.73 1.74-1 1 1.73zM41 67h-2v-2h2v2zm6.95-1.18l-1.93.52-.52-1.93 1.94-.52.51 1.93zm-13.97.52l-1.93-.52.51-1.93 1.94.52-.52 1.93zm-6.61-2.46l-1.74-1 1-1.73 1.74 1-1 1.73zm-5.75-4.08l-1.42-1.42 1.42-1.4 1.4 1.4-1.4 1.42zm-4.5-5.43l-1-1.74 1.73-1 1 1.74-1.73 1zm-2.94-6.42l-.52-1.93 1.93-.52.52 1.94-1.93.51zM13 41v-2h2v2h-2zm.66-7.02l.52-1.93 1.93.51-.52 1.94-1.93-.52zm2.46-6.61l1-1.74 1.73 1-1 1.74-1.73-1zm4.08-5.75l1.42-1.42 1.4 1.42-1.4 1.4-1.42-1.4zm5.43-4.5l1.74-1 1 1.73-1.74 1-1-1.73zm6.42-2.94l1.93-.52.52 1.93-1.94.52-.51-1.93zM40 63a23 23 0 1 1 0-46 23 23 0 0 1 0 46zm0-2a21 21 0 1 0 0-42 21 21 0 0 0 0 42zm0-2a19 19 0 1 1 0-38 19 19 0 0 1 0 38zm0-2a17 17 0 1 0 0-34 17 17 0 0 0 0 34z'/%3E%3C/g%3E%3C/svg%3E");
-
-                }
-
-
-                .fonbg {
-                    background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-                }
-
-                #categoriesTable {
-
-                  background-color: WhiteSmoke;
-                  border: 3px solid black;
-               }
-               /* Mevcut link stilleri korundu */
-               a {
-                   text-decoration: none;
-                   color: inherit;
-               }
-               a:visited {
-                   color: inherit;
-               }
-               a:hover {
-                   color: blue;
-               }
-
-               th {
-                   text-align: center;
-               }
-
-               /* Filtre satırına biraz görünüm kazandırmak isterseniz (opsiyonel) */
-               #topicsTable input.form-control {
-                   width: 100%; /* Hücrenin tamamını kaplasın */
-               }
-
-               .css-archived {
-                  background-color: Salmon !important;
-               }
-
-
-
-
-
-         #navigation-panel button, a{
-           border-radius:10px !important;
-         }
-
-
-        #navigation-panel {
-            max-width: 740px;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 3px;
-            border: 2px solid DarKGray;
-            border-radius: 7px 7px 7px 7px;
-
-            /* https://cssgradient.io/ */
-
-            background: #a7d6e8;
-            background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 206, 1) 33%, rgba(242, 209, 203, 1) 66%, rgba(209, 209, 209, 0.50) 100%);
-         }
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon-180x180.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <style th:inline="css">
+        body { background-color: /*[[${htmlBackgroundColor}]]*/ #f4f5f7; }
+        .categories-page { max-width: 62rem; overflow-wrap: anywhere; }
+        .category-row { scroll-margin-top: 1rem; }
+        .category-row:target { box-shadow: inset .25rem 0 var(--bs-primary); background: var(--bs-primary-bg-subtle); }
+        .category-identity { min-width: 0; }
     </style>
-
-    <style>
-        #categoriesTable th:nth-child(1),
-        #categoriesTable td:nth-child(1) {
-          max-width: 6ch;
-          text-align: right;
-          white-space: nowrap;
-        }
-
-        #categoriesTable th:nth-child(3),
-        #categoriesTable td:nth-child(3) {
-          max-width: 5ch;
-          text-align: right;
-          white-space: nowrap;
-        }
-
-        #categoriesTable th:nth-child(2),
-        #categoriesTable td:nth-child(2) {
-          width: 100%; /* kalan alanı alsın */
-        }
-
-    </style>
-
-
-
-
-
-
 </head>
 <body>
-
-<div  id="navigation-panel">
+<div class="container categories-page mt-2">
     <div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
-    <div style="margin-top:4px;">
-        <a th:href="@{/categories/create(returnPage='categories')}"
-           class="btn btn-secondary btn-sm" style="color:white;"><i class="fa-solid fa-circle-plus"></i> New Category</a>
-
-    </div>
 </div>
-
-<div class="container my-2" style="max-width: 800px;">
-
-    <h1><span class="fonbg">Categories</span></h1>
-
-    <!-- Hata mesajı varsa göster -->
-    <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert">
-        <p th:text="${errorMessage}"></p>
-    </div>
-
-
-    <div style="background-color:rgba(203, 231, 242, 0.50);">
-
-    <!-- Tablo -->
-    <table id="categoriesTable" class="table table-striped table-bordered table-sm">
-        <thead>
-        <tr>
-
-            <th style="cursor: pointer;" title="Category ID">ID</th>
-
-
-            <th style="cursor: pointer;" title="Category Name">Category</th>
-
-
-            <th style="cursor: pointer;" title="Topics Count">
-                <i class="fa fa-list-ol"></i>
-            </th>
-
-
-
-
-
-
-
-
-            <!-- <th>#</th> -->
-        </tr>
-
-
-        </thead>
-        <tbody>
-        <!-- "categories" model attribute'undan gelen CategoryDTO listesi -->
-        <tr th:each="cat, iStat : ${categories}" th:with="zeroPaddedCategoryId=${#numbers.formatInteger(cat.id, 4)}">
-
-            <td class="text-center">
-                <span th:text="${zeroPaddedCategoryId}"></span>
-
-
-                <br/>
-                <i class="fa"
-                   th:classappend="${cat.archived} ? ' fa-eye-slash' : ' fa-eye' "
-                   th:style=" 'color: ' + (${cat.archived} ? ' gray;' : ' black;') "
-
-                   aria-hidden="true"></i>
-            </td>
-
-
-            <td>
-                <span th:text="${cat.name}"></span>
-                <br/>
-
-                <div>
-
-                    <a th:href="@{/categories/delete/{id}(id=${cat.id})}"
-                       title="Delete Category"
-                       onclick="return confirmDelete()">
-                        🗑
-                    </a>
-                    &nbsp;
-                    <!-- Her kategori satırında, yeni topic oluşturma linki -->
-                    <a th:href="@{/topics/create(categoryId=${cat.id})}"
-                       target="_blank" title="Add Topic">
-                        ＋
-                    </a>
-                    &nbsp;
-
-                    <a th:href="@{/topics(categoryId=${cat.id})}"
-                       target="_self" th:title="${cat.name}">☰
-                    </a>
-
-                    <a th:href="@{/entry-results/page(categoryId=${cat.id})}"
-                       title="Blog View"
-                       class="btn btn-secondary btn-sm"
-                       style="color:white;">
-                        <i class="fa-brands fa-readme" ></i>&nbsp;Blog View</a>
-                    &nbsp;
-
-                    <a th:if="${!cat.archived}"
-                       style="display: inline-block; white-space: normal;"
-                       th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}"
-                       >
-                        <i class="fa-solid fa-gear" style="color: #FFD43B;"></i>
-                    </a>
-
-
-
-                        <i th:if="${cat.archived}" class="fa-solid fa-gear" style="color: gray;"></i>
-
-                    &nbsp;
-
-                    <a th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage='categories')}" title="Edit Category">
-                        ✎
-                    </a>
+<main class="container categories-page my-3">
+    <header class="bg-body border rounded p-3 mb-3">
+        <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between mb-3">
+            <h1 class="h3 mb-0">Categories</h1>
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/category-groups}">Category groups</a>
+        </div>
+        <form method="get" th:action="@{/categories}" th:attr="hx-get=@{/categories}"
+              hx-trigger="submit, input changed delay:350ms from:#category-query, change from:#category-group, change from:#category-status, change from:#category-sort"
+              hx-target="#category-results" hx-swap="outerHTML" hx-sync="this:replace">
+            <div class="row g-2">
+                <div class="col-12 col-lg-4">
+                    <label for="category-query" class="form-label mb-1">Category name</label>
+                    <input id="category-query" name="q" type="search" class="form-control"
+                           th:value="${filter.q}" maxlength="160" autocomplete="off">
                 </div>
-            </td>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="category-group" class="form-label mb-1">Category group</label>
+                    <select id="category-group" name="groupId" class="form-select">
+                        <option value="">All groups</option>
+                        <option th:each="group : ${groups}" th:value="${group.id}" th:text="${group.name}"
+                                th:selected="${group.id == filter.groupId}"></option>
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label for="category-status" class="form-label mb-1">Status</label>
+                    <select id="category-status" name="archived" class="form-select">
+                        <option value="">All statuses</option>
+                        <option value="false" th:selected="${filter.archived == false}">Active</option>
+                        <option value="true" th:selected="${filter.archived == true}">Archived</option>
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="category-sort" class="form-label mb-1">Sort by</label>
+                    <select id="category-sort" name="sort" class="form-select">
+                        <option th:each="option : ${sortOptions}" th:value="${option.name()}" th:text="${option.label}"
+                                th:selected="${option == filter.sort}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a th:href="@{/categories}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </header>
 
-
-            <td th:text="${cat.topics.size()}" class="text-center align-middle">0</td>
-
-
-
-
-
-            <!-- thymeleaf in satir no indeksi ozelligi(sifirdan baslar)-->
-          <!--  <td th:text="${iStat.index + 1}">
-            </td>
-            -->
-        </tr>
-        </tbody>
-    </table>
-    </div>
-
-</div>
-
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-WebJars path'leri şu yapıyı izler:
-/webjars/{artifactId}/{version}/{dosya}
--->
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
- <script type="text/javascript" th:src="@{/webjars/datatables/2.3.0/js/dataTables.js}"></script>
-
-
-<!-- https://datatables.net/plug-ins/sorting/turkish-string -->
-<script src="https://cdn.datatables.net/plug-ins/2.3.2/sorting/turkish-string.js"></script>
-
-
-
-
-
-<script>
-    $(document).ready(function () {
-        let table = new DataTable('#categoriesTable', {
-            columnDefs: [
-                { targets: 0, width: "1%", className: "text-end" },  // ID
-                { targets: 1, width: "auto" },                       // Name
-                { targets: 2, width: "1%", className: "text-end" }   // Count
-            ],
-            paging: false,
-            scrollCollapse: true,
-            scrollX: false,
-            scrollY: 600
-        });
-    });
-</script>
-
-
-
-
-
-<script>
-    function confirmDelete() {
-        return confirm("Are you sure to delete this category?");
-    }
-</script>
-
-
-
-
-
+    <section id="category-results" th:fragment="results" aria-label="Category results" class="bg-body border rounded p-3">
+        <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+        <div th:if="${success != null}" class="alert alert-success" role="status" th:text="${success}"></div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <p th:if="${categoriesPage.hasContent()}" class="text-body-secondary mb-0" role="status"
+               th:text="|${categoriesPage.pageable.offset + 1}–${categoriesPage.pageable.offset + categoriesPage.numberOfElements} of ${categoriesPage.totalElements} categories|"></p>
+            <a th:unless="${groups.isEmpty()}" class="btn btn-sm btn-outline-primary"
+               th:href="@{/categories/create(categoryGroupId=${filter.groupId},listReturn=${listReturn})}">New category</a>
+        </div>
+        <nav th:fragment="categoryPagination" th:if="${categoriesPage.totalPages > 1}" aria-label="Category pages"
+             class="d-flex flex-wrap gap-2 align-items-center my-2">
+            <a th:if="${previousPath != null}" class="btn btn-sm btn-outline-secondary" rel="prev"
+               th:href="@{${previousPath}}">Previous</a>
+            <span class="small" th:text="|Page ${categoriesPage.number + 1} of ${categoriesPage.totalPages}|"></span>
+            <a th:if="${nextPath != null}" class="btn btn-sm btn-outline-secondary" rel="next"
+               th:href="@{${nextPath}}">Next</a>
+        </nav>
+        <p th:unless="${categoriesPage.hasContent()}" class="mb-0" role="status"
+           th:text="${groups.isEmpty() ? 'Create a category group before adding categories.' :
+                   (filter.q.isEmpty() and filter.groupId == null and filter.archived == null
+                   ? 'No categories yet.' : 'No categories match these filters.')}"></p>
+        <ul th:if="${categoriesPage.hasContent()}" class="list-group list-group-flush">
+            <li th:each="category : ${categoriesPage.content}" th:id="'category-' + ${category.id}"
+                class="category-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="category-identity">
+                    <div class="d-flex flex-wrap gap-2 align-items-baseline">
+                        <a class="fw-semibold" th:href="@{/topics(categoryId=${category.id})}" th:text="${category.name}">
+                            Category
+                        </a>
+                        <span class="badge rounded-pill"
+                              th:classappend="${category.archived ? 'text-bg-secondary' : 'text-bg-light'}"
+                              th:text="${category.archived ? 'Archived' : 'Active'}"></span>
+                    </div>
+                    <div class="small text-body-secondary">
+                        <a th:href="@{/categories(groupId=${category.groupId})}" th:text="${category.groupName}"></a>
+                        <span th:text="| · ${category.topicCount} ${category.topicCount == 1 ? 'topic' : 'topics'} · #${category.id}|"></span>
+                    </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-outline-primary"
+                       th:href="@{/topics/create(categoryId=${category.id},categoryReturn=${listReturn})}">Add topic</a>
+                    <a th:unless="${category.archived}" class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entry-filter/form(categoryId=${category.id})}">Tracker</a>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/entry-results/page(categoryId=${category.id})}">Blog view</a>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       th:href="@{/categories/edit/{id}(id=${category.id},listReturn=${listReturn})}">Edit</a>
+                    <form method="post" th:action="@{/categories/delete/{id}(id=${category.id})}"
+                          onsubmit="return confirm('Delete this category?')">
+                        <input type="hidden" name="listReturn" th:value="${listReturn}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+        <div th:replace="~{::categoryPagination}"></div>
+    </section>
+</main>
+<script th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 </body>
 </html>

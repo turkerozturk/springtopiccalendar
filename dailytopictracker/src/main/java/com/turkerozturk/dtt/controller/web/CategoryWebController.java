@@ -22,6 +22,7 @@ package com.turkerozturk.dtt.controller.web;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,9 +32,12 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.CategoryListService;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.text.Collator;
+import java.util.Comparator;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 @Controller
 @RequestMapping("/categories")
@@ -45,15 +49,32 @@ public class CategoryWebController {
     @Autowired
     private CategoryGroupRepository categoryGroupRepository;
 
-    // Tüm kategorileri listeleyen sayfa
+    private final CategoryListService categoryListService;
+
+    public CategoryWebController(CategoryListService categoryListService) {
+        this.categoryListService = categoryListService;
+    }
+
     @GetMapping
-    public String listCategories(Model model) {
-        var categoryDTOs = categoryService.getAllCategories()
-                .stream()
+    public String listCategories(@ModelAttribute("filter") CategoryListService.Filter filter,
+                                 HttpServletRequest request, HttpServletResponse response, Model model) {
+        var groups = categoryGroupRepository.findAll();
+        groups.sort(Comparator.comparing(CategoryGroup::getName, Collator.getInstance(LocaleContextHolder.getLocale())));
+        var categories = categoryListService.browse(filter);
+        String listReturn = filter.path(categories.getNumber());
+        model.addAttribute("groups", groups);
+        model.addAttribute("categoriesPage", categories);
+        model.addAttribute("sortOptions", CategoryListService.Sort.values());
+        model.addAttribute("listReturn", listReturn);
+        model.addAttribute("previousPath", categories.hasPrevious() ? filter.path(categories.getNumber() - 1) : null);
+        model.addAttribute("nextPath", categories.hasNext() ? filter.path(categories.getNumber() + 1) : null);
 
-                .collect(Collectors.toList());
-
-        model.addAttribute("categories", categoryDTOs);
+        response.addHeader("Vary", "HX-Request, HX-History-Restore-Request");
+        if ("true".equals(request.getHeader("HX-Request"))
+                && !"true".equals(request.getHeader("HX-History-Restore-Request"))) {
+            response.setHeader("HX-Push-Url", request.getContextPath() + listReturn);
+            return "categories/category-list :: results";
+        }
         return "categories/category-list";
     }
 
@@ -61,7 +82,8 @@ public class CategoryWebController {
     @GetMapping("/create")
     public String showCreateForm(Model model,
                                  @RequestParam(name="returnPage", required=false) String returnPage,
-                                 @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId) {
+                                 @RequestParam(name="categoryGroupId", required=false) Long categoryGroupId,
+                                 @RequestParam(required = false) String listReturn) {
         Category category = new Category();
         if(categoryGroupId != null) {
             CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId).get();
@@ -71,21 +93,27 @@ public class CategoryWebController {
         model.addAttribute("allGroups", categoryGroupRepository.findAllByOrderByIdDesc());
         model.addAttribute("returnPage", returnPage);
 
+        addListReturn(model, listReturn, null);
         return "categories/category-form"; // templates/category-form.html
     }
 
     // Yeni kategori kaydetmek için (form post)
     @PostMapping
     public String saveCategory(@ModelAttribute("categoryDTO") Category category,
+                               @RequestParam(required = false) String listReturn,
                                RedirectAttributes redirectAttrs,
                                HttpServletRequest request,
                                Model model) {
+        String listPath = PageReturnPath.categoryList(listReturn);
         categoryService.saveCategory(category);
         redirectAttrs.addFlashAttribute("success", "Category created successfully.");
+        if (listPath != null) {
+            return "redirect:" + PageReturnPath.categoryAnchor(listPath, category.getId());
+        }
 
         String returnPage = request.getParameter("returnPage");
 
-        if (returnPage != null) {
+        if (returnPage != null && !returnPage.isBlank()) {
 
             return "redirect:/entries/redirect"
                 + "?returnPage=" + returnPage;
@@ -98,7 +126,8 @@ public class CategoryWebController {
     // Mevcut kategoriyi düzenleme formu
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model,
-                               @ModelAttribute("returnPage") String returnPage
+                               @RequestParam(required = false) String listReturn,
+                               @RequestParam(required = false) String returnPage
                                ) {
         Category category = categoryService
                 .getCategoryById(id)
@@ -109,6 +138,7 @@ public class CategoryWebController {
         model.addAttribute("returnPage", returnPage);
 
 
+        addListReturn(model, listReturn, id);
         return "categories/category-form"; // Aynı formu kullanacağız
     }
 
@@ -116,7 +146,10 @@ public class CategoryWebController {
     @PostMapping("/update/{id}")
     public String updateCategory(@PathVariable Long id,
                                  @ModelAttribute("categoryDTO") Category dto,
-                                 @ModelAttribute("returnPage") String returnPage) {
+                                 @RequestParam(required = false) String returnPage,
+                                 @RequestParam(required = false) String listReturn,
+                                 RedirectAttributes redirectAttributes) {
+        String listPath = PageReturnPath.categoryList(listReturn);
         Category category = categoryService
                 .getCategoryById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
@@ -130,10 +163,15 @@ public class CategoryWebController {
 
         // Topics liste gibi daha fazlası varsa burada set edebilirsiniz.
         categoryService.saveCategory(category);
+        if (listPath != null) {
+            redirectAttributes.addFlashAttribute("success", "Category updated.");
+            return "redirect:" + PageReturnPath.categoryAnchor(listPath, id);
+        }
+
 
         Long categoryId = category.getId();
 
-        if (returnPage != null) {
+        if (returnPage != null && !returnPage.isBlank()) {
 
             return "redirect:/entries/redirect"
                     + "?returnPage=" + returnPage
@@ -144,15 +182,25 @@ public class CategoryWebController {
         return "redirect:/categories";
     }
 
-    // Kategori silme
-    @GetMapping("/delete/{id}")
-    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    private void addListReturn(Model model, String listReturn, Long categoryId) {
+        String listPath = PageReturnPath.categoryList(listReturn);
+        if (listPath != null) {
+            model.addAttribute("listReturn", listPath);
+            model.addAttribute("categoryListPath", categoryId == null ? listPath : PageReturnPath.categoryAnchor(listPath, categoryId));
+        }
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = {RequestMethod.GET, RequestMethod.POST})
+    public String deleteCategory(@PathVariable Long id, @RequestParam(required = false) String listReturn,
+                                 RedirectAttributes redirectAttributes) {
+        String listPath = PageReturnPath.categoryList(listReturn);
         try {
             categoryService.deleteCategory(id);
+            redirectAttributes.addFlashAttribute("success", "Category deleted.");
         } catch (IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        return "redirect:/categories";
+        return "redirect:" + (listPath != null ? listPath : "/categories");
     }
 
     @GetMapping("/info/{id}")

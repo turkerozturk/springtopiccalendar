@@ -19,18 +19,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.Collator;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 @Service
 public class TopicListService {
     public static final long ALL_CATEGORIES = -1;
     private static final int PAGE_SIZE = 25;
-    private static final Pattern MARKS = Pattern.compile("\\p{M}+");
     private static final String MATCH = "dtt_topic_match";
     private static final String FOLD = "dtt_topic_fold";
     private static final String ORDER = "dtt_topic_order";
@@ -58,7 +55,7 @@ public class TopicListService {
         if (categoryId != ALL_CATEGORIES) {
             equalTo(filter, values, "t.category_id", categoryId);
         }
-        String query = fold(criteria.q());
+        String query = CatalogText.fold(criteria.q(), locale);
         if (!query.isBlank()) {
             filter.append(" AND dtt_topic_match(t.name) >= 0");
         }
@@ -79,14 +76,14 @@ public class TopicListService {
             Function.create(sqlite, MATCH, new Function() {
                 @Override
                 protected void xFunc() throws SQLException {
-                    result(query.isBlank() ? 0 : rank(fold(value_text(0)), query));
+                    result(query.isBlank() ? 0 : CatalogText.rank(CatalogText.fold(value_text(0), locale), query));
                 }
             }, 1, Function.FLAG_DETERMINISTIC);
             try {
                 Function.create(sqlite, FOLD, new Function() {
                     @Override
                     protected void xFunc() throws SQLException {
-                        result(fold(value_text(0)));
+                        result(CatalogText.fold(value_text(0), locale));
                     }
                 }, 1, Function.FLAG_DETERMINISTIC);
                 try {
@@ -160,7 +157,7 @@ public class TopicListService {
     private void contains(StringBuilder filter, List<Object> values, String column, String text) {
         if (!text.isBlank()) {
             filter.append(" AND instr(dtt_topic_fold(").append(column).append("), ?) > 0");
-            values.add(fold(text));
+            values.add(CatalogText.fold(text, locale));
         }
     }
 
@@ -175,26 +172,4 @@ public class TopicListService {
         values.add(day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli());
     }
 
-    private String fold(String text) {
-        if (text == null) return "";
-        var normalized = Normalizer.normalize(text.toLowerCase(locale).replace('ı', 'i'), Normalizer.Form.NFD);
-        return MARKS.matcher(normalized).replaceAll("");
-    }
-
-    private static int rank(String name, String query) {
-        if (query.isBlank() || name.equals(query)) return 0;
-        if (name.startsWith(query)) return 1;
-        if (name.contains(query)) return 2;
-
-        int from = 0;
-        for (int offset = 0; offset < query.length();) {
-            int letter = query.codePointAt(offset);
-            offset += Character.charCount(letter);
-            if (Character.isWhitespace(letter)) continue;
-            int position = name.indexOf(letter, from);
-            if (position < 0) return -1;
-            from = position + Character.charCount(letter);
-        }
-        return 3;
-    }
 }

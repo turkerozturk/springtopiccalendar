@@ -106,10 +106,7 @@ public class TopicWebController {
                              @ModelAttribute("criteria") TopicListCriteria criteria,
                              HttpServletRequest request, HttpServletResponse response, Model model) {
         var categories = categoryService.getAllCategories();
-        Long selectedCategoryId = categoryId;
-        if (selectedCategoryId == null) {
-            selectedCategoryId = categories.stream().map(Category::getId).min(Long::compareTo).orElse(null);
-        }
+        long selectedCategoryId = categoryId != null ? categoryId : TopicListService.ALL_CATEGORIES;
         var topics = topicListService.browse(selectedCategoryId, criteria);
         String listReturn = criteria.path(selectedCategoryId, topics.getNumber());
         model.addAttribute("categories", categories);
@@ -133,6 +130,7 @@ public class TopicWebController {
     @GetMapping("/create")
     public String showCreateForm(HttpSession session,
                                  @RequestParam(required = false) String listReturn,
+                                 @RequestParam(required = false) String categoryReturn,
                                  @RequestParam(name="categoryId", required=false) Long categoryId,
                                  @RequestParam(name="returnPage", required=false) String returnPage,
                                  @RequestParam(name = "dateMillisYmd", required = false) Long dateMillisYmd,
@@ -201,6 +199,11 @@ public class TopicWebController {
             model.addAttribute("listReturn", listPath);
             model.addAttribute("topicListPath", topic.getId() == null ? listPath : PageReturnPath.topicAnchor(listPath, topic.getId()));
         }
+        String categoryPath = PageReturnPath.categoryList(categoryReturn);
+        if (categoryPath != null) {
+            model.addAttribute("categoryReturn", categoryPath);
+            model.addAttribute("topicListPath", categoryId == null ? categoryPath : PageReturnPath.categoryAnchor(categoryPath, categoryId));
+        }
         return "topics/topic-form"; // templates/topic-form.html
     }
 
@@ -208,10 +211,12 @@ public class TopicWebController {
     @PostMapping
     public String saveTopic(@ModelAttribute("topic") Topic topic,
                             @RequestParam(required = false) String listReturn,
+                            @RequestParam(required = false) String categoryReturn,
                             @RequestParam(name="returnPage", required=false) String returnPage,
                             @RequestParam(required = false) Long dateMillisYmd
                             ) {
         String listPath = PageReturnPath.topicList(listReturn);
+        String categoryPath = PageReturnPath.categoryList(categoryReturn);
         // Seçilen category'yi veritabanından bul
         var categoryId = topic.getCategory().getId();
         Category category = categoryService
@@ -226,6 +231,10 @@ public class TopicWebController {
 
         // Kaydet
         topicService.saveTopic(topic);
+        if (categoryPath != null) {
+            return "redirect:" + PageReturnPath.categoryAnchor(categoryPath, categoryId);
+        }
+
         if (listPath != null) {
             return "redirect:" + PageReturnPath.topicAnchor(listPath, topic.getId());
         }
