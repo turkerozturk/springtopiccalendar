@@ -93,20 +93,20 @@ a:hover {
   width: 100%; /* Hücrenin tamamını kaplasın */
 }
 
-.crop-text {
-/*
-white-space: nowrap;
-overflow: hidden;
-position: relative;
-max-width: 200px;
-*/
+.topic-title {
+    overflow-wrap: anywhere;
+    text-decoration: underline;
 }
-
-
-
-
-
-
+.topic-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem .75rem;
+    align-items: center;
+}
+.topic-actions .btn-link {
+    color: inherit;
+    text-decoration: underline;
+}
 
 #navigation-panel button, a{
 border-radius:10px !important;
@@ -217,7 +217,7 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
             <div style="background-color: white;">
                 <!-- Topics Tablosu -->
-                <table id="topicsTable"
+                <table id="topicsTable" th:attr="data-category-id=${selectedCategoryId}"
                        class="table table-striped table-bordered table-sm align-middle"
                        style="margin-top: 10px; border-collapse: collapse;">
                     <thead>
@@ -235,7 +235,8 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
                     <tbody>
                     <!-- iStat: https://www.baeldung.com/thymeleaf-iteration -->
-                    <tr th:each="topic, iStat : ${topics}" th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
+                    <tr th:each="topic : ${topics}" th:id="'topic-' + ${topic.id}"
+                        th:with="zeroPaddedTopicId=${#numbers.formatInteger(topic.id, 5)}">
 
                         <td style="text-align:center;">
                             <span
@@ -246,76 +247,33 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
 
 
 
-                        <!-- Topic Name -->
-                        <td>
+                        <td class="p-2" th:attr="data-order=${topic.name},data-search=${topic.name}">
+                            <a class="topic-title fw-semibold" data-remember-topic-list
+                               th:href="@{/topics/{id}(id=${topic.id},listCategoryId=${selectedCategoryId})}"
+                               th:text="${topic.name}">Topic name</a>
 
-
-
-                            <span class="crop-text"
-                                th:hx-get="@{/topics/info/{id}(id=${topic.id})}"
-                                hx-target="#topicInfoContent"
-                                hx-trigger="click"
-                                data-bs-toggle="modal"
-                                data-bs-target="#topicInfoModal"
-                                th:text="${topic.name}">
-                            </span>
-                            <br/>
-
-
-
-
-
-                            &nbsp;
-                            <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
-                               onclick="return confirm('Are you sure to delete this topic?')"
-                               title="Delete Topic">
-                                🗑
-                            </a>
-                            &nbsp;
-                            <a th:href="@{/entries/new(topicId=${topic.id}, returnPage='topics', categoryId=${topic.category.id})}"
-                               title="Add Entry">
-                                +
-                            </a>
-                            &nbsp;
-                            <a th:href="@{/entries?topicId={id}(id=${topic.id})}"
-                               th:text="'☰'"
-                                title="List Entries">
-                                Entries List
-                            </a>
-                            &nbsp;
-
-
-                            <a
-                                    th:href="@{/entries/weekly-calendar?topicId={id}(id=${topic.id})}"
-                                    th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id}, fragment='true')}"
-                                    hx-target="#modal-content"
-                                    hx-trigger="click"
-                                    hx-swap="innerHTML"
-                                    onclick="document.getElementById('modal').style.display='block'; return false;"
-                                    title="View Weekly Calendar";
-                                    th:text="'📅'">
-                                View Weekly Calendar
-                            </a>
-                            &nbsp;
-
-                            <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
-                               title="Edit Topic">
-                                ✎
-                            </a>
-
-                            <!--
-                        <div class="crop-text" style="width: 100%; text-align: right; color: gray;">
-                            <a th:href="@{/categories/edit/{id}(id=${topic.category.id}, returnPage= 'topics')}"
-                               th:text="${topic.category.name}">
-                                Edit Category Name
-                            </a>
-                        </div>
-                            -->
-                            &nbsp;
-
+                            <div class="topic-actions mt-1">
+                                <a class="btn btn-sm btn-outline-primary" data-remember-topic-list
+                                   th:href="@{/entries/new(topicId=${topic.id},returnPage='topicList',listCategoryId=${selectedCategoryId})}">
+                                    Add entry
+                                </a>
+                                <a th:href="@{/entries(topicId=${topic.id})}">Entries</a>
+                                <button type="button" class="btn btn-sm btn-link p-0"
+                                        th:hx-get="@{/topics/info/{id}(id=${topic.id})}"
+                                        hx-target="#topicInfoContent"
+                                        data-bs-toggle="modal" data-bs-target="#topicInfoModal">Overview</button>
+                                <a th:href="@{/entries/weekly-calendar(topicId=${topic.id})}"
+                                   th:attr="hx-get=@{/entries/weekly-calendar(topicId=${topic.id},fragment='true')}"
+                                   hx-target="#modal-content" hx-swap="innerHTML"
+                                   onclick="document.getElementById('modal').style.display='block'; return false;"
+                                   title="View weekly calendar" aria-label="View weekly calendar">📅</a>
+                                <a th:href="@{/topics/edit/{id}(id=${topic.id})}"
+                                   title="Edit topic" aria-label="Edit topic">✎</a>
+                                <a th:href="@{/topics/delete/{id}(id=${topic.id})}"
+                                   onclick="return confirm('Are you sure to delete this topic?')"
+                                   title="Delete topic" aria-label="Delete topic">🗑</a>
+                            </div>
                         </td>
-
-
                     </tr>
                     </tbody>
                 </table>
@@ -371,28 +329,7 @@ background: linear-gradient(90deg, rgba(203, 231, 242, 0.50) 0%, rgba(203, 242, 
             });
         </script>
 
-        <script>
-
-            $(document).ready( function () {
-                let table = new DataTable('#topicsTable', {
-                    pageLength: 50
-                });
-
-            });
-        </script>
-
-        <script th:inline="javascript">
-            function onCategoryChange() {
-                var categoryId = document.getElementById("categorySelect").value;
-                var baseUrl = /*[[ @{/topics} ]]*/;  // Bu satır, server tarafında /topics olarak parse edilecek
-
-                if (categoryId === "") {
-                    window.location.href = baseUrl;
-                } else {
-                    window.location.href = baseUrl + "?categoryId=" + categoryId;
-                }
-            }
-        </script>
+        <script th:src="@{/js/topic-list.js}"></script>
 
         <!-- 3️⃣ Filtreleme için JS -->
         <script>

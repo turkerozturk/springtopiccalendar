@@ -45,7 +45,13 @@
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <form th:action="@{/entries/save}" th:object="${entry}" method="post">
+    <a th:if="${topicEntryForm == true and returnPage == 'topicDetail'}" class="d-inline-block mb-3"
+       th:href="@{/topics/{id}(id=${entry.topic.id},listCategoryId=${listCategoryId})}">← Back to topic</a>
+    <a th:if="${topicEntryForm == true and returnPage == 'topicList'}" class="d-inline-block mb-3"
+       th:href="@{/topics(categoryId=${listCategoryId})} + '#topic-' + ${entry.topic.id}">← Back to topics</a>
+
+    <form th:action="@{/entries/save}" th:object="${entry}" method="post"
+          th:classappend="${topicEntryForm == true ? 'px-3 py-2' : ''}">
         <fieldset>
 
             <legend th:text="${#strings.isEmpty(entry.id) ? 'Add New Entry' : 'Update Entry (id: ' + entry.id + ')'}"></legend>
@@ -56,20 +62,27 @@
 
         <!-- kaydolunca geri donecegi sayfayi belirten bir placeholer string. bkz. save metodu.(gizli alan) -->
         <input type="hidden" name="returnPage" th:value="${returnPage}">
+        <input th:if="${topicEntryForm}" type="hidden" name="listCategoryId" th:value="${listCategoryId}">
 
 
 
        <!--  <input type="hidden" name="categoryGroupId" th:value="${entry.topic.category.categoryGroup.id}" th:if="${entry.topic != null}"> -->
 
-            <input type="hidden" name="categoryGroupId" th:value="${categoryGroupId}" th:if="${entry.topic != null}">
+            <input type="hidden" name="categoryGroupId" th:value="${categoryGroupId}" th:if="${topicEntryForm != true and entry.topic != null}">
 
 
         <!-- entry ID (gizli alan) -->
         <input type="hidden" th:field="*{id}"/>
 
         <!-- dateMillisYmd (artık gizli) -->
-        <input type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
+        <input th:unless="${topicEntryForm}" type="hidden" id="dateMillisYmd" th:field="*{dateMillisYmd}" />
 
+        <div th:if="${topicEntryForm}" class="mb-3">
+            <input type="hidden" th:field="*{topic.id}"/>
+            <strong th:text="${entry.topic.name}">Topic</strong>
+        </div>
+
+        <th:block th:unless="${topicEntryForm}">
         <!-- (1) KATEGORİ FİLTRE SEÇİMİ -->
         <div class="mb-3 row">
             <label for="categoryFilter" class="col-sm-5 col-form-label col-form-label-sm">Select a Category:</label>
@@ -105,8 +118,16 @@
             </div>
         </div>
 
+        </th:block>
+
+        <div th:if="${topicEntryForm}" class="mb-3">
+            <label for="topicEntryDate" class="form-label">Date</label>
+            <input type="date" id="topicEntryDate" name="topicEntryDate" class="form-control"
+                   th:value="${topicEntryDate}" required>
+        </div>
+
         <!-- Alternatif: Date Picker (tıklayarak seçim) -->
-        <div class="row mb-3" id="entryDateContainer">
+        <div th:unless="${topicEntryForm}" class="row mb-3" id="entryDateContainer">
             <div class="input-group entryDateStyle date">
                 <label for="entryDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
                 <input type="text" id="entryDatePicker"
@@ -136,27 +157,30 @@
         <div class="mb-3 row">
             <span class="col-sm-3 col-form-label col-form-label-sm">Status:</span>
 
-            <div class="col-sm-6 d-flex gap-3">
+            <div class="d-flex flex-wrap gap-3" th:classappend="${topicEntryForm == true ? 'col-sm-9' : 'col-sm-6'}">
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="2" tabindex="6">
-                    <i class="fas fa-circle-exclamation" title="Warning" style="cursor: pointer; color: tomato; font-size: 1.5em;"></i>
+                    <input type="radio" th:field="*{status}" value="2" th:attr="tabindex=${topicEntryForm == true ? null : 6}" aria-label="Warning">
+                    <i th:unless="${topicEntryForm}" class="fas fa-circle-exclamation" title="Warning" style="cursor: pointer; color: tomato; font-size: 1.5em;"></i>
+                    <span th:if="${topicEntryForm}">Warning</span>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="0" tabindex="7">
-                    <i class="fas fa-circle-dot text-secondary" title="Not Marked" style="cursor: pointer; color: gainsboro; font-size: 1.5em;"></i>
+                    <input type="radio" th:field="*{status}" value="0" th:attr="tabindex=${topicEntryForm == true ? null : 7}" aria-label="Not marked">
+                    <i th:unless="${topicEntryForm}" class="fas fa-circle-dot text-secondary" title="Not Marked" style="cursor: pointer; color: gainsboro; font-size: 1.5em;"></i>
+                    <span th:if="${topicEntryForm}">Not marked</span>
                 </label>
 
                 <label>
-                    <input type="radio" th:field="*{status}" value="1" tabindex="8">
-                    <i class="fas fa-check-circle text-success" title="Done" style="cursor: pointer; color: palegreen; font-size: 1.5em;"></i>
+                    <input type="radio" th:field="*{status}" value="1" th:attr="tabindex=${topicEntryForm == true ? null : 8}" aria-label="Done">
+                    <i th:unless="${topicEntryForm}" class="fas fa-check-circle text-success" title="Done" style="cursor: pointer; color: palegreen; font-size: 1.5em;"></i>
+                    <span th:if="${topicEntryForm}">Done</span>
                 </label>
 
 
             </div>
 
-            <button type="submit" class="btn btn-sm btn-secondary col-sm-2" tabindex="9">Save</button>
+            <button th:unless="${topicEntryForm}" type="submit" class="btn btn-sm btn-secondary col-sm-2" tabindex="9">Save</button>
 
         </div>
 
@@ -169,14 +193,16 @@
             <!-- markdown easymde -->
             <label for="note_content" class="col-sm-2 col-form-label col-form-label-sm">Note:</label>
             <div class="col-sm-9">
-                <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control" tabindex="10" autofocus></textarea>
+                <textarea th:field="*{note.content}" id="note_content" rows="8" class="form-control"
+                          th:attr="tabindex=${topicEntryForm == true ? null : 10},autofocus=${topicEntryForm == true ? null : 'autofocus'}"></textarea>
             </div>
         </div>
+        <button th:if="${topicEntryForm}" type="submit" class="btn btn-primary mb-3">Save entry</button>
         </fieldset>
     </form>
 
 
-    <form th:action="@{/entries/redirect}" id="cancelForm" method="post">
+    <form th:unless="${topicEntryForm}" th:action="@{/entries/redirect}" id="cancelForm" method="post">
         <!-- dateMillisYmd (artık gizli) -->
         <input type="hidden" name="dateMillisYmd" th:value="${entry.dateMillisYmd}" />
         <input type="hidden" name="returnPage" th:value="${returnPage}">
@@ -281,6 +307,7 @@ let allTopics = [];
 document.addEventListener('DOMContentLoaded', () => {
 
     const topicSelect = document.getElementById('topicSelect');
+    if (!topicSelect) return;
 
     // İlk optionları hafızaya al
     allTopics = Array.from(topicSelect.options).map(option => ({

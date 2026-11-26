@@ -21,17 +21,21 @@
 package com.turkerozturk.dtt.controller.web;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
+import com.turkerozturk.dtt.component.MarkdownService;
 import com.turkerozturk.dtt.component.ParserRegistryLoader;
 import com.turkerozturk.dtt.entity.Entry;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.server.ResponseStatusException;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.TopicDetailsService;
 import com.turkerozturk.dtt.service.TopicService;
 
 import java.io.File;
@@ -56,8 +60,24 @@ public class TopicWebController {
 
     private final AppTimeZoneProvider timeZoneProvider;
 
-    public TopicWebController(AppTimeZoneProvider timeZoneProvider) {
+    private final TopicDetailsService topicDetailsService;
+    private final MarkdownService markdownService;
+
+    public TopicWebController(AppTimeZoneProvider timeZoneProvider, TopicDetailsService topicDetailsService,
+                              MarkdownService markdownService) {
         this.timeZoneProvider = timeZoneProvider;
+        this.topicDetailsService = topicDetailsService;
+        this.markdownService = markdownService;
+    }
+
+    @GetMapping("/{id}")
+    public String showTopic(@PathVariable long id, @RequestParam(required = false) Long listCategoryId, Model model) {
+        var detail = topicDetailsService.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        model.addAttribute("topic", detail);
+        model.addAttribute("descriptionHtml", markdownService.render(detail.description()));
+        model.addAttribute("listCategoryId", listCategoryId != null ? listCategoryId : detail.categoryId());
+        return "topics/topic-detail";
     }
 
 
