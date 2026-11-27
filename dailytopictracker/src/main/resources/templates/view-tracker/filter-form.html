@@ -2005,10 +2005,12 @@ $(document).ready(function () {
 
 
 <!--/* Bu modal tablo hucresi uzerine tiklayinca secenekler gostermek icin kullaniliyor. */-->
-<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalTitle" aria-hidden="true"
+     th:attr="data-cell-url=@{/entry-filter/cell},data-status-url=@{/api/entries/status},
+              data-entry-url=@{/entries},data-entry-new-url=@{/entries/new},data-entry-edit-url=@{/entries/edit}">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content text-center p-3">
-            <h6 class="mb-3">Set Status</h6>
+            <h6 class="mb-3 text-truncate" id="statusModalTitle">Entry</h6>
             <div class="d-flex justify-content-around">
                 <!--/* Edit/New Entry formunu yukleme butonu */-->
                 <button class="btn edit-btn" style="width:50px;height:50px;">
@@ -2024,6 +2026,23 @@ $(document).ready(function () {
                 <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
                 <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
             </div>
+            <form id="tracker-cell-note-form" class="mt-3">
+                <label for="tracker-cell-note" class="visually-hidden">Entry note</label>
+                <div class="d-flex align-items-start gap-2">
+                    <textarea id="tracker-cell-note" class="form-control" rows="1" wrap="off"
+                              placeholder="Entry note" style="min-width:0; resize:none;"></textarea>
+                    <button class="btn btn-primary" type="submit" id="tracker-cell-note-save">Save</button>
+                </div>
+                <div class="d-flex justify-content-between gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" id="tracker-cell-note-newline">
+                        New line
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" type="button" id="tracker-cell-delete" hidden>
+                        Delete entry
+                    </button>
+                </div>
+                <p class="small text-start mb-0 mt-2" id="tracker-cell-message" role="status" hidden></p>
+            </form>
         </div>
     </div>
 </div>
@@ -2047,138 +2066,6 @@ $(document).ready(function () {
     </div>
 </div>
 
-
-<script>
-    $(function () {
-        let currentCell;
-
-        // Hücreye tıklanınca modal aç
-        $(".pivot-table-entry-cell").on("click", function () {
-            currentCell = $(this);
-
-            let entryId = currentCell.data("entry-id");
-            let oldStatus = currentCell.data("old-status");
-
-            // Buton elementini bul
-            let btn = $(".note-read-btn");
-
-            if (entryId && oldStatus !== 3) {
-                // Geçerli entry -> butonu aktif yap
-                btn.prop("disabled", false);
-            } else {
-                // Entry yok ya da status=3 -> butonu pasifleştir
-                btn.prop("disabled", true);
-            }
-
-
-            $("#statusModal").modal("show");
-        });
-
-        // Status değiştirme
-        $(".status-btn").on("click", function () {
-            let status = $(this).data("status");
-            let oldStatus = currentCell.data("old-status");
-            let entryId = currentCell.data("entry-id");
-            let topicId = currentCell.data("topic-id");
-            let categoryId = currentCell.data("category-id");
-            let localDate = currentCell.data("date-local");
-
-            const csrfToken = $('meta[name="_csrf"]').attr('content');
-            const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
-
-            $.ajax({
-                url: "/api/entries/status",
-                method: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({
-                    entryId: entryId,
-                    topicId: topicId,
-                    categoryId: categoryId,
-                    localDate: localDate,
-                    status: status,
-                    oldStatus: oldStatus
-                }),
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader(csrfHeader, csrfToken);
-                },
-                success: function (resp) {
-                    // status-* class’ını güncelle
-                    currentCell.removeClass("status-0 status-1 status-2 status-3")
-                               .addClass("status-" + resp.status)
-                               .data("entry-id", resp.id)
-                               .data("old-status", resp.status);
-
-                    // hücre içeriğini güncelle (artık <span data-href> formatıyla)
-                    const newHtml = `
-                        <span data-href="/entries/edit/${resp.id}?categoryId=${currentCell.data("category-id")}&returnPage=pivottable" class="fake-link">
-                            <span title="Entry ${resp.id}">&nbsp;</span>
-                        </span><br>
-                    `;
-                    currentCell.html(newHtml);
-
-                    $("#statusModal").modal("hide");
-                    currentCell[0].dispatchEvent(new Event("tracker-status-updated", { bubbles: true }));
-                },
-                error: function () {
-                    alert("Error updating status");
-                }
-            });
-        });
-
-        // Edit/New Entry butonuna tıklayınca hücredeki data-href'e git
-        $(".edit-btn").on("click", function () {
-            if (currentCell) {
-                const link = currentCell.find("span[data-href]").data("href");
-                if (link) {
-                    window.location.href = link;
-                }
-            }
-        });
-
-        // Read Note butonuna tıklayınca noteModal acilsin.
-        // Note butonuna tıklayınca
-        $(document).on("click", ".note-read-btn", function () {
-            if (!currentCell) return;
-
-            if ($(this).prop("disabled")) {
-            return; // pasifse hiçbir şey yapma
-        }
-
-            // Hücrede geçerli entry var mı? (status != 3 ve data-entry-id mevcut olmalı)
-            let entryId = currentCell.data("entry-id");
-            let oldStatus = currentCell.data("old-status");
-
-            if (entryId && oldStatus !== 3) {
-                // Önce statusModal’i kapat
-                $("#statusModal").modal("hide");
-
-                // HTMX ile içerik yükle
-                let noteUrl = '/entries/' + entryId + '/note-full';
-                // alert(noteUrl);
-
-
-                htmx.ajax('GET',
-                    noteUrl,
-                    {
-                        target: "#noteModal .modal-body",
-                        swap: "innerHTML"
-                    }
-                );
-
-                // burada kod yazabilirdik ama onun yerine asagida htmx:afterSwap olay dinleyici icine yaziyoruz.
-                // Cunku htmx swap komutunu calistirinca afterSwap ile degisikligi yakalamak burada degilse bile
-                // diger sayfalarda modal ustune modal olarak actigimiz orneklerde gerekli oluyor.
-                // Sonuc olarak yukarida henuz goze gorunmeyen modal govdesini degistirdikten sonra asagidaki
-                // htmx olay yakalayici ile bootstrap modali gostermis oluyoruz. ve de text copy dugmesinin metodunu da
-                // halletmis oluyoruz.
-
-
-
-            }
-        });
-
-    });
-</script>
 
 <script>
     // HTMX olayı: içerik yüklendikten hemen sonra
@@ -2371,5 +2258,6 @@ new source repository URL is https://git.sheetjs.com/sheetjs/sheetjs*/-->
 
 
 <script defer th:src="@{/js/tracker-view.js}"></script>
+<script defer th:src="@{/js/tracker-cell.js}"></script>
 </body>
 </html>
