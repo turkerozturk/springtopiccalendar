@@ -1,0 +1,4 @@
+<p xmlns:th="http://www.thymeleaf.org" th:fragment="indicator" th:if="${activeCategoryProfileName != null}"
+   class="small text-body-secondary mb-2">
+    Active profile <a th:href="@{/profiles}" th:text="${activeCategoryProfileName}">Profile</a>
+</p>

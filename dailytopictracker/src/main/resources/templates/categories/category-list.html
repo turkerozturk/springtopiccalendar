@@ -41,6 +41,9 @@
                     <label for="category-group" class="form-label mb-1">Category group</label>
                     <select id="category-group" name="groupId" class="form-select">
                         <option value="">All groups</option>
+                        <option th:if="${groupOutsideProfile == true}" th:value="${filter.groupId}" selected>
+                            Outside active profile
+                        </option>
                         <option th:each="group : ${groups}" th:value="${group.id}" th:text="${group.name}"
                                 th:selected="${group.id == filter.groupId}"></option>
                     </select>
@@ -71,10 +74,11 @@
     <section id="category-results" th:fragment="results" aria-label="Category results" class="bg-body border rounded p-3">
         <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
         <div th:if="${success != null}" class="alert alert-success" role="status" th:text="${success}"></div>
+        <div th:replace="~{fragments/active-category-profile :: indicator}"></div>
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <p th:if="${categoriesPage.hasContent()}" class="text-body-secondary mb-0" role="status"
                th:text="|${categoriesPage.pageable.offset + 1}–${categoriesPage.pageable.offset + categoriesPage.numberOfElements} of ${categoriesPage.totalElements} categories|"></p>
-            <a th:unless="${groups.isEmpty()}" class="btn btn-sm btn-outline-primary"
+            <a th:unless="${groups.isEmpty() or groupOutsideProfile == true}" class="btn btn-sm btn-outline-primary"
                th:href="@{/categories/create(categoryGroupId=${filter.groupId},listReturn=${listReturn})}">New category</a>
         </div>
         <nav th:fragment="categoryPagination" th:if="${categoriesPage.totalPages > 1}" aria-label="Category pages"
@@ -86,9 +90,11 @@
                th:href="@{${nextPath}}">Next</a>
         </nav>
         <p th:unless="${categoriesPage.hasContent()}" class="mb-0" role="status"
-           th:text="${groups.isEmpty() ? 'Create a category group before adding categories.' :
+           th:text="${groupOutsideProfile == true ? 'This group has no categories in the active profile.' :
+                   (groups.isEmpty() and activeCategoryProfileName != null ? 'No categories in the active profile.' :
+                   (groups.isEmpty() ? 'Create a category group before adding categories.' :
                    (filter.q.isEmpty() and filter.groupId == null and filter.archived == null
-                   ? 'No categories yet.' : 'No categories match these filters.')}"></p>
+                   ? 'No categories yet.' : 'No categories match these filters.')))}"></p>
         <ul th:if="${categoriesPage.hasContent()}" class="list-group list-group-flush">
             <li th:each="category : ${categoriesPage.content}" th:id="'category-' + ${category.id}"
                 class="category-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">

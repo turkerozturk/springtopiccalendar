@@ -30,6 +30,7 @@
 <main class="container entries-page my-3">
     <header class="bg-body border rounded p-3 mb-3">
         <h1 class="h3 mb-2" th:text="${topic == null ? 'Entries' : topic.name + ' · Entries'}">Entries</h1>
+        <div th:replace="~{fragments/active-category-profile :: indicator}"></div>
         <div th:if="${topic != null}" class="mb-3">
             <div class="mb-2" style="white-space: pre-line;" th:if="${!topicDescriptionAsHtml.isEmpty()}"
                  th:utext="${topicDescriptionAsHtml}"></div>
@@ -41,7 +42,9 @@
             </nav>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a th:if="${hasTopics}" class="btn btn-primary"
+            <a th:if="${topicOutsideProfile == true}" class="btn btn-outline-secondary"
+               th:href="@{/entries(size=${entriesPage.size})}">Entries in active profile</a>
+            <a th:if="${hasTopics and topicOutsideProfile != true}" class="btn btn-primary"
                th:href="@{/entries/new(topicId=${topicId},returnPage='entryList',
                                       listTopicId=${topicId},listPage=${entriesPage.number},listSize=${entriesPage.size})}">New entry</a>
             <a class="btn btn-outline-secondary" th:href="@{/entry-results/page(topicId=${topicId})}">Blog view</a>
@@ -73,7 +76,9 @@
             </form>
         </details>
 
-        <p th:unless="${entriesPage.hasContent()}" class="mb-0">No entries yet.</p>
+        <p th:unless="${entriesPage.hasContent()}" class="mb-0"
+           th:text="${topicOutsideProfile == true ? 'This topic is outside the active profile.' :
+                   (activeCategoryProfileName != null ? 'No entries in the active profile match this view.' : 'No entries yet.')}"></p>
         <ul th:if="${entriesPage.hasContent()}" class="list-group list-group-flush">
             <li th:each="entry : ${entriesPage.content}" th:id="'entry-' + ${entry.id}"
                 class="entry-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-start gap-2"

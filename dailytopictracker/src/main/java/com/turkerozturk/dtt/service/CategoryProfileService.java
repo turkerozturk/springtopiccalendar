@@ -90,6 +90,10 @@ public class CategoryProfileService {
     }
 
 
+    public Optional<CategoryProfile> getActiveProfile() {
+        return getActiveProfileId().flatMap(this::findById);
+    }
+
     public Optional<CategoryProfile> findById(Long categoryProfileId) {
         return categoryProfileRepository.findById(categoryProfileId);
     }

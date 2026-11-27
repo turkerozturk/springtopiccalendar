@@ -49,6 +49,17 @@ public interface EntryRepository extends JpaRepository<Entry, Long>, EntryReposi
     // bu alanın "id"si üzerinden filtre yapmak için:
     List<Entry> findByTopicId(Long topicId);
 
+    String PROFILE_LIST_SCOPE = " FROM Entry e JOIN e.topic t WHERE (:topicId IS NULL OR t.id = :topicId) "
+            + TopicRepository.PROFILE_SCOPE;
+
+    @Query("SELECT e" + PROFILE_LIST_SCOPE + "ORDER BY e.dateMillisYmd DESC, e.id DESC")
+    Page<Entry> findProfileEntries(@Param("topicId") Long topicId, @Param("profileId") Long profileId, Pageable pageable);
+
+    @Query("SELECT COUNT(e)" + PROFILE_LIST_SCOPE
+            + "AND (:fromDate IS NULL OR e.dateMillisYmd >= :fromDate)")
+    long countProfileEntries(@Param("topicId") Long topicId, @Param("profileId") Long profileId,
+                             @Param("fromDate") Long fromDate);
+
     Page<Entry> findAllByOrderByDateMillisYmdDescIdDesc(Pageable pageable);
     Page<Entry> findByTopicIdOrderByDateMillisYmdDescIdDesc(Long topicId, Pageable pageable);
 

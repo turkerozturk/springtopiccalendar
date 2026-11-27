@@ -32,11 +32,13 @@ import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.CategoryGroup;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.CategoryProfileService;
 import com.turkerozturk.dtt.service.CategoryListService;
 
 import java.util.Optional;
 import java.text.Collator;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 @Controller
@@ -51,8 +53,11 @@ public class CategoryWebController {
 
     private final CategoryListService categoryListService;
 
-    public CategoryWebController(CategoryListService categoryListService) {
+    private final CategoryProfileService profileService;
+
+    public CategoryWebController(CategoryListService categoryListService, CategoryProfileService profileService) {
         this.categoryListService = categoryListService;
+        this.profileService = profileService;
     }
 
     @GetMapping
@@ -60,7 +65,15 @@ public class CategoryWebController {
                                  HttpServletRequest request, HttpServletResponse response, Model model) {
         var groups = categoryGroupRepository.findAll();
         groups.sort(Comparator.comparing(CategoryGroup::getName, Collator.getInstance(LocaleContextHolder.getLocale())));
-        var categories = categoryListService.browse(filter);
+        var activeProfile = profileService.getActiveProfile().orElse(null);
+        if (activeProfile != null) {
+            var groupIds = activeProfile.getCategories().stream()
+                    .map(category -> category.getCategoryGroup().getId()).collect(Collectors.toSet());
+            groups = groups.stream().filter(group -> groupIds.contains(group.getId())).toList();
+            model.addAttribute("activeCategoryProfileName", activeProfile.getName());
+            model.addAttribute("groupOutsideProfile", filter.groupId() != null && !groupIds.contains(filter.groupId()));
+        }
+        var categories = categoryListService.browse(filter, activeProfile == null ? null : activeProfile.getId());
         String listReturn = filter.path(categories.getNumber());
         model.addAttribute("groups", groups);
         model.addAttribute("categoriesPage", categories);

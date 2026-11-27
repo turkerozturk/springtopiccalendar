@@ -37,6 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.CategoryProfileService;
 import com.turkerozturk.dtt.service.TopicDetailsService;
 import com.turkerozturk.dtt.service.TopicListCriteria;
 import com.turkerozturk.dtt.service.TopicListService;
@@ -67,13 +68,16 @@ public class TopicWebController {
     private final TopicDetailsService topicDetailsService;
     private final MarkdownService markdownService;
     private final TopicListService topicListService;
+    private final CategoryProfileService profileService;
 
     public TopicWebController(AppTimeZoneProvider timeZoneProvider, TopicDetailsService topicDetailsService,
-                              MarkdownService markdownService, TopicListService topicListService) {
+                              MarkdownService markdownService, TopicListService topicListService,
+                              CategoryProfileService profileService) {
         this.timeZoneProvider = timeZoneProvider;
         this.topicDetailsService = topicDetailsService;
         this.markdownService = markdownService;
         this.topicListService = topicListService;
+        this.profileService = profileService;
     }
 
     @GetMapping("/{id}")
@@ -107,7 +111,15 @@ public class TopicWebController {
                              HttpServletRequest request, HttpServletResponse response, Model model) {
         var categories = categoryService.getAllCategories();
         long selectedCategoryId = categoryId != null ? categoryId : TopicListService.ALL_CATEGORIES;
-        var topics = topicListService.browse(selectedCategoryId, criteria);
+        var activeProfile = profileService.getActiveProfile().orElse(null);
+        if (activeProfile != null) {
+            Set<Long> categoryIds = activeProfile.getCategories().stream().map(Category::getId).collect(Collectors.toSet());
+            categories = categories.stream().filter(category -> categoryIds.contains(category.getId())).toList();
+            model.addAttribute("activeCategoryProfileName", activeProfile.getName());
+            model.addAttribute("categoryOutsideProfile",
+                    selectedCategoryId != TopicListService.ALL_CATEGORIES && !categoryIds.contains(selectedCategoryId));
+        }
+        var topics = topicListService.browse(selectedCategoryId, criteria, activeProfile == null ? null : activeProfile.getId());
         String listReturn = criteria.path(selectedCategoryId, topics.getNumber());
         model.addAttribute("categories", categories);
         model.addAttribute("selectedCategoryId", selectedCategoryId);

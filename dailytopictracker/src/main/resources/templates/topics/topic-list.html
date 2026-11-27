@@ -40,6 +40,9 @@
                     <label for="topic-category" class="form-label mb-1">Category</label>
                     <select id="topic-category" name="categoryId" class="form-select">
                         <option value="-1" th:selected="${selectedCategoryId == -1}">All categories</option>
+                        <option th:if="${categoryOutsideProfile == true}" th:value="${selectedCategoryId}" selected>
+                            Outside active profile
+                        </option>
                         <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
                                 th:selected="${cat.id == selectedCategoryId}"></option>
                     </select>
@@ -115,10 +118,11 @@
 
     <section id="topic-results" th:fragment="results" aria-label="Topic results" class="bg-body border rounded p-3">
         <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+        <div th:replace="~{fragments/active-category-profile :: indicator}"></div>
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <p class="text-body-secondary mb-0" role="status" th:if="${topicsPage.hasContent()}"
                th:text="|${topicsPage.pageable.offset + 1}–${topicsPage.pageable.offset + topicsPage.numberOfElements} of ${topicsPage.totalElements} topics|"></p>
-            <a th:unless="${categories.isEmpty()}" class="btn btn-sm btn-outline-primary"
+            <a th:unless="${categories.isEmpty() or categoryOutsideProfile == true}" class="btn btn-sm btn-outline-primary"
                th:href="@{/topics/create(categoryId=${selectedCategoryId != -1 ? selectedCategoryId : null},
                                         listReturn=${listReturn})}">New topic</a>
         </div>
@@ -131,7 +135,9 @@
                th:href="@{${nextPath}}">Next</a>
         </nav>
         <p th:unless="${topicsPage.hasContent()}" class="mb-0" role="status"
-           th:text="${categories.isEmpty() ? 'Create a category before adding topics.' : 'No topics match these filters.'}"></p>
+           th:text="${categoryOutsideProfile == true ? 'This category is outside the active profile.' :
+                   (categories.isEmpty() and activeCategoryProfileName != null ? 'No categories in the active profile.' :
+                   (categories.isEmpty() ? 'Create a category before adding topics.' : 'No topics match these filters.'))}"></p>
         <ul th:if="${topicsPage.hasContent()}" class="list-group list-group-flush">
             <li th:each="topic : ${topicsPage.content}" th:id="'topic-' + ${topic.id}"
                 class="topic-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">

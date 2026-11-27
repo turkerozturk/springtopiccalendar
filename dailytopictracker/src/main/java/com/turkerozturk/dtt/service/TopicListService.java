@@ -46,7 +46,7 @@ public class TopicListService {
     public record TopicRow(long id, String name, String categoryName, boolean pinned, int weight) {}
 
     @Transactional(readOnly = true)
-    public Page<TopicRow> browse(Long categoryId, TopicListCriteria criteria) {
+    public Page<TopicRow> browse(Long categoryId, TopicListCriteria criteria, Long profileId) {
         if (categoryId == null) {
             return Page.empty(PageRequest.of(0, PAGE_SIZE));
         }
@@ -54,6 +54,10 @@ public class TopicListService {
         List<Object> values = new ArrayList<>();
         if (categoryId != ALL_CATEGORIES) {
             equalTo(filter, values, "t.category_id", categoryId);
+        }
+        if (profileId != null) {
+            filter.append(" AND t.category_id IN (SELECT category_id FROM category_profile_categories WHERE profile_id = ?)");
+            values.add(profileId);
         }
         String query = CatalogText.fold(criteria.q(), locale);
         if (!query.isBlank()) {

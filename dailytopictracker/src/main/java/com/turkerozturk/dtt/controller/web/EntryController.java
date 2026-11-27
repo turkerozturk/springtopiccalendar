@@ -33,6 +33,7 @@ import com.turkerozturk.dtt.helper.OccurrenceParser;
 import com.turkerozturk.dtt.helper.SuccessAnalyzer;
 import com.turkerozturk.dtt.repository.CategoryGroupRepository;
 import com.turkerozturk.dtt.service.CategoryService;
+import com.turkerozturk.dtt.service.CategoryProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -84,6 +85,7 @@ public class EntryController {
     private final CategoryGroupRepository categoryGroupRepository;
 
     private final CategoryService categoryService;
+    private final CategoryProfileService profileService;
 
 
     private final MarkdownService markdownService;
@@ -92,7 +94,8 @@ public class EntryController {
     private String startDayOfWeek;
 
 
-    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicService topicService, CategoryRepository categoryRepository, CategoryGroupRepository categoryGroupRepository, CategoryService categoryService, MarkdownService markdownService) {
+    public EntryController(AppTimeZoneProvider timeZoneProvider, EntryRepository entryRepository, FilterService entryService, EntryService entryService1, TopicService topicService, CategoryRepository categoryRepository, CategoryGroupRepository categoryGroupRepository, CategoryService categoryService, MarkdownService markdownService,
+                           CategoryProfileService profileService) {
         this.timeZoneProvider = timeZoneProvider;
         this.entryRepository = entryRepository;
         this.filterService = entryService;
@@ -101,6 +104,7 @@ public class EntryController {
         this.categoryRepository = categoryRepository;
         this.categoryGroupRepository = categoryGroupRepository;
         this.categoryService = categoryService;
+        this.profileService = profileService;
         this.markdownService = markdownService;
     }
 
@@ -115,28 +119,41 @@ public class EntryController {
         Topic topic = topicId == null ? null : topicService.getTopicById(topicId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         size = Math.max(1, Math.min(200, size));
+        var activeProfile = profileService.getActiveProfile().orElse(null);
+        Long profileId = activeProfile == null ? null : activeProfile.getId();
+        if (activeProfile != null) {
+            model.addAttribute("activeCategoryProfileName", activeProfile.getName());
+            if (topic != null && activeProfile.getCategories().stream()
+                    .noneMatch(category -> category.getId().equals(topic.getCategory().getId()))) {
+                model.addAttribute("topicOutsideProfile", true);
+                model.addAttribute("entriesPage", Page.empty(PageRequest.of(0, size)));
+                return "entries/entry-list";
+            }
+        }
 
         if (pageNumber != null) {
             page = Math.max(1, pageNumber) - 1;
         } else if (page == null) {
             ZoneId zone = timeZoneProvider.getZoneId();
             long tomorrow = LocalDate.now(zone).plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli();
-            int futureEntries = topicId == null
-                    ? entryRepository.countEntriesWithDateGreaterThanEqual(tomorrow)
+            long futureEntries = profileId != null
+                    ? entryRepository.countProfileEntries(topicId, profileId, tomorrow)
+                    : topicId == null ? entryRepository.countEntriesWithDateGreaterThanEqual(tomorrow)
                     : entryRepository.countEntriesWithDateGreaterThanEqualAndTopicId(tomorrow, topicId);
-            page = futureEntries / size;
+            page = (int) Math.min(Integer.MAX_VALUE, futureEntries / size);
         }
 
         page = Math.max(0, page);
         int largestQueryablePage = Integer.MAX_VALUE / size;
         if (page > largestQueryablePage) {
-            long entryCount = topicId == null ? entryRepository.count() : entryRepository.countByTopicId(topicId);
+            long entryCount = profileId != null ? entryRepository.countProfileEntries(topicId, profileId, null)
+                    : topicId == null ? entryRepository.count() : entryRepository.countByTopicId(topicId);
             page = (int) Math.min(largestQueryablePage, Math.max(0, (entryCount - 1) / size));
         }
-        Page<Entry> entriesPage = loadEntriesPage(topicId, PageRequest.of(page, size));
+        Page<Entry> entriesPage = loadEntriesPage(topicId, profileId, PageRequest.of(page, size));
         int lastPage = Math.max(0, entriesPage.getTotalPages() - 1);
         if (entriesPage.getNumber() > lastPage) {
-            entriesPage = loadEntriesPage(topicId, PageRequest.of(lastPage, size));
+            entriesPage = loadEntriesPage(topicId, profileId, PageRequest.of(lastPage, size));
         }
         model.addAttribute("entriesPage", entriesPage);
         model.addAttribute("topicId", topicId);
@@ -147,7 +164,10 @@ public class EntryController {
         return "entries/entry-list";
     }
 
-    private Page<Entry> loadEntriesPage(Long topicId, Pageable pageable) {
+    private Page<Entry> loadEntriesPage(Long topicId, Long profileId, Pageable pageable) {
+        if (profileId != null) {
+            return entryRepository.findProfileEntries(topicId, profileId, pageable);
+        }
         return topicId == null
                 ? entryRepository.findAllByOrderByDateMillisYmdDescIdDesc(pageable)
                 : entryRepository.findByTopicIdOrderByDateMillisYmdDescIdDesc(topicId, pageable);

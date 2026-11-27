@@ -67,7 +67,7 @@ public class CategoryListService {
         }
     }
 
-    public Page<Row> browse(Filter filter) {
+    public Page<Row> browse(Filter filter, Long profileId) {
         // Fetch only category summaries and count topics without loading entries or JPA collections.
         var summaries = jdbc.query("""
                 SELECT c.id, c.name, c.category_group_number AS group_id,
@@ -77,10 +77,13 @@ public class CategoryListService {
                 LEFT JOIN topics t ON t.category_id = c.id
                 WHERE (? IS NULL OR c.category_group_number = ?)
                   AND (? IS NULL OR c.is_archived = ?)
+                  AND (? IS NULL OR c.id IN (
+                      SELECT category_id FROM category_profile_categories WHERE profile_id = ?
+                  ))
                 GROUP BY c.id, c.name, c.category_group_number, g.name, c.is_archived
                 """, (row, number) -> new Row(row.getLong("id"), row.getString("name"),
                 row.getLong("group_id"), row.getString("group_name"), row.getBoolean("is_archived"),
-                row.getLong("topic_count")), filter.groupId(), filter.groupId(), filter.archived(), filter.archived());
+                row.getLong("topic_count")), filter.groupId(), filter.groupId(), filter.archived(), filter.archived(), profileId, profileId);
 
         var collator = Collator.getInstance(locale);
         collator.setStrength(Collator.SECONDARY);
