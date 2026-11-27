@@ -1,621 +1,181 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!--
-    This file is part of the DailyTopicTracker project.
-    Please refer to the project's README.md file for additional details.
-    https://github.com/turkerozturk/springtopiccalendar
-    -->
-    <meta charset="UTF-8"/>
-
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
-
-    <!-- favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
-
-    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap-datepicker/dist/css/bootstrap-datepicker.css}">
-
-    <link rel="stylesheet" href="/webjars/easymde/2.18.0/dist/easymde.min.css">
-
-    <style>
-        form {
-            background-color: WhiteSmoke;
-            border-radius: 15px;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${topic.id == null ? 'Create topic' : 'Edit topic'}">Topic</title>
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/favicon-180x180.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/manifest.json}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/easymde/2.18.0/dist/easymde.min.css}">
+    <style th:inline="css">
+        body { background-color: /*[[${htmlBackgroundColor}]]*/ #f4f5f7; }
+        .topic-form-page { max-width: 82rem; }
+        .topic-form-header { z-index: 4; }
+        .topic-form-card { min-width: 0; }
+        .topic-form-card .editor-toolbar:not(.fullscreen) { display: flex; flex-wrap: wrap; }
+        .topic-form-card .editor-preview { overflow-wrap: anywhere; }
+        .topic-form-card .editor-preview img { max-width: 100%; height: auto; }
+        .topic-form-card .editor-preview pre { white-space: pre-wrap; }
+        .topic-image-preview { width: 5rem; height: 5rem; object-fit: contain; }
     </style>
-    <title>Topic Form</title>
-
-
 </head>
 <body>
-
-<div class="container my-4" style="max-width: 600px;">
-    <!-- Başlık (Edit / Create) -->
-    <h1 th:if="${topic.id != null}" class="mb-4">Edit Topic</h1>
-    <h1 th:if="${topic.id == null}" class="mb-4">Create Topic</h1>
-
-    <!-- Form -->
-    <form th:object="${topic}"
-          th:action="${topic.id != null} ? @{/topics/update/{id}(id=${topic.id})} : @{/topics}"
+<main class="container topic-form-page py-3">
+    <form th:object="${topic}" th:action="${topic.id != null} ? @{/topics/update/{id}(id=${topic.id})} : @{/topics}"
           method="post">
-
-        <!-- preserve returnPage -->
-        <input type="hidden" name="returnPage" th:value="${returnPage}"/>
+        <input th:if="${topic.id != null}" type="hidden" th:field="*{id}">
+        <input type="hidden" name="returnPage" th:value="${returnPage}">
         <input th:if="${listReturn != null}" type="hidden" name="listReturn" th:value="${listReturn}">
         <input th:if="${categoryReturn != null}" type="hidden" name="categoryReturn" th:value="${categoryReturn}">
+        <input type="hidden" name="dateMillisYmd" th:value="${dateMillisYmd}">
 
-        <!--/* dateMillisYmd yi bu topic formda sadece food.html kalori takip sayfasinda dogru gune geri donmek icin kullaniyoruz */-->
-        <input type="hidden" id="dateMillisYmd" name="dateMillisYmd" th:value="${dateMillisYmd}" />
-
-        <div class="mb-3">
-            <label for="category" class="form-label">Category:</label>
-
-            <!-- Filtre kutusu -->
-            <input type="text" id="categoryFilter" class="form-control mb-2" placeholder="Filter categories...">
-
-            <!-- Kategori select -->
-            <select id="category" th:field="*{category.id}" class="form-select">
-                <option th:each="cat : ${categories}"
-                        th:value="${cat.id}"
-                        th:text="${cat.name}">
-                </option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="name" class="form-label">Topic Name:</label>
-            <input type="text" id="name" th:field="*{name}" class="form-control"  required autofocus/>
-        </div>
-
-        <div class="mb-3">
-            <!-- markdown easymde -->
-            <label for="description" class="form-label">Description:</label>
-            <textarea id="description" th:field="*{description}" class="form-control"></textarea>
-
-        </div>
-
-
-
-
-
-        <div class="mb-3">
-            <label for="someTimeLater" class="form-label">Next Prediction Day Count(to disable: leave blank or set 0)</label>
-            <input type="number"
-                   id="someTimeLater"
-                   th:field="*{someTimeLater}"
-                   class="form-control"
-                   min="0"
-                   placeholder="After how many days should a ghost entry be added" />
-        </div>
-
-        <div class="mb-3">
-            <label for="name" class="form-label">Interval Rule:</label>
-            <input type="text" id="intervalRule" th:field="*{intervalRule}" class="form-control" />
-        </div>
-
-
-        <div class="form-check form-switch mb-3">
-            <input
-                    class="form-check-input"
-                    type="checkbox"
-                    th:field="*{pinned}"
-                    id="pinned" />
-            <label class="form-check-label" for="pinned">
-                Pinned
-            </label>
-        </div>
-
-        <div class="mb-3">
-            <label for="weight" class="form-label">Weight(default 0, ignore -1)</label>
-            <input type="number"
-                   id="weight"
-                   th:field="*{weight}"
-                   class="form-control"
-                   min="-1"
-                   placeholder="The numerical importance of the topic"
-                   title="The numerical importance of the topic" />
-        </div>
-
-
-
-        <!-- baseDateMillisYmd (artık gizli) -->
-        <input type="hidden" id="baseDateMillisYmd" th:field="*{baseDateMillisYmd}"  name="baseDateMillisYmd" />
-        <input type="hidden" id="endDateMillisYmd" th:field="*{endDateMillisYmd}"  name="endDateMillisYmd" />
-
-        <!-- Checkbox: aktif değilse tarih seçici disable olur -->
-        <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="enableBaseDate"
-                   onclick="toggleBaseDatePicker()" />
-            <label class="form-check-label" for="enableBaseDate">Enable Base Date</label>
-        </div>
-
-
-        <!-- Date picker input alanı -->
-        <div class="mb-3" id="baseDateContainer">
-            <div class="input-group baseDateStyle date">
-                <label for="baseDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select Date:</label>
-                <input type="text" id="baseDatePicker"
-                       class="form-control form-control-sm"
-                       onchange="convertBaseDateToEpoch()"
-                       th:value="${
-                   topic.baseDateMillisYmd != null
-                     ? T(java.time.Instant).ofEpochMilli(topic.baseDateMillisYmd)
-                        .atZone(T(java.time.ZoneId).systemDefault())
-                        .toLocalDate()
-                     : ''
-               }"
-                />
-                <span class="input-group-append">
-             <button class="btn btn-outline-secondary" type="button">
-                 <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
-                 <i class="far fa-calendar" aria-hidden="true"></i>
-             </button>
-        </span>
-            </div>
-        </div>
-
-        <!-- Temizle ve Son Giriş Tarihini Kullan butonları -->
-        <div class="mb-3 d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearBaseDate()">Clear Date</button>
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="useFirstDoneEntryDate()"
-                    th:if="${firstDoneEntryDateMillisYmd != null}">
-                Use First Done Entry Date
-            </button>
-        </div>
-
-        <th:block th:if="${imageFilePaths} != null">
-
-            <div class="mb-3">
-                <label for="imageFilter" class="form-label">Filter Images:</label>
-                <input type="text" id="imageFilter" class="form-control" placeholder="Contains text...">
-            </div>
-
-            <div class="mb-3">
-                <th:block th:if="${imageFilePaths.size != null && imageFilePaths.size > 0}">
-                <label for="imageFileName" class="form-label">Image File:</label>
-                <select id="imageFileName" th:field="*{imageFileName}" class="form-select" onchange="updatePreview(this)">
-                    <option value="" disabled>Select Image</option>
-                    <option th:each="path : ${imageFilePaths}"
-                            th:value="${path}"
-                            th:text="${path}"
-                            th:selected="${path}">
-                    </option>
-                </select>
+        <header class="topic-form-header sticky-top d-flex justify-content-between align-items-center gap-2 flex-wrap
+                       rounded border bg-body p-3 mb-3 shadow-sm">
+            <h1 class="h4 mb-0" th:text="${topic.id == null ? 'Create topic' : 'Edit topic'}">Edit topic</h1>
+            <div class="d-flex gap-2">
+                <th:block th:switch="${topicListPath != null ? 'listReturn' : returnPage}">
+                    <a th:case="'listReturn'" class="btn btn-outline-secondary" th:href="@{${topicListPath}}">Cancel</a>
+                    <a th:case="'pivottable'" class="btn btn-outline-secondary" th:href="@{/entry-filter/return}">Cancel</a>
+                    <a th:case="'topics'" class="btn btn-outline-secondary" th:href="@{/entry-filter/return}">Cancel</a>
+                    <a th:case="'reporttable'" class="btn btn-outline-secondary" th:href="@{/reports/all}">Cancel</a>
+                    <a th:case="'entries'" class="btn btn-outline-secondary" th:href="@{/entries(topicId=${topic.id})}">Cancel</a>
+                    <a th:case="'home'" class="btn btn-outline-secondary" th:href="@{/}">Cancel</a>
+                    <a th:case="'index'" class="btn btn-outline-secondary" th:href="@{/}">Cancel</a>
+                    <a th:case="'calorietracker'" class="btn btn-outline-secondary"
+                       th:href="@{/food(dateMillisYmd=${dateMillisYmd})}">Cancel</a>
+                    <a th:case="'dayviewtracker'" class="btn btn-outline-secondary"
+                       th:href="@{/dayview(dateMillisYmd=${dateMillisYmd})}">Cancel</a>
+                    <a th:case="*" class="btn btn-outline-secondary" th:href="@{/topics(categoryId=${topic.category?.id})}">Cancel</a>
                 </th:block>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </header>
+
+        <div class="row g-3">
+            <div class="col-lg-7 col-xl-8">
+                <section class="topic-form-card rounded border bg-body p-3" aria-label="Topic and description">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Topic name</label>
+                            <input type="text" th:field="*{name}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="category" class="form-label">Category</label>
+                            <select id="category" th:field="*{category.id}" class="form-select" required>
+                                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                            </select>
+                            <label for="categoryFilter" class="visually-hidden">Filter categories</label>
+                            <input type="search" id="categoryFilter" class="form-control form-control-sm mt-2"
+                                   placeholder="Filter categories" autocomplete="off">
+                        </div>
+                    </div>
+                    <label for="description" class="form-label">Description (Markdown)</label>
+                    <textarea id="description" th:field="*{description}" class="form-control" rows="12"></textarea>
+                </section>
             </div>
 
-            <!-- Highlightlı gösterim -->
-            <ul id="highlightList" class="list-group mt-2"></ul>
+            <div class="col-lg-5 col-xl-4 d-flex flex-column gap-3">
+                <section class="topic-form-card rounded border bg-body p-3" aria-labelledby="topic-schedule">
+                    <h2 class="h6 mb-3" id="topic-schedule">Schedule</h2>
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm">
+                            <label for="someTimeLater" class="form-label">Prediction days</label>
+                            <input type="number" th:field="*{someTimeLater}" class="form-control" min="0"
+                                   aria-describedby="prediction-days-help">
+                            <div class="form-text" id="prediction-days-help">Blank or 0 disables prediction.</div>
+                        </div>
+                        <div class="col-sm">
+                            <label for="intervalRule" class="form-label">Interval rule</label>
+                            <input type="text" th:field="*{intervalRule}" class="form-control">
+                        </div>
+                    </div>
 
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            <input type="hidden" th:field="*{baseDateMillisYmd}">
+                            <label for="baseDatePicker" class="form-label">Base date</label>
+                            <input type="date" id="baseDatePicker" class="form-control"
+                                   th:value="${topic.baseDateMillisYmd == null ? null :
+                                     T(java.time.Instant).ofEpochMilli(topic.baseDateMillisYmd).atZone(T(java.time.ZoneId).systemDefault()).toLocalDate()}">
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-date="base">Clear</button>
+                                <button th:if="${firstDoneEntryDateMillisYmd != null}" type="button"
+                                        class="btn btn-sm btn-outline-secondary" data-use-date="base"
+                                        th:attr="data-date-millis=${firstDoneEntryDateMillisYmd}">Use first done date</button>
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <input type="hidden" th:field="*{endDateMillisYmd}">
+                            <label for="endDatePicker" class="form-label">End date</label>
+                            <input type="date" id="endDatePicker" class="form-control"
+                                   th:value="${topic.endDateMillisYmd == null ? null :
+                                     T(java.time.Instant).ofEpochMilli(topic.endDateMillisYmd).atZone(T(java.time.ZoneId).systemDefault()).toLocalDate()}">
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-clear-date="end">Clear</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-use-date="end"
+                                        th:attr="data-date-millis=${todayMillisYmd}">Use today</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            <div class="mb-3" style="text-align:center;">
-            <img id="imagePreview" th:src="@{${topic.imageFileName != null} ? ${topic.imageFileName} : '/images/default.png'}"
-                 width="135" height="135" alt="Selected Image" style="object-fit: contain; border: 1px solid #ccc;" />
+                <section class="topic-form-card rounded border bg-body p-3" aria-labelledby="topic-options">
+                    <h2 class="h6 mb-3" id="topic-options">Topic options</h2>
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-sm">
+                            <label for="weight" class="form-label">Weight</label>
+                            <input type="number" th:field="*{weight}" class="form-control" min="-1"
+                                   aria-describedby="weight-help">
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-check form-switch py-1">
+                                <input type="checkbox" id="pinned" th:field="*{pinned}" class="form-check-input">
+                                <label for="pinned" class="form-check-label">Pinned</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text mt-n2 mb-3" id="weight-help">Default is 0. Use −1 for low priority.</div>
+                    <label for="dataClassName" class="form-label">Parser</label>
+                    <select th:field="*{dataClassName}" class="form-select">
+                        <option value="">Without parser</option>
+                        <option th:if="${!#strings.isEmpty(topic.dataClassName) and !availableParsers.contains(topic.dataClassName)}"
+                                th:value="${topic.dataClassName}" th:text="${topic.dataClassName + ' (saved)'}"></option>
+                        <option th:each="parserName : ${availableParsers}" th:value="${parserName}" th:text="${parserName}"></option>
+                    </select>
+                </section>
+
+                <section th:if="${imageFilePaths != null}" class="topic-form-card rounded border bg-body p-3"
+                         aria-labelledby="topic-image">
+                    <h2 class="h6 mb-3" id="topic-image">Image</h2>
+                    <div class="d-flex gap-2 align-items-start">
+                        <div class="flex-grow-1 topic-form-card">
+                            <label for="imageFileName" class="visually-hidden">Image file</label>
+                            <select th:field="*{imageFileName}" class="form-select">
+                                <option value="">No image</option>
+                                <option th:if="${!#strings.isEmpty(topic.imageFileName) and !imageFilePaths.contains(topic.imageFileName)}"
+                                        th:value="${topic.imageFileName}" th:text="${topic.imageFileName + ' (saved)'}"
+                                        th:attr="data-preview-url=@{${topic.imageFileName}}"></option>
+                                <option th:each="path : ${imageFilePaths}" th:value="${path}" th:text="${path}"
+                                        th:attr="data-preview-url=@{${path}}"></option>
+                            </select>
+                            <label for="imageFilter" class="visually-hidden">Filter images</label>
+                            <input id="imageFilter" type="search" class="form-control form-control-sm mt-2"
+                                   placeholder="Filter images" autocomplete="off">
+                        </div>
+                        <img id="imagePreview" class="topic-image-preview rounded border" alt="Image preview"
+                             th:src="${#strings.isEmpty(topic.imageFileName)} ? @{/images/default.png} : @{${topic.imageFileName}}"
+                             th:attr="data-default-url=@{/images/default.png}">
+                    </div>
+                </section>
             </div>
-
-        </th:block>
-
-
-        <!-- Checkbox: aktif değilse tarih seçici disable olur -->
-        <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="enableEndDate"
-                   onclick="toggleEndDatePicker()" />
-            <label class="form-check-label" for="enableEndDate">Enable End Date</label>
         </div>
-
-        <!-- Date picker input alanı -->
-        <div class="mb-3" id="endDateContainer">
-            <div class="input-group endDateStyle date">
-                <label for="endDatePicker" class="col-sm-4 col-form-label col-form-label-sm">Select End Date:</label>
-                <input type="text" id="endDatePicker"
-                       class="form-control form-control-sm"
-                       onchange="convertEndDateToEpoch()"
-                       th:value="${
-                   topic.endDateMillisYmd != null
-                     ? T(java.time.Instant).ofEpochMilli(topic.endDateMillisYmd)
-                        .atZone(T(java.time.ZoneId).systemDefault())
-                        .toLocalDate()
-                     : ''
-               }"
-                />
-                <span class="input-group-append">
-             <button class="btn btn-outline-secondary" type="button">
-                 <!-- https://www.w3schools.com/icons/fontawesome5_icons_datetime.asp -->
-                 <i class="far fa-calendar" aria-hidden="true"></i>
-             </button>
-        </span>
-            </div>
-        </div>
-
-        <!-- Temizle ve Bugunu Kullan butonlari -->
-        <div class="mb-3 d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearEndDate()">Clear Date</button>
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="useTodaysDate()">
-                Use Today's Date
-            </button>
-        </div>
-
-
-
-        <div class="mb-3">
-            <label for="dataClassName" class="form-label">Parser:</label>
-            <select id="dataClassName" th:field="*{dataClassName}" class="form-select">
-                <option value="">-- Without Parser --</option>
-                <option th:each="parserName : ${availableParsers}"
-                        th:value="${parserName}"
-                        th:text="${parserName}">Parser</option>
-            </select>
-        </div>
-
-        <br>
-        <br>
-
-        <button type="submit" class="btn btn-primary w-100">Save</button>
-
-        <a th:if="${topicListPath != null}" class="btn btn-outline-secondary mt-2" th:href="@{${topicListPath}}">Cancel</a>
-
-        <!-- if user hits “cancel,” send them back -->
-        <a th:if="${returnPage=='pivottable'}"
-           th:href="@{/entry-filter/return}">
-            Cancel
-        </a>
     </form>
-
-   
-    
-
-    <div class="mt-3">
-        <a th:href="@{/topics(categoryId=${topic.category.id})}" class="btn btn-secondary w-100">Back to Topic List</a>
-    </div>
-</div>
-
-
-
-
-
-<!-- asagida jquery nin bulunabilmesi ve web gezgini konsolunda hata vermemesi icin maalesef versiyonu da yazdik
-cunku zannedersem webjar locator kutuphanesi bunu versiyonsuz bulamiyor.
-WebJars path'leri şu yapıyı izler:
-/webjars/{artifactId}/{version}/{dosya}
--->
-<script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
-
-<script type="text/javascript"
-        th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
-
-<script type="text/javascript" th:src="@{/webjars/bootstrap-datepicker/dist/js/bootstrap-datepicker.js}"></script>
-
-
-<noscript>
-    Please enable JavaScript.
-</noscript>
-
-<script th:inline="javascript">
-    /**
-     * Date Picker’da tarih seçilince,
-     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
-     * dateMillisYmd input’una yazan basit fonksiyon.
-     */
-    function convertBaseDateToEpoch() {
-        const selectedDate = document.getElementById('baseDatePicker').value; // yyyy-MM-dd
-        if (selectedDate) {
-            const [year, month, day] = selectedDate.split('-');
-            const dateObj = new Date(year, month - 1, day);
-            const epochMillis = dateObj.getTime();
-            document.getElementById('baseDateMillisYmd').value = epochMillis;
-        }
-    }
-
-
-
-    function clearBaseDate() {
-        document.getElementById('baseDateMillisYmd').value = '';
-        document.getElementById('baseDatePicker').value = '';
-        document.getElementById('enableBaseDate').checked = false;
-        toggleBaseDatePicker();
-    }
-
-    function useFirstDoneEntryDate() {
-
-
-        const lastMillis = /*[[${firstDoneEntryDateMillisYmd}]]*/ null;
-
-        if (lastMillis) {
-            const dateObj = new Date(Number(lastMillis));
-            const yyyy = dateObj.getFullYear();
-            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const dd = String(dateObj.getDate()).padStart(2, '0');
-            const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-            document.getElementById('baseDatePicker').value = formattedDate;
-            document.getElementById('baseDateMillisYmd').value = lastMillis;
-            document.getElementById('enableBaseDate').checked = true;
-            toggleBaseDatePicker();
-        }
-    }
-
-    function toggleBaseDatePicker() {
-        const isEnabled = document.getElementById('enableBaseDate').checked;
-        document.getElementById('baseDatePicker').disabled = !isEnabled;
-    }
-
-    // Sayfa açıldığında baseDate varsa checkbox işaretli gelsin
-    window.addEventListener('DOMContentLoaded', () => {
-        const hasValue = document.getElementById('baseDateMillisYmd').value !== '';
-        document.getElementById('enableBaseDate').checked = hasValue;
-        toggleBaseDatePicker();
-    });
-
-
-    /** https://uxsolutions.github.io/bootstrap-datepicker/
-    * "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range.
-    * calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers
-    */
-
-        $(function() {
-          $('#baseDateContainer .baseDateStyle.date').datepicker({
-              format: "yyyy-mm-dd",
-              todayBtn: "linked",
-              daysOfWeekHighlighted: "0,6",
-              calendarWeeks: false,
-              autoclose: true,
-              todayHighlight: true
-          });
-      });
-</script>
-
-
-<script th:inline="javascript">
-    /**
-     * Date Picker’da tarih seçilince,
-     * seçili tarihi (yyyy-MM-dd) milisaniyeye çevirip
-     * dateMillisYmd input’una yazan basit fonksiyon.
-     */
-    function convertEndDateToEpoch() {
-        const selectedDate = document.getElementById('endDatePicker').value; // yyyy-MM-dd
-        if (selectedDate) {
-            const [year, month, day] = selectedDate.split('-');
-            const dateObj = new Date(year, month - 1, day);
-            const epochMillis = dateObj.getTime();
-            document.getElementById('endDateMillisYmd').value = epochMillis;
-        }
-    }
-
-
-
-    function clearEndDate() {
-        document.getElementById('endDateMillisYmd').value = '';
-        document.getElementById('endDatePicker').value = '';
-        document.getElementById('enableEndDate').checked = false;
-        toggleEndDatePicker();
-    }
-
-    function useTodaysDate() {
-
-
-        const todayMillis = /*[[${todayMillisYmd}]]*/ null;
-
-        if (todayMillis) {
-            const dateObj = new Date(Number(todayMillis));
-            const yyyy = dateObj.getFullYear();
-            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const dd = String(dateObj.getDate()).padStart(2, '0');
-            const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-            document.getElementById('endDatePicker').value = formattedDate;
-            document.getElementById('endDateMillisYmd').value = todayMillis;
-            document.getElementById('enableEndDate').checked = true;
-            toggleEndDatePicker();
-        }
-    }
-
-    function toggleEndDatePicker() {
-        const isEnabled = document.getElementById('enableEndDate').checked;
-        document.getElementById('endDatePicker').disabled = !isEnabled;
-    }
-
-    // Sayfa açıldığında endDate varsa checkbox işaretli gelsin
-    window.addEventListener('DOMContentLoaded', () => {
-        const hasValue = document.getElementById('endDateMillisYmd').value !== '';
-        document.getElementById('enableEndDate').checked = hasValue;
-        toggleEndDatePicker();
-    });
-
-
-    /** https://uxsolutions.github.io/bootstrap-datepicker/
-    * "0,6" means: 0 is Sunday, 6 is Saturday. Comma separated, not range.
-    * calendarWeeks 20 gostermesi gerekirken 21 gosterdi Pazar gunu, disable ettim.  https://www.epochconverter.com/weeknumbers
-    */
-
-        $(function() {
-          $('#endDateContainer .endDateStyle.date').datepicker({
-              format: "yyyy-mm-dd",
-              todayBtn: "linked",
-              daysOfWeekHighlighted: "0,6",
-              calendarWeeks: false,
-              autoclose: true,
-              todayHighlight: true
-          });
-      });
-</script>
-
-<script>
-    function updatePreview(selectElement) {
-        const csrfToken = $('meta[name="_csrf"]').attr('content');
-        const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
-        const selectedValue = selectElement.value;
-        const imagePreview = document.getElementById("imagePreview");
-        if (selectedValue && selectedValue.trim() !== "") {
-            imagePreview.src = selectedValue;
-        } else {
-            imagePreview.src = "/images/default.png";
-        }
-    }
-</script>
-
-<script src="/webjars/easymde/2.18.0/dist/easymde.min.js"></script>
-<!--/*
-    easymde'nin toolbar ayarında nelerin görünmesi gerektiğini manuel olarak yazıyoruz
-    (dışarıdan bakıldığında default görünüm),
-    çünkü link ekleme düğmesinin işlevini kendi fonksiyonumuzla değiştirdik. Artık köşeli parantez içine alıyor.
-    Benzer şekilde image ekleme işlevini de değiştirdik. ![](image url) içine alıyor. Online resimler görünür oluyor.
-    Toolbar disindaki metod Paste event yakalar yani clipboarddan yapıştırma yapılırsa aşağıdaki
-    kurala göre işlem yapar metin üzerinde.
-    Fakat onu devredışı bıraktık çünkü image link de ekleyebiliyoruz ve onda zorluk çıkarıyor, yoksa kolaylık idi.
-    Burada yaptırdığımıza şey, yapıştırılan metin https veya http ile başlıyorsa köşe parantez ile çevrelemesi.
-    Böylece markdown link haline gelir.
-*/-->
-<script>
-    var easyMDE = new EasyMDE({
-        element: document.getElementById("description"),
-        spellChecker: false,
-        forceSync: true, // <-- onemli: EasyMDE icerigini textarea ile senkronize eder
-        toolbar: [
-            "bold", "italic", "heading",
-            "|",
-            "quote", "unordered-list", "ordered-list",
-            "|",
-            { // custom actionumuz
-                name: "link",
-                action: function customLink(editor){
-                    var cm = editor.codemirror;
-                    var selection = cm.getSelection();
-                    if (/^https?:\/\//.test(selection)) {
-                        cm.replaceSelection("<" + selection + ">");
-                    } else {
-                        cm.replaceSelection("<https://>");
-                        cm.setCursor(cm.getCursor().line, cm.getCursor().ch - 1);
-                    }
-                },
-                className: "fa fa-link",
-                title: "Insert autolink"
-            },
-            { // custom actionumuz
-                name: "image",
-                action: function customImage(editor){
-                            var cm = editor.codemirror;
-                            var selection = cm.getSelection();
-                            if (/^https?:\/\//.test(selection)) {
-                                cm.replaceSelection("![](" + selection + ")");
-                            } else {
-                                cm.replaceSelection("![](https://)");
-                                cm.setCursor(cm.getCursor().line, cm.getCursor().ch - 1);
-                            }
-                        },
-                className: "fa fa-image",
-                title: "Insert image"
-            },
-            "preview", "fullscreen",
-            "|",
-            "guide"
-        ]
-    });
-
-    // Paste event yakalar fakat devredisi biraktim cunku link yerine, image link eklemek istenirse zorluk olmasin.
-    /*
-    easyMDE.codemirror.on("paste", function(cm, event) {
-        let clipboardData = (event.clipboardData || window.clipboardData);
-        let pastedText = clipboardData.getData("text");
-
-        // Eğer sadece URL yapıştırıldıysa
-        if (/^https?:\/\/[^\s]+$/.test(pastedText)) {
-            event.preventDefault();
-            cm.replaceSelection("<" + pastedText + ">");
-        }
-    });
-    */
-</script>
-
-
-<!-- Mevcut image filter kodun altına ekle (ayrı çalışır, çakışmaz) -->
-<script>
-    const categoryFilterInput = document.getElementById("categoryFilter");
-    const categorySelect = document.getElementById("category");
-
-    function buildRegex(query) {
-        return new RegExp(query.split("").join(".*"), "i");
-    }
-
-    categoryFilterInput.addEventListener("input", function () {
-        const query = this.value.trim();
-        const regex = buildRegex(query);
-
-        Array.from(categorySelect.options).forEach((opt, idx) => {
-            if (query === "") {
-                opt.style.display = "block";
-                return;
-            }
-            const text = opt.textContent.trim();
-            opt.style.display = regex.test(text) ? "block" : "none";
-        });
-    });
-</script>
-
-
-<script>
-    const filterInput = document.getElementById("imageFilter");
-    const select = document.getElementById("imageFileName");
-    const highlightList = document.getElementById("highlightList");
-
-    function buildRegex(query) {
-        // "meziyet" -> m.*e.*z.*i.*y.*e.*t
-        return new RegExp(query.split("").join(".*"), "i");
-    }
-
-    filterInput.addEventListener("input", function () {
-        const query = this.value.trim();
-        const regex = buildRegex(query);
-        highlightList.innerHTML = ""; // liste temizle
-
-        Array.from(select.options).forEach((opt, idx) => {
-            if (idx === 0) return;
-
-            const fullText = opt.textContent;
-            const imagesDir = /*[[${imagesDir}]]*/ 'topicimages';
-            const visibleText = fullText.replace(new RegExp("^/" + imagesDir + "/"), "");
-
-            if (regex.test(visibleText)) {
-                opt.style.display = "block";
-
-                // highlight: harf harf dolaş
-                let qIndex = 0;
-                let highlighted = "";
-                for (let ch of visibleText) {
-                    if (qIndex < query.length &&
-                        ch.toLocaleLowerCase() === query[qIndex].toLocaleLowerCase()) {
-                        highlighted += `<span style="color:red;font-weight:bold">${ch}</span>`;
-                        qIndex++;
-                    } else {
-                        highlighted += ch;
-                    }
-                }
-
-                const li = document.createElement("li");
-                li.className = "list-group-item";
-                li.innerHTML = highlighted;
-                highlightList.appendChild(li);
-
-            } else {
-                opt.style.display = "none";
-            }
-        });
-    });
-</script>
-
-
-
-
+</main>
+<script th:src="@{/webjars/easymde/2.18.0/dist/easymde.min.js}"></script>
+<script th:src="@{/js/topic-form.js}"></script>
 </body>
 </html>
-
