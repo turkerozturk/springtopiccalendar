@@ -1720,6 +1720,10 @@ public class EntryController {
                     return "redirect:/topics?categoryId=" + categoryId;
                 case "pivottable":
                     return "redirect:/entry-filter/return?categoryId=" + categoryId;
+                case "dayTracker":
+                    if (dateMillisYmd == null) return "redirect:/day-tracker";
+                    LocalDate day = Instant.ofEpochMilli(dateMillisYmd).atZone(timeZoneProvider.getZoneId()).toLocalDate();
+                    return "redirect:/day-tracker?date=" + day;
                 case "entries":
                     if(topicId != null) {
                         return "redirect:/entries?topicId=" + topicId;

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Day Tracker</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/day-tracker.css}">
+</head>
+<body>
+<div th:replace="~{fragments/fragnavigation :: fragnavigation}"></div>
+<main class="day-tracker px-2 pb-4 mx-auto">
+    <h1 class="h3 text-center">Day Tracker</h1>
+    <details id="day-tracker-controls" class="day-tracker-controls border rounded mb-3" open>
+        <summary class="px-3 py-2">
+            <span class="day-tracker-summary">
+                <span>Filters</span>
+                <time th:datetime="${selectedDate}" th:text="${selectedDate}">2026-11-28</time>
+            </span>
+        </summary>
+        <form id="day-tracker-filter" class="p-2 px-sm-3 pb-3" method="get" th:action="@{/day-tracker}"
+              th:attr="data-chunk-url=@{/day-tracker/chunk},data-scope=${scope}">
+            <p class="small text-center mb-2">
+                <a th:if="${profileName != null}" th:href="@{/profiles}" th:text="${profileName}">Active profile</a>
+                <span th:unless="${profileName != null}">All categories</span>
+            </p>
+            <div class="day-tracker-date mb-2">
+                <a class="btn btn-outline-secondary" th:if="${selectedDate.year > 1 or selectedDate.dayOfYear > 1}"
+                   th:href="@{/day-tracker(date=${selectedDate.minusDays(1)},q=${q},sort=${sort})}"
+                   data-day-date-link aria-label="Previous day">‹</a>
+                <label for="day-tracker-date" class="visually-hidden">Date</label>
+                <input id="day-tracker-date" class="form-control" type="date" name="date" required
+                       min="0001-01-01" max="9999-12-31" th:value="${selectedDate}">
+                <a class="btn btn-outline-secondary" th:if="${selectedDate.year < 9999 or selectedDate.monthValue < 12 or selectedDate.dayOfMonth < 31}"
+                   th:href="@{/day-tracker(date=${selectedDate.plusDays(1)},q=${q},sort=${sort})}"
+                   data-day-date-link aria-label="Next day">›</a>
+                <a class="btn btn-outline-secondary" th:href="@{/day-tracker(date=${today},q=${q},sort=${sort})}"
+                   data-day-date-link>Today</a>
+            </div>
+            <div class="day-tracker-search">
+                <label for="day-tracker-query" class="visually-hidden">Search topics</label>
+                <input id="day-tracker-query" class="form-control" type="search" name="q"
+                       placeholder="Search topics" th:value="${q}" autocomplete="off">
+                <label for="day-tracker-sort" class="visually-hidden">Topic name order</label>
+                <select id="day-tracker-sort" class="form-select" name="sort">
+                    <option value="asc" th:selected="${sort == 'asc'}">A–Z</option>
+                    <option value="desc" th:selected="${sort == 'desc'}">Z–A</option>
+                </select>
+                <noscript><button class="btn btn-primary" type="submit">Apply</button></noscript>
+            </div>
+        </form>
+    </details>
+
+    <div id="day-tracker-list" data-tracker-entry-container>
+        <div th:replace="~{::chunk}"></div>
+    </div>
+    <p id="day-tracker-empty" class="text-center mt-3" th:hidden="${!topics.isEmpty()}">No matching topics.</p>
+    <div id="day-tracker-loading" class="text-center py-3">
+        <p id="day-tracker-message" class="small mb-2" role="status" hidden></p>
+        <button id="day-tracker-more" class="btn btn-outline-secondary" type="button" hidden>Load more</button>
+    </div>
+</main>
+<div th:replace="~{fragments/tracker-cell-dialogs :: dialogs(true)}"></div>
+
+<script defer th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script defer th:src="@{/webjars/bootstrap/js/bootstrap.bundle.js}"></script>
+<script defer th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
+<script defer th:src="@{/js/tracker-cell.js}"></script>
+<script defer th:src="@{/js/day-tracker.js}"></script>
+
+<th:block th:remove="all">
+<div th:fragment="chunk" data-day-chunk
+     th:attr="data-next=${nextPage == null} ? null : @{/day-tracker/chunk(date=${selectedDate},q=${q},sort=${sort},page=${nextPage},scope=${scope})}">
+    <th:block th:each="row, iter : ${topics}" th:with="previous=${iter.first} ? null : ${topics[iter.index - 1]}">
+        <h2 class="day-tracker-group" data-day-group
+            th:if="${previous == null or previous.groupId != row.groupId}" th:text="${row.groupName}">Group</h2>
+        <h3 class="day-tracker-category" data-day-category
+            th:if="${previous == null or previous.categoryId != row.categoryId}" th:text="${row.categoryName}">Category</h3>
+        <button type="button" class="day-tracker-topic"
+                th:attr="data-topic-id=${row.topicId},data-category-id=${row.categoryId},data-group-id=${row.groupId},
+                         data-date-local=${selectedDate},data-entry-id=${row.entryId},data-old-status=${row.status},
+                         data-category-url=(@{/categories(groupId=${row.groupId},q=${row.categoryName})} + '#category-' + ${row.categoryId}),data-topic-url=@{/topics/{id}(id=${row.topicId})},
+                         data-tracker-url=@{/entry-filter/form(categoryId=${row.categoryId})},
+                         data-report-url=@{/reports/cg(categoryGroupId=${row.groupId})}">
+            <span class="day-tracker-topic-name" data-topic-name th:text="${row.topicName}">Topic</span>
+            <span data-entry-status-label class="visually-hidden" th:text="${row.statusLabel()}">No entry</span>
+            <span data-entry-note-icon th:hidden="${!row.hasNote}" title="Has note">
+                <i class="fa-brands fa-readme" aria-hidden="true"></i><span class="visually-hidden">Has note</span>
+            </span>
+            <span data-entry-prediction class="day-tracker-prediction" th:hidden="${!row.predicted}">
+                <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                <span class="visually-hidden">Predicted for this day</span>
+            </span>
+        </button>
+    </th:block>
+</div>
+</th:block>
+</body>
+</html>

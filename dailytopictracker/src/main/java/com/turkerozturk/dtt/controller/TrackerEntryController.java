@@ -105,11 +105,11 @@ public class TrackerEntryController {
     public record CellNote(Long entryId, Long topicId, LocalDate localDate, String content) {
     }
 
-    public record CellEntry(Long id, Integer status, String content, boolean hasNote) {
+    public record CellEntry(Long id, Integer status, String content, boolean hasNote, LocalDate predictionDate) {
         private static CellEntry from(Entry entry) {
             String content = entry.getNote() == null ? null : entry.getNote().getContent();
             return new CellEntry(entry.getId(), entry.getStatus(), content == null ? "" : content,
-                    content != null && !content.isBlank());
+                    content != null && !content.isBlank(), entry.getTopic().getPredictionDate());
         }
     }
 

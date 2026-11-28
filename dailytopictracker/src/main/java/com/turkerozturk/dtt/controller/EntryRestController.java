@@ -92,7 +92,8 @@ public class EntryRestController {
         // we need to update both of the topic statuses(for old and new topic) after saving the entry.
         topicService.updateTopicStatus(topicId);
 
-        return ResponseEntity.ok(new EntryDto(saved.getId(), saved.getStatus()));
+        LocalDate predictionDate = topicService.getTopicById(topicId).map(Topic::getPredictionDate).orElse(null);
+        return ResponseEntity.ok(new EntryDto(saved.getId(), saved.getStatus(), predictionDate));
 
     }
 
@@ -112,6 +113,7 @@ public class EntryRestController {
     public static class EntryDto {
         private Long id;
         private Integer status;
+        private LocalDate predictionDate;
     }
 }
 

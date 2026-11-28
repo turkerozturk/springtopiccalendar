@@ -1,6 +1,6 @@
 (() => {
-    const table = document.getElementById("pivot-table");
-    if (!table) return;
+    const container = document.querySelector("[data-tracker-entry-container]");
+    if (!container) return;
 
     const dialog = document.getElementById("statusModal");
     const modal = bootstrap.Modal.getOrCreateInstance(dialog);
@@ -66,10 +66,23 @@
     }
 
     function entryUrl(path, params) {
-        return path + "?" + new URLSearchParams({ ...params, returnPage: "pivottable" });
+        return path + "?" + new URLSearchParams(params);
     }
 
-    function paintCell(cell, entry, predicted = false) {
+    function paintCell(cell, entry, predictionDate = entry?.predictionDate) {
+        const predicted = predictionDate === cell.dataset.dateLocal;
+        if (cell.classList.contains("day-tracker-topic")) {
+            if (entry) {
+                cell.dataset.entryId = entry.id;
+                cell.dataset.oldStatus = entry.status;
+            } else {
+                delete cell.dataset.entryId;
+                delete cell.dataset.oldStatus;
+            }
+            cell.dispatchEvent(new CustomEvent("day-tracker-entry-updated", { bubbles: true, detail: { entry, predicted } }));
+            return;
+        }
+
         const link = document.createElement("span");
         link.className = "fake-link";
         const { topicId, categoryId, dateLocal } = cell.dataset;
@@ -79,7 +92,7 @@
             cell.dataset.entryId = entry.id;
             cell.dataset.oldStatus = entry.status;
             cell.classList.add("status-" + entry.status);
-            link.dataset.href = entryUrl(dialog.dataset.entryEditUrl + "/" + entry.id, { categoryId });
+            link.dataset.href = entryUrl(dialog.dataset.entryEditUrl + "/" + entry.id, { categoryId, returnPage: "pivottable" });
             const content = document.createElement("span");
             content.title = "Entry ID: " + entry.id;
             if (entry.hasNote) {
@@ -97,7 +110,7 @@
                 cell.dataset.oldStatus = "3";
                 cell.classList.add("status-3");
             }
-            link.dataset.href = entryUrl(dialog.dataset.entryNewUrl, { topicId, dateYmd: dateLocal, categoryId });
+            link.dataset.href = entryUrl(dialog.dataset.entryNewUrl, { topicId, dateYmd: dateLocal, categoryId, returnPage: "pivottable" });
             link.title = "Add New Entry";
             link.classList.add("add-new-entry");
             link.textContent = "+";
@@ -134,16 +147,20 @@
         closeDialog();
     }
 
-    table.addEventListener("click", async event => {
-        const cell = event.target.closest(".pivot-table-entry-cell");
+    container.addEventListener("click", async event => {
+        const cell = event.target.closest(".pivot-table-entry-cell, .day-tracker-topic");
         if (!cell || active) return;
 
         const entryId = cell.dataset.entryId ?? null;
         const opened = { cell, entryId, noteReady: !entryId, originalNote: "",
             pending: false, shown: false, closing: false, focusAtEnd: false };
         active = opened;
-        title.textContent = cell.closest("tr").dataset.trackerTopic || "Entry";
+        title.textContent = cell.querySelector("[data-topic-name]")?.textContent
+            || cell.closest("tr")?.dataset.trackerTopic || "Entry";
         title.title = title.textContent;
+        dialog.querySelectorAll("[data-day-link]").forEach(link => {
+            link.href = cell.dataset[link.dataset.dayLink];
+        });
         fillEditor("");
         showMessage(entryId ? "Loading note…" : "");
         syncControls();
@@ -176,7 +193,11 @@
             active.closing = true;
         }
     });
-    dialog.addEventListener("hidden.bs.modal", () => { active = null; });
+    dialog.addEventListener("hidden.bs.modal", () => {
+        const cell = active?.cell;
+        active = null;
+        if (cell?.classList.contains("day-tracker-topic")) cell.focus({ preventScroll: true });
+    });
 
     editor.addEventListener("focus", () => {
         if (!active?.focusAtEnd) return;
@@ -217,13 +238,13 @@
         const params = new URLSearchParams({ topicId, localDate });
         mutate(async () => {
             const result = await request(dialog.dataset.cellUrl + "/" + entryId + "?" + params, "DELETE");
-            paintCell(cell, null, result.predictionDate === cell.dataset.dateLocal);
+            paintCell(cell, null, result.predictionDate);
         }, "Could not delete the entry.");
     });
 
     statusButtons.forEach(button => button.addEventListener("click", () => {
         const { cell } = active;
-        const hasNote = Boolean(cell.querySelector(".entry-with-content"));
+        const hasNote = Boolean(cell.querySelector(".entry-with-content, [data-entry-note-icon]:not([hidden])"));
         const payload = { ...cellData(), status: button.dataset.status, oldStatus: cell.dataset.oldStatus };
         mutate(async () => {
             const entry = await request(dialog.dataset.statusUrl, "POST", payload);
@@ -232,8 +253,19 @@
     }));
 
     edit.addEventListener("click", () => {
-        const link = active?.cell.querySelector("[data-href]");
-        if (link) window.location.href = link.dataset.href;
+        const cell = active?.cell;
+        if (!cell) return;
+
+        const link = cell.querySelector("[data-href]");
+        if (link) {
+            window.location.href = link.dataset.href;
+        } else if (cell.classList.contains("day-tracker-topic")) {
+            const { entryId, topicId, categoryId, dateLocal } = cell.dataset;
+            const params = { categoryId, returnPage: "dayTracker" };
+            window.location.href = entryId
+                ? entryUrl(dialog.dataset.entryEditUrl + "/" + entryId, params)
+                : entryUrl(dialog.dataset.entryNewUrl, { ...params, topicId, dateYmd: dateLocal });
+        }
     });
     preview.addEventListener("click", () => {
         if (!active?.entryId) return;
@@ -242,5 +274,14 @@
             htmx.ajax("GET", noteUrl, { target: "#noteModal .modal-body", swap: "innerHTML" });
         }, { once: true });
         closeDialog();
+    });
+
+    const noteModal = document.getElementById("noteModal");
+    const noteBody = noteModal.querySelector(".modal-body");
+    document.body.addEventListener("htmx:afterSwap", event => {
+        if (event.detail.target === noteBody) bootstrap.Modal.getOrCreateInstance(noteModal).show();
+    });
+    document.getElementById("copyNoteBtn").addEventListener("click", () => {
+        navigator.clipboard.writeText(noteBody.innerText);
     });
 })();

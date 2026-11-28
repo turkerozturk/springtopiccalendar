@@ -1013,7 +1013,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
         <div class="table-wrapper">
 
-    <table id="pivot-table" class="table-bordered table-sm caption-top"
+    <table id="pivot-table" data-tracker-entry-container class="table-bordered table-sm caption-top"
            th:data-tracker-locale="${@environment.getProperty('app.locale', 'en')}">
 
         <colgroup>
@@ -2004,89 +2004,7 @@ $(document).ready(function () {
 
 
 
-<!--/* Bu modal tablo hucresi uzerine tiklayinca secenekler gostermek icin kullaniliyor. */-->
-<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalTitle" aria-hidden="true"
-     th:attr="data-cell-url=@{/entry-filter/cell},data-status-url=@{/api/entries/status},
-              data-entry-url=@{/entries},data-entry-new-url=@{/entries/new},data-entry-edit-url=@{/entries/edit}">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content text-center p-3">
-            <h6 class="mb-3 text-truncate" id="statusModalTitle">Entry</h6>
-            <div class="d-flex justify-content-around">
-                <!--/* Edit/New Entry formunu yukleme butonu */-->
-                <button class="btn edit-btn" style="width:50px;height:50px;">
-                    <i class="fa-solid fa-pencil" style="color:#808080;"></i>
-                </button>
-                <!--/* entry notunu noteModal icinde gosterme butonu */-->
-                <button class="btn note-read-btn" style="width:50px;height:50px;" disabled>
-                    <i class="fa-brands fa-readme" style="color: blue;"></i>
-                </button>
-                <!--/* status degistirme dugmeleri */-->
-                <!--/* done dugmesini ortaya koydum mobil cihazda basparmakla erisi kolayligi olmasi icin */-->
-                <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
-                <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
-                <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
-            </div>
-            <form id="tracker-cell-note-form" class="mt-3">
-                <label for="tracker-cell-note" class="visually-hidden">Entry note</label>
-                <div class="d-flex align-items-start gap-2">
-                    <textarea id="tracker-cell-note" class="form-control" rows="1" wrap="off"
-                              placeholder="Entry note" style="min-width:0; resize:none;"></textarea>
-                    <button class="btn btn-primary" type="submit" id="tracker-cell-note-save">Save</button>
-                </div>
-                <div class="d-flex justify-content-between gap-2 mt-2">
-                    <button class="btn btn-sm btn-outline-secondary" type="button" id="tracker-cell-note-newline">
-                        New line
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" type="button" id="tracker-cell-delete" hidden>
-                        Delete entry
-                    </button>
-                </div>
-                <p class="small text-start mb-0 mt-2" id="tracker-cell-message" role="status" hidden></p>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-<!--/* note modal, entry note icerigini gostermek icin. */-->
-<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
-                &nbsp;
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
-
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
-                <!--/* HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor */-->
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<script>
-    // HTMX olayı: içerik yüklendikten hemen sonra
-    document.body.addEventListener('htmx:afterSwap', function(evt) {
-      // Eğer swap hedefi modal-body içindeyse
-      if (evt.detail.target.closest('#noteModal .modal-body')) {
-        // Bootstrap modal’ı göster
-        var modalEl = document.getElementById('noteModal');
-        var modal = new bootstrap.Modal(modalEl);
-        modal.show();
-
-        // Copy butonunu bağla
-        document.getElementById('copyNoteBtn').onclick = function() {
-          var text = modalEl.querySelector('.modal-body').innerText;
-          navigator.clipboard.writeText(text)
-            .then(() => {/* dilerseniz kullanıcıya bildirim gösterin */});
-        };
-      }
-    });
-</script>
-
+<div th:replace="~{fragments/tracker-cell-dialogs :: dialogs(false)}"></div>
 
 <script>
     $(function () {

@@ -1,0 +1,70 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="dialogs(dayTracker)" th:remove="tag">
+<!--/* Bu modal tablo hucresi uzerine tiklayinca secenekler gostermek icin kullaniliyor. */-->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalTitle" aria-hidden="true"
+     th:attr="data-cell-url=@{/entry-filter/cell},data-status-url=@{/api/entries/status},
+              data-entry-url=@{/entries},data-entry-new-url=@{/entries/new},data-entry-edit-url=@{/entries/edit}">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content text-center p-3">
+            <h6 class="mb-3 text-truncate" id="statusModalTitle">Entry</h6>
+            <div class="d-flex justify-content-around">
+                <!--/* Edit/New Entry formunu yukleme butonu */-->
+                <button class="btn edit-btn" style="width:50px;height:50px;">
+                    <i class="fa-solid fa-pencil" style="color:#808080;"></i>
+                </button>
+                <!--/* entry notunu noteModal icinde gosterme butonu */-->
+                <button class="btn note-read-btn" style="width:50px;height:50px;" disabled>
+                    <i class="fa-brands fa-readme" style="color: blue;"></i>
+                </button>
+                <!--/* status degistirme dugmeleri */-->
+                <!--/* done dugmesini ortaya koydum mobil cihazda basparmakla erisi kolayligi olmasi icin */-->
+                <button class="btn btn-success status-btn" data-status="1" style="width:50px;height:50px;"></button>
+                <button class="btn btn-secondary status-btn" data-status="0" style="background-color:gray;width:50px;height:50px;"></button>
+                <button class="btn btn-danger status-btn" data-status="2" style="width:50px;height:50px;"></button>
+            </div>
+            <form id="tracker-cell-note-form" class="mt-3">
+                <label for="tracker-cell-note" class="visually-hidden">Entry note</label>
+                <div class="d-flex align-items-start gap-2">
+                    <textarea id="tracker-cell-note" class="form-control" rows="1" wrap="off"
+                              placeholder="Entry note" style="min-width:0; resize:none;"></textarea>
+                    <button class="btn btn-primary" type="submit" id="tracker-cell-note-save">Save</button>
+                </div>
+                <div class="d-flex justify-content-between gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" id="tracker-cell-note-newline">
+                        New line
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" type="button" id="tracker-cell-delete" hidden>
+                        Delete entry
+                    </button>
+                </div>
+                <p class="small text-start mb-0 mt-2" id="tracker-cell-message" role="status" hidden></p>
+            </form>
+            <nav th:if="${dayTracker == true}" class="day-tracker-dialog-links border-top pt-2 mt-3"
+                 aria-label="Related pages">
+                <a data-day-link="categoryUrl"><i class="fa-solid fa-folder" aria-hidden="true"></i> Category</a>
+                <a data-day-link="topicUrl"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Topic</a>
+                <a data-day-link="trackerUrl"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Tracker</a>
+                <a data-day-link="reportUrl"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> Report</a>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<!--/* note modal, entry note icerigini gostermek icin. */-->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noteModalLabel">Note Detail</h5>
+                &nbsp;
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="copyNoteBtn">Copy</button>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="white-space: pre-line;height: 600px;overflow-y:scroll;">
+                <!--/* HTMX ile buraya tam içerik gelecek, pre-line sayesinde satirlar yanyana degil altalta gorunuyor */-->
+            </div>
+        </div>
+    </div>
+</div>
+</div>

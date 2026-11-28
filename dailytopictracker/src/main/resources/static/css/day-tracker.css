@@ -1,0 +1,128 @@
+.day-tracker {
+    max-width: 44rem;
+}
+
+.day-tracker-controls {
+    background: #f8fafc;
+}
+
+.day-tracker-controls summary {
+    cursor: pointer;
+}
+
+.day-tracker-summary {
+    display: inline-flex;
+    gap: .6rem;
+    align-items: baseline;
+}
+
+.day-tracker-summary time {
+    font-size: .875rem;
+    color: #425467;
+}
+
+.day-tracker-date,
+.day-tracker-search {
+    display: flex;
+    justify-content: center;
+    gap: .35rem;
+}
+
+.day-tracker-date .form-control {
+    min-width: 0;
+    max-width: 12rem;
+}
+
+.day-tracker-search .form-select {
+    width: auto;
+}
+
+.day-tracker-group,
+.day-tracker-category {
+    margin: 0;
+    padding: .5rem .75rem;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.day-tracker-group {
+    margin-top: .8rem;
+    border-radius: .5rem .5rem 0 0;
+    background: #243751;
+    color: white;
+    font-size: 1rem;
+}
+
+.day-tracker-category {
+    background: #e7eef7;
+    color: #22354d;
+    border: 1px solid #c4d1e0;
+    font-size: .9rem;
+}
+
+.day-tracker-topic {
+    display: grid;
+    grid-template-columns: 2.15rem minmax(0, 1fr) 2.15rem;
+    justify-items: center;
+    align-items: center;
+    column-gap: .35rem;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: .35rem .5rem;
+    background: white;
+    color: #1b293a;
+    border: 1px solid #cad4df;
+    border-top: 0;
+}
+
+.day-tracker-topic:hover {
+    box-shadow: inset 0 0 0 1px #7088a3;
+}
+
+.day-tracker-topic:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
+}
+
+.day-tracker-topic[data-old-status="0"] { background: #eceff3; }
+.day-tracker-topic[data-old-status="1"] { background: #d9efde; }
+.day-tracker-topic[data-old-status="2"] { background: #f8dce0; }
+
+.day-tracker-topic-name {
+    grid-column: 2;
+    overflow-wrap: anywhere;
+    min-width: 0;
+}
+
+.day-tracker-topic [data-entry-note-icon],
+.day-tracker-topic [data-entry-prediction] {
+    grid-column: 3;
+    grid-row: 1;
+    color: #154875;
+}
+
+.day-tracker-topic [data-entry-note-icon] {
+    grid-column: 1;
+    justify-self: end;
+}
+
+.day-tracker-prediction {
+    border-radius: 1rem;
+    background: #bde6fc;
+    padding: .15rem .4rem;
+    font-size: .85rem;
+}
+
+.day-tracker-dialog-links {
+    display: flex;
+    justify-content: space-around;
+    gap: .25rem;
+}
+
+.day-tracker-dialog-links a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: .8rem;
+    padding: .35rem .2rem;
+}
