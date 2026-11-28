@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.controller.web;
 
 
+import com.turkerozturk.dtt.helper.EntityIcons;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,11 +114,13 @@ public class CategoryWebController {
     // Yeni kategori kaydetmek için (form post)
     @PostMapping
     public String saveCategory(@ModelAttribute("categoryDTO") Category category,
+                               @RequestParam(required = false) String iconKey,
                                @RequestParam(required = false) String listReturn,
                                RedirectAttributes redirectAttrs,
                                HttpServletRequest request,
                                Model model) {
         String listPath = PageReturnPath.categoryList(listReturn);
+        category.setIconKey(EntityIcons.selection(null, iconKey));
         categoryService.saveCategory(category);
         redirectAttrs.addFlashAttribute("success", "Category created successfully.");
         if (listPath != null) {
@@ -159,6 +162,7 @@ public class CategoryWebController {
     @PostMapping("/update/{id}")
     public String updateCategory(@PathVariable Long id,
                                  @ModelAttribute("categoryDTO") Category dto,
+                                 @RequestParam(required = false) String iconKey,
                                  @RequestParam(required = false) String returnPage,
                                  @RequestParam(required = false) String listReturn,
                                  RedirectAttributes redirectAttributes) {
@@ -168,6 +172,7 @@ public class CategoryWebController {
                 .orElseThrow(() -> new RuntimeException("Category not found!"));
 
         // Sadece adını güncellesin diye basit bir şekilde yazıyoruz
+        category.setIconKey(EntityIcons.selection(category.getIconKey(), iconKey));
         category.setName(dto.getName());
         category.setArchived(dto.isArchived());
        // category.setCategoryGroupNumber(dto.getCategoryGroupNumber());

@@ -22,6 +22,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
 
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body class="p-4">
 <div class="container">
@@ -49,6 +50,8 @@
 
 
 
+
+        <div th:replace="~{fragments/entity-icons :: picker(${group.iconKey})}"></div>
 
         <div class="mb-3">
             <label for="backgroundColor" class="form-label">Color picker</label>

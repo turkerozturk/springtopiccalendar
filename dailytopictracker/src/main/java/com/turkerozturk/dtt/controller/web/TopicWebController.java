@@ -43,6 +43,7 @@ import com.turkerozturk.dtt.service.TopicListCriteria;
 import com.turkerozturk.dtt.service.TopicListService;
 import com.turkerozturk.dtt.service.TopicService;
 import com.turkerozturk.dtt.service.TopicTagService;
+import com.turkerozturk.dtt.helper.EntityIcons;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -228,6 +229,7 @@ public class TopicWebController {
     @Transactional
     public String saveTopic(@ModelAttribute("topic") Topic topic,
                             @RequestParam(required = false) String tagLines,
+                            @RequestParam(required = false) String iconKey,
                             @RequestParam(required = false) String listReturn,
                             @RequestParam(required = false) String categoryReturn,
                             @RequestParam(name="returnPage", required=false) String returnPage,
@@ -248,6 +250,7 @@ public class TopicWebController {
         topic.setCategory(category);
 
         // Kaydet
+        topic.setIconKey(EntityIcons.selection(null, iconKey));
         Topic saved = topicService.saveTopic(topic);
         topicTags.addTags(saved.getId(), topicTags.parseTags(tagLines));
         if (categoryPath != null) {
@@ -355,6 +358,7 @@ public class TopicWebController {
     @Transactional
     public String updateTopic(@PathVariable Long id,
                               @RequestParam(required = false) String tagLines,
+                              @RequestParam(required = false) String iconKey,
                               @RequestParam(required = false) String listReturn,
                               @RequestParam(name = "returnPage", required = false) String returnPage,
                               @ModelAttribute("topic") Topic topic,
@@ -367,6 +371,7 @@ public class TopicWebController {
                 .orElseThrow(() -> new RuntimeException("Topic not found!"));
 
         // Topic bilgilerini güncelle
+        existingTopic.setIconKey(EntityIcons.selection(existingTopic.getIconKey(), iconKey));
         existingTopic.setName(topic.getName());
         existingTopic.setDescription(topic.getDescription());
 

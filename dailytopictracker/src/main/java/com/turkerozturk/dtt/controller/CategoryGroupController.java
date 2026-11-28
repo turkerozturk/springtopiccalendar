@@ -21,6 +21,7 @@
 package com.turkerozturk.dtt.controller;
 
 
+import com.turkerozturk.dtt.helper.EntityIcons;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -137,6 +138,7 @@ public class CategoryGroupController {
     @PostMapping("/new")
     public String create(
             @ModelAttribute("group") CategoryGroup formGroup,
+            @RequestParam(required = false) String iconKey,
             RedirectAttributes redirectAttrs,
             HttpServletRequest request,
             Model model
@@ -152,6 +154,7 @@ public class CategoryGroupController {
         // Otomatik priority ataması
         Integer maxPriority = repo.findMaxPriority().orElse(0);
         formGroup.setPriority(maxPriority + 1);
+        formGroup.setIconKey(EntityIcons.selection(null, iconKey));
 
         repo.save(formGroup);
         redirectAttrs.addFlashAttribute("success", "Category group created successfully.");
@@ -193,6 +196,7 @@ public class CategoryGroupController {
     public String update(
             @PathVariable Long id,
             @ModelAttribute("group") CategoryGroup formGroup,
+            @RequestParam(required = false) String iconKey,
             RedirectAttributes redirectAttrs
     ) {
         if (repo.existsByName(formGroup.getName())
@@ -203,6 +207,7 @@ public class CategoryGroupController {
         }
         CategoryGroup managed = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid CategoryGroup id: " + id));
+        managed.setIconKey(EntityIcons.selection(managed.getIconKey(), iconKey));
         managed.setName(formGroup.getName());
         managed.setBackgroundColor(formGroup.getBackgroundColor());
         managed.setImageFileName(formGroup.getImageFileName());

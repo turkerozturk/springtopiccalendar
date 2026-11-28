@@ -17,6 +17,7 @@
         .topic-row:target { box-shadow: inset .25rem 0 var(--bs-primary); background: var(--bs-primary-bg-subtle); }
         .topic-identity { min-width: 0; }
     </style>
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 <div class="container topics-page mt-2">
@@ -143,8 +144,7 @@
                 class="topic-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div class="topic-identity">
                     <a class="topic-title fw-semibold"
-                       th:href="@{/topics/{id}(id=${topic.id},listCategoryId=${selectedCategoryId},listReturn=${listReturn})}"
-                       th:text="${topic.name}">Topic</a>
+                       th:href="@{/topics/{id}(id=${topic.id},listCategoryId=${selectedCategoryId},listReturn=${listReturn})}"><i th:replace="~{fragments/entity-icons :: icon(${topic.iconKey})}"></i><span th:text="${topic.name}">Topic</span></a>
                     <div class="small text-body-secondary">
                         <span th:text="${topic.categoryName}"></span>
                         <span th:text="| · #${topic.id}|"></span>

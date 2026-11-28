@@ -220,6 +220,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
     </style>
 
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 
@@ -277,7 +278,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
                 <!--/* Üst satır: numara + isim + actions */-->
                 <div class="cg-header" th:style="${'background-color:' + grp.backgroundColor}">
-                    <span class="cg-index" th:text="${jStats.index + 1}"></span>. <span class="cg-name" th:text="${grp.name}">Group Name</span>
+                    <span class="cg-index" th:text="${jStats.index + 1}"></span>. <span class="cg-name"><i th:replace="~{fragments/entity-icons :: icon(${grp.iconKey})}"></i><span th:text="${grp.name}">Group Name</span></span>
                     <div class="cg-actions">
 
                         <a href="#" class="move-up" title="Move Up"
@@ -461,7 +462,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
                                           style="display: inline-block; white-space: normal; color: white; background-color: rgba(25, 25, 112, 0.60); box-shadow: 3px 4px rgba(0,0,0,0.5); padding-left:3px; padding-right:3px;"
                                                 th:href="@{/entry-filter/form?categoryId={id}(id=${cat.id})}">
 
-                                                <span th:text="${cat.name}"></span>
+                                                <i th:replace="~{fragments/entity-icons :: icon(${cat.iconKey})}"></i><span th:text="${cat.name}"></span>
 
                                         </a>
 
@@ -470,7 +471,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 
                                               title="This category is archived. Some pages appear after removing the archive option from the category settings."
                                               >
-                                            <span th:text="${cat.name}" style="color: black; "></span>
+                                            <i th:replace="~{fragments/entity-icons :: icon(${cat.iconKey})}"></i><span th:text="${cat.name}" style="color: black; "></span>
                                         </span>
                                     </span>
 

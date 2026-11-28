@@ -25,6 +25,7 @@ package com.turkerozturk.dtt.controller;
 import com.turkerozturk.dtt.dto.ActivityLevel;
 import com.turkerozturk.dtt.dto.Gender;
 import com.turkerozturk.dtt.entity.Setting;
+import com.turkerozturk.dtt.helper.EntityIcons;
 import com.turkerozturk.dtt.service.SettingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,6 +51,12 @@ public class SettingController {
         model.addAttribute("activityLevels", ActivityLevel.values());
 
         return "settings/index";
+    }
+
+    @PostMapping("/entity-icons")
+    public String setEntityIcons(@RequestParam(defaultValue = "false") boolean enabled) {
+        settingService.setValue(EntityIcons.ENABLED_KEY, Boolean.toString(enabled));
+        return "redirect:/settings";
     }
 
     @PostMapping("/save")

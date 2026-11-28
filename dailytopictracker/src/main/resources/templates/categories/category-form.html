@@ -22,6 +22,7 @@
     <title>Category Form</title>
 
 
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 
@@ -65,6 +66,8 @@
         </div>
 
 
+
+        <div th:replace="~{fragments/entity-icons :: picker(${categoryDTO.iconKey})}"></div>
 
         <input type="hidden" th:field="*{archived}">
         <p th:if="${categoryDTO.id != null}" class="text-body-secondary">

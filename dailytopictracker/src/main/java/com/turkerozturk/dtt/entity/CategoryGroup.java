@@ -38,6 +38,9 @@ public class CategoryGroup {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "icon_key")
+    private String iconKey;
+
     @Column(nullable = false, unique = true)
     private Integer priority;
 

@@ -119,23 +119,25 @@ public class CategoryGroupExportService {
 
     private void insertCategoryGroup(Connection conn, CategoryGroup cg) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO category_groups (id, name, priority, background_color, image_file_name) VALUES (?, ?, ?, ?, ?)")) {
+                "INSERT INTO category_groups (id, name, priority, background_color, image_file_name, icon_key) VALUES (?, ?, ?, ?, ?, ?)")) {
             ps.setLong(1, cg.getId());
             ps.setString(2, cg.getName());
             ps.setInt(3, cg.getPriority());
             ps.setString(4, cg.getBackgroundColor());
             ps.setString(5, cg.getImageFileName());
+            ps.setString(6, cg.getIconKey());
             ps.executeUpdate();
         }
     }
 
     private void insertCategory(Connection conn, Category cat, Long categoryGroupId) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
-                "INSERT INTO categories (id, name, is_archived, category_group_number) VALUES (?, ?, ?, ?)")) {
+                "INSERT INTO categories (id, name, is_archived, category_group_number, icon_key) VALUES (?, ?, ?, ?, ?)")) {
             ps.setLong(1, cat.getId());
             ps.setString(2, cat.getName());
             ps.setInt(3, cat.isArchived() ? 1 : 0);
             ps.setLong(4, categoryGroupId);
+            ps.setString(5, cat.getIconKey());
             ps.executeUpdate();
         }
     }
@@ -154,8 +156,8 @@ public class CategoryGroupExportService {
             data_class_name, image_file_name, interval_rule,
             prediction_date_millis_ymd, last_past_entry_date_millis_ymd, 
             first_warning_entry_date_millis_ymd, first_future_neutral_entry_date_millis_ymd,
-            base_date_millis_ymd, end_date_millis_ymd, weight, category_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            base_date_millis_ymd, end_date_millis_ymd, weight, category_id, icon_key
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -175,6 +177,7 @@ public class CategoryGroupExportService {
             ps.setObject(14, topic.getEndDateMillisYmd(), java.sql.Types.BIGINT);
             ps.setInt(15, topic.getWeight());
             ps.setLong(16, categoryId);
+            ps.setString(17, topic.getIconKey());
 
             ps.executeUpdate();
         }

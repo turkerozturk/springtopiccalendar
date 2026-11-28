@@ -34,14 +34,12 @@ https://github.com/turkerozturk/springtopiccalendar
         <tr th:each="item, iStats : ${filteredItems}"
             th:class="${item.dateLocal} == ${today} ? 'highlight-today' : 'normal-table-row'">
 
-            <td th:text="${item.topic.category.categoryGroup.name}"
-                th:title="${item.topic.category.categoryGroup.name}">Category Group</td>
+            <td th:title="${item.topic.category.categoryGroup.name}"><i th:replace="~{fragments/entity-icons :: icon(${item.topic.category.categoryGroup.iconKey})}"></i><th:block th:text="${item.topic.category.categoryGroup.name}">Category Group</th:block></td>
 
             <td>
                 <a th:href="'/categories/info/' + ${item.topic.category.id}"
-                   th:text="${item.topic.category.name}"
                    th:title="${item.topic.category.name}"
-                   th:classappend="${item.topic.category.archived} ? ' css-archived' : ''">Category</a>
+                   th:classappend="${item.topic.category.archived} ? ' css-archived' : ''"><i th:replace="~{fragments/entity-icons :: icon(${item.topic.category.iconKey})}"></i><th:block th:text="${item.topic.category.name}">Category</th:block></a>
             </td>
 
 
@@ -200,11 +198,8 @@ https://github.com/turkerozturk/springtopiccalendar
                 hx-trigger="click"
                 data-bs-toggle="modal"
                 data-bs-target="#topicInfoModal"
-                th:text="${#strings.abbreviate(item.topic.name, 27)}"
                 th:title="${item.topic.name}"
-
-            >
-            </td>
+            ><i th:replace="~{fragments/entity-icons :: icon(${item.topic.iconKey})}"></i><th:block th:text="${#strings.abbreviate(item.topic.name, 27)}"></th:block></td>
 
 
 

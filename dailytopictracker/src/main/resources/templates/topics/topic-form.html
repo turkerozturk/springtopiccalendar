@@ -22,6 +22,7 @@
         .topic-form-card .editor-preview pre { white-space: pre-wrap; }
         .topic-image-preview { width: 5rem; height: 5rem; object-fit: contain; }
     </style>
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 <main class="container topic-form-page py-3">
@@ -73,6 +74,7 @@
                                    placeholder="Filter categories" autocomplete="off">
                         </div>
                     </div>
+                    <div th:replace="~{fragments/entity-icons :: picker(${topic.iconKey})}"></div>
                     <div class="mb-3">
                         <label for="tagLines" class="form-label">Tags</label>
                         <textarea id="tagLines" name="tagLines" class="form-control" rows="2"

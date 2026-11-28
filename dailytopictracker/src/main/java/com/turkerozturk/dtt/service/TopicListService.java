@@ -43,7 +43,7 @@ public class TopicListService {
         this.locale = Locale.forLanguageTag(language);
     }
 
-    public record TopicRow(long id, String name, String categoryName, boolean pinned, int weight) {}
+    public record TopicRow(long id, String name, String categoryName, boolean pinned, int weight, String iconKey) {}
 
     @Transactional(readOnly = true)
     public Page<TopicRow> browse(Long categoryId, TopicListCriteria criteria, Long profileId) {
@@ -124,7 +124,7 @@ public class TopicListService {
         if (total == 0) return Page.empty(page);
 
         var sql = """
-                SELECT t.id, t.name, c.name AS category_name, t.is_pinned, t.weight, dtt_topic_match(t.name) AS match_rank
+                SELECT t.id, t.name, c.name AS category_name, t.is_pinned, t.weight, t.icon_key, dtt_topic_match(t.name) AS match_rank
                 """ + filter + " ORDER BY " + criteria.sort().sql + " LIMIT ? OFFSET ?";
         var topics = new ArrayList<TopicRow>();
         try (var statement = statement(connection, sql, values)) {
@@ -133,7 +133,7 @@ public class TopicListService {
             try (var rows = statement.executeQuery()) {
                 while (rows.next()) {
                     topics.add(new TopicRow(rows.getLong("id"), rows.getString("name"), rows.getString("category_name"),
-                            rows.getBoolean("is_pinned"), rows.getInt("weight")));
+                            rows.getBoolean("is_pinned"), rows.getInt("weight"), rows.getString("icon_key")));
                 }
             }
         }

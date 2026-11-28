@@ -26,7 +26,7 @@ public class CategoryListService {
         this.locale = Locale.forLanguageTag(language);
     }
 
-    public record Row(long id, String name, long groupId, String groupName, boolean archived, long topicCount) {}
+    public record Row(long id, String name, long groupId, String groupName, boolean archived, long topicCount, String iconKey) {}
 
     public record Filter(String q, Long groupId, Boolean archived, Sort sort, Integer page) {
         public Filter {
@@ -71,7 +71,7 @@ public class CategoryListService {
         // Fetch only category summaries and count topics without loading entries or JPA collections.
         var summaries = jdbc.query("""
                 SELECT c.id, c.name, c.category_group_number AS group_id,
-                       COALESCE(g.name, 'Unassigned') AS group_name, c.is_archived, COUNT(t.id) AS topic_count
+                       COALESCE(g.name, 'Unassigned') AS group_name, c.is_archived, COUNT(t.id) AS topic_count, c.icon_key
                 FROM categories c
                 LEFT JOIN category_groups g ON g.id = c.category_group_number
                 LEFT JOIN topics t ON t.category_id = c.id
@@ -80,10 +80,10 @@ public class CategoryListService {
                   AND (? IS NULL OR c.id IN (
                       SELECT category_id FROM category_profile_categories WHERE profile_id = ?
                   ))
-                GROUP BY c.id, c.name, c.category_group_number, g.name, c.is_archived
+                GROUP BY c.id, c.name, c.category_group_number, g.name, c.is_archived, c.icon_key
                 """, (row, number) -> new Row(row.getLong("id"), row.getString("name"),
                 row.getLong("group_id"), row.getString("group_name"), row.getBoolean("is_archived"),
-                row.getLong("topic_count")), filter.groupId(), filter.groupId(), filter.archived(), filter.archived(), profileId, profileId);
+                row.getLong("topic_count"), row.getString("icon_key")), filter.groupId(), filter.groupId(), filter.archived(), filter.archived(), profileId, profileId);
 
         var collator = Collator.getInstance(locale);
         collator.setStrength(Collator.SECONDARY);

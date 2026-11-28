@@ -29,6 +29,15 @@
             <button type="button" class="btn btn-primary" id="add-setting">Add setting</button>
         </div>
 
+        <form class="d-flex flex-wrap align-items-center gap-2 my-3" th:action="@{/settings/entity-icons}" method="post">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="entity-icons-enabled" name="enabled" value="true"
+                       th:checked="${entityIconsEnabled}">
+                <label class="form-check-label" for="entity-icons-enabled">Show group, category and topic icons</label>
+            </div>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+        </form>
+
         <div class="row g-2">
             <div class="col-sm-8">
                 <label for="setting-search" class="form-label mb-1">Filter by key or value</label>

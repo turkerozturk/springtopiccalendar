@@ -65,6 +65,10 @@ public class SettingService {
         return settingRepository.save(setting);
     }
 
+    public void setValue(String key, String value) {
+        settingRepository.upsert(key, value);
+    }
+
     public void deleteById(Long id) {
         settingRepository.deleteById(id);
     }

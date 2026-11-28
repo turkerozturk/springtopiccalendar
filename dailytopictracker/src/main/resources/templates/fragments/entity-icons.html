@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<i th:fragment="icon(key)" th:if="${entityIconsEnabled == true and key != null and entityIconCatalog.containsKey(key)}"
+   class="dtt-entity-icon fa-solid" th:classappend="'fa-' + ${key}" aria-hidden="true"></i>
+
+<details th:fragment="picker(current)" data-entity-icon-picker class="border rounded p-2 mb-3"
+         th:with="selected=${current != null and entityIconCatalog.containsKey(current) ? current : ''}">
+    <summary class="fw-semibold">
+        Icon
+        <i data-icon-preview class="fa-solid" th:classappend="${selected.isEmpty() ? '' : 'fa-' + selected}"
+           th:hidden="${selected.isEmpty()}" aria-hidden="true"></i>
+        <span data-icon-label class="fw-normal text-body-secondary"
+              th:text="${selected.isEmpty() ? 'No icon' : entityIconCatalog.get(selected)}">No icon</span>
+    </summary>
+    <label class="visually-hidden" for="entity-icon-search">Find icons</label>
+    <input id="entity-icon-search" type="search" class="form-control form-control-sm my-2"
+           placeholder="Find icons" autocomplete="off" data-icon-search>
+    <div class="dtt-icon-choices" role="group" aria-label="Icon choices">
+        <label data-icon-choice="No icon" title="No icon">
+            <input class="visually-hidden" type="radio" name="iconKey" value="" th:checked="${selected.isEmpty()}">
+            <span><i class="fa-solid fa-ban" aria-hidden="true"></i><span class="visually-hidden">No icon</span></span>
+        </label>
+        <label th:each="icon : ${entityIconCatalog}" th:title="${icon.value}" th:data-icon-choice="${icon.value}">
+            <input class="visually-hidden" type="radio" name="iconKey" th:value="${icon.key}"
+                   th:checked="${selected == icon.key}">
+            <span><i class="fa-solid" th:classappend="'fa-' + ${icon.key}" aria-hidden="true"></i><span
+                  class="visually-hidden" th:text="${icon.value}"></span></span>
+        </label>
+    </div>
+    <p data-icon-empty class="small mt-2 mb-0" role="status" hidden>No matching icons.</p>
+    <script defer th:src="@{/js/entity-icon-picker.js}"></script>
+</details>
+</body>
+</html>

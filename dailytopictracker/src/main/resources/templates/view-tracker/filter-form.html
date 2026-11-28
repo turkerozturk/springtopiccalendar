@@ -628,6 +628,7 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
             cursor: not-allowed;
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 
@@ -1055,10 +1056,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                       th:if="${cat.id} == ${filterDto.categoryId}">
 
                 <!--/* your existing link */-->
-                <a th:text="${'-&nbsp;' + cat.name}"
-                   th:title="${'Click to rename'}"
-                   th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">
-                </a>
+                <a th:title="${'Click to rename'}"
+                   th:href="@{/categories/edit/{id}(id=${cat.id}, returnPage= 'pivottable')}">-&nbsp;<i th:replace="~{fragments/entity-icons :: icon(${cat.iconKey})}"></i><span th:text="${cat.name}"></span></a>
 
                             <!--/* position / total */-->
                 <span class="ms-2"
@@ -1071,10 +1070,8 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
 
 
             <th:block th:if="${selectedCategory != null && selectedCategory.archived}">
-                <a th:text="${'-&nbsp;' + selectedCategory.name}"
-                   th:title="${'Click to rename'}"
-                   th:href="@{/categories/edit/{id}(id=${selectedCategory.id}, returnPage= 'pivottable')}">
-                </a>
+                <a th:title="${'Click to rename'}"
+                   th:href="@{/categories/edit/{id}(id=${selectedCategory.id}, returnPage= 'pivottable')}">-&nbsp;<i th:replace="~{fragments/entity-icons :: icon(${selectedCategory.iconKey})}"></i><span th:text="${selectedCategory.name}"></span></a>
                 <span> &nbsp;[An archived category does not have previous and next category navigation buttons.]</span>
             </th:block>
 
@@ -1253,11 +1250,11 @@ background: radial-gradient(circle, gainsboro 30%, rgba(255, 255, 255, 1) 100%);
                 hx-trigger="click"
                 data-bs-toggle="modal"
                 data-bs-target="#topicInfoModal">
-                <span th:text="${topic.name}">Topic Name</span>
+                <i th:replace="~{fragments/entity-icons :: icon(${topic.iconKey})}"></i><span th:text="${topic.name}">Topic Name</span>
             </td>
 
             <!--/* kondisyonal sütun: category sütunu sadece tek bir kategori seçilmediğinde görünsün */-->
-            <td class="left-frozen-category" id="category-name" th:if="${filterDto.categoryId == null}" th:text="${topic.category.name}"></td>
+            <td class="left-frozen-category" id="category-name" th:if="${filterDto.categoryId == null}"><i th:replace="~{fragments/entity-icons :: icon(${topic.category.iconKey})}"></i><span th:text="${topic.category.name}"></span></td>
 
             <!--/* Ardından pivotData.dateRange kadar hücre */-->
             <!--/* pivotData.dateRange kadar hücre */-->

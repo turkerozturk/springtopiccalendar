@@ -17,6 +17,7 @@
         .category-row:target { box-shadow: inset .25rem 0 var(--bs-primary); background: var(--bs-primary-bg-subtle); }
         .category-identity { min-width: 0; }
     </style>
+    <link rel="stylesheet" th:href="@{/css/entity-icons.css}">
 </head>
 <body>
 <div class="container categories-page mt-2">
@@ -100,9 +101,7 @@
                 class="category-row list-group-item px-2 py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div class="category-identity">
                     <div class="d-flex flex-wrap gap-2 align-items-baseline">
-                        <a class="fw-semibold" th:href="@{/topics(categoryId=${category.id})}" th:text="${category.name}">
-                            Category
-                        </a>
+                        <a class="fw-semibold" th:href="@{/topics(categoryId=${category.id})}"><i th:replace="~{fragments/entity-icons :: icon(${category.iconKey})}"></i><span th:text="${category.name}">Category</span></a>
                         <span class="badge rounded-pill"
                               th:classappend="${category.archived ? 'text-bg-secondary' : 'text-bg-light'}"
                               th:text="${category.archived ? 'Archived' : 'Active'}"></span>

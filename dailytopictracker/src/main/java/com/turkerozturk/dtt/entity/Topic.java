@@ -46,6 +46,9 @@ public class Topic {
     private Category category;
 
     private String name;
+
+    @Column(name = "icon_key")
+    private String iconKey;
     private String description;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

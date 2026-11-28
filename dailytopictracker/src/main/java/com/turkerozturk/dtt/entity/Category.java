@@ -37,6 +37,9 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name = "icon_key")
+    private String iconKey;
+
     @Column(name = "is_archived", nullable = false)
     private boolean archived;
 
