@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Topic Tree</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/jquery.fancytree/2.38.5/dist/skin-win8/ui.fancytree.min.css}">
+    <link rel="stylesheet" th:href="@{/css/topic-tree.css}">
+    <script defer th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+    <script defer th:src="@{/webjars/jquery.fancytree/2.38.5/dist/jquery.fancytree-all-deps.min.js}"></script>
+    <script defer th:src="@{/js/topic-tag-filter.js}"></script>
+    <script defer th:src="@{/js/topic-tree.js}"></script>
+</head>
+<body>
+<main id="topic-tree-page" class="container-fluid topic-tree-page"
+      th:attr="data-nodes-url=@{/topic-tree/nodes},data-panel-url=@{/topic-tree/topic},
+               data-show-date=${showTreeDate},data-show-tags=${showTreeTags},data-show-icons=${showTreeIcons}">
+    <header class="d-flex align-items-center gap-3 py-2">
+        <a th:href="@{/}" class="btn btn-sm btn-outline-secondary">Home</a>
+        <h1 class="h5 mb-0">Topic Tree</h1>
+        <a th:href="@{/settings}" class="ms-auto">Settings</a>
+    </header>
+    <div id="topic-tree-layout" class="topic-tree-layout">
+        <aside id="topic-tree-navigation" class="topic-tree-navigation border rounded" aria-label="Topic navigation">
+            <a id="topic-tree-profile" th:href="@{/profiles}" class="small mx-2 mt-2" hidden></a>
+            <details id="topic-tree-tag-filter" class="border rounded m-2 p-2">
+                <summary>Topic tags <span id="topic-tree-tag-summary" class="small text-body-secondary"></span></summary>
+                <div class="d-flex gap-2 mt-2 mb-2">
+                    <label for="topic-tree-tag-search" class="visually-hidden">Find tags</label>
+                    <input type="search" class="form-control form-control-sm" id="topic-tree-tag-search"
+                           placeholder="Find tags">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="topic-tree-tag-clear">Clear</button>
+                </div>
+                <div class="topic-tree-tag-options">
+                    <p id="topic-tree-tag-empty" class="small mb-0" th:hidden="${!topicTags.isEmpty()}">No matching tags.</p>
+                    <div class="topic-tree-tag" th:each="tag, iter : ${topicTags}">
+                        <label th:for="'topic-tree-tag-' + ${iter.index}" th:text="${tag}">Tag</label>
+                        <select th:id="'topic-tree-tag-' + ${iter.index}" th:data-tree-tag="${tag}"
+                                class="form-select form-select-sm w-auto">
+                            <option value="">Any</option>
+                            <option value="include">Include</option>
+                            <option value="exclude">Exclude</option>
+                        </select>
+                    </div>
+                </div>
+            </details>
+            <p id="topic-tree-status" class="small mx-2" role="status">Loading topics…</p>
+            <div id="topic-tree-nodes" class="topic-tree-nodes" aria-label="Database tree"></div>
+        </aside>
+        <div id="topic-tree-splitter" role="separator" aria-label="Resize the topic navigation"
+             aria-orientation="vertical" aria-controls="topic-tree-navigation" aria-valuemin="22" aria-valuemax="70"
+             aria-valuenow="34" tabindex="0"></div>
+        <section id="topic-tree-content" class="topic-tree-content border rounded" aria-label="Topic content">
+            <button type="button" id="topic-tree-back" class="btn btn-sm btn-outline-secondary mb-3">‹ Back to tree</button>
+            <div id="topic-tree-panel">
+                <p class="text-body-secondary">Select a topic to add an entry or view its details.</p>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

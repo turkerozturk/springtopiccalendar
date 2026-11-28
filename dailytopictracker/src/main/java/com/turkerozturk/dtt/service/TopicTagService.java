@@ -61,18 +61,7 @@ public class TopicTagService {
                 WHERE t.name IS NOT NULL
                 """);
         var parameters = new MapSqlParameterSource();
-        if (!include.isEmpty()) {
-            sql.append("""
-                     AND t.id IN (SELECT topic_id FROM topic_tags WHERE tag IN (:include))
-                    """);
-            parameters.addValue("include", include);
-        }
-        if (!exclude.isEmpty()) {
-            sql.append("""
-                     AND NOT EXISTS (SELECT 1 FROM topic_tags tt WHERE tt.topic_id = t.id AND tt.tag IN (:exclude))
-                    """);
-            parameters.addValue("exclude", exclude);
-        }
+        appendTopicFilter(sql, parameters, include, exclude);
 
         // Keep the existing locale-aware substring search and alphabetical order.
         String needle = query.toLowerCase(locale);
@@ -88,6 +77,23 @@ public class TopicTagService {
         });
         matches.sort(Comparator.comparing(DayViewTopic::topicName, collator()).thenComparingLong(DayViewTopic::id));
         return matches;
+    }
+
+    // The caller's topic table must use the alias t.
+    static void appendTopicFilter(StringBuilder sql, MapSqlParameterSource parameters,
+                                  List<String> include, List<String> exclude) {
+        if (!include.isEmpty()) {
+            sql.append("""
+                     AND t.id IN (SELECT topic_id FROM topic_tags WHERE tag IN (:include))
+                    """);
+            parameters.addValue("include", include);
+        }
+        if (!exclude.isEmpty()) {
+            sql.append("""
+                     AND NOT EXISTS (SELECT 1 FROM topic_tags tt WHERE tt.topic_id = t.id AND tt.tag IN (:exclude))
+                    """);
+            parameters.addValue("exclude", exclude);
+        }
     }
 
     private List<String> sorted(List<String> tags) {

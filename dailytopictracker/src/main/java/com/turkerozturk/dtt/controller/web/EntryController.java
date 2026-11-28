@@ -1352,7 +1352,9 @@ public class EntryController {
                             HttpServletRequest request) {
 
         String returnPage = request.getParameter("returnPage");
-        boolean fromTopic = returnsToTopic(returnPage) && formEntry.getId() == null;
+        boolean fromTree = "topicTree".equals(returnPage) && formEntry.getId() == null;
+        boolean inlineTree = fromTree && "true".equals(request.getHeader("X-Topic-Tree"));
+        boolean fromTopic = (fromTree || returnsToTopic(returnPage)) && formEntry.getId() == null;
         boolean hasReturnLocation = "entryList".equals(returnPage) || "entryBrowse".equals(returnPage);
         String topicListPath = fromTopic ? PageReturnPath.topicList(listReturn) : null;
         if (fromTopic || hasReturnLocation) {
@@ -1401,6 +1403,9 @@ public class EntryController {
             // a) Aynı topic+date'li kayıt var mı?
             Optional<Entry> existing = entryRepository.findByTopicIdAndDateMillisYmd(topicId, dateMillisYmd);
             if (existing.isPresent()) {
+                if (inlineTree) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "An entry already exists for this date");
+                }
                 // Kayıt varsa formu tekrar göster ve hata mesajı ver
                 if (fromTopic) {
                     model.addAttribute("errorMessage", "An entry already exists for this date. Choose a different date.");
@@ -1491,6 +1496,10 @@ public class EntryController {
             return "redirect:" + entryReturnPath(returnPage, entryListLocation, browseReturn, formEntry.getId());
         }
 
+        if (fromTree) {
+            return inlineTree ? "redirect:/topic-tree/topic/" + topicId + "?saved=true"
+                    : "redirect:/topic-tree?topicId=" + topicId + "&saved=true";
+        }
         if (fromTopic) {
             long listCategory = listCategoryId != null ? listCategoryId : categoryId;
             if ("topicDetail".equals(returnPage)) {
@@ -1525,7 +1534,9 @@ public class EntryController {
         long listCategory = listCategoryId != null ? listCategoryId : entry.getTopic().getCategory().getId();
         model.addAttribute("listCategoryId", listCategory);
         model.addAttribute("listReturn", topicListPath);
-        if ("topicDetail".equals(returnPage)) {
+        if ("topicTree".equals(returnPage)) {
+            model.addAttribute("topicReturnPath", "/topic-tree?topicId=" + entry.getTopic().getId());
+        } else if ("topicDetail".equals(returnPage)) {
             model.addAttribute("topicReturnPath", historyFilter.returnPath(entry.getTopic().getId(), listCategory, topicListPath));
         } else {
             String path = topicListPath != null ? topicListPath : "/topics?categoryId=" + listCategory;

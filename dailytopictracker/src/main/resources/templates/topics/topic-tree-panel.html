@@ -1,0 +1,51 @@
+<section xmlns:th="http://www.thymeleaf.org" th:fragment="panel"
+         th:attr="data-panel-topic=${topic.id},data-last-entry=${entrySummary.lastEntryDate}">
+    <header class="mb-3">
+        <h2 class="h4 mb-1" th:text="${topic.name}">Topic</h2>
+        <p class="text-body-secondary mb-1"
+           th:text="|${topic.category.categoryGroup.name} / ${topic.category.name}|">Group / Category</p>
+        <a th:href="@{/topics/{id}(id=${topic.id})}">Topic details</a>
+        <span aria-hidden="true"> · </span>
+        <a th:href="@{/entries(topicId=${topic.id})}">Entries</a>
+    </header>
+    <form th:action="@{/entries/save}" method="post" class="border rounded p-3 mb-3" data-tree-entry-form>
+        <h3 class="h6">Add entry</h3>
+        <input type="hidden" name="returnPage" value="topicTree">
+        <input type="hidden" name="topic.id" th:value="${topic.id}">
+        <div class="row g-2 mb-2">
+            <div class="col-sm">
+                <label for="tree-entry-date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="tree-entry-date" name="topicEntryDate"
+                       th:value="${today}" required>
+            </div>
+            <div class="col-sm">
+                <label for="tree-entry-status" class="form-label">Status</label>
+                <select class="form-select" id="tree-entry-status" name="status">
+                    <option value="0">Not marked</option>
+                    <option value="1">Done</option>
+                    <option value="2">Warning</option>
+                </select>
+            </div>
+        </div>
+        <label for="tree-entry-note" class="form-label">Note (Markdown)</label>
+        <textarea class="form-control mb-2" id="tree-entry-note" name="note.content" rows="4"></textarea>
+        <button type="submit" class="btn btn-primary">Save entry</button>
+        <p data-tree-entry-message role="status" th:text="${saved ? 'Entry saved.' : ''}"
+           class="small mb-0 mt-2" th:hidden="${!saved}"></p>
+    </form>
+    <section aria-label="Topic info" class="topic-tree-info">
+        <h3 class="h6">Topic info</h3>
+        <dl class="d-flex flex-wrap column-gap-3 row-gap-1 small mb-2">
+            <div class="d-flex gap-1"><dt>Entries</dt><dd class="mb-0" th:text="${entrySummary.count}">0</dd></div>
+            <div class="d-flex gap-1"><dt>Weight</dt><dd class="mb-0" th:text="${topic.weight}">0</dd></div>
+            <div th:if="${topic.someTimeLater != null and topic.someTimeLater > 0}" class="d-flex gap-1">
+                <dt>Prediction interval</dt><dd class="mb-0" th:text="|${topic.someTimeLater} days|">7 days</dd>
+            </div>
+        </dl>
+        <p th:if="${!topicTags.isEmpty()}" class="small mb-2">
+            <span th:each="tag : ${topicTags}" class="badge text-bg-light me-1" th:text="${tag}">Tag</span>
+        </p>
+        <div th:if="${!#strings.isEmpty(descriptionHtml)}" th:utext="${descriptionHtml}"></div>
+        <p th:if="${#strings.isEmpty(descriptionHtml)}" class="text-body-secondary">No description.</p>
+    </section>
+</section>

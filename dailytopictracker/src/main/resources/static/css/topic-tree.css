@@ -1,0 +1,135 @@
+.topic-tree-page {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    padding-bottom: .5rem;
+}
+
+.topic-tree-layout {
+    --tree-width: 34%;
+    display: grid;
+    grid-template-columns: minmax(13rem, var(--tree-width)) .65rem minmax(0, 1fr);
+    flex: 1;
+    min-height: 0;
+}
+
+.topic-tree-navigation {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.topic-tree-nodes {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.topic-tree-nodes ul.fancytree-container {
+    border: 0;
+    font-size: .9rem;
+    overflow: visible;
+}
+
+.topic-tree-nodes .fancytree-title {
+    white-space: nowrap;
+}
+
+.topic-tree-name {
+    font-weight: 500;
+}
+
+.topic-tree-icon,
+.topic-tree-date {
+    display: inline-block;
+    margin-inline-end: .35rem;
+}
+
+.topic-tree-date {
+    min-width: 10ch;
+    color: var(--bs-secondary-color);
+    font-variant-numeric: tabular-nums;
+}
+
+.topic-tree-tags {
+    display: inline-flex;
+    gap: .25rem;
+    margin-inline-start: .4rem;
+}
+
+.topic-tree-tag-options {
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+.topic-tree-tag:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .25rem;
+}
+
+.topic-tree-tag label {
+    overflow-wrap: anywhere;
+}
+
+.topic-tree-content {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    padding: 1rem;
+}
+
+.topic-tree-info {
+    overflow-wrap: anywhere;
+}
+
+.topic-tree-info img {
+    max-width: 100%;
+    height: auto;
+}
+
+#topic-tree-splitter {
+    background: var(--bs-border-color);
+    border-inline: 2px solid var(--bs-body-bg);
+    cursor: col-resize;
+    touch-action: none;
+}
+
+#topic-tree-splitter:hover,
+#topic-tree-splitter:focus-visible {
+    background: var(--bs-primary);
+}
+
+body.topic-tree-resizing {
+    user-select: none;
+    cursor: col-resize;
+}
+
+#topic-tree-back {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .topic-tree-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #topic-tree-splitter,
+    .topic-tree-content,
+    .topic-tree-layout.show-content .topic-tree-navigation {
+        display: none;
+    }
+
+    .topic-tree-layout.show-content .topic-tree-content,
+    #topic-tree-back {
+        display: block;
+    }
+
+    .topic-tree-nodes span.fancytree-node {
+        min-height: 2rem;
+        padding: .25rem 0;
+    }
+}

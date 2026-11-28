@@ -32,6 +32,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import com.turkerozturk.dtt.helper.SettingHelper;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,11 +43,14 @@ import org.springframework.web.bind.annotation.*;
 public class SettingController {
 
     private final SettingService settingService;
+    private final SettingHelper settingHelper;
 
     @GetMapping
     public String page(Model model) {
 
         model.addAttribute("settings", settingService.findAll());
+        model.addAttribute("showTreeDate", settingHelper.getBoolean(TopicTreeController.SHOW_DATE, true));
+        model.addAttribute("showTreeTags", settingHelper.getBoolean(TopicTreeController.SHOW_TAGS, true));
 
         model.addAttribute("genders", Gender.values());
         model.addAttribute("activityLevels", ActivityLevel.values());
@@ -56,6 +61,15 @@ public class SettingController {
     @PostMapping("/entity-icons")
     public String setEntityIcons(@RequestParam(defaultValue = "false") boolean enabled) {
         settingService.setValue(EntityIcons.ENABLED_KEY, Boolean.toString(enabled));
+        return "redirect:/settings";
+    }
+
+    @PostMapping("/topic-tree")
+    @Transactional
+    public String setTopicTreePreferences(@RequestParam(defaultValue = "false") boolean showLastEntryDate,
+                                          @RequestParam(defaultValue = "false") boolean showTags) {
+        settingService.setValue(TopicTreeController.SHOW_DATE, Boolean.toString(showLastEntryDate));
+        settingService.setValue(TopicTreeController.SHOW_TAGS, Boolean.toString(showTags));
         return "redirect:/settings";
     }
 

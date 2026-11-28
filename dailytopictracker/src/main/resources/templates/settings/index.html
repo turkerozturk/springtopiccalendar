@@ -38,6 +38,20 @@
             <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
         </form>
 
+        <form class="d-flex flex-wrap align-items-center gap-2 my-3" th:action="@{/settings/topic-tree}" method="post">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="tree-last-entry-date" name="showLastEntryDate" value="true"
+                       th:checked="${showTreeDate}">
+                <label class="form-check-label" for="tree-last-entry-date">Show last entry dates in Topic Tree</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="tree-show-tags" name="showTags" value="true"
+                       th:checked="${showTreeTags}">
+                <label class="form-check-label" for="tree-show-tags">Show tags in Topic Tree</label>
+            </div>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+        </form>
+
         <div class="row g-2">
             <div class="col-sm-8">
                 <label for="setting-search" class="form-label mb-1">Filter by key or value</label>
