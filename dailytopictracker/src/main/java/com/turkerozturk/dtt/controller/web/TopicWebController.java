@@ -42,6 +42,8 @@ import com.turkerozturk.dtt.service.TopicDetailsService;
 import com.turkerozturk.dtt.service.TopicListCriteria;
 import com.turkerozturk.dtt.service.TopicListService;
 import com.turkerozturk.dtt.service.TopicService;
+import com.turkerozturk.dtt.service.TopicTagService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.time.Instant;
@@ -69,15 +71,17 @@ public class TopicWebController {
     private final MarkdownService markdownService;
     private final TopicListService topicListService;
     private final CategoryProfileService profileService;
+    private final TopicTagService topicTags;
 
     public TopicWebController(AppTimeZoneProvider timeZoneProvider, TopicDetailsService topicDetailsService,
                               MarkdownService markdownService, TopicListService topicListService,
-                              CategoryProfileService profileService) {
+                              CategoryProfileService profileService, TopicTagService topicTags) {
         this.timeZoneProvider = timeZoneProvider;
         this.topicDetailsService = topicDetailsService;
         this.markdownService = markdownService;
         this.topicListService = topicListService;
         this.profileService = profileService;
+        this.topicTags = topicTags;
     }
 
     @GetMapping("/{id}")
@@ -221,7 +225,9 @@ public class TopicWebController {
 
     // Yeni topic kaydetme
     @PostMapping
+    @Transactional
     public String saveTopic(@ModelAttribute("topic") Topic topic,
+                            @RequestParam(required = false) String tagLines,
                             @RequestParam(required = false) String listReturn,
                             @RequestParam(required = false) String categoryReturn,
                             @RequestParam(name="returnPage", required=false) String returnPage,
@@ -242,7 +248,8 @@ public class TopicWebController {
         topic.setCategory(category);
 
         // Kaydet
-        topicService.saveTopic(topic);
+        Topic saved = topicService.saveTopic(topic);
+        topicTags.addTags(saved.getId(), topicTags.parseTags(tagLines));
         if (categoryPath != null) {
             return "redirect:" + PageReturnPath.categoryAnchor(categoryPath, categoryId);
         }
@@ -300,6 +307,7 @@ public class TopicWebController {
         model.addAttribute("categories", categoryDTOList);
 
         model.addAttribute("topic", topic);
+        model.addAttribute("tagLines", String.join("\n", topicTags.tagsForTopic(id)));
 
         // basla
         List<Entry> entries = topic.getActivities();
@@ -344,7 +352,9 @@ public class TopicWebController {
 
     // Mevcut topic'i güncelleme
     @PostMapping("/update/{id}")
+    @Transactional
     public String updateTopic(@PathVariable Long id,
+                              @RequestParam(required = false) String tagLines,
                               @RequestParam(required = false) String listReturn,
                               @RequestParam(name = "returnPage", required = false) String returnPage,
                               @ModelAttribute("topic") Topic topic,
@@ -383,6 +393,9 @@ public class TopicWebController {
 
         // If the topic is changed while updating an existing record, the variables of the old and new topic are recalculated.
         topicService.updateTopicStatus(existingTopic.getId());
+        if (tagLines != null) {
+            topicTags.replaceTags(id, topicTags.parseTags(tagLines));
+        }
         if (listPath != null) {
             return "redirect:" + PageReturnPath.topicAnchor(listPath, existingTopic.getId());
         }

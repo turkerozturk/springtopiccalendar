@@ -26,6 +26,7 @@ public class CategoryGroupExportService {
     private final DataSource mainDataSource;
   //  private final Flyway flyway;
     private final CategoryGroupRepository categoryGroupRepository;
+    private final TopicTagService topicTags;
 
     public Path exportCategoryGroups(List<Long> categoryGroupIds, boolean includeEntries) throws Exception {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
@@ -102,6 +103,7 @@ public class CategoryGroupExportService {
                 insertCategory(conn, cat, cg.getId());
                 for (Topic topic : cat.getTopics()) {
                     insertTopic(conn, topic, cat.getId());
+                    copyTopicTags(conn, topic.getId());
                     if(includeEntries) {
                         for (Entry entry : topic.getActivities()) {
                             insertEntry(conn, entry, topic.getId());
@@ -178,6 +180,22 @@ public class CategoryGroupExportService {
         }
     }
 
+
+    private void copyTopicTags(Connection conn, long topicId) throws SQLException {
+        List<String> tags = topicTags.tagsForTopic(topicId);
+        try (var delete = conn.prepareStatement("DELETE FROM topic_tags WHERE topic_id = ?");
+             var insert = conn.prepareStatement("INSERT INTO topic_tags (topic_id, tag) VALUES (?, ?)")) {
+            // Replace the export database's auto-generated category tag with the actual set.
+            delete.setLong(1, topicId);
+            delete.executeUpdate();
+            for (String tag : tags) {
+                insert.setLong(1, topicId);
+                insert.setString(2, tag);
+                insert.addBatch();
+            }
+            insert.executeBatch();
+        }
+    }
 
     private void insertEntry(Connection conn, Entry entry, Long topicId) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(

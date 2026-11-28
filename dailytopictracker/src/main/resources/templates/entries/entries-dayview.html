@@ -197,6 +197,13 @@
         border-bottom: 2px solid yellow;
         background-color: Snow;
     }
+    [data-topic-tag-row]:not([hidden]) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .5rem;
+    }
+
     .category-name-in-search-box {
         font-size: small;
         font-style: italic;
@@ -224,7 +231,33 @@
 
 
 
-  <label>Add Entry</label>
+  <details id="dayview-tag-filter" class="border rounded bg-white p-2 mb-2">
+    <summary>
+      Topic tags <span id="dayview-tag-summary" class="small text-body-secondary"></span>
+    </summary>
+    <div class="mt-2">
+      <p class="form-text mt-0">Match any included tag. Excluded tags always hide a topic.</p>
+      <div class="d-flex gap-2 mb-2">
+        <label class="visually-hidden" for="dayview-tag-query">Find tags</label>
+        <input id="dayview-tag-query" type="search" class="form-control form-control-sm" placeholder="Find tags">
+        <button type="button" id="dayview-tag-clear" class="btn btn-sm btn-outline-secondary">Clear</button>
+      </div>
+      <div style="max-height: 14rem; overflow-y:auto;">
+        <p id="dayview-tag-empty" class="small mb-0" role="status" th:hidden="${!topicTags.isEmpty()}">No matching tags.</p>
+        <div th:each="tag, i : ${topicTags}" data-topic-tag-row>
+          <label th:for="'dayview-tag-' + ${i.index}" th:text="${tag}" class="text-break"></label>
+          <select th:id="'dayview-tag-' + ${i.index}" th:data-topic-tag="${tag}"
+                  class="form-select form-select-sm w-auto mb-1">
+            <option value="">Any</option>
+            <option value="include">Include</option>
+            <option value="exclude">Exclude</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <label for="foodSearchInput">Add Entry</label>
   <input type="text" id="foodSearchInput" class="form-control form-control-sm" placeholder="Öğe adı yaz..." autofocus>
 
   <ul id="foodSearchResults" class="list-group mt-1"></ul>
@@ -301,6 +334,7 @@
 
 
 <script type="text/javascript" th:src="@{/webjars/jquery/3.7.1/jquery.min.js}"></script>
+<script th:src="@{/js/topic-tag-filter.js}"></script>
 
 <script type="text/javascript"
         th:src="@{/webjars/bootstrap/5.3.7/js/bootstrap.min.js}"></script>
@@ -549,84 +583,120 @@ $('#nextDayBtn').click(function () {
       });
 
 
-        // topic arama kodu
+    const $input = $('#foodSearchInput');
+    const $results = $('#foodSearchResults');
+    const panel = document.getElementById("dayview-tag-filter");
+    const tagSelects = [...panel.querySelectorAll("[data-topic-tag]")];
+    const tagSummary = document.getElementById("dayview-tag-summary");
+    const tagSearch = document.getElementById("dayview-tag-query");
+    const noTags = document.getElementById("dayview-tag-empty");
+    const clearTags = document.getElementById("dayview-tag-clear");
+    const preferences = window.dttTopicTagFilter;
+    const panelKey = "dtt.dayview.tagPanel";
+    let debounceTimer;
+    let searchRequest;
+    let currentResults = [];
+    let selectedIndex = -1;
 
-        const $input = $('#foodSearchInput');
-        const $results = $('#foodSearchResults');
-
-
-        // Kullanici yazarken her tusta API cagrisi yapmamak icin bekleme koyar.
-        // bu debounce olmasa da filtreleme calisiyordu.
-        // debounce ile:
-        // kullanici yazmayi birakinca (ornegin 300ms sonra) cagri yapilir.
-        let debounceTimer;
-
-        $input.on('input', function () {
-
-            clearTimeout(debounceTimer);
-
-            const query = $(this).val();
-
-            if (query.length < 2) {
-                $results.empty();
-                return;
-            }
-
-            debounceTimer = setTimeout(() => {
-                if (query.length >= 2) {
-                    //const csrfToken = $('meta[name="_csrf"]').attr('content');
-                    //const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
-
-                    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-                    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-
-
-                    $.ajax({
-                        url: '/api/dayview-topics',
-                        data: { q: query },
-                        beforeSend: function (xhr) {
-                                xhr.setRequestHeader(csrfHeader, csrfToken);
-                        },
-                        success: function (data) {
-
-                            currentResults = data;
-                            selectedIndex = -1;
-
-                            $results.empty();
-
-                            if (data.length === 0) {
-                                $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
-                            }
-
-                            data.forEach((item, index) => {
-
-                                const highlighted = highlightMatch(item.name, query);
-
-                                const li = $(`
-                                    <li class="list-group-item list-group-item-action" style="cursor:pointer;">
-                                        ${highlighted}
-                                    </li>
-                                `);
-
-                                li.on('click', function () {
-                                    redirectToNewEntry(item.id);
-                                });
-
-                                $results.append(li);
-                            });
-
-
-                        }
-                    });
-
-
-                }
-            }, 300);
-
-
+    function selectedTags() {
+        const selection = { include: [], exclude: [] };
+        tagSelects.forEach(select => {
+            if (select.value) selection[select.value].push(select.dataset.topicTag);
         });
+        return selection;
+    }
 
+    function refreshTagSummary() {
+        const { include, exclude } = selectedTags();
+        tagSummary.textContent = include.length || exclude.length ? `(${include.length} included, ${exclude.length} excluded)` : "";
+        clearTags.disabled = include.length + exclude.length === 0;
+    }
 
+    function restoreTags() {
+        const { include, exclude } = preferences.read();
+        tagSelects.forEach(select => {
+            const tag = select.dataset.topicTag;
+            select.value = exclude.includes(tag) ? "exclude" : include.includes(tag) ? "include" : "";
+        });
+        refreshTagSummary();
+    }
+
+    try {
+        panel.open = localStorage.getItem(panelKey) === "expanded";
+    } catch { /* A blocked store still allows changing the filter. */ }
+    panel.addEventListener("toggle", () => {
+        try {
+            localStorage.setItem(panelKey, panel.open ? "expanded" : "collapsed");
+        } catch { /* Preserve the current panel state. */ }
+    });
+
+    function saveTagSelection() {
+        preferences.write(selectedTags());
+        refreshTagSummary();
+        scheduleSearch();
+    }
+
+    tagSelects.forEach(select => select.addEventListener("change", saveTagSelection));
+    clearTags.addEventListener("click", () => {
+        tagSelects.forEach(select => { select.value = ""; });
+        saveTagSelection();
+    });
+    tagSearch.addEventListener("input", () => {
+        const fold = text => normalizeText(text).replaceAll("ı", "i");
+        const needle = fold(tagSearch.value.trim());
+        let visible = 0;
+        tagSelects.forEach(select => {
+            const row = select.closest("[data-topic-tag-row]");
+            row.hidden = !fold(select.dataset.topicTag).includes(needle);
+            if (!row.hidden) visible++;
+        });
+        noTags.hidden = visible !== 0;
+    });
+    window.addEventListener("storage", event => {
+        if (event.key === preferences.key) {
+            restoreTags();
+            scheduleSearch();
+        }
+    });
+    restoreTags();
+
+    function closeSearch() {
+        clearTimeout(debounceTimer);
+        searchRequest?.abort();
+        currentResults = [];
+        selectedIndex = -1;
+        $results.empty();
+    }
+
+    function scheduleSearch() {
+        closeSearch();
+        const query = $input.val();
+        if (query.length < 2) return;
+
+        debounceTimer = setTimeout(() => {
+            const params = preferences.appendParams(new URLSearchParams({ q: query }), selectedTags());
+            searchRequest = $.ajax({
+                url: '/api/dayview-topics?' + params,
+                success(data) {
+                    currentResults = data;
+                    selectedIndex = -1;
+                    $results.empty();
+                    if (!data.length) {
+                        $results.append('<li class="list-group-item">Sonuç bulunamadı</li>');
+                    }
+                    data.forEach(item => {
+                        const li = $('<li class="list-group-item list-group-item-action" style="cursor:pointer;">');
+                        li.append(highlightMatch(item.topicName, query), " 🡰 ",
+                            $('<span class="category-name-in-search-box">').text(item.categoryName + "[" + item.weight + "]"));
+                        li.on("click", () => redirectToNewEntry(item.id));
+                        $results.append(li);
+                    });
+                }
+            });
+        }, 300);
+    }
+
+    $input.on("input", scheduleSearch);
 
     // ⬇️⬆️ ENTER ESC kontrolü
     $input.on('keydown', function (e) {
@@ -636,13 +706,13 @@ $('#nextDayBtn').click(function () {
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-            updateSelection(items);
+            updateSelection(items, selectedIndex);
         }
 
         if (e.key === 'ArrowUp') {
             e.preventDefault();
             selectedIndex = Math.max(selectedIndex - 1, 0);
-            updateSelection(items);
+            updateSelection(items, selectedIndex);
         }
 
         if (e.key === 'Enter') {
@@ -653,23 +723,21 @@ $('#nextDayBtn').click(function () {
         }
 
         if (e.key === 'Escape') {
-            $results.empty();
-            selectedIndex = -1;
+            closeSearch();
         }
     });
 
     // dışarı tıklama
     $(document).on('click', function (e) {
-        if (!$(e.target).closest('#foodSearchInput, #foodSearchResults').length) {
-            $results.empty();
-            selectedIndex = -1;
+        if (!$(e.target).closest('#foodSearchInput, #foodSearchResults, #dayview-tag-filter').length) {
+            closeSearch();
         }
     });
 
 
 });
 
-function updateSelection(items) {
+function updateSelection(items, selectedIndex) {
     items.removeClass('active');
 
     if (selectedIndex >= 0) {
@@ -704,19 +772,19 @@ function normalizeText(str) {
         .replace(/\p{Diacritic}/gu, "");  // aksanları sil
 }
 function highlightMatch(text, query) {
-
-    const normText = normalizeText(text);
-    const normQuery = normalizeText(query);
-
-    const index = normText.indexOf(normQuery);
-
-    if (index === -1) return text;
-
-    const end = index + normQuery.length;
-
-    return text.substring(0, index)
-        + "<strong style=\"background-color: LightPink; color: gray;\">" + text.substring(index, end) + "</strong>"
-        + text.substring(end);
+    const normalizedQuery = normalizeText(query);
+    const index = normalizeText(text).indexOf(normalizedQuery);
+    const fragment = document.createDocumentFragment();
+    if (index < 0 || !normalizedQuery) {
+        fragment.append(text);
+        return fragment;
+    }
+    const end = index + normalizedQuery.length;
+    const match = document.createElement("strong");
+    match.style.cssText = "background-color: LightPink; color: gray;";
+    match.textContent = text.slice(index, end);
+    fragment.append(text.slice(0, index), match, text.slice(end));
+    return fragment;
 }
 
 </script>

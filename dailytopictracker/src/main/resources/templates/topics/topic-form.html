@@ -73,6 +73,13 @@
                                    placeholder="Filter categories" autocomplete="off">
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label for="tagLines" class="form-label">Tags</label>
+                        <textarea id="tagLines" name="tagLines" class="form-control" rows="2"
+                                  aria-describedby="topic-tags-help" th:text="${tagLines}"></textarea>
+                        <div id="topic-tags-help" class="form-text"
+                             th:text="${topic.id == null ? 'One extra tag per line. The selected category is added automatically.' : 'One tag per line. Spaces within a tag are allowed.'}"></div>
+                    </div>
                     <label for="description" class="form-label">Description (Markdown)</label>
                     <textarea id="description" th:field="*{description}" class="form-control" rows="12"></textarea>
                 </section>

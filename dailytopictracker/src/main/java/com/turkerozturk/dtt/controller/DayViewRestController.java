@@ -21,13 +21,13 @@
 package com.turkerozturk.dtt.controller;
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
-import com.turkerozturk.dtt.dto.TopicDto;
 import com.turkerozturk.dtt.entity.Category;
 import com.turkerozturk.dtt.entity.Entry;
 import com.turkerozturk.dtt.entity.Topic;
 import com.turkerozturk.dtt.service.CategoryService;
 import com.turkerozturk.dtt.service.EntryService;
-import com.turkerozturk.dtt.service.TopicService;
+import com.turkerozturk.dtt.service.TopicTagService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,14 +48,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DayViewRestController {
 
-    @Autowired
-    private TopicService topicService;
+    private final TopicTagService topicTags;
 
     @GetMapping("/api/dayview-topics")
     @ResponseBody
-    public List<TopicDto> searchDayViewTopics(@RequestParam String q) {
+    public List<TopicTagService.DayViewTopic> searchDayViewTopics(@RequestParam String q, HttpServletRequest request) {
+        return topicTags.searchDayView(q, tagParameters(request, "includeTag"), tagParameters(request, "excludeTag"));
+    }
 
-        return topicService.searchDayViewTopics(q);
+    private List<String> tagParameters(HttpServletRequest request, String name) {
+        String[] values = request.getParameterValues(name);
+        return values == null ? List.of() : List.of(values);
     }
 
 

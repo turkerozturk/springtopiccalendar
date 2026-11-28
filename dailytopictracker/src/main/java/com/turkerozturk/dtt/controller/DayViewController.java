@@ -22,8 +22,7 @@ package com.turkerozturk.dtt.controller;
 
 
 import com.turkerozturk.dtt.component.AppTimeZoneProvider;
-import com.turkerozturk.dtt.dto.FoodSummaryDto;
-import com.turkerozturk.dtt.service.FoodService;
+import com.turkerozturk.dtt.service.TopicTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +38,7 @@ public class DayViewController {
 
     //private final FoodService foodService;
     private final AppTimeZoneProvider timeZoneProvider;
+    private final TopicTagService topicTags;
 
 
     @GetMapping("/dayview")
@@ -64,6 +64,7 @@ public class DayViewController {
         // O yuzden calisan kodu simdilik gelistirme geregi duymadim.
         model.addAttribute("dateMillisYmd", dateMillisYmd);
         model.addAttribute("zoneId", zoneId);
+        model.addAttribute("topicTags", topicTags.allTags());
 
         return "entries/entries-dayview";
     }
