@@ -187,7 +187,15 @@ public class EntryController {
             @RequestParam(required = false) String startDateString,
             @RequestParam(required = false) String endDateString,
             @RequestParam(required = false, defaultValue = "false") boolean fragment, // aymi html dosyasini hem htmx ile hem de dogrudan cagirdigimizda ayirdedici olmasi icin.
+            @RequestParam(defaultValue = "0") int period,
+            @RequestParam(defaultValue = "false") boolean tableOnly,
             Model model) {
+
+        Topic topic = topicId == null ? null : topicService.getByIdOrNull(topicId);
+        if (topic == null) {
+            if (tableOnly) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            return "entries/entry-list-weekly-calendar-empty";
+        }
 
         int totalDays = 364;
         model.addAttribute("totalDays", totalDays);
@@ -207,7 +215,7 @@ public class EntryController {
 
         LocalDate endDate = (endDateString != null && !endDateString.isBlank())
                 ? LocalDate.parse(endDateString, formatter)
-                : LocalDate.now(zoneId); // Since no end date is specified, it is determined as today's date.
+                : today; // Since no end date is specified, it is determined as today's date.
         model.addAttribute("finishDate", endDate);
 
 
@@ -218,88 +226,55 @@ public class EntryController {
         model.addAttribute("beginDate", startDate);
 
 
+        long periodDays = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        LocalDate earliestDate = LocalDate.of(1, 1, 1);
+        if (periodDays <= 0 || period < 0 || startDate.isBefore(earliestDate) || endDate.getYear() > 9999) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        long offset = periodDays * period;
+        long availableDays = ChronoUnit.DAYS.between(earliestDate, startDate);
+        if (offset > availableDays) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        LocalDate calendarStart = startDate.minusDays(offset);
+        LocalDate calendarEnd = endDate.minusDays(offset);
         long startDateMillis = startDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
         long endDateMillis = endDate.atStartOfDay(zoneId).toInstant().toEpochMilli();
 
+        List<Entry> calendarEntries = entryService.findByTopicIdAndDateInterval(topicId,
+                calendarStart.atStartOfDay(zoneId).toInstant().toEpochMilli(),
+                calendarEnd.atStartOfDay(zoneId).toInstant().toEpochMilli());
 
-        // Repository'den verileri al
-        List<Entry> entries = entryService.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
-        if (entries == null || entries.size() == 0) {
-            return "entries/entry-list-weekly-calendar-empty";
+        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
+        populateWeeklyCalendarTable(model, calendarEntries, calendarStart, calendarEnd, startDay, zoneId);
+        model.addAttribute("topic", topic);
+        model.addAttribute("period", period);
+        model.addAttribute("hasOlderCalendarPeriod", offset + periodDays <= availableDays);
+        model.addAttribute("weeklyCalendarEmbedded", fragment);
+        if (tableOnly) {
+            return "entries/entry-list-weekly-calendar :: calendarTable";
         }
-        //System.out.println(startDateMillis + " " + endDateMillis + " " + entries.size());
-        for(Entry ent : entries) {
-            if(ent.getStatus() == 1) {
-                model.addAttribute("oldestDoneDate", Instant.ofEpochMilli(ent.getDateMillisYmd()).atZone(zoneId).toLocalDate());
+
+        // Statistics and charts continue to use the page's original date range.
+        List<Entry> entries = period == 0 ? calendarEntries
+                : entryService.findByTopicIdAndDateInterval(topicId, startDateMillis, endDateMillis);
+        model.addAttribute("hasWeeklyEntries", !entries.isEmpty());
+        String view = fragment ? "entries/entry-list-weekly-calendar :: content" : "entries/entry-list-weekly-calendar";
+        if (entries.isEmpty()) {
+            return view;
+        }
+        for (Entry entry : entries) {
+            if (entry.getStatus() == 1) {
+                model.addAttribute("oldestDoneDate", Instant.ofEpochMilli(entry.getDateMillisYmd()).atZone(zoneId).toLocalDate());
                 break;
             }
         }
-
-
-        DayOfWeek startDay = DayOfWeek.valueOf(startDayOfWeek.toUpperCase());
-        List<String> dayNames = new ArrayList<>();
-        for (int j = 0; j < 7; j++) {
-            dayNames.add(startDay.plus(j).getDisplayName(TextStyle.FULL, Locale.ENGLISH));
-        }
-        model.addAttribute("dayNames", dayNames);
-        String startDateDayName = startDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        model.addAttribute("startDateDayName", startDateDayName);
-        String todayDateDayName = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        //System.out.println("BUGUNN: " + todayDateDayName);
-        model.addAttribute("todayDateDayName", todayDateDayName);
-        String endDateDayName = endDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-        //model.addAttribute("endDateDayName", endDateDayName);
-
+        model.addAttribute("todayDateDayName", today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
         LocalDate startDateAlignedToWeek = filterService.getStartOfWeek(startDate, startDay);
-        LocalDate endDateAlignedToWeek = getEndOfWeek(endDate, startDay);
-        List<LocalDate> dateRange = filterService.buildDateRangeList(startDateAlignedToWeek, endDateAlignedToWeek);
+        Map<LocalDate, Entry> entryMap = weeklyCalendarEntriesByDate(entries, zoneId);
 
-
-
-
-
-        // Entry'leri tarihiyle eşle
-        Map<LocalDate, Entry> entryMap = entries.stream()
-                .collect(Collectors.toMap(
-                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
-                        Function.identity()
-                ));
-
-        WeeklyViewDTO weeklyViewDTO = calculateCalendarRows(entryMap, dateRange, startDate, endDate, zoneId);
-
-        // basla counter
-        int countt = weeklyViewDTO.getTop1ColumnDates().size();
-        List<Integer> weekNumbers = new ArrayList<>();
-        for(int i = 0; i < countt; i++) {
-            weekNumbers.add(countt-i);
-        }
-        model.addAttribute("weekNumbers", weekNumbers);
-        // bitti counter
-
-        model.addAttribute("top1ColumnDates", weeklyViewDTO.getTop1ColumnDates());
-        model.addAttribute("top2ColumnDates", weeklyViewDTO.getTop2ColumnDates());
-        model.addAttribute("top3ColumnDates", weeklyViewDTO.getTop3ColumnDates());
-        model.addAttribute("bottom1ColumnDates", weeklyViewDTO.getBottom1ColumnDates());
-        model.addAttribute("bottom2ColumnDates", weeklyViewDTO.getBottom2ColumnDates());
-        model.addAttribute("bottom3ColumnDates", weeklyViewDTO.getBottom3ColumnDates());
-
-        List<Map<LocalDate, Entry>> weeklyMaps = weeklyViewDTO.getWeeklyMaps();
-
-        // frontenddeki takvimde hesaplama disinda kalan takvim gunlerini farkli renkte gostermek icin yaptigimiz islem:
-        // BASLA calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
-        long npcStartDayCount = ChronoUnit.DAYS.between(startDateAlignedToWeek, startDate);
-        long npcEndDayCount = ChronoUnit.DAYS.between(endDate, endDateAlignedToWeek);
-        //System.out.println(npcStartDayCount + " " + npcEndDayCount); TODO
-        //List<Map<LocalDate, Entry>> weeklyMapsWithFakeEntries = addNpcFakeEntriesToWeeklyMaps(weeklyMaps, npcStartDayCount, npcEndDayCount, zoneId);
-        // BITTI calendar olusturan weeklyMaps'in 7 elemanina, tarih araliginin dikkate alinmayan bastaki ve en sondaki gunleri icin fake entry ekler
-
-        model.addAttribute("weeklyMaps", weeklyMaps);
-
-
-        Topic topic = topicService.getById(topicId);
         String descriptionHtml = markdownService.render(topic.getDescription());
         topic.setDescriptionAsHtml(descriptionHtml);
-        model.addAttribute("topic", topic);
 
         Long topicBaseDateMillis = null;
         LocalDate topicBaseDate = null;
@@ -332,11 +307,7 @@ public class EntryController {
         List<Entry> manualEntries = entryService.findByTopicIdAndDateInterval(topicId, topicBaseDateMillis, topicEndDateMillis);
 
         // Kisitli tarih araligindaki Entry'leri tarihiyle eşle
-        Map<LocalDate, Entry> manualEntryMap = manualEntries.stream()
-                .collect(Collectors.toMap(
-                        e -> Instant.ofEpochMilli(e.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
-                        Function.identity()
-                ));
+        Map<LocalDate, Entry> manualEntryMap = weeklyCalendarEntriesByDate(manualEntries, zoneId);
         List<LocalDate> manualDateRange = filterService.buildDateRangeList(topicBaseDate, topicEndDate);
         WeeklyViewDTO manualWeeklyViewDTO = calculateCalendarRows(manualEntryMap, manualDateRange, topicBaseDate, topicEndDate, zoneId);
         List<Map<LocalDate, Entry>> manualWeeklyMaps = manualWeeklyViewDTO.getWeeklyMaps();
@@ -515,9 +486,42 @@ public class EntryController {
 
         model.addAttribute("zoneId", zoneId);
 
-        return fragment ? "entries/entry-list-weekly-calendar :: content"
-                        : "entries/entry-list-weekly-calendar";
+        return view;
+    }
 
+    private void populateWeeklyCalendarTable(Model model, List<Entry> entries, LocalDate start, LocalDate end,
+                                             DayOfWeek startDay, ZoneId zoneId) {
+        List<LocalDate> dates = filterService.buildDateRangeList(
+                filterService.getStartOfWeek(start, startDay), getEndOfWeek(end, startDay));
+        WeeklyViewDTO grid = calculateCalendarRows(weeklyCalendarEntriesByDate(entries, zoneId), dates, start, end, zoneId);
+        List<String> dayNames = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            dayNames.add(startDay.plus(i).getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        }
+        List<Integer> weekNumbers = new ArrayList<>();
+        for (int i = grid.getTop1ColumnDates().size(); i > 0; i--) {
+            weekNumbers.add(i);
+        }
+        model.addAttribute("calendarStart", start);
+        model.addAttribute("calendarEnd", end);
+        model.addAttribute("calendarHasEntries", !entries.isEmpty());
+        model.addAttribute("dayNames", dayNames);
+        model.addAttribute("startDateDayName", start.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        model.addAttribute("calendarEndDayName", end.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH));
+        model.addAttribute("weekNumbers", weekNumbers);
+        model.addAttribute("top1ColumnDates", grid.getTop1ColumnDates());
+        model.addAttribute("top2ColumnDates", grid.getTop2ColumnDates());
+        model.addAttribute("top3ColumnDates", grid.getTop3ColumnDates());
+        model.addAttribute("bottom1ColumnDates", grid.getBottom1ColumnDates());
+        model.addAttribute("bottom2ColumnDates", grid.getBottom2ColumnDates());
+        model.addAttribute("bottom3ColumnDates", grid.getBottom3ColumnDates());
+        model.addAttribute("weeklyMaps", grid.getWeeklyMaps());
+    }
+
+    private Map<LocalDate, Entry> weeklyCalendarEntriesByDate(List<Entry> entries, ZoneId zoneId) {
+        return entries.stream().collect(Collectors.toMap(
+                entry -> Instant.ofEpochMilli(entry.getDateMillisYmd()).atZone(zoneId).toLocalDate(),
+                Function.identity(), (first, second) -> first));
     }
 
 

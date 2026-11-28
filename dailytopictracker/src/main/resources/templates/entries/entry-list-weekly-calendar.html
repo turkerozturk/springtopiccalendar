@@ -138,6 +138,7 @@
         }
 
     </style>
+    <script th:src="@{/webjars/htmx.org/dist/htmx.min.js}"></script>
 </head>
 
 <body>
@@ -156,14 +157,48 @@
             a:hover .edit-icon {
                 visibility: visible;
             }
+
+            @media (max-width: 575px) {
+                #tableWrapperWeeklyCalendar .weekly-calendar-title {
+                    --weekly-title-margin: 8px;
+                    max-width: calc(100vw - 14rem);
+                    margin-left: auto;
+                }
+
+                #tableWrapperWeeklyCalendar .weekly-calendar-title a {
+                    display: block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+            }
         </style>
 
-        <div style="overflow-x: auto;" id="tableWrapperWeeklyCalendar">
+        <div style="overflow-x: auto;" id="tableWrapperWeeklyCalendar" th:fragment="calendarTable"
+             th:attr="data-weekly-standalone=${!weeklyCalendarEmbedded}">
             <table class="table-bordered" style="min-width:1920px;">
 
                 <caption style="background-color:black;">
-                    <h4 style="font-weight:bold;color:white;text-align:right;margin-right:130px;">
-                        <a th:href="@{/topics/edit/{id}(id=${topic.id})}" style="text-decoration:none; color:white;">
+                    <nav class="d-inline-flex align-items-center gap-1 px-2 small" aria-label="Calendar year"
+                         style="float:left; position:sticky; left:0; z-index:1; background:black; white-space:nowrap;">
+                        <a th:if="${hasOlderCalendarPeriod}" class="btn btn-sm btn-outline-light py-0 px-2"
+                           th:href="@{/entries/weekly-calendar(topicId=${topic.id},startDateString=${beginDate},endDateString=${finishDate},period=${period + 1})}"
+                           data-weekly-shift="older" aria-label="Previous year" title="Previous year">‹</a>
+                        <button th:unless="${hasOlderCalendarPeriod}" type="button" disabled
+                                class="btn btn-sm btn-outline-light py-0 px-2" aria-label="Previous year">‹</button>
+                        <span data-weekly-period tabindex="-1" th:title="${calendarHasEntries ? null : 'No entries in this period'}">
+                            <span th:text="|${calendarStart} – ${calendarEnd}|"></span>
+                            <span th:unless="${calendarHasEntries}" class="visually-hidden">No entries in this period.</span>
+                        </span>
+                        <a th:if="${period > 0}" class="btn btn-sm btn-outline-light py-0 px-2"
+                           th:href="@{/entries/weekly-calendar(topicId=${topic.id},startDateString=${beginDate},endDateString=${finishDate},period=${period - 1})}"
+                           data-weekly-shift="newer" aria-label="Next year" title="Next year">›</a>
+                        <button th:unless="${period > 0}" type="button" disabled
+                                class="btn btn-sm btn-outline-light py-0 px-2" aria-label="Next year">›</button>
+                        <span data-weekly-error role="status"></span>
+                    </nav>
+                    <h4 class="weekly-calendar-title" style="font-weight:bold;color:white;text-align:right;margin-right:var(--weekly-title-margin, 130px);">
+                        <a th:href="@{/topics/edit/{id}(id=${topic.id})}" th:title="${topic.name}" style="text-decoration:none; color:white;">
                             <span th:text="${topic.name}"></span>
                             <span class="edit-icon">✎</span>
                         </a>
@@ -235,7 +270,7 @@
                                     hx-target="#noteModal2 .modal-body"
                                     hx-swap="innerHTML"
                                 >
-                                    <span th:if="${!#strings.isEmpty(entry.value.note.content)}"
+                                    <span th:if="${entry.value.note != null and !#strings.isEmpty(entry.value.note.content)}"
                                           th:text="${'@'}"></span>
 
                                 </td>
@@ -284,9 +319,9 @@
 
 
                     <!-- http://xahlee.info/comp/unicode_arrows.html -->
-                    <td th:style="${dayNames[stat.index]} == ${todayDateDayName} ? 'background-color: lightyellow;' : 'background-color: WhiteSmoke;'">
+                    <td th:style="${dayNames[stat.index]} == ${calendarEndDayName} ? 'background-color: lightyellow;' : 'background-color: WhiteSmoke;'">
                         <div style="display: flex; justify-content: center; align-items: center; position: relative;">
-                            <span th:if="${dayNames[stat.index]} == ${todayDateDayName}" style="position: absolute; left: 5px;">←</span>
+                            <span th:if="${dayNames[stat.index]} == ${calendarEndDayName}" style="position: absolute; left: 5px;">←</span>
                             <span style="margin: 0 auto;" th:text="${dayNames[stat.index]}"></span>
                         </div>
                     </td>
@@ -374,6 +409,7 @@
 -->
 
 
+        <th:block th:if="${hasWeeklyEntries}">
         <!-- Asagidaki bloktakiler mobil cihazda gorunmezken masaustu genis ekranda gorunurler. Yanyana 6 tane bolum seklinde -->
         <div th:if="${!isMobile}" class="row d-none d-md-flex" style="height:500px;">
             <div class="col-2 bg-light p-1" style="height:100%; overflow-y:auto;">
@@ -428,6 +464,8 @@
 
 
 
+
+        </th:block>
 
     <div id="custom-tooltip-popup" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
     background-color: white; border: 2px solid gray; padding: 20px 30px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-radius: 10px;">
@@ -658,6 +696,7 @@
 
 
 
+    <th:block th:if="${hasWeeklyEntries}">
     <!-- streak chart -->
     <script>
         (() => {
@@ -897,7 +936,7 @@
     // entry verilerinden olusan fragmentteki kucuk grafige tiklaninca tam ekran buyumesini ve tekrar tiklaninca eski haline gelmesini saglar.
     var chartContainer = document.getElementById("measurementChartContainer");
 
-    chartContainer.addEventListener("click", async function () {
+    chartContainer?.addEventListener("click", async function () {
 
       try {
 
@@ -916,6 +955,8 @@
     });
 </script>
 
+
+        </th:block>
 
     <script>
         var tooltipTimeout;
@@ -1024,6 +1065,8 @@
     </script>
 
 
+
+    <script th:src="@{/js/weekly-calendar-period.js}"></script>
 
     </div> <!-- bu div cok onemli. fragment bitisi. scriptler yukarida olmali. -->
 
