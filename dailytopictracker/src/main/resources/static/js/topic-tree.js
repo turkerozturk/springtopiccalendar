@@ -5,6 +5,11 @@
     const panel = document.getElementById("topic-tree-panel");
     const back = document.getElementById("topic-tree-back");
     const status = document.getElementById("topic-tree-status");
+    const fancytree = window.jQuery?.ui?.fancytree;
+    if (typeof fancytree?.createTree !== "function") {
+        status.textContent = "The tree library could not load. Reload this page to try again.";
+        return;
+    }
     const profile = document.getElementById("topic-tree-profile");
     const preferences = window.dttTopicTagFilter;
     const tagSelects = [...page.querySelectorAll("[data-tree-tag]")];
@@ -65,7 +70,7 @@
         }
     }
 
-    const tree = $.ui.fancytree.createTree(nodes, {
+    const tree = fancytree.createTree(nodes, {
         source: [],
         escapeTitles: true,
         icon: false,

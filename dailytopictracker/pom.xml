@@ -254,19 +254,6 @@
             <version>6.7.2</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.webjars.npm</groupId>
-            <artifactId>jquery.fancytree</artifactId>
-            <version>2.38.5</version>
-            <exclusions>
-                <!-- The application already ships jQuery 3.7.1. -->
-                <exclusion>
-                    <groupId>org.webjars.npm</groupId>
-                    <artifactId>jquery</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/org.webjars/jquery -->
         <dependency>
             <groupId>org.webjars</groupId>
